@@ -19,20 +19,26 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: organizer-app/package-lock.json
 
     - name: Install dependencies
+      working-directory: organizer-app
       run: npm ci
 
     - name: Generate Prisma Client
+      working-directory: organizer-app
       run: npx prisma generate
 
     - name: Run ESLint
+      working-directory: organizer-app
       run: npm run lint
 
     - name: Type check
+      working-directory: organizer-app
       run: npx tsc --noEmit
 
     - name: Build application
+      working-directory: organizer-app
       run: npm run build
       env:
         DATABASE_URL: "postgresql://test:test@localhost:5432/test"
