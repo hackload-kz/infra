@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: postgres-cluster-role-binding
+  namespace: ${namespace}
+subjects:
+  - kind: ServiceAccount
+    name: postgres-cluster
+    namespace: ${namespace}
+roleRef:
+  kind: Role
+  name: postgres-cluster-role
+  apiGroup: rbac.authorization.k8s.io

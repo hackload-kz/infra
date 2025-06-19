@@ -1,12 +1,31 @@
 import { auth } from "./src/auth";
 
 export default auth((req) => {
-    if (!req.auth && req.nextUrl.pathname.startsWith('/dashboard')) {
-        return Response.redirect(new URL('/login', req.url))
+    const isLoggedIn = !!req.auth;
+    const { pathname } = req.nextUrl;
+
+    // Admin routes - require admin role
+    if (pathname.startsWith('/dashboard') || pathname.startsWith('/admin')) {
+        if (!isLoggedIn) {
+            return Response.redirect(new URL('/login', req.url));
+        }
+        if (req.auth?.user?.role !== 'admin') {
+            return Response.redirect(new URL('/profile', req.url));
+        }
+        return;
     }
 
-    if (req.auth && req.nextUrl.pathname === '/login') {
-        return Response.redirect(new URL('/dashboard', req.url))
+    // Profile route - require authentication
+    if (pathname.startsWith('/profile')) {
+        if (!isLoggedIn) {
+            return Response.redirect(new URL('/login', req.url));
+        }
+        return;
+    }
+
+    // Redirect authenticated users away from auth pages
+    if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
+        return Response.redirect(new URL('/profile', req.url));
     }
 });
 

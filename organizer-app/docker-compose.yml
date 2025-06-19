@@ -2,9 +2,10 @@ version: '3.8'
 
 services:
   organizer-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/hackload-kz/infra:sha-1c161c0
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "3300:3300"
     environment:
@@ -13,7 +14,7 @@ services:
       - NEXTAUTH_URL=http://localhost:3300
       - NEXTAUTH_SECRET=your-secret-key-change-in-production
       - AUTH_TRUST_HOST=http://localhost:3300
-      - ADMIN_USERS=admin@hackload.com:admin123,organizer@hackload.com:organizer123
+      - ADMIN_USERS=admin@hackload.kz:admin123,organizer@hackload.kz:organizer123
     depends_on:
       db:
         condition: service_healthy

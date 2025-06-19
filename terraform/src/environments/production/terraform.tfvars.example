@@ -1,0 +1,8 @@
+# OpenStack Provider Configuration
+# Copy this file to terraform.tfvars and fill in your actual values
+
+openstack_auth_url    = "https://auth.pscloud.io/v3/"
+openstack_region      = "your-region"
+openstack_tenant_name = "your-tenant-name"
+openstack_user_name   = "your-username"
+openstack_password    = "your-password"

@@ -3,12 +3,18 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { Users, Calendar, TrendingUp, Activity } from 'lucide-react'
 import Link from 'next/link'
+import { isOrganizer } from '@/lib/admin'
 
 export default async function DashboardPage() {
     const session = await auth()
 
     if (!session) {
         redirect('/login')
+    }
+
+    // Check if user is an organizer
+    if (!isOrganizer(session.user?.email)) {
+        redirect('/')
     }
 
     // Get team statistics

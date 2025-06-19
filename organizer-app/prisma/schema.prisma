@@ -21,15 +21,45 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relations
+  leader   Participant?  @relation("TeamLeader")
+  leaderId String?       @unique
+  members  Participant[] @relation("TeamMembers")
+
   @@map("teams")
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  password  String
+  password  String? // Optional for OAuth users
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relations
+  participant Participant?
+
   @@map("users")
+}
+
+model Participant {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  city      String?
+  company   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  team   Team?   @relation("TeamMembers", fields: [teamId], references: [id])
+  teamId String?
+
+  ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id])
+  ledTeamId String? @unique
+
+  @@map("participants")
 }
