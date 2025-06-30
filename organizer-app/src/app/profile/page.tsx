@@ -6,6 +6,7 @@ import { SignOutButton } from '@/components/sign-out-button';
 import { Header } from '@/components/header';
 import { TeamInviteLink } from '@/components/team-invite-link';
 import { isOrganizer } from '@/lib/admin';
+import Link from 'next/link';
 
 export default async function ProfilePage() {
     const session = await auth();
@@ -130,24 +131,24 @@ export default async function ProfilePage() {
 
                         <div className="mt-8 pt-8 border-t border-gray-200">
                             <div className="flex flex-wrap gap-4">
-                                <a
+                                <Link
                                     href="/dashboard"
                                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                     Перейти к панели управления
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/teams"
                                     className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
                                 >
                                     Просмотреть команды
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/"
                                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
                                 >
                                     На главную
-                                </a>
+                                </Link>
                                 <SignOutButton />
                             </div>
                         </div>

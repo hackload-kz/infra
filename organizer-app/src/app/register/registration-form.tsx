@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,14 +41,7 @@ export function RegistrationForm({ preselectedTeam }: RegistrationFormProps) {
 
     const router = useRouter();
 
-    // Автоматически загружаем команды, если есть предвыбранная команда
-    useEffect(() => {
-        if (preselectedTeam) {
-            loadTeams();
-        }
-    }, [preselectedTeam]);
-
-    const loadTeams = async () => {
+    const loadTeams = useCallback(async () => {
         if (teamsLoaded) return;
 
         try {
@@ -66,7 +59,14 @@ export function RegistrationForm({ preselectedTeam }: RegistrationFormProps) {
         } catch (error) {
             console.error('Error loading teams:', error);
         }
-    };
+    }, [teamsLoaded, preselectedTeam]);
+
+    // Автоматически загружаем команды, если есть предвыбранная команда
+    useEffect(() => {
+        if (preselectedTeam) {
+            loadTeams();
+        }
+    }, [preselectedTeam, loadTeams]);
 
     const handleTeamOptionChange = (option: string) => {
         setFormData(prev => ({ ...prev, teamOption: option }));
@@ -102,7 +102,6 @@ export function RegistrationForm({ preselectedTeam }: RegistrationFormProps) {
             });
 
             if (response.ok) {
-                const result = await response.json();
                 // Redirect to login with success message
                 router.push('/login?message=registration-success');
             } else {

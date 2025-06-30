@@ -42,6 +42,52 @@ variable "traefik_dashboard_tls_enabled" {
   default     = false
 }
 
+variable "hub_image_tag" {
+  description = "Docker image tag for the hub application"
+  type        = string
+  default     = "latest"
+}
+
+variable "hub_host" {
+  description = "Hostname for the hub application"
+  type        = string
+}
+
+variable "hub_replicas" {
+  description = "Number of replicas for the hub deployment"
+  type        = number
+  default     = 2
+}
+
+variable "hub_environment_variables" {
+  description = "Environment variables for the hub application"
+  type        = map(string)
+  default     = {}
+}
+
+variable "hub_db_connection_string" {
+  type      = string
+  sensitive = true
+}
+
+variable "ghcr_username" {
+  description = "GitHub Container Registry username"
+  type        = string
+  sensitive   = true
+}
+
+variable "ghcr_token" {
+  description = "GitHub Container Registry token/password"
+  type        = string
+  sensitive   = true
+}
+
+variable "ghcr_email" {
+  description = "Email for GitHub Container Registry"
+  type        = string
+  default     = ""
+}
+
 # variable "openstack_auth_url" {
 #   description = "OpenStack authentication URL"
 #   type        = string

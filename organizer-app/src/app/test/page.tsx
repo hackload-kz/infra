@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import { isOrganizer } from '@/lib/admin';
+import Link from 'next/link';
 
 export default async function TestPage() {
     const session = await auth();
@@ -20,14 +21,14 @@ export default async function TestPage() {
                             <ul className="space-y-2">
                                 {userIsOrganizer ? (
                                     <>
-                                        <li>✅ <a href="/dashboard" className="text-blue-600 hover:underline">Dashboard (Панель управления)</a></li>
-                                        <li>✅ <a href="/dashboard/teams" className="text-blue-600 hover:underline">Управление командами</a></li>
+                                        <li>✅ <Link href="/dashboard" className="text-blue-600 hover:underline">Dashboard (Панель управления)</Link></li>
+                                        <li>✅ <Link href="/dashboard/teams" className="text-blue-600 hover:underline">Управление командами</Link></li>
                                         <li>❌ /profile (недоступно для организаторов)</li>
                                     </>
                                 ) : (
                                     <>
-                                        <li>✅ <a href="/profile" className="text-blue-600 hover:underline">Профиль участника</a></li>
-                                        <li>✅ <a href="/teams" className="text-blue-600 hover:underline">Команды</a></li>
+                                        <li>✅ <Link href="/profile" className="text-blue-600 hover:underline">Профиль участника</Link></li>
+                                        <li>✅ <Link href="/teams" className="text-blue-600 hover:underline">Команды</Link></li>
                                         <li>❌ /dashboard (недоступно для участников)</li>
                                     </>
                                 )}
@@ -35,11 +36,11 @@ export default async function TestPage() {
                         </div>
                     </div>
                 ) : (
-                    <p>Вы не авторизованы. <a href="/login" className="text-blue-600 hover:underline">Войти</a></p>
+                    <p>Вы не авторизованы. <Link href="/login" className="text-blue-600 hover:underline">Войти</Link></p>
                 )}
 
                 <div className="mt-6 pt-4 border-t">
-                    <a href="/" className="text-blue-600 hover:underline">← На главную</a>
+                    <Link href="/" className="text-blue-600 hover:underline">← На главную</Link>
                 </div>
             </div>
         </div>

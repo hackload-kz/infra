@@ -6,3 +6,9 @@ openstack_region      = "your-region"
 openstack_tenant_name = "your-tenant-name"
 openstack_user_name   = "your-username"
 openstack_password    = "your-password"
+
+ghcr_username = "your-github-username"
+ghcr_token    = "your-github-personal-access-token"
+ghcr_email    = "your-email@example.com"
+
+hub_db_connection_string = "connection_string"

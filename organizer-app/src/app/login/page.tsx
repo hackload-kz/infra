@@ -1,6 +1,11 @@
 import { LoginForm } from '@/components/login-form'
 import Link from 'next/link'
 import { Header } from '@/components/header'
+import { Suspense } from 'react'
+
+function LoginContent() {
+    return <LoginForm />
+}
 
 export default function LoginPage() {
     return (
@@ -16,7 +21,9 @@ export default function LoginPage() {
                             HackLoad 2025
                         </p>
                     </div>
-                    <LoginForm />
+                    <Suspense fallback={<div>Загрузка...</div>}>
+                        <LoginContent />
+                    </Suspense>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">

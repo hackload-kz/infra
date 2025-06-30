@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { getAdminCredentials, isOrganizer } from "@/lib/admin";
+import { getAdminCredentials } from "@/lib/admin";
 
 export default {
   providers: [
@@ -67,7 +67,7 @@ export default {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // For OAuth providers, ensure user exists in database
       if (account?.provider === "google" && user.email) {
         try {

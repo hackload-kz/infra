@@ -5,9 +5,9 @@ import { Header } from '@/components/header';
 import { db } from '@/lib/db';
 
 interface RegisterPageProps {
-    searchParams: {
+    searchParams: Promise<{
         team?: string;
-    };
+    }>;
 }
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
@@ -18,13 +18,15 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         redirect('/profile');
     }
 
+    const { team } = await searchParams;
+
     // Check if team parameter exists and find the team
     let preselectedTeam = null;
-    if (searchParams.team) {
+    if (team) {
         try {
             preselectedTeam = await db.team.findUnique({
                 where: {
-                    nickname: searchParams.team,
+                    nickname: team,
                     isDeleted: false
                 },
                 select: {
