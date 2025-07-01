@@ -11,4 +11,13 @@ ghcr_username = "your-github-username"
 ghcr_token    = "your-github-personal-access-token"
 ghcr_email    = "your-email@example.com"
 
-hub_db_connection_string = "connection_string"
+hub_db_connection_string = "postgresql://username:password@host:5432/database"
+
+# NextAuth and OAuth configuration
+nextauth_url          = "https://your-domain.com"
+nextauth_secret       = "your-nextauth-secret-32-chars-long"
+google_client_id      = "your-google-oauth-client-id"
+google_client_secret  = "your-google-oauth-client-secret"
+github_client_id      = "your-github-oauth-client-id"
+github_client_secret  = "your-github-oauth-client-secret"
+admin_users           = "admin@example.com,user2@example.com"

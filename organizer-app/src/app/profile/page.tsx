@@ -73,8 +73,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         },
     });
 
+    // User should exist because OAuth creates them in auth.config.ts
+    // If for some reason they don't exist, something went wrong
     if (!user) {
-        redirect('/register');
+        console.error('User not found in database after OAuth login:', session.user.email);
+        redirect('/login');
     }
 
     // Check if team parameter exists and find the team

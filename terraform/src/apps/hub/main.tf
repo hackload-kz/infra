@@ -60,6 +60,15 @@ module "hub" {
   cert_issuer_name      = module.cert_manager.cluster_issuer_name
   db_connection_string  = var.hub_db_connection_string
 
+  # NextAuth and OAuth configuration
+  nextauth_url          = var.hub_nextauth_url
+  nextauth_secret       = var.hub_nextauth_secret
+  google_client_id      = var.hub_google_client_id
+  google_client_secret  = var.hub_google_client_secret
+  github_client_id      = var.hub_github_client_id
+  github_client_secret  = var.hub_github_client_secret
+  admin_users           = var.hub_admin_users
+
   registry_credentials = {
     server   = "ghcr.io"
     username = var.ghcr_username

@@ -88,6 +88,47 @@ variable "ghcr_email" {
   default     = ""
 }
 
+variable "hub_nextauth_url" {
+  description = "NextAuth URL for the hub application"
+  type        = string
+}
+
+variable "hub_nextauth_secret" {
+  description = "NextAuth secret for JWT signing"
+  type        = string
+  sensitive   = true
+}
+
+variable "hub_google_client_id" {
+  description = "Google OAuth client ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "hub_google_client_secret" {
+  description = "Google OAuth client secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "hub_github_client_id" {
+  description = "GitHub OAuth client ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "hub_github_client_secret" {
+  description = "GitHub OAuth client secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "hub_admin_users" {
+  description = "Comma-separated list of admin users"
+  type        = string
+  sensitive   = true
+}
+
 # variable "openstack_auth_url" {
 #   description = "OpenStack authentication URL"
 #   type        = string

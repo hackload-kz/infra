@@ -1,5 +1,3 @@
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import Link from 'next/link';
 
@@ -10,12 +8,8 @@ interface RegisterPageProps {
 }
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
-    const session = await auth();
-
-    // If user is already logged in, redirect to profile setup or dashboard
-    if (session) {
-        redirect('/profile');
-    }
+    // Register page is just for showing OAuth login options
+    // After OAuth, users go to /profile to complete registration
 
     const { team } = await searchParams;
 

@@ -94,7 +94,37 @@ resource "kubernetes_deployment" "hub" {
 
           env {
             name  = "NEXTAUTH_URL"
-            value = var.enable_tls ? "https://${var.host}" : "http://${var.host}"
+            value = var.nextauth_url
+          }
+
+          env {
+            name  = "NEXTAUTH_SECRET"
+            value = var.nextauth_secret
+          }
+
+          env {
+            name  = "GOOGLE_CLIENT_ID"
+            value = var.google_client_id
+          }
+
+          env {
+            name  = "GOOGLE_CLIENT_SECRET"
+            value = var.google_client_secret
+          }
+
+          env {
+            name  = "GITHUB_CLIENT_ID"
+            value = var.github_client_id
+          }
+
+          env {
+            name  = "GITHUB_CLIENT_SECRET"
+            value = var.github_client_secret
+          }
+
+          env {
+            name  = "ADMIN_USERS"
+            value = var.admin_users
           }
 
         #   liveness_probe {
