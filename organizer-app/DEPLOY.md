@@ -29,7 +29,11 @@ docker run -p 3000:3000 \
   -e DATABASE_URL="postgresql://user:password@host:5432/db" \
   -e NEXTAUTH_URL="http://localhost:3000" \
   -e NEXTAUTH_SECRET="your-secret" \
-  -e ADMIN_USERS="admin@hackload.com:admin123" \
+  -e GOOGLE_CLIENT_ID="your-google-client-id" \
+  -e GOOGLE_CLIENT_SECRET="your-google-client-secret" \
+  -e GITHUB_CLIENT_ID="your-github-client-id" \
+  -e GITHUB_CLIENT_SECRET="your-github-client-secret" \
+  -e ADMIN_USERS="admin@hackload.com" \
   hackload-organizer
 ```
 
@@ -59,7 +63,11 @@ docker run -p 3000:3000 \
   -e DATABASE_URL="your-db-url" \
   -e NEXTAUTH_URL="https://your-domain.com" \
   -e NEXTAUTH_SECRET="your-secret" \
-  -e ADMIN_USERS="admin@hackload.com:admin123" \
+  -e GOOGLE_CLIENT_ID="your-google-client-id" \
+  -e GOOGLE_CLIENT_SECRET="your-google-client-secret" \
+  -e GITHUB_CLIENT_ID="your-github-client-id" \
+  -e GITHUB_CLIENT_SECRET="your-github-client-secret" \
+  -e ADMIN_USERS="admin@hackload.com" \
   ghcr.io/your-username/your-repo:latest
 ```
 
@@ -70,7 +78,11 @@ NODE_ENV=production
 DATABASE_URL=postgresql://user:password@host:5432/db
 NEXTAUTH_URL=https://your-domain.com
 NEXTAUTH_SECRET=secure-random-secret-change-this
-ADMIN_USERS=admin@hackload.com:secure_password,organizer@hackload.com:another_password
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+ADMIN_USERS=admin@hackload.com,organizer@hackload.com
 ```
 
 ## Kubernetes деплой (пример)

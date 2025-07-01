@@ -47,8 +47,14 @@ DATABASE_URL="postgresql://user:password@localhost:5432/hackload_organizer?schem
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-nextauth-secret-key-here-change-this-in-production"
 
-# Admin Users (email:password pairs separated by comma)
-ADMIN_USERS="admin@hackload.com:admin123,organizer@hackload.com:organizer123"
+# OAuth Providers
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+
+# Admin Users (email addresses separated by comma)
+ADMIN_USERS="admin@hackload.com,organizer@hackload.com"
 ```
 
 ### 4. Применение миграций
@@ -71,7 +77,7 @@ npm run dev
 ### Вход в систему
 
 1. Перейдите на [http://localhost:3000](http://localhost:3000)
-2. Введите один из логинов и паролей, указанных в `ADMIN_USERS`
+2. Войдите в систему через Google или GitHub, используя один из email-ов, указанных в `ADMIN_USERS`
 3. Автоматический редирект в панель управления
 
 ### Управление командами
@@ -135,13 +141,19 @@ npx prisma db seed         # Заполнение тестовыми данны�
 | `DATABASE_URL` | Строка подключения к PostgreSQL | `postgresql://user:pass@localhost:5432/db` |
 | `NEXTAUTH_URL` | URL приложения | `http://localhost:3000` |
 | `NEXTAUTH_SECRET` | Секретный ключ для NextAuth | `your-secret-key` |
-| `ADMIN_USERS` | Пары email:password через запятую | `admin@test.com:pass123,user@test.com:pass456` |
+| `GOOGLE_CLIENT_ID` | Client ID для Google OAuth | `your-google-client-id` |
+| `GOOGLE_CLIENT_SECRET` | Client Secret для Google OAuth | `your-google-client-secret` |
+| `GITHUB_CLIENT_ID` | Client ID для GitHub OAuth | `your-github-client-id` |
+| `GITHUB_CLIENT_SECRET` | Client Secret для GitHub OAuth | `your-github-client-secret` |
+| `ADMIN_USERS` | Email адреса администраторов через запятую | `admin@test.com,user@test.com` |
 
 ## Безопасность
 
-- Пароли хранятся в переменных окружения (не хешируются для простоты)
-- В продакшене рекомендуется использовать более сложную систему аутентификации
+- Аутентификация происходит только через OAuth (Google и GitHub)
+- Пароли не хранятся в системе, так как используется только OAuth
+- В продакшене рекомендуется настроить OAuth приложения с правильными callback URL
 - Обязательно смените `NEXTAUTH_SECRET` в продакшене
+- Убедитесь, что OAuth приложения настроены с правильными доменами в продакшене
 
 ## Дизайн и UX
 

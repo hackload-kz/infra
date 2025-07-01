@@ -23,6 +23,14 @@ export async function POST(request: NextRequest) {
             selectedTeam,
             newTeamName,
             newTeamNickname,
+            // Experience fields
+            experienceLevel,
+            technologies,
+            cloudServices,
+            cloudProviders,
+            otherTechnologies,
+            otherCloudServices,
+            otherCloudProviders,
         } = body;
 
         // Validate required fields
@@ -113,6 +121,14 @@ export async function POST(request: NextRequest) {
                     userId: user.id,
                     teamId,
                     ledTeamId: isLeader ? teamId : null,
+                    // Experience fields
+                    experienceLevel: experienceLevel || null,
+                    technologies: technologies ? JSON.stringify(technologies) : null,
+                    cloudServices: cloudServices ? JSON.stringify(cloudServices) : null,
+                    cloudProviders: cloudProviders ? JSON.stringify(cloudProviders) : null,
+                    otherTechnologies: otherTechnologies || null,
+                    otherCloudServices: otherCloudServices || null,
+                    otherCloudProviders: otherCloudProviders || null,
                 },
             });
 

@@ -48,6 +48,16 @@ model Participant {
   email     String   @unique
   city      String?
   company   String?
+  
+  // Experience fields
+  experienceLevel     String?
+  technologies        String?  // JSON string of array
+  cloudServices       String?  // JSON string of array
+  cloudProviders      String?  // JSON string of array
+  otherTechnologies   String?
+  otherCloudServices  String?
+  otherCloudProviders String?
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

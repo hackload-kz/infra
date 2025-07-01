@@ -1,75 +1,34 @@
 import { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
 import { db } from "@/lib/db";
-import bcrypt from "bcryptjs";
-import { getAdminCredentials } from "@/lib/admin";
+import { isOrganizer } from "@/lib/admin";
 
 export default {
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    Credentials({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        // Check admin users first
-        const adminCredentials = getAdminCredentials();
-        const adminUser = adminCredentials.find(admin =>
-          admin.email === credentials.email && admin.password === credentials.password
-        );
-
-        if (adminUser) {
-          return {
-            id: adminUser.email,
-            email: adminUser.email,
-            name: adminUser.email.split("@")[0],
-            role: "organizer",
-          };
-        }
-
-        // Check regular users in database
-        try {
-          const user = await db.user.findUnique({
-            where: { email: credentials.email as string },
-          });
-
-          if (user && user.password) {
-            const isPasswordValid = await bcrypt.compare(
-              credentials.password as string,
-              user.password
-            );
-
-            if (isPasswordValid) {
-              return {
-                id: user.id,
-                email: user.email,
-                name: user.email.split("@")[0],
-                role: "participant",
-              };
-            }
-          }
-        } catch (error) {
-          console.error("Database error during authentication:", error);
-        }
-
-        return null;
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
       // For OAuth providers, ensure user exists in database
-      if (account?.provider === "google" && user.email) {
+      if ((account?.provider === "google" || account?.provider === "github") && user.email) {
         try {
           let dbUser = await db.user.findUnique({
             where: { email: user.email },
@@ -92,8 +51,9 @@ export default {
       return true;
     },
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role || "participant";
+      if (user && user.email) {
+        // Determine role based on email
+        token.role = isOrganizer(user.email) ? "admin" : "participant";
       }
       return token;
     },

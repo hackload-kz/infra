@@ -1,8 +1,7 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { RegistrationForm } from './registration-form';
-import { Header } from '@/components/header';
 import { db } from '@/lib/db';
+import Link from 'next/link';
 
 interface RegisterPageProps {
     searchParams: Promise<{
@@ -40,41 +39,51 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         }
     }
 
-    return (
-        <>
-            <Header title="Регистрация" />
-            <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-                <div className="w-full max-w-md">
-                    <div className="bg-white rounded-lg shadow-xl p-8">
-                        <div className="text-center mb-8">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Регистрация
-                            </h1>
-                            {preselectedTeam ? (
-                                <div className="space-y-2">
-                                    <p className="text-gray-600">
-                                        Присоединяйтесь к команде
-                                    </p>
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                        <p className="text-blue-800 font-semibold">
-                                            {preselectedTeam.name}
-                                        </p>
-                                        <p className="text-blue-600 text-sm">
-                                            @{preselectedTeam.nickname}
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-gray-600">
-                                    Присоединяйтесь к хакатону и найдите свою команду
-                                </p>
-                            )}
-                        </div>
+    // Store team info in URL parameters for after OAuth login
+    const loginUrl = team ? `/login?team=${team}` : '/login';
 
-                        <RegistrationForm preselectedTeam={preselectedTeam} />
+    return (
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                <div className="bg-white rounded-lg shadow-xl p-8">
+                    <div className="text-center mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                            Регистрация
+                        </h1>
+                        {preselectedTeam ? (
+                            <div className="space-y-2">
+                                <p className="text-gray-600">
+                                    Присоединяйтесь к команде
+                                </p>
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                    <p className="text-blue-800 font-semibold">
+                                        {preselectedTeam.name}
+                                    </p>
+                                    <p className="text-blue-600 text-sm">
+                                        @{preselectedTeam.nickname}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-gray-600">
+                                Присоединяйтесь к хакатону и найдите свою команду
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="text-center space-y-4">
+                        <p className="text-gray-600">
+                            Для регистрации необходимо войти через Google или GitHub
+                        </p>
+                        <Link
+                            href={loginUrl}
+                            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                        >
+                            Войти для регистрации
+                        </Link>
                     </div>
                 </div>
-            </main>
-        </>
+            </div>
+        </main>
     );
 }

@@ -24,11 +24,11 @@ export default async function Home() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Добро пожаловать на хакатон!
+            Добро пожаловать на HackLoad 2025!
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Присоединяйтесь к нам, создавайте команды и участвуйте в увлекательном хакатоне.
-            Зарегистрируйтесь, чтобы найти команду или создать свою собственную!
+            Зарегистрируйтесь, чтобы найти команду или создать свою собственную.
           </p>
 
           <div className="space-x-4">
@@ -54,18 +54,11 @@ export default async function Home() {
                     // Participant interface
                     <>
                       {userHasParticipantProfile ? (
-                        <>
-                          <Link href="/profile">
-                            <Button size="lg">
-                              Мой профиль
-                            </Button>
-                          </Link>
-                          <Link href="/teams">
-                            <Button variant="outline" size="lg">
-                              Все команды
-                            </Button>
-                          </Link>
-                        </>
+                        <Link href="/profile">
+                          <Button size="lg">
+                            Мой профиль
+                          </Button>
+                        </Link>
                       ) : (
                         <Link href="/profile">
                           <Button size="lg">
@@ -92,42 +85,11 @@ export default async function Home() {
                 </Link>
               </div>
             )}
-          </div>        </div>
-
-        {/* Show teams link only for participants or non-logged users */}
-        {(!session || !userIsOrganizer) && (
-          <div className="mt-12 text-center">
-            <Link href="/teams">
-              <Button variant="outline" size="lg">
-                Просмотреть все команды
-              </Button>
-            </Link>
           </div>
-        )}
-
-        {/* Show participant-focused features only for non-organizers */}
-        {(!session || !userIsOrganizer) && (
-          <div className="mt-16 grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-lg shadow-md">
-              <h3 className="text-2xl font-semibold mb-4">Создайте команду</h3>
-              <p className="text-gray-600">
-                Станьте лидером команды и найдите единомышленников для участия в хакатоне
-              </p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-lg shadow-md">
-              <h3 className="text-2xl font-semibold mb-4">Присоединитесь к команде</h3>
-              <p className="text-gray-600">
-                Найдите команду, которая соответствует вашим интересам и навыкам
-              </p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-lg shadow-md">
-              <h3 className="text-2xl font-semibold mb-4">Работайте самостоятельно</h3>
-              <p className="text-gray-600">
-                Участвуйте в хакатоне вне команды, если предпочитаете индивидуальную работу
-              </p>
-            </div>
-          </div>
-        )}
+          <p className="text-l text-gray-600 mt-8 mb-8 max-w-2xl mx-auto">
+            Функционал сайта будет расширяться и мы будем оповещать вас об этом.
+          </p>
+        </div>
       </div>
     </main>
   );

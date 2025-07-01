@@ -28,7 +28,6 @@ export default async function TestPage() {
                                 ) : (
                                     <>
                                         <li>✅ <Link href="/profile" className="text-blue-600 hover:underline">Профиль участника</Link></li>
-                                        <li>✅ <Link href="/teams" className="text-blue-600 hover:underline">Команды</Link></li>
                                         <li>❌ /dashboard (недоступно для участников)</li>
                                     </>
                                 )}
