@@ -98,6 +98,11 @@ resource "kubernetes_deployment" "hub" {
           }
 
           env {
+            name  = "AUTH_TRUST_HOST"
+            value = var.nextauth_url
+          }
+
+          env {
             name  = "NEXTAUTH_SECRET"
             value = var.nextauth_secret
           }

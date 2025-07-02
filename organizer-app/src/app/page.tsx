@@ -11,13 +11,18 @@ export default async function Home() {
 
   // For organizers, check if they have a participant profile (they shouldn't)
   let userHasParticipantProfile = false;
+  let participantName = null;
   if (session?.user?.email && !userIsOrganizer) {
     const user = await db.user.findUnique({
       where: { email: session.user.email },
       include: { participant: true }
     });
     userHasParticipantProfile = !!user?.participant;
+    participantName = user?.participant?.name;
   }
+
+  // Determine the display name
+  const displayName = participantName || session?.user?.name || session?.user?.email;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -34,7 +39,7 @@ export default async function Home() {
           <div className="space-x-4">
             {session ? (
               <div className="space-y-4">
-                <p className="text-gray-700">Добро пожаловать, {session.user?.name || session.user?.email}!</p>
+                <p className="text-gray-700">Добро пожаловать, {displayName}!</p>
                 <div className="flex flex-wrap justify-center gap-4">
                   {userIsOrganizer ? (
                     // Organizer interface

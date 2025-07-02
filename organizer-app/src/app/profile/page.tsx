@@ -111,15 +111,15 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                                 Завершите регистрацию
                             </h1>
                             {preselectedTeam ? (
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <p className="text-gray-600">
-                                        Присоединяйтесь к команде
+                                        Присоединяйтесь к команде:
                                     </p>
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                        <p className="text-blue-800 font-semibold">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <p className="text-blue-900 font-bold text-lg text-center">
                                             {preselectedTeam.name}
                                         </p>
-                                        <p className="text-blue-600 text-sm">
+                                        <p className="text-blue-700 text-center mt-1">
                                             @{preselectedTeam.nickname}
                                         </p>
                                     </div>
@@ -145,7 +145,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 <div className="bg-white rounded-lg shadow-xl p-8">
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            Мой профиль
+                            Профиль участника
                         </h1>
                         <p className="text-gray-600">
                             Ваша информация и команда
@@ -194,7 +194,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                                     )}
                                 </div>
                             ) : (
-                                <p className="text-gray-600">Вы участвуете вне команды</p>
+                                <p className="text-gray-600">Вы пока не состоите в команде</p>
                             )}
                         </div>
                     </div>
@@ -211,7 +211,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                                 )}
                                 {(user.participant as ExtendedParticipant).technologies && (
                                     <div>
-                                        <span className="font-semibold text-gray-800">Технологии:</span>
+                                        <span className="font-semibold text-gray-800">Приложения в облаке:</span>
                                         <div className="mt-1">
                                             {JSON.parse((user.participant as ExtendedParticipant).technologies!).map((tech: string, index: number) => (
                                                 <span key={index} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded mr-2 mb-1">

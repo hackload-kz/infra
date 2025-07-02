@@ -170,7 +170,7 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
                             onChange={(e) => handleTeamOptionChange(e.target.value)}
                             className="mr-2"
                         />
-                        Вне команды
+                        Пока без команды, вступлю позже
                     </label>
 
                     <label className="flex items-center font-medium text-gray-800">
@@ -194,7 +194,7 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
                             onChange={(e) => handleTeamOptionChange(e.target.value)}
                             className="mr-2"
                         />
-                        Создать новую команду
+                        Создать новую команду (даже если вы единственный член команды)
                     </label>
                 </div>
 
@@ -267,7 +267,7 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
 
             {/* Experience Section */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Мой опыт</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Ваш опыт</h3>
 
                 {/* Experience Level */}
                 <div>
@@ -301,7 +301,7 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
                 {/* Technologies */}
                 <div>
                     <label className="block text-sm font-semibold text-gray-800 mb-2">
-                        Какие технологии вы используете? (выбор нескольких вариантов)
+                        Какие сервисы / ПО ваша компания размещает в облаке? (выбор нескольких вариантов)
                     </label>
                     <div className="space-y-2">
                         {[
