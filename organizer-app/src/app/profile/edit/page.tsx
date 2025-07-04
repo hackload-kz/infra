@@ -22,10 +22,30 @@ export default async function EditProfilePage() {
         include: {
             participant: {
                 include: {
-                    team: true,
-                    ledTeam: true,
+                    team: {
+                        include: {
+                            members: true,
+                        },
+                    },
+                    ledTeam: {
+                        include: {
+                            members: true,
+                        },
+                    },
                 },
             },
+        },
+    });
+
+    // Get all teams for selection
+    const allTeams = await db.team.findMany({
+        select: {
+            id: true,
+            name: true,
+            nickname: true,
+        },
+        orderBy: {
+            name: 'asc',
         },
     });
 
@@ -56,6 +76,7 @@ export default async function EditProfilePage() {
                     <EditProfileForm
                         participant={user.participant}
                         userEmail={session.user.email}
+                        availableTeams={allTeams}
                     />
                 </div>
             </div>
