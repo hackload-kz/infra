@@ -4,6 +4,9 @@ import { auth } from '@/auth';
 import { SignOutButton } from '@/components/sign-out-button';
 import { isOrganizer } from '@/lib/admin';
 
+// Force dynamic rendering since this page requires database access
+export const dynamic = 'force-dynamic'
+
 export default async function TeamsPage() {
     const session = await auth();
     const userIsOrganizer = isOrganizer(session?.user?.email);

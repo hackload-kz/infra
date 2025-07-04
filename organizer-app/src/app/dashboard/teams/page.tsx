@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import TeamsForm from '@/app/dashboard/teams/teams-form'
 
+// Force dynamic rendering since this page requires authentication and database access
+export const dynamic = 'force-dynamic'
+
 export default async function TeamsPage() {
     const session = await auth()
 

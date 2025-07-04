@@ -5,6 +5,9 @@ import { Users, Calendar, TrendingUp, Activity, UserCheck } from 'lucide-react'
 import Link from 'next/link'
 import { isOrganizer } from '@/lib/admin'
 
+// Force dynamic rendering since this page requires authentication and database access
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
     const session = await auth()
 
