@@ -5,12 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-interface Team {
-    id: string;
-    name: string;
-    nickname: string;
-}
-
 interface Participant {
     id: string;
     name: string;
@@ -39,10 +33,9 @@ interface Participant {
 interface EditProfileFormProps {
     participant: Participant;
     userEmail: string;
-    availableTeams: Team[];
 }
 
-export function EditProfileForm({ participant, userEmail, availableTeams }: EditProfileFormProps) {
+export function EditProfileForm({ participant, userEmail }: EditProfileFormProps) {
     const [formData, setFormData] = useState({
         name: participant.name || '',
         city: participant.city || '',
@@ -54,11 +47,6 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
         otherTechnologies: participant.otherTechnologies || '',
         otherCloudServices: participant.otherCloudServices || '',
         otherCloudProviders: participant.otherCloudProviders || '',
-        // Team fields
-        teamOption: participant.team ? 'existing' : 'none',
-        selectedTeam: participant.team?.id || '',
-        newTeamName: '',
-        newTeamNickname: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -78,31 +66,6 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
         e.preventDefault();
         setLoading(true);
         setError(null);
-
-        // Validate team selection
-        if (formData.teamOption === 'existing' && !formData.selectedTeam) {
-            setError('Выберите команду из списка');
-            setLoading(false);
-            return;
-        }
-
-        if (formData.teamOption === 'new') {
-            if (!formData.newTeamName.trim()) {
-                setError('Введите название команды');
-                setLoading(false);
-                return;
-            }
-            if (!formData.newTeamNickname.trim()) {
-                setError('Введите nickname команды');
-                setLoading(false);
-                return;
-            }
-            if (!/^[a-zA-Z0-9_-]+$/.test(formData.newTeamNickname)) {
-                setError('Nickname команды может содержать только латинские буквы, цифры, подчеркивания и дефисы');
-                setLoading(false);
-                return;
-            }
-        }
 
         try {
             const response = await fetch('/api/participant/profile', {
@@ -348,106 +311,40 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
             <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Команда</h3>
 
-                <div className="space-y-3">
-                    <label className="flex items-center font-medium text-gray-800">
-                        <input
-                            type="radio"
-                            name="teamOption"
-                            value="none"
-                            checked={formData.teamOption === 'none'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, teamOption: e.target.value }))}
-                            className="mr-2"
-                        />
-                        Не состоять в команде
-                    </label>
-
-                    <label className="flex items-center font-medium text-gray-800">
-                        <input
-                            type="radio"
-                            name="teamOption"
-                            value="existing"
-                            checked={formData.teamOption === 'existing'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, teamOption: e.target.value }))}
-                            className="mr-2"
-                        />
-                        Присоединиться к существующей команде
-                    </label>
-
-                    {formData.teamOption === 'existing' && (
-                        <div className="ml-6">
-                            <select
-                                value={formData.selectedTeam}
-                                onChange={(e) => setFormData(prev => ({ ...prev, selectedTeam: e.target.value }))}
-                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                required
-                            >
-                                <option value="">Выберите команду</option>
-                                {availableTeams.map(team => (
-                                    <option key={team.id} value={team.id}>
-                                        {team.name} (@{team.nickname})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    <label className="flex items-center font-medium text-gray-800">
-                        <input
-                            type="radio"
-                            name="teamOption"
-                            value="new"
-                            checked={formData.teamOption === 'new'}
-                            onChange={(e) => setFormData(prev => ({ ...prev, teamOption: e.target.value }))}
-                            className="mr-2"
-                        />
-                        Создать новую команду
-                    </label>
-
-                    {formData.teamOption === 'new' && (
-                        <div className="ml-6 space-y-3">
-                            <div>
-                                <label htmlFor="newTeamName" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Название команды
-                                </label>
-                                <Input
-                                    id="newTeamName"
-                                    type="text"
-                                    value={formData.newTeamName}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, newTeamName: e.target.value }))}
-                                    placeholder="Название вашей команды"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="newTeamNickname" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Nickname команды
-                                </label>
-                                <Input
-                                    id="newTeamNickname"
-                                    type="text"
-                                    value={formData.newTeamNickname}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, newTeamNickname: e.target.value }))}
-                                    placeholder="nickname_команды"
-                                    required
-                                    pattern="[a-zA-Z0-9_-]+"
-                                    title="Используйте только буквы, цифры, подчеркивания и дефисы"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Используйте только латинские буквы, цифры, подчеркивания и дефисы
-                                </p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    {participant.team ? (
+                        <div>
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                                Текущая команда:
+                            </p>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-semibold text-gray-900">
+                                        {participant.team.name}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        @{participant.team.nickname}
+                                    </p>
+                                </div>
+                                {participant.ledTeam && participant.ledTeam.id === participant.team.id && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Лидер
+                                    </span>
+                                )}
                             </div>
                         </div>
+                    ) : (
+                        <p className="text-gray-600">
+                            Вы не состоите ни в одной команде
+                        </p>
                     )}
-                </div>
 
-                {participant.ledTeam && formData.teamOption !== 'new' && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p className="text-yellow-800 text-sm">
-                            ⚠️ <strong>Внимание:</strong> Вы являетесь лидером команды &quot;{participant.ledTeam.name}&quot;.
-                            При изменении команды лидерство может быть передано другому участнику или команда может быть расформирована.
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                            💡 Для изменения команды (создать новую, присоединиться к существующей или покинуть текущую) обратитесь к организаторам. Либо дождитесь, когда этот функционал будет реализован. Это произойдёт в ближайшие дни.
                         </p>
                     </div>
-                )}
+                </div>
             </div>
 
             <div className="flex gap-4">

@@ -29,18 +29,6 @@ export default async function EditProfilePage() {
         },
     });
 
-    // Load available teams for selection
-    const availableTeams = await db.team.findMany({
-        select: {
-            id: true,
-            name: true,
-            nickname: true,
-        },
-        orderBy: {
-            name: 'asc',
-        },
-    });
-
     // User should exist because OAuth creates them in auth.config.ts
     if (!user) {
         console.error('User not found in database after OAuth login:', session.user.email);
@@ -68,7 +56,6 @@ export default async function EditProfilePage() {
                     <EditProfileForm
                         participant={user.participant}
                         userEmail={session.user.email}
-                        availableTeams={availableTeams}
                     />
                 </div>
             </div>
