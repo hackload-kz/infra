@@ -5,7 +5,7 @@ import { isOrganizer } from '@/lib/admin'
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await auth()
@@ -14,6 +14,7 @@ export async function PUT(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const resolvedParams = await params
         const data = await request.json()
         const { 
             name, 
@@ -31,7 +32,7 @@ export async function PUT(
 
         // Find the participant
         const participant = await db.participant.findUnique({
-            where: { id: params.id },
+            where: { id: resolvedParams.id },
         })
 
         if (!participant) {
@@ -40,7 +41,7 @@ export async function PUT(
 
         // Update participant
         const updatedParticipant = await db.participant.update({
-            where: { id: params.id },
+            where: { id: resolvedParams.id },
             data: {
                 name,
                 city,

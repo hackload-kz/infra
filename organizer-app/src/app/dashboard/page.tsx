@@ -42,14 +42,6 @@ export default async function DashboardPage() {
     // Get participant statistics
     const totalParticipants = await db.participant.count();
 
-    const participantsThisWeek = await db.participant.count({
-        where: {
-            createdAt: {
-                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            }
-        }
-    });
-
     return (
         <div className="space-y-6">
             <div>

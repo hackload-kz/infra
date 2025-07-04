@@ -3,14 +3,15 @@ import { db } from '@/lib/db'
 import { EditParticipantForm } from './edit-participant-form'
 
 interface EditParticipantPageProps {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>
 }
 
 export default async function EditParticipantPage({ params }: EditParticipantPageProps) {
+    const resolvedParams = await params
     const participant = await db.participant.findUnique({
-        where: { id: params.id },
+        where: { id: resolvedParams.id },
         include: {
             user: true,
             team: true,
