@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { createTeam, updateTeam, deleteTeam } from '@/lib/actions'
-import { TeamStatus } from '@prisma/client'
+import { TeamStatus, TeamLevel } from '@prisma/client'
 
 interface Participant {
     id: string
@@ -19,6 +19,8 @@ interface Team {
     name: string
     nickname: string
     status?: TeamStatus
+    level?: TeamLevel | null
+    comment?: string | null
     createdAt: string | Date
     updatedAt: string | Date
     members?: Participant[]
@@ -33,6 +35,16 @@ const statusLabels: Record<TeamStatus, string> = {
     APPROVED: 'Одобрена',
     CANCELED: 'Отменена',
     REJECTED: 'Отклонена',
+}
+
+const levelLabels: Record<TeamLevel, string> = {
+    BEGINNER: 'Начинающий',
+    ADVANCED: 'Продвинутый',
+}
+
+const levelColors: Record<TeamLevel, string> = {
+    BEGINNER: 'bg-green-100 text-green-800',
+    ADVANCED: 'bg-orange-100 text-orange-800',
 }
 
 const statusColors: Record<TeamStatus, string> = {
@@ -141,6 +153,9 @@ function TeamsForm({ teams }: TeamsFormProps) {
                                         Status
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                        Level
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
                                         Members
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
@@ -164,6 +179,13 @@ function TeamsForm({ teams }: TeamsFormProps) {
                                             {team.status && (
                                                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[team.status]}`}>
                                                     {statusLabels[team.status]}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {team.level && (
+                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${levelColors[team.level]}`}>
+                                                    {levelLabels[team.level]}
                                                 </span>
                                             )}
                                         </td>

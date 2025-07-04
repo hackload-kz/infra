@@ -211,32 +211,57 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 const isCurrentLeader = !!participant.ledTeam;
                 const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
 
-                if (isCurrentLeader && remainingMembers.length > 0) {
-                    if (!newLeaderId) {
-                        throw new Error('Вы должны выбрать нового лидера для текущей команды');
-                    }
-                    
-                    const newLeader = remainingMembers.find(m => m.id === newLeaderId);
-                    if (!newLeader) {
-                        throw new Error('Выбранный лидер не является участником команды');
-                    }
+                if (isCurrentLeader) {
+                    if (remainingMembers.length === 0) {
+                        // Delete empty team and remove leadership
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { 
+                                ledTeamId: null,
+                                teamId: null,
+                            },
+                        });
+                        
+                        await tx.team.delete({
+                            where: { id: currentTeam.id },
+                        });
+                    } else {
+                        // Transfer leadership
+                        if (!newLeaderId) {
+                            throw new Error('Вы должны выбрать нового лидера для текущей команды');
+                        }
+                        
+                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        if (!newLeader) {
+                            throw new Error('Выбранный лидер не является участником команды');
+                        }
 
-                    // First, remove current leader's ledTeamId
+                        // First, remove current leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { 
+                                ledTeamId: null,
+                                teamId: null,
+                            },
+                        });
+
+                        // Then assign new leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: newLeaderId },
+                            data: { ledTeamId: currentTeam.id },
+                        });
+
+                        // Finally, update team leader
+                        await tx.team.update({
+                            where: { id: currentTeam.id },
+                            data: { leaderId: newLeaderId },
+                        });
+                    }
+                } else {
+                    // Regular member leaving
                     await tx.participant.update({
                         where: { id: participantId },
-                        data: { ledTeamId: null },
-                    });
-
-                    // Then assign new leader's ledTeamId
-                    await tx.participant.update({
-                        where: { id: newLeaderId },
-                        data: { ledTeamId: currentTeam.id },
-                    });
-
-                    // Finally, update team leader
-                    await tx.team.update({
-                        where: { id: currentTeam.id },
-                        data: { leaderId: newLeaderId },
+                        data: { teamId: null },
                     });
                 }
             }

@@ -23,11 +23,18 @@ enum TeamStatus {
   REJECTED
 }
 
+enum TeamLevel {
+  BEGINNER
+  ADVANCED
+}
+
 model Team {
   id        String     @id @default(cuid())
   name      String
   nickname  String     @unique
   status    TeamStatus @default(NEW)
+  level     TeamLevel?
+  comment   String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
