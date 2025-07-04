@@ -13,9 +13,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
     const team = await db.team.findFirst({
         where: {
             nickname,
-            isDeleted: false,
         },
-    })
+    });
 
     if (!team) {
         notFound()

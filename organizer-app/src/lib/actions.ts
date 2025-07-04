@@ -59,14 +59,26 @@ export async function deleteTeam(formData: FormData) {
     }
 
     try {
-        await db.team.update({
-            where: { id },
-            data: {
-                isDeleted: true,
+        // First, remove all team members by setting their teamId and ledTeamId to null
+        await db.participant.updateMany({
+            where: {
+                OR: [
+                    { teamId: id },
+                    { ledTeamId: id }
+                ]
             },
-        })
+            data: {
+                teamId: null,
+                ledTeamId: null,
+            },
+        });
 
-        revalidatePath('/dashboard/teams')
+        // Then delete the team
+        await db.team.delete({
+            where: { id },
+        });
+
+        revalidatePath('/dashboard/teams');
     } catch (error) {
         console.error('Error deleting team:', error)
         throw new Error('Failed to delete team')

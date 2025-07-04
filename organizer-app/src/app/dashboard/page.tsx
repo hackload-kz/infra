@@ -18,12 +18,9 @@ export default async function DashboardPage() {
     }
 
     // Get team statistics
-    const totalTeams = await db.team.count({
-        where: { isDeleted: false }
-    })
+    const totalTeams = await db.team.count();
 
     const recentTeams = await db.team.findMany({
-        where: { isDeleted: false },
         orderBy: { createdAt: 'desc' },
         take: 5,
         select: {
@@ -32,16 +29,15 @@ export default async function DashboardPage() {
             nickname: true,
             createdAt: true
         }
-    })
+    });
 
     const teamsThisWeek = await db.team.count({
         where: {
-            isDeleted: false,
             createdAt: {
                 gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
             }
         }
-    })
+    });
 
     return (
         <div className="space-y-6">

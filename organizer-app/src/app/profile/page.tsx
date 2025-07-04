@@ -87,7 +87,6 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             preselectedTeam = await db.team.findUnique({
                 where: {
                     nickname: team,
-                    isDeleted: false
                 },
                 select: {
                     id: true,
@@ -111,15 +110,15 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                                 Завершите регистрацию
                             </h1>
                             {preselectedTeam ? (
-                                <div className="space-y-3">
+                                <div className="space-y-2">
                                     <p className="text-gray-600">
-                                        Присоединяйтесь к команде:
+                                        Присоединяйтесь к команде
                                     </p>
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                        <p className="text-blue-900 font-bold text-lg text-center">
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                        <p className="text-blue-800 font-semibold">
                                             {preselectedTeam.name}
                                         </p>
-                                        <p className="text-blue-700 text-center mt-1">
+                                        <p className="text-blue-600 text-sm">
                                             @{preselectedTeam.nickname}
                                         </p>
                                     </div>
@@ -145,7 +144,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 <div className="bg-white rounded-lg shadow-xl p-8">
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                            Профиль участника
+                            Привет, {user.participant.name}!
                         </h1>
                         <p className="text-gray-600">
                             Ваша информация и команда
@@ -273,6 +272,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
                     <div className="mt-8 pt-8 border-t border-gray-200">
                         <div className="flex flex-wrap gap-4">
+                            <Link
+                                href="/profile/edit"
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Редактировать профиль
+                            </Link>
                             <Link
                                 href="/"
                                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"

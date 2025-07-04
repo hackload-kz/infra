@@ -17,7 +17,6 @@ model Team {
   id        String   @id @default(cuid())
   name      String
   nickname  String   @unique
-  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -65,10 +64,10 @@ model Participant {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 
-  team   Team?   @relation("TeamMembers", fields: [teamId], references: [id])
+  team   Team?   @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
   teamId String?
 
-  ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id])
+  ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id], onDelete: SetNull)
   ledTeamId String? @unique
 
   @@map("participants")

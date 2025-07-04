@@ -12,9 +12,8 @@ export default async function TeamsPage() {
 
     // Получаем команды напрямую из БД на сервере
     const teams = await db.team.findMany({
-        where: { isDeleted: false },
         orderBy: { createdAt: 'desc' },
-    })
+    });
 
     return <TeamsForm teams={teams} />
 }

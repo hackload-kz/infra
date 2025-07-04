@@ -10,7 +10,6 @@ export async function GET(
         const team = await db.team.findUnique({
             where: {
                 id: id,
-                isDeleted: false,
             },
             include: {
                 leader: {
@@ -64,7 +63,6 @@ export async function PUT(
         const team = await db.team.update({
             where: {
                 id: id,
-                isDeleted: false,
             },
             data: {
                 name,
@@ -88,12 +86,25 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        await db.team.update({
+
+        // First, remove all team members by setting their teamId and ledTeamId to null
+        await db.participant.updateMany({
             where: {
-                id: id,
+                OR: [
+                    { teamId: id },
+                    { ledTeamId: id }
+                ]
             },
             data: {
-                isDeleted: true,
+                teamId: null,
+                ledTeamId: null,
+            },
+        });
+
+        // Then delete the team
+        await db.team.delete({
+            where: {
+                id: id,
             },
         });
 

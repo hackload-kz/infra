@@ -20,7 +20,6 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
             preselectedTeam = await db.team.findUnique({
                 where: {
                     nickname: team,
-                    isDeleted: false
                 },
                 select: {
                     id: true,
