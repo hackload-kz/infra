@@ -6,13 +6,43 @@ import { Input } from '@/components/ui/input'
 import { Plus, Edit, Trash2, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { createTeam, updateTeam, deleteTeam } from '@/lib/actions'
+import { TeamStatus } from '@prisma/client'
+
+interface Participant {
+    id: string
+    name: string
+    email: string
+}
 
 interface Team {
     id: string
     name: string
     nickname: string
+    status?: TeamStatus
     createdAt: string | Date
     updatedAt: string | Date
+    members?: Participant[]
+    leader?: Participant | null
+}
+
+const statusLabels: Record<TeamStatus, string> = {
+    NEW: 'Новая',
+    INCOMPLETED: 'Не завершена',
+    FINISHED: 'Завершена',
+    IN_REVIEW: 'На рассмотрении',
+    APPROVED: 'Одобрена',
+    CANCELED: 'Отменена',
+    REJECTED: 'Отклонена',
+}
+
+const statusColors: Record<TeamStatus, string> = {
+    NEW: 'bg-blue-100 text-blue-800',
+    INCOMPLETED: 'bg-yellow-100 text-yellow-800',
+    FINISHED: 'bg-green-100 text-green-800',
+    IN_REVIEW: 'bg-purple-100 text-purple-800',
+    APPROVED: 'bg-green-100 text-green-800',
+    CANCELED: 'bg-gray-100 text-gray-800',
+    REJECTED: 'bg-red-100 text-red-800',
 }
 
 interface TeamsFormProps {
@@ -32,6 +62,7 @@ function TeamsForm({ teams }: TeamsFormProps) {
         setShowForm(false)
         setEditingTeam(null)
     }
+
 
     return (
         <div className="space-y-6">
@@ -107,6 +138,12 @@ function TeamsForm({ teams }: TeamsFormProps) {
                                         Nickname
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                        Members
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
                                         Created
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
@@ -122,6 +159,16 @@ function TeamsForm({ teams }: TeamsFormProps) {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {team.nickname}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {team.status && (
+                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[team.status]}`}>
+                                                    {statusLabels[team.status]}
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {team.members?.length || 0} / 4
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {new Date(team.createdAt).toLocaleDateString()}
