@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { TeamManagement } from '@/components/team-management';
-import { leaveTeam, createAndJoinTeam, joinTeam } from '@/lib/actions';
+import { changeTeam } from '@/lib/actions';
 
 interface Participant {
     id: string;
@@ -70,6 +69,12 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [teamChangeMode, setTeamChangeMode] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<string>('');
+    const [selectedNewLeader, setSelectedNewLeader] = useState<string>('');
+    const [teamChangeLoading, setTeamChangeLoading] = useState(false);
+    const [newTeamName, setNewTeamName] = useState('');
+    const [newTeamNickname, setNewTeamNickname] = useState('');
     const router = useRouter();
 
     const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders', value: string) => {
@@ -113,34 +118,60 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
         }
     };
 
-    const handleTeamChange = async (action: string, data?: any) => {
-        switch (action) {
-            case 'leave':
-                await leaveTeam(participant.id, data?.newLeaderId);
-                break;
-            case 'create':
-                await createAndJoinTeam(
-                    participant.id,
-                    data.teamName,
-                    data.teamNickname,
-                    data.newLeaderId
-                );
-                break;
-            case 'join':
-                await joinTeam(participant.id, data.teamId, data.newLeaderId);
-                break;
+    const handleTeamChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setTeamChangeLoading(true);
+        setError(null);
+
+        try {
+            const formData = new FormData();
+            formData.append('participantId', participant.id);
+            formData.append('newTeamId', selectedTeam);
+
+            // If creating new team, add team details
+            if (selectedTeam === 'new') {
+                if (!newTeamName || !newTeamNickname) {
+                    setError('Введите название и никнейм новой команды');
+                    return;
+                }
+                formData.append('newTeamName', newTeamName);
+                formData.append('newTeamNickname', newTeamNickname);
+            }
+
+            // If user is leaving as leader and team will have remaining members, require new leader
+            const isLeader = !!participant.ledTeam;
+            const teamMembers = participant.team?.members || [];
+            const remainingMembers = teamMembers.filter(m => m.id !== participant.id);
+
+            if (isLeader && remainingMembers.length > 0 && selectedTeam !== 'new') {
+                if (!selectedNewLeader) {
+                    setError('Выберите нового лидера команды');
+                    return;
+                }
+                formData.append('newLeaderId', selectedNewLeader);
+            }
+
+            await changeTeam(formData);
+            router.push('/profile');
+            router.refresh();
+        } catch (error) {
+            console.error('Team change error:', error);
+            setError(error instanceof Error ? error.message : 'Ошибка при смене команды');
+        } finally {
+            setTeamChangeLoading(false);
         }
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <p className="text-red-800 text-sm">{error}</p>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">{/* Profile form */}
+
                 {/* Personal Information */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">Личная информация</h3>
@@ -346,29 +377,188 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
                     </div>
                 </div>
 
-                <div className="flex gap-4">
-                    <Button type="submit" className="flex-1" disabled={loading}>
-                        {loading ? 'Сохранение...' : 'Сохранить изменения'}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.push('/profile')}
-                        className="flex-1"
-                    >
-                        Отмена
-                    </Button>
-                </div>
+                {!teamChangeMode && (
+                    <div className="flex gap-4">
+                        <Button type="submit" className="flex-1" disabled={loading}>
+                            {loading ? 'Сохранение...' : 'Сохранить изменения'}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => router.push('/profile')}
+                            className="flex-1"
+                        >
+                            Отмена
+                        </Button>
+                    </div>
+                )}
             </form>
 
-            {/* Team Management Section */}
-            <div className="border-t pt-8">
-                <TeamManagement
-                    participant={participant}
-                    availableTeams={availableTeams}
-                    onTeamChange={handleTeamChange}
-                />
+            {/* Team Information */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Команда</h3>
+
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    {participant.team ? (
+                        <div>
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                                Текущая команда:
+                            </p>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-semibold text-gray-900">
+                                        {participant.team.name}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        @{participant.team.nickname}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                        Участников: {participant.team.members.length}
+                                    </p>
+                                </div>
+                                {participant.ledTeam && participant.ledTeam.id === participant.team.id && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Лидер
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-gray-600">
+                            Вы не состоите ни в одной команде
+                        </p>
+                    )}
+
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                        {!teamChangeMode ? (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setTeamChangeMode(true)}
+                                className="w-full"
+                            >
+                                Сменить команду
+                            </Button>
+                        ) : (
+                            <form onSubmit={handleTeamChange} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Выберите новую команду
+                                    </label>
+                                    <select
+                                        value={selectedTeam}
+                                        onChange={(e) => setSelectedTeam(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium"
+                                        required
+                                    >
+                                        <option value="">Выберите команду</option>
+                                        <option value="null">Покинуть команду</option>
+                                        <option value="new">Создать новую команду</option>
+                                        {availableTeams
+                                            .filter(team => team.id !== participant.team?.id)
+                                            .map(team => (
+                                                <option key={team.id} value={team.id}>
+                                                    {team.name} (@{team.nickname})
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+
+                                {/* Show new team creation fields */}
+                                {selectedTeam === 'new' && (
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Название команды *
+                                            </label>
+                                            <Input
+                                                type="text"
+                                                value={newTeamName}
+                                                onChange={(e) => setNewTeamName(e.target.value)}
+                                                placeholder="Введите название команды"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Никнейм команды *
+                                            </label>
+                                            <Input
+                                                type="text"
+                                                value={newTeamNickname}
+                                                onChange={(e) => setNewTeamNickname(e.target.value)}
+                                                placeholder="nickname"
+                                                pattern="^[a-zA-Z0-9_-]+$"
+                                                title="Только буквы, цифры, дефисы и подчеркивания"
+                                                required
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Только буквы, цифры, дефисы и подчеркивания
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Show leader selection if user is leader and team will have remaining members */}
+                                {(() => {
+                                    const isLeader = !!participant.ledTeam;
+                                    const teamMembers = participant.team?.members || [];
+                                    const remainingMembers = teamMembers.filter(m => m.id !== participant.id);
+
+                                    if (isLeader && remainingMembers.length > 0) {
+                                        return (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Выберите нового лидера команды
+                                                </label>
+                                                <select
+                                                    value={selectedNewLeader}
+                                                    onChange={(e) => setSelectedNewLeader(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium"
+                                                    required
+                                                >
+                                                    <option value="">Выберите нового лидера</option>
+                                                    {remainingMembers.map(member => (
+                                                        <option key={member.id} value={member.id}>
+                                                            {member.name} ({member.email})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
+
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="submit"
+                                        disabled={teamChangeLoading}
+                                        className="flex-1"
+                                    >
+                                        {teamChangeLoading ? 'Сохранение...' : 'Сменить команду'}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setTeamChangeMode(false);
+                                            setSelectedTeam('');
+                                            setSelectedNewLeader('');
+                                            setNewTeamName('');
+                                            setNewTeamNickname('');
+                                        }}
+                                        className="flex-1"
+                                    >
+                                        Отмена
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
             </div>
+
         </div>
     );
 }
