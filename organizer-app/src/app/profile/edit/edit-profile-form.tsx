@@ -113,12 +113,20 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
         }
     };
 
-    const handleTeamChange = async (action: string, data?: any) => {
+    const handleTeamChange = async (action: string, data?: {
+        teamId?: string;
+        teamName?: string;
+        teamNickname?: string;
+        newLeaderId?: string | null;
+    }) => {
         switch (action) {
             case 'leave':
                 await leaveTeam(participant.id, data?.newLeaderId);
                 break;
             case 'create':
+                if (!data?.teamName || !data?.teamNickname) {
+                    throw new Error('Название и никнейм команды обязательны');
+                }
                 await createAndJoinTeam(
                     participant.id,
                     data.teamName,
@@ -127,6 +135,9 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
                 );
                 break;
             case 'join':
+                if (!data?.teamId) {
+                    throw new Error('ID команды обязателен');
+                }
                 await joinTeam(participant.id, data.teamId, data.newLeaderId);
                 break;
         }

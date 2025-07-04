@@ -23,10 +23,17 @@ interface Participant {
     ledTeam?: Team | null;
 }
 
+interface TeamChangeData {
+    teamId?: string;
+    teamName?: string;
+    teamNickname?: string;
+    newLeaderId?: string | null;
+}
+
 interface TeamManagementProps {
     participant: Participant;
     availableTeams: { id: string; name: string; nickname: string; }[];
-    onTeamChange: (action: string, data?: any) => Promise<void>;
+    onTeamChange: (action: string, data?: TeamChangeData) => Promise<void>;
 }
 
 export function TeamManagement({ participant, availableTeams, onTeamChange }: TeamManagementProps) {
@@ -46,7 +53,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
     const teamMembers = currentTeam?.members || [];
     const otherMembers = teamMembers.filter(m => m.id !== participant.id);
 
-    const handleAction = async (action: string, data?: any) => {
+    const handleAction = async (action: string, data?: TeamChangeData) => {
         setLoading(true);
         setError(null);
         
@@ -94,7 +101,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                             <select
                                 value={selectedNewLeader}
                                 onChange={(e) => setSelectedNewLeader(e.target.value)}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 font-medium"
                                 required
                             >
                                 <option value="">Выберите нового лидера</option>
@@ -160,7 +167,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                                 <select
                                     value={selectedNewLeader}
                                     onChange={(e) => setSelectedNewLeader(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 font-medium"
                                     required
                                 >
                                     <option value="">Выберите нового лидера</option>
@@ -215,7 +222,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                             newLeaderId: selectedNewLeader || null
                         })}
                         disabled={loading || !newTeamName || !newTeamNickname || 
-                                (currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}
+                                Boolean(currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}
                         className="flex-1"
                     >
                         {loading ? 'Создание...' : 'Создать команду'}
@@ -255,7 +262,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                                 <select
                                     value={selectedNewLeader}
                                     onChange={(e) => setSelectedNewLeader(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 font-medium"
                                     required
                                 >
                                     <option value="">Выберите нового лидера</option>
@@ -277,7 +284,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                     <select
                         value={selectedTeamId}
                         onChange={(e) => setSelectedTeamId(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium"
                         required
                     >
                         <option value="">Выберите команду</option>
@@ -298,7 +305,7 @@ export function TeamManagement({ participant, availableTeams, onTeamChange }: Te
                             newLeaderId: selectedNewLeader || null
                         })}
                         disabled={loading || !selectedTeamId || 
-                                (currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}
+                                Boolean(currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}
                         className="flex-1"
                     >
                         {loading ? 'Присоединение...' : 'Присоединиться'}

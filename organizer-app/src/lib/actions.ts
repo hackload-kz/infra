@@ -85,7 +85,7 @@ export async function deleteTeam(formData: FormData) {
     }
 }
 
-export async function leaveTeam(participantId: string, newLeaderId?: string) {
+export async function leaveTeam(participantId: string, newLeaderId?: string | null) {
     if (!participantId) {
         throw new Error('Participant ID is required')
     }
@@ -129,13 +129,19 @@ export async function leaveTeam(participantId: string, newLeaderId?: string) {
                         throw new Error('Выбранный лидер не является участником команды');
                     }
 
-                    // Update new leader
+                    // First, remove current leader's ledTeamId
+                    await tx.participant.update({
+                        where: { id: participantId },
+                        data: { ledTeamId: null },
+                    });
+
+                    // Then assign new leader's ledTeamId
                     await tx.participant.update({
                         where: { id: newLeaderId },
                         data: { ledTeamId: currentTeam.id },
                     });
 
-                    // Update team leader
+                    // Finally, update team leader
                     await tx.team.update({
                         where: { id: currentTeam.id },
                         data: { leaderId: newLeaderId },
@@ -161,7 +167,7 @@ export async function leaveTeam(participantId: string, newLeaderId?: string) {
     }
 }
 
-export async function createAndJoinTeam(participantId: string, teamName: string, teamNickname: string, newLeaderId?: string) {
+export async function createAndJoinTeam(participantId: string, teamName: string, teamNickname: string, newLeaderId?: string | null) {
     if (!participantId || !teamName || !teamNickname) {
         throw new Error('Все поля обязательны для заполнения')
     }
@@ -213,13 +219,19 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                         throw new Error('Выбранный лидер не является участником команды');
                     }
 
-                    // Update new leader
+                    // First, remove current leader's ledTeamId
+                    await tx.participant.update({
+                        where: { id: participantId },
+                        data: { ledTeamId: null },
+                    });
+
+                    // Then assign new leader's ledTeamId
                     await tx.participant.update({
                         where: { id: newLeaderId },
                         data: { ledTeamId: currentTeam.id },
                     });
 
-                    // Update team leader
+                    // Finally, update team leader
                     await tx.team.update({
                         where: { id: currentTeam.id },
                         data: { leaderId: newLeaderId },
@@ -254,7 +266,7 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
     }
 }
 
-export async function joinTeam(participantId: string, teamId: string, newLeaderId?: string) {
+export async function joinTeam(participantId: string, teamId: string, newLeaderId?: string | null) {
     if (!participantId || !teamId) {
         throw new Error('Participant ID and Team ID are required')
     }
@@ -309,13 +321,19 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
                             throw new Error('Выбранный лидер не является участником команды');
                         }
 
-                        // Update new leader
+                        // First, remove current leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { ledTeamId: null },
+                        });
+
+                        // Then assign new leader's ledTeamId
                         await tx.participant.update({
                             where: { id: newLeaderId },
                             data: { ledTeamId: currentTeam.id },
                         });
 
-                        // Update team leader
+                        // Finally, update team leader
                         await tx.team.update({
                             where: { id: currentTeam.id },
                             data: { leaderId: newLeaderId },
