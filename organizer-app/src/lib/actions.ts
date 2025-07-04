@@ -84,3 +84,181 @@ export async function deleteTeam(formData: FormData) {
         throw new Error('Failed to delete team')
     }
 }
+
+export async function changeTeam(formData: FormData) {
+    const participantId = formData.get('participantId') as string
+    const newTeamId = formData.get('newTeamId') as string
+    const newLeaderId = formData.get('newLeaderId') as string | null
+    const newTeamName = formData.get('newTeamName') as string | null
+    const newTeamNickname = formData.get('newTeamNickname') as string | null
+
+    if (!participantId) {
+        throw new Error('Participant ID is required')
+    }
+
+    // Validate new team creation
+    if (newTeamId === 'new') {
+        if (!newTeamName || !newTeamNickname) {
+            throw new Error('Название и никнейм команды обязательны')
+        }
+        
+        // Check if nickname is valid
+        if (!/^[a-zA-Z0-9_-]+$/.test(newTeamNickname)) {
+            throw new Error('Никнейм команды может содержать только буквы, цифры, дефисы и подчеркивания')
+        }
+    }
+
+    try {
+        await db.$transaction(async (tx) => {
+            // Get current participant with team info
+            const participant = await tx.participant.findUnique({
+                where: { id: participantId },
+                include: {
+                    team: {
+                        include: {
+                            members: true,
+                            leader: true,
+                        },
+                    },
+                    ledTeam: {
+                        include: {
+                            members: true,
+                        },
+                    },
+                },
+            });
+
+            if (!participant) {
+                throw new Error('Participant not found');
+            }
+
+            const currentTeam = participant.team;
+            const isCurrentLeader = !!participant.ledTeam;
+
+            // Handle leaving current team
+            if (currentTeam) {
+                const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
+                
+                if (isCurrentLeader) {
+                    // Leader is leaving
+                    if (remainingMembers.length === 0) {
+                        // No one left, delete the team
+                        await tx.team.delete({
+                            where: { id: currentTeam.id },
+                        });
+                    } else {
+                        // Transfer leadership
+                        if (!newLeaderId) {
+                            throw new Error('Вы должны выбрать нового лидера команды');
+                        }
+                        
+                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        if (!newLeader) {
+                            throw new Error('Выбранный лидер не является участником команды');
+                        }
+
+                        // First, remove current leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { ledTeamId: null },
+                        });
+
+                        // Then assign new leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: newLeaderId },
+                            data: { ledTeamId: currentTeam.id },
+                        });
+
+                        // Finally, update team leader
+                        await tx.team.update({
+                            where: { id: currentTeam.id },
+                            data: { leaderId: newLeaderId },
+                        });
+                    }
+                } else {
+                    // Regular member leaving
+                    if (remainingMembers.length === 0) {
+                        // Team becomes empty, delete it
+                        await tx.team.delete({
+                            where: { id: currentTeam.id },
+                        });
+                    }
+                }
+            }
+
+            let finalTeamId: string | null = null;
+            let isNewLeader = false;
+
+            // Handle team assignment
+            if (newTeamId === 'new') {
+                // Create new team
+                const existingTeam = await tx.team.findUnique({
+                    where: { nickname: newTeamNickname! },
+                });
+
+                if (existingTeam) {
+                    throw new Error('Команда с таким никнеймом уже существует');
+                }
+
+                const createdTeam = await tx.team.create({
+                    data: {
+                        name: newTeamName!,
+                        nickname: newTeamNickname!,
+                    },
+                });
+
+                finalTeamId = createdTeam.id;
+                isNewLeader = true;
+            } else if (newTeamId === 'null') {
+                finalTeamId = null;
+            } else if (newTeamId) {
+                // Join existing team
+                const existingTeam = await tx.team.findUnique({
+                    where: { id: newTeamId },
+                });
+
+                if (!existingTeam) {
+                    throw new Error('Новая команда не найдена');
+                }
+
+                finalTeamId = newTeamId;
+            }
+
+            // Update participant (only if leadership wasn't already transferred)
+            const wasLeadershipTransferred = isCurrentLeader && currentTeam && 
+                currentTeam.members.filter(m => m.id !== participantId).length > 0 && 
+                finalTeamId !== currentTeam.id;
+            if (!wasLeadershipTransferred) {
+                await tx.participant.update({
+                    where: { id: participantId },
+                    data: {
+                        teamId: finalTeamId,
+                        ledTeamId: isNewLeader ? finalTeamId : null,
+                    },
+                });
+            } else {
+                // Only update teamId if leadership was already transferred
+                await tx.participant.update({
+                    where: { id: participantId },
+                    data: {
+                        teamId: finalTeamId,
+                    },
+                });
+            }
+
+            // If participant became leader of new team, update team's leaderId
+            if (isNewLeader && finalTeamId) {
+                await tx.team.update({
+                    where: { id: finalTeamId },
+                    data: { leaderId: participantId },
+                });
+            }
+        });
+
+        revalidatePath('/profile');
+        revalidatePath('/dashboard/teams');
+    } catch (error) {
+        console.error('Error changing team:', error);
+        throw error;
+    }
+}
