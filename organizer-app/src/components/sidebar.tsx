@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Users, Home } from 'lucide-react'
+import { Users, Home, UserCheck } from 'lucide-react'
 
 const navigation = [
     { name: 'Главная', href: '/dashboard', icon: Home },
     { name: 'Команды', href: '/dashboard/teams', icon: Users },
+    { name: 'Участники', href: '/dashboard/participants', icon: UserCheck },
 ]
 
 export function Sidebar() {

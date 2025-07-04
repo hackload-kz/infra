@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { Users, Calendar, TrendingUp, Activity } from 'lucide-react'
+import { Users, Calendar, TrendingUp, Activity, UserCheck } from 'lucide-react'
 import Link from 'next/link'
 import { isOrganizer } from '@/lib/admin'
 
@@ -39,6 +39,17 @@ export default async function DashboardPage() {
         }
     });
 
+    // Get participant statistics
+    const totalParticipants = await db.participant.count();
+
+    const participantsThisWeek = await db.participant.count({
+        where: {
+            createdAt: {
+                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            }
+        }
+    });
+
     return (
         <div className="space-y-6">
             <div>
@@ -62,24 +73,24 @@ export default async function DashboardPage() {
 
                 <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-sm">
                     <div className="flex items-center">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                            <TrendingUp className="h-6 w-6 text-green-600" />
+                        <div className="p-2 bg-indigo-100 rounded-lg">
+                            <UserCheck className="h-6 w-6 text-indigo-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Команд за неделю</p>
-                            <p className="text-2xl font-bold text-gray-900">{teamsThisWeek}</p>
+                            <p className="text-sm font-medium text-gray-800">Всего участников</p>
+                            <p className="text-2xl font-bold text-gray-900">{totalParticipants}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-sm">
                     <div className="flex items-center">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                            <Activity className="h-6 w-6 text-purple-600" />
+                        <div className="p-2 bg-green-100 rounded-lg">
+                            <TrendingUp className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Активных тестов</p>
-                            <p className="text-2xl font-bold text-gray-900">0</p>
+                            <p className="text-sm font-medium text-gray-800">Команд за неделю</p>
+                            <p className="text-2xl font-bold text-gray-900">{teamsThisWeek}</p>
                         </div>
                     </div>
                 </div>
@@ -131,7 +142,7 @@ export default async function DashboardPage() {
                     <h2 className="text-lg font-semibold text-gray-900">Быстрые действия</h2>
                 </div>
                 <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <Link
                             href="/dashboard/teams"
                             className="block p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
@@ -141,6 +152,18 @@ export default async function DashboardPage() {
                                 <div>
                                     <h3 className="font-medium text-gray-900">Управление командами</h3>
                                     <p className="text-sm text-gray-700">Просмотр, создание и редактирование команд</p>
+                                </div>
+                            </div>
+                        </Link>
+                        <Link
+                            href="/dashboard/participants"
+                            className="block p-4 border border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
+                        >
+                            <div className="flex items-center">
+                                <UserCheck className="h-5 w-5 text-indigo-600 mr-3" />
+                                <div>
+                                    <h3 className="font-medium text-gray-900">Управление участниками</h3>
+                                    <p className="text-sm text-gray-700">Просмотр и редактирование участников</p>
                                 </div>
                             </div>
                         </Link>
