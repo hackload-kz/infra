@@ -1,5 +1,5 @@
 # Используем официальный Node.js образ
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Устанавливаем зависимости только когда нужно
 FROM base AS deps
@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Копируем файлы зависимостей
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --verbose
 
 # Пересборка исходного кода только когда нужно
 FROM base AS builder
@@ -20,7 +20,7 @@ COPY . .
 RUN npx prisma generate
 
 # Отключаем телеметрию Next.js во время сборки
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Собираем приложение
 RUN npm run build
@@ -29,8 +29,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -59,7 +59,7 @@ USER nextjs
 
 EXPOSE 3300
 
-ENV PORT 3300
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3300
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["./docker-entrypoint.sh"]
