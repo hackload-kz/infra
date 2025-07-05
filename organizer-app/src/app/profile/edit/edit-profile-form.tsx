@@ -13,6 +13,7 @@ interface Participant {
     email: string;
     city: string | null;
     company: string | null;
+    telegram?: string | null;
     experienceLevel?: string | null;
     technologies?: string | null;
     cloudServices?: string | null;
@@ -59,6 +60,7 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
         name: participant.name || '',
         city: participant.city || '',
         company: participant.company || '',
+        telegram: participant.telegram || '',
         experienceLevel: participant.experienceLevel || '',
         technologies: participant.technologies ? JSON.parse(participant.technologies) : [],
         cloudServices: participant.cloudServices ? JSON.parse(participant.cloudServices) : [],
@@ -194,6 +196,22 @@ export function EditProfileForm({ participant, userEmail, availableTeams }: Edit
                             onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                             placeholder="Название компании"
                         />
+                    </div>
+
+                    <div>
+                        <label htmlFor="telegram" className="block text-sm font-semibold text-gray-800 mb-1">
+                            Telegram
+                        </label>
+                        <Input
+                            id="telegram"
+                            type="text"
+                            value={formData.telegram}
+                            onChange={(e) => setFormData(prev => ({ ...prev, telegram: e.target.value }))}
+                            placeholder="@username или https://t.me/username"
+                        />
+                        <p className="text-gray-600 text-xs mt-1">
+                            Введите @username или полную ссылку на профиль
+                        </p>
                     </div>
                 </div>
 

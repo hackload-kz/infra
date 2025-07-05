@@ -31,7 +31,7 @@ export default async function SpaceFaqPage() {
   const user = {
     name: participant.name,
     email: participant.email,
-    image: session.user?.image
+    image: session.user?.image || undefined
   }
 
   const faqs = [

@@ -31,7 +31,7 @@ export default async function SpaceCalendarPage() {
   const user = {
     name: participant.name,
     email: participant.email,
-    image: session.user?.image
+    image: session.user?.image || undefined
   }
 
   // Mock calendar events

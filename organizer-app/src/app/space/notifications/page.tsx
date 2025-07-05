@@ -9,13 +9,13 @@ export const dynamic = 'force-dynamic'
 export default async function SpaceNotificationsPage() {
   const session = await auth()
 
-  if (!session) {
+  if (!session?.user?.email) {
     redirect('/login')
   }
 
   const participant = await db.participant.findFirst({
     where: { 
-      user: { email: session.user?.email } 
+      user: { email: session.user.email } 
     },
     include: {
       user: true,
@@ -31,7 +31,7 @@ export default async function SpaceNotificationsPage() {
   const user = {
     name: participant.name,
     email: participant.email,
-    image: session.user?.image
+    image: session.user?.image || undefined
   }
 
   return (

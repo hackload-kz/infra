@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
             email,
             city,
             company,
+            telegram,
             teamOption,
             selectedTeam,
             newTeamName,
@@ -118,6 +119,7 @@ export async function POST(request: NextRequest) {
                     email,
                     city: city || null,
                     company: company || null,
+                    telegram: telegram || null,
                     userId: user.id,
                     teamId,
                     ledTeamId: isLeader ? teamId : null,
@@ -197,6 +199,7 @@ export async function PUT(request: NextRequest) {
             name,
             city,
             company,
+            telegram,
             // Experience fields
             experienceLevel,
             technologies,
@@ -242,6 +245,7 @@ export async function PUT(request: NextRequest) {
                 name,
                 city: city || null,
                 company: company || null,
+                telegram: telegram || null,
                 // Experience fields
                 experienceLevel: experienceLevel || null,
                 technologies: technologies ? JSON.stringify(technologies) : null,

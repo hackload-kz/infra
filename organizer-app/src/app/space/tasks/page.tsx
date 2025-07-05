@@ -36,7 +36,7 @@ export default async function SpaceTasksPage() {
   const user = {
     name: participant.name,
     email: participant.email,
-    image: session.user?.image
+    image: session.user?.image || undefined
   }
 
   // Mock tasks data

@@ -13,7 +13,8 @@ import {
   Mail,
   MapPin,
   Building,
-  ExternalLink
+  ExternalLink,
+  Send
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -53,7 +54,7 @@ export default async function ProfileTeamPage() {
   const user = {
     name: participant.name,
     email: participant.email,
-    image: session.user?.image
+    image: session.user?.image || undefined
   }
 
   const statusLabels = {
@@ -155,7 +156,7 @@ export default async function ProfileTeamPage() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
                         <h4 className="text-white font-medium">{member.name}</h4>
-                        {member.id === participant.team.leader?.id && (
+                        {member.id === participant.team?.leader?.id && (
                           <Crown className="w-4 h-4 text-amber-400" />
                         )}
                         {member.id === participant.id && (
@@ -177,6 +178,22 @@ export default async function ProfileTeamPage() {
                           <div className="flex items-center space-x-2 text-sm text-slate-400">
                             <MapPin className="w-3 h-3" />
                             <span>{member.city}</span>
+                          </div>
+                        )}
+                        {member.telegram && (
+                          <div className="flex items-center space-x-2 text-sm text-slate-400">
+                            <Send className="w-3 h-3" />
+                            <a
+                              href={member.telegram.startsWith('http') ? member.telegram : `https://t.me/${member.telegram.replace('@', '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-amber-400 transition-colors"
+                            >
+                              {member.telegram.startsWith('http') ? 
+                                member.telegram.replace('https://t.me/', '@') : 
+                                member.telegram.startsWith('@') ? member.telegram : `@${member.telegram}`
+                              }
+                            </a>
                           </div>
                         )}
                       </div>

@@ -10,6 +10,7 @@ interface Participant {
     email: string
     city: string | null
     company: string | null
+    telegram?: string | null
     experienceLevel?: string | null
     technologies?: string | null
     cloudServices?: string | null
@@ -29,6 +30,7 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
         name: participant.name || '',
         city: participant.city || '',
         company: participant.company || '',
+        telegram: participant.telegram || '',
         experienceLevel: participant.experienceLevel || '',
         technologies: participant.technologies ? JSON.parse(participant.technologies) : [],
         cloudServices: participant.cloudServices ? JSON.parse(participant.cloudServices) : [],
@@ -125,7 +127,7 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
                             />
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div>
                             <label htmlFor="company" className="block text-sm font-medium text-slate-300 mb-2">
                                 Компания
                             </label>
@@ -137,6 +139,23 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
                                 placeholder="Название компании"
                                 className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="telegram" className="block text-sm font-medium text-slate-300 mb-2">
+                                Telegram
+                            </label>
+                            <input
+                                id="telegram"
+                                type="text"
+                                value={formData.telegram}
+                                onChange={(e) => setFormData(prev => ({ ...prev, telegram: e.target.value }))}
+                                placeholder="@username или https://t.me/username"
+                                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
+                            />
+                            <p className="text-slate-500 text-xs mt-1">
+                                Введите @username или полную ссылку на профиль
+                            </p>
                         </div>
                     </div>
                 </div>

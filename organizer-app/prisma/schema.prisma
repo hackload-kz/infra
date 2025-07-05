@@ -65,6 +65,7 @@ model Participant {
   email     String   @unique
   city      String?
   company   String?
+  telegram  String?  // Telegram username or profile link
   
   // Experience fields
   experienceLevel     String?
