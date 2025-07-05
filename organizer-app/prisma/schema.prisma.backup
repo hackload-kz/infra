@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -87,62 +93,73 @@ model HackathonParticipation {
 }
 
 model Team {
-  id        String        @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
-  nickname  String        @unique
-  comment   String?
-  status    TeamStatus    @default(NEW)
+  nickname  String     @unique
+  status    TeamStatus @default(NEW)
   level     TeamLevel?
-  
+  comment   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
   // Hackathon relation
   hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   hackathonId String
-  
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  leaderId  String?       @unique
-  leader    Participant?  @relation("TeamLeader")
-  members   Participant[] @relation("TeamMembers")
+
+  // Relations
+  leader   Participant?  @relation("TeamLeader")
+  leaderId String?       @unique
+  members  Participant[] @relation("TeamMembers")
   joinRequests JoinRequest[] @relation("TeamJoinRequests")
 
   @@map("teams")
 }
 
 model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  password    String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String? // Optional for OAuth users
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
   participant Participant?
 
   @@map("users")
 }
 
 model Participant {
-  id                  String   @id @default(cuid())
-  name                String
-  email               String   @unique
-  city                String?
-  company             String?
-  telegram            String?  // Telegram username or profile link
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  userId              String   @unique
-  teamId              String?
-  ledTeamId           String?  @unique
-  cloudProviders      String?
-  cloudServices       String?
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  city      String?
+  company   String?
+  telegram  String?  // Telegram username or profile link
+  
+  // Experience fields
   experienceLevel     String?
-  otherCloudProviders String?
-  otherCloudServices  String?
+  technologies        String?  // JSON string of array
+  cloudServices       String?  // JSON string of array
+  cloudProviders      String?  // JSON string of array
   otherTechnologies   String?
-  technologies        String?
-  ledTeam             Team?    @relation("TeamLeader", fields: [ledTeamId], references: [id])
-  team                Team?    @relation("TeamMembers", fields: [teamId], references: [id])
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  otherCloudServices  String?
+  otherCloudProviders String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  team   Team?   @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  teamId String?
+
+  ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id], onDelete: SetNull)
+  ledTeamId String? @unique
+
+  joinRequests JoinRequest[] @relation("ParticipantJoinRequests")
   hackathonParticipations HackathonParticipation[]
-  joinRequests        JoinRequest[] @relation("ParticipantJoinRequests")
 
   @@map("participants")
 }
@@ -151,7 +168,9 @@ model JoinRequest {
   id        String            @id @default(cuid())
   status    JoinRequestStatus @default(PENDING)
   message   String?           // Optional message from participant
-  
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
   // Relations
   hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   hackathonId String
@@ -161,9 +180,6 @@ model JoinRequest {
 
   team   Team   @relation("TeamJoinRequests", fields: [teamId], references: [id], onDelete: Cascade)
   teamId String
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   // Unique constraint to prevent duplicate requests within same hackathon
   @@unique([participantId, teamId, hackathonId])

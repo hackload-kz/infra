@@ -4,10 +4,14 @@ import { Button } from '@/components/ui/button';
 import { SignOutButton } from '@/components/sign-out-button';
 import { isOrganizer } from '@/lib/admin';
 import { db } from '@/lib/db';
+import { getCurrentHackathon } from '@/lib/hackathon';
 
 export default async function Home() {
   const session = await auth();
   const userIsOrganizer = isOrganizer(session?.user?.email);
+
+  // Get current hackathon
+  const hackathon = await getCurrentHackathon();
 
   // For organizers, check if they have a participant profile (they shouldn't)
   let userHasParticipantProfile = false;
@@ -29,12 +33,18 @@ export default async function Home() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Добро пожаловать на HackLoad 2025!
+            Добро пожаловать на {hackathon?.name || 'Хакатон'}!
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Присоединяйтесь к нам, создавайте команды и участвуйте в увлекательном хакатоне.
+            {hackathon?.description || 'Присоединяйтесь к нам, создавайте команды и участвуйте в увлекательном хакатоне.'}
             Зарегистрируйтесь, чтобы найти команду или создать свою собственную.
           </p>
+          {hackathon?.theme && (
+            <div className="mb-8">
+              <p className="text-lg font-semibold text-blue-700 mb-2">Тема хакатона:</p>
+              <p className="text-xl text-gray-800 font-medium">{hackathon.theme}</p>
+            </div>
+          )}
 
           <div className="space-x-4">
             {session ? (

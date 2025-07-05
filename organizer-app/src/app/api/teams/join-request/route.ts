@@ -56,12 +56,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Team is not accepting new members' }, { status: 400 })
     }
 
+    // Get current hackathon
+    const { getCurrentHackathon } = await import('@/lib/hackathon')
+    const hackathon = await getCurrentHackathon()
+    if (!hackathon) {
+      return NextResponse.json({ error: 'No active hackathon found' }, { status: 400 })
+    }
+
     // Check if participant already has a pending request for this team
     const existingRequest = await db.joinRequest.findUnique({
       where: {
-        participantId_teamId: {
+        participantId_teamId_hackathonId: {
           participantId: participant.id,
-          teamId: teamId
+          teamId: teamId,
+          hackathonId: hackathon.id
         }
       }
     })
@@ -75,6 +83,7 @@ export async function POST(request: NextRequest) {
       data: {
         participantId: participant.id,
         teamId: teamId,
+        hackathonId: hackathon.id,
         message: message || null
       },
       include: {

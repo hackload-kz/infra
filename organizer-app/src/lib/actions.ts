@@ -3,6 +3,7 @@
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { TeamStatus } from '@prisma/client'
+import { getCurrentHackathon } from '@/lib/hackathon'
 
 
 export async function createTeam(formData: FormData) {
@@ -14,10 +15,16 @@ export async function createTeam(formData: FormData) {
     }
 
     try {
+        const hackathon = await getCurrentHackathon()
+        if (!hackathon) {
+            throw new Error('No active hackathon found')
+        }
+
         await db.team.create({
             data: {
                 name,
                 nickname,
+                hackathonId: hackathon.id,
             },
         })
 
@@ -266,12 +273,19 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 }
             }
 
+            // Get current hackathon
+            const hackathon = await getCurrentHackathon()
+            if (!hackathon) {
+                throw new Error('No active hackathon found')
+            }
+
             // Create new team
             const createdTeam = await tx.team.create({
                 data: {
                     name: teamName,
                     nickname: teamNickname,
                     leaderId: participantId,
+                    hackathonId: hackathon.id,
                 },
             });
 
@@ -521,10 +535,17 @@ export async function changeTeam(formData: FormData) {
                     throw new Error('Команда с таким никнеймом уже существует');
                 }
 
+                // Get current hackathon
+                const hackathon = await getCurrentHackathon()
+                if (!hackathon) {
+                    throw new Error('No active hackathon found')
+                }
+
                 const createdTeam = await tx.team.create({
                     data: {
                         name: newTeamName!,
                         nickname: newTeamNickname!,
+                        hackathonId: hackathon.id,
                     },
                 });
 
@@ -590,6 +611,12 @@ export async function createJoinRequest(participantId: string, teamId: string, m
     }
 
     try {
+        // Get current hackathon
+        const hackathon = await getCurrentHackathon()
+        if (!hackathon) {
+            throw new Error('No active hackathon found')
+        }
+
         // Check if participant is already in a team
         const participant = await db.participant.findUnique({
             where: { id: participantId }
@@ -609,7 +636,10 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             include: { 
                 members: true,
                 joinRequests: {
-                    where: { status: 'PENDING' }
+                    where: { 
+                        status: 'PENDING',
+                        hackathonId: hackathon.id
+                    }
                 }
             }
         })
@@ -618,7 +648,11 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             throw new Error('Команда не найдена')
         }
 
-        if (team.members.length >= 4) {
+        if (team.hackathonId !== hackathon.id) {
+            throw new Error('Команда принадлежит другому хакатону')
+        }
+
+        if (team.members.length >= hackathon.maxTeamSize) {
             throw new Error('Команда переполнена')
         }
 
@@ -630,9 +664,10 @@ export async function createJoinRequest(participantId: string, teamId: string, m
         // Check if participant already has a pending request for this team
         const existingRequest = await db.joinRequest.findUnique({
             where: {
-                participantId_teamId: {
+                participantId_teamId_hackathonId: {
                     participantId: participantId,
-                    teamId: teamId
+                    teamId: teamId,
+                    hackathonId: hackathon.id
                 }
             }
         })
@@ -646,6 +681,7 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             data: {
                 participantId: participantId,
                 teamId: teamId,
+                hackathonId: hackathon.id,
                 message: message || null
             }
         })

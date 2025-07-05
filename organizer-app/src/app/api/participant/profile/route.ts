@@ -101,10 +101,18 @@ export async function POST(request: NextRequest) {
                     throw new Error('Команда с таким nickname уже существует');
                 }
 
+                // Get current hackathon
+                const { getCurrentHackathon } = await import('@/lib/hackathon')
+                const hackathon = await getCurrentHackathon()
+                if (!hackathon) {
+                    throw new Error('No active hackathon found')
+                }
+
                 const newTeam = await tx.team.create({
                     data: {
                         name: newTeamName,
                         nickname: newTeamNickname,
+                        hackathonId: hackathon.id,
                     },
                 });
 

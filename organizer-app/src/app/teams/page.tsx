@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 import { SignOutButton } from '@/components/sign-out-button';
 import { isOrganizer } from '@/lib/admin';
+import { getCurrentHackathon } from '@/lib/hackathon';
 
 // Force dynamic rendering since this page requires database access
 export const dynamic = 'force-dynamic'
@@ -11,7 +12,13 @@ export default async function TeamsPage() {
     const session = await auth();
     const userIsOrganizer = isOrganizer(session?.user?.email);
 
+    // Get current hackathon
+    const hackathon = await getCurrentHackathon();
+    
     const teams = await db.team.findMany({
+        where: hackathon ? {
+            hackathonId: hackathon.id
+        } : {},
         include: {
             leader: true,
             members: true,
@@ -33,11 +40,16 @@ export default async function TeamsPage() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Команды хакатона
+                                Команды {hackathon?.name || 'хакатона'}
                             </h1>
                             <p className="text-gray-700 font-medium">
                                 Все зарегистрированные команды участников
                             </p>
+                            {hackathon?.theme && (
+                                <p className="text-gray-600 text-sm mt-1">
+                                    Тема: {hackathon.theme}
+                                </p>
+                            )}
                         </div>
 
                         <div className="flex flex-wrap gap-4">
