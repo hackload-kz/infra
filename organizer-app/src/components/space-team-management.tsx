@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { 
   Users, 
   Crown, 
@@ -610,15 +611,13 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
                 <span className="text-white font-medium">Создать команду</span>
               </button>
               
-              {joinableTeams.length > 0 && (
-                <button
-                  onClick={() => setActiveAction('find-teams')}
-                  className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-150 border border-blue-500/30"
-                >
-                  <Search className="w-5 h-5 text-blue-400" />
-                  <span className="text-white font-medium">Найти команду</span>
-                </button>
-              )}
+              <Link
+                href="/space/teams"
+                className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-150 border border-blue-500/30"
+              >
+                <Search className="w-5 h-5 text-blue-400" />
+                <span className="text-white font-medium">Найти команду</span>
+              </Link>
             </>
           ) : (
             <>
@@ -638,24 +637,22 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
                 <span className="text-white font-medium">Создать новую</span>
               </button>
 
-              {(currentTeam.members.length < 4 || joinableTeams.length > 0) && (
-                <button
-                  onClick={() => setActiveAction('find-teams')}
-                  className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-150 border border-blue-500/30"
-                >
-                  {currentTeam.members.length < 4 ? (
-                    <>
-                      <UserPlus className="w-5 h-5 text-blue-400" />
-                      <span className="text-white font-medium">Найти участников</span>
-                    </>
-                  ) : (
-                    <>
-                      <Search className="w-5 h-5 text-blue-400" />
-                      <span className="text-white font-medium">Найти команду</span>
-                    </>
-                  )}
-                </button>
-              )}
+              <Link
+                href="/space/teams"
+                className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-150 border border-blue-500/30"
+              >
+                {currentTeam?.members.length < 4 ? (
+                  <>
+                    <UserPlus className="w-5 h-5 text-blue-400" />
+                    <span className="text-white font-medium">Найти участников</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-5 h-5 text-blue-400" />
+                    <span className="text-white font-medium">Найти команду</span>
+                  </>
+                )}
+              </Link>
             </>
           )}
         </div>

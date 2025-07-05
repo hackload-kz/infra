@@ -15,7 +15,8 @@ import {
   Bell,
   FileText,
   MessageSquare,
-  HelpCircle
+  HelpCircle,
+  Search
 } from 'lucide-react'
 
 interface PersonalCabinetLayoutProps {
@@ -38,6 +39,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Home, label: 'Главная', href: '/space' },
   { icon: User, label: 'Мой профиль', href: '/space/info' },
   { icon: Users, label: 'Моя команда', href: '/space/team' },
+  { icon: Search, label: 'Поиск команд', href: '/space/teams' },
   { icon: Calendar, label: 'Календарь', href: '/space/calendar' },
   { icon: FileText, label: 'Задание', href: '/space/tasks' },
   { icon: Trophy, label: 'Журнал', href: '/space/journal' },

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { SpaceTeamManagement } from '@/components/space-team-management'
+import { JoinRequestsManagement } from '@/components/join-requests-management'
+import { TeamEditWrapper } from '@/components/team-edit-wrapper'
 import Link from 'next/link'
 import { 
   Users,
@@ -40,12 +42,58 @@ export default async function ProfileTeamPage() {
           include: {
             members: true,
             leader: true,
+            joinRequests: {
+              where: { status: 'PENDING' },
+              include: {
+                participant: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    city: true,
+                    company: true,
+                    telegram: true,
+                    experienceLevel: true,
+                    technologies: true,
+                    cloudServices: true,
+                    cloudProviders: true,
+                    otherTechnologies: true,
+                    otherCloudServices: true,
+                    otherCloudProviders: true,
+                  }
+                }
+              },
+              orderBy: { createdAt: 'desc' }
+            }
           }
         },
         ledTeam: {
           include: {
             members: true,
             leader: true,
+            joinRequests: {
+              where: { status: 'PENDING' },
+              include: {
+                participant: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    city: true,
+                    company: true,
+                    telegram: true,
+                    experienceLevel: true,
+                    technologies: true,
+                    cloudServices: true,
+                    cloudProviders: true,
+                    otherTechnologies: true,
+                    otherCloudServices: true,
+                    otherCloudProviders: true,
+                  }
+                }
+              },
+              orderBy: { createdAt: 'desc' }
+            }
           }
         },
       },
@@ -238,6 +286,35 @@ export default async function ProfileTeamPage() {
                 ))}
               </div>
             </div>
+
+            {/* Team Editing for Leaders */}
+            {participant.ledTeam && participant.team && (
+              <TeamEditWrapper
+                team={{
+                  id: participant.team.id,
+                  name: participant.team.name,
+                  nickname: participant.team.nickname,
+                  status: participant.team.status,
+                  members: participant.team.members.map(member => ({
+                    id: member.id,
+                    name: member.name,
+                    email: member.email,
+                    company: member.company,
+                    city: member.city,
+                  })),
+                  leader: participant.team.leader
+                }}
+                leaderId={participant.id}
+              />
+            )}
+
+            {/* Join Requests for Team Leaders */}
+            {participant.ledTeam && participant.team?.joinRequests && participant.team.joinRequests.length > 0 && (
+              <JoinRequestsManagement 
+                joinRequests={participant.team.joinRequests}
+                teamLeaderId={participant.id}
+              />
+            )}
           </>
         ) : (
           <div className="text-center py-16">

@@ -28,6 +28,12 @@ enum TeamLevel {
   ADVANCED
 }
 
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
 model Team {
   id        String     @id @default(cuid())
   name      String
@@ -42,6 +48,7 @@ model Team {
   leader   Participant?  @relation("TeamLeader")
   leaderId String?       @unique
   members  Participant[] @relation("TeamMembers")
+  joinRequests JoinRequest[] @relation("TeamJoinRequests")
 
   @@map("teams")
 }
@@ -89,5 +96,26 @@ model Participant {
   ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id], onDelete: SetNull)
   ledTeamId String? @unique
 
+  joinRequests JoinRequest[] @relation("ParticipantJoinRequests")
+
   @@map("participants")
+}
+
+model JoinRequest {
+  id        String            @id @default(cuid())
+  status    JoinRequestStatus @default(PENDING)
+  message   String?           // Optional message from participant
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  // Relations
+  participant   Participant @relation("ParticipantJoinRequests", fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  team   Team   @relation("TeamJoinRequests", fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+
+  // Unique constraint to prevent duplicate requests
+  @@unique([participantId, teamId])
+  @@map("join_requests")
 }
