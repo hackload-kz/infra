@@ -63,12 +63,16 @@ npx prisma studio
 #### Authentication & Authorization
 - OAuth-only authentication (Google + GitHub)
 - Role-based access control via `ADMIN_USERS` environment variable
-- Admin users access `/dashboard` routes, regular users access `/profile`
+- Admin users access `/dashboard` routes, regular users access `/space`
 - Middleware handles route protection and redirects
 
-#### Database Design
-- Three main models: `User`, `Participant`, `Team`
-- Soft deletion for teams (`isDeleted` field)
+#### Database Design - Universal Hackathon System
+- **Core Models**: `User`, `Participant`, `Team`, `Hackathon`
+- **Relationship Models**: `HackathonParticipation`, `JoinRequest`
+- **Enums**: `TeamStatus`, `TeamLevel`, `JoinRequestStatus`
+- Teams belong to specific hackathons (`hackathonId` required)
+- Participants can participate in multiple hackathons
+- Join requests are hackathon-specific
 - Unique constraints on team nicknames for URL-friendly routing
 - Cascade deletion from User to Participant
 
@@ -85,9 +89,23 @@ src/
 │   ├── api/               # API routes
 │   │   ├── auth/          # NextAuth configuration
 │   │   ├── participant/   # Participant profile endpoints
+│   │   ├── participants/  # Participant management endpoints
 │   │   └── teams/         # Team management endpoints
 │   ├── dashboard/         # Admin dashboard (organizer-only)
+│   │   ├── hackathons/    # Hackathon management
+│   │   ├── participants/  # Participant administration
+│   │   └── teams/         # Team administration
+│   ├── space/             # Participant cabinet
+│   │   ├── calendar/      # Event calendar
+│   │   ├── faq/          # FAQ section
+│   │   ├── info/         # Hackathon information
+│   │   ├── journal/      # Participant journal
+│   │   ├── messages/     # Messages and notifications
+│   │   ├── tasks/        # Task management
+│   │   ├── team/         # Team management
+│   │   └── teams/        # Team browsing and joining
 │   ├── profile/           # User profile management
+│   ├── teams/             # Public team pages
 │   └── login/             # OAuth login page
 ├── components/            # React components
 │   ├── ui/               # Reusable UI components
@@ -109,6 +127,7 @@ src/
 - Always run `npx prisma generate` after modifying `schema.prisma`
 - Use `npx prisma db push` for development schema changes
 - Database migrations are in `prisma/migrations/`
+- **Migration Strategy**: Use gradual migrations for data-preserving schema changes
 
 ### Authentication Flow
 - Users authenticate via OAuth (Google/GitHub)
@@ -116,11 +135,34 @@ src/
 - Use `isOrganizer()` function to check admin privileges
 - Session role is set in JWT callback in `auth.config.ts`
 
-### Team Management
-- Teams have unique nicknames for URL routing
-- Use soft deletion (set `isDeleted: true`)
+### API Endpoints
+#### Team Management
+- `GET/POST /api/teams` - List/create teams
+- `GET/PUT/DELETE /api/teams/[id]` - Team operations
+- `PUT /api/teams/[id]/edit` - Admin team editing
+- `POST/DELETE /api/teams/[id]/members/[participantId]` - Member management
+- `POST /api/teams/join-request` - Create join request
+- `GET/PUT /api/teams/join-request/[id]` - Handle join requests
+- `GET /api/teams/my-join-requests` - User's join requests
+
+#### Participant Management
+- `GET/PUT /api/participant/profile` - User profile operations
+- `GET /api/participants/[id]` - Get participant details
+
+#### Cabinet URLs (Future Implementation)
+- **Admin Cabinet**: `/[hackathon-slug]/dashboard` (e.g., `/hackload-2025/dashboard`)
+- **Participant Cabinet**: `/[hackathon-slug]/space` (e.g., `/hackload-2025/space`)
+- **Current**: `/dashboard` (admin), `/space` (participant)
+
+### Hackathon & Team Management
+- **Hackathons**: Each hackathon has unique slug for URL routing (`/hackload-2025`)
+- **Teams**: Belong to specific hackathons, have unique nicknames within hackathon
+- **Team Status**: NEW, INCOMPLETED, FINISHED, IN_REVIEW, APPROVED, CANCELED, REJECTED
+- **Team Level**: BEGINNER, ADVANCED (optional)
+- **Join Requests**: Hackathon-specific team join requests with status tracking
 - Team leaders are linked via `leaderId` field
 - Team members are linked via `teamId` field in Participant model
+- Participants can join multiple hackathons via `HackathonParticipation`
 
 ### UI Components
 - Follow existing Tailwind CSS patterns
@@ -152,3 +194,76 @@ ADMIN_USERS=admin1@example.com,admin2@example.com
 - GitHub Actions builds and publishes Docker images
 - Images tagged with both `latest` and commit SHA
 - Published to GitHub Container Registry (ghcr.io)
+- Uses self-hosted runners with `[self-hosted, orgs]` labels
+
+## Database Schema
+
+### Core Entities
+
+#### Hackathon
+```typescript
+model Hackathon {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique // URL-friendly identifier
+  description String?
+  theme       String? // e.g., "Building a ticket selling system"
+  
+  // Timing
+  startDate         DateTime
+  endDate           DateTime
+  registrationStart DateTime
+  registrationEnd   DateTime
+  
+  // Settings
+  maxTeamSize       Int @default(4)
+  minTeamSize       Int @default(1)
+  allowTeamChanges  Boolean @default(true)
+  isActive          Boolean @default(true)
+  isPublic          Boolean @default(true)
+  
+  // Branding
+  logoUrl          String?
+  bannerUrl        String?
+  primaryColor     String?
+  secondaryColor   String?
+  
+  // Relations
+  teams            Team[]
+  participations   HackathonParticipation[]
+  joinRequests     JoinRequest[]
+}
+```
+
+#### Team (Enhanced)
+```typescript
+model Team {
+  id        String        @id @default(cuid())
+  name      String
+  nickname  String        @unique
+  comment   String?
+  status    TeamStatus    @default(NEW)
+  level     TeamLevel?
+  
+  // Hackathon relation
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id])
+  hackathonId String
+  
+  // Relations
+  leader    Participant?  @relation("TeamLeader")
+  members   Participant[] @relation("TeamMembers")
+  joinRequests JoinRequest[]
+}
+```
+
+#### New Entities
+
+**HackathonParticipation**: Links participants to hackathons
+**JoinRequest**: Manages team join requests within hackathons
+**Enums**: TeamStatus, TeamLevel, JoinRequestStatus
+
+### Default Data
+- **Default Hackathon**: "HackLoad 2025" (slug: `hackload-2025`)
+- **Theme**: "Building a ticket selling system"
+- **Dates**: January 15-17, 2025
+- **Registration**: Until January 14, 2025

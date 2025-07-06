@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
             email,
             city,
             company,
+            telegram,
             teamOption,
             selectedTeam,
             newTeamName,
@@ -100,10 +101,18 @@ export async function POST(request: NextRequest) {
                     throw new Error('Команда с таким nickname уже существует');
                 }
 
+                // Get current hackathon
+                const { getCurrentHackathon } = await import('@/lib/hackathon')
+                const hackathon = await getCurrentHackathon()
+                if (!hackathon) {
+                    throw new Error('No active hackathon found')
+                }
+
                 const newTeam = await tx.team.create({
                     data: {
                         name: newTeamName,
                         nickname: newTeamNickname,
+                        hackathonId: hackathon.id,
                     },
                 });
 
@@ -118,6 +127,7 @@ export async function POST(request: NextRequest) {
                     email,
                     city: city || null,
                     company: company || null,
+                    telegram: telegram || null,
                     userId: user.id,
                     teamId,
                     ledTeamId: isLeader ? teamId : null,
@@ -197,6 +207,7 @@ export async function PUT(request: NextRequest) {
             name,
             city,
             company,
+            telegram,
             // Experience fields
             experienceLevel,
             technologies,
@@ -242,6 +253,7 @@ export async function PUT(request: NextRequest) {
                 name,
                 city: city || null,
                 company: company || null,
+                telegram: telegram || null,
                 // Experience fields
                 experienceLevel: experienceLevel || null,
                 technologies: technologies ? JSON.stringify(technologies) : null,

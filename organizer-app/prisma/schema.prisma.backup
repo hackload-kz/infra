@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TeamStatus {
+  NEW
+  INCOMPLETED
+  FINISHED
+  IN_REVIEW
+  APPROVED
+  CANCELED
+  REJECTED
+}
+
+enum TeamLevel {
+  BEGINNER
+  ADVANCED
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
+model Hackathon {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  description String?
+  theme       String? // e.g., "Building a ticket selling system"
+  
+  // Timing
+  startDate         DateTime
+  endDate           DateTime
+  registrationStart DateTime
+  registrationEnd   DateTime
+  
+  // Settings
+  maxTeamSize       Int @default(4)
+  minTeamSize       Int @default(1)
+  allowTeamChanges  Boolean @default(true)
+  isActive          Boolean @default(true)
+  isPublic          Boolean @default(true)
+  
+  // Branding
+  logoUrl          String?
+  bannerUrl        String?
+  primaryColor     String?
+  secondaryColor   String?
+  
+  // Relations
+  teams            Team[]
+  participations   HackathonParticipation[]
+  joinRequests     JoinRequest[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("hackathons")
+}
+
+model HackathonParticipation {
+  id            String @id @default(cuid())
+  
+  // Relations
+  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId   String
+  
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+  
+  // Participation details
+  registeredAt  DateTime @default(now())
+  isActive      Boolean @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([hackathonId, participantId])
+  @@map("hackathon_participations")
+}
+
+model Team {
+  id        String     @id @default(cuid())
+  name      String
+  nickname  String     @unique
+  status    TeamStatus @default(NEW)
+  level     TeamLevel?
+  comment   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Hackathon relation
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId String
+
+  // Relations
+  leader   Participant?  @relation("TeamLeader")
+  leaderId String?       @unique
+  members  Participant[] @relation("TeamMembers")
+  joinRequests JoinRequest[] @relation("TeamJoinRequests")
+
+  @@map("teams")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String? // Optional for OAuth users
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  participant Participant?
+
+  @@map("users")
+}
+
+model Participant {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  city      String?
+  company   String?
+  telegram  String?  // Telegram username or profile link
+  
+  // Experience fields
+  experienceLevel     String?
+  technologies        String?  // JSON string of array
+  cloudServices       String?  // JSON string of array
+  cloudProviders      String?  // JSON string of array
+  otherTechnologies   String?
+  otherCloudServices  String?
+  otherCloudProviders String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  team   Team?   @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  teamId String?
+
+  ledTeam   Team?   @relation("TeamLeader", fields: [ledTeamId], references: [id], onDelete: SetNull)
+  ledTeamId String? @unique
+
+  joinRequests JoinRequest[] @relation("ParticipantJoinRequests")
+  hackathonParticipations HackathonParticipation[]
+
+  @@map("participants")
+}
+
+model JoinRequest {
+  id        String            @id @default(cuid())
+  status    JoinRequestStatus @default(PENDING)
+  message   String?           // Optional message from participant
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  // Relations
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId String
+
+  participant   Participant @relation("ParticipantJoinRequests", fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  team   Team   @relation("TeamJoinRequests", fields: [teamId], references: [id], onDelete: Cascade)
+  teamId String
+
+  // Unique constraint to prevent duplicate requests within same hackathon
+  @@unique([participantId, teamId, hackathonId])
+  @@map("join_requests")
+}

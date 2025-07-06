@@ -6,14 +6,29 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# Оптимизация npm для быстрой установки
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set fetch-retries 3
+RUN npm config set fetch-retry-mintimeout 10000
+RUN npm config set fetch-retry-maxtimeout 60000
+
 # Копируем файлы зависимостей
 COPY package.json package-lock.json* ./
-RUN npm ci --verbose
+
+# Используем npm ci без verbose для быстрой установки
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --silent
 
 # Пересборка исходного кода только когда нужно
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+
+# Устанавливаем все зависимости (включая dev) для сборки
+COPY package.json package-lock.json* ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --silent
+
+# Копируем исходный код
 COPY . .
 
 # Генерируем Prisma Client

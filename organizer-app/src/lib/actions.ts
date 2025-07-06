@@ -3,6 +3,7 @@
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { TeamStatus } from '@prisma/client'
+import { getCurrentHackathon } from '@/lib/hackathon'
 
 
 export async function createTeam(formData: FormData) {
@@ -14,10 +15,16 @@ export async function createTeam(formData: FormData) {
     }
 
     try {
+        const hackathon = await getCurrentHackathon()
+        if (!hackathon) {
+            throw new Error('No active hackathon found')
+        }
+
         await db.team.create({
             data: {
                 name,
                 nickname,
+                hackathonId: hackathon.id,
             },
         })
 
@@ -266,12 +273,19 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 }
             }
 
+            // Get current hackathon
+            const hackathon = await getCurrentHackathon()
+            if (!hackathon) {
+                throw new Error('No active hackathon found')
+            }
+
             // Create new team
             const createdTeam = await tx.team.create({
                 data: {
                     name: teamName,
                     nickname: teamNickname,
                     leaderId: participantId,
+                    hackathonId: hackathon.id,
                 },
             });
 
@@ -521,10 +535,17 @@ export async function changeTeam(formData: FormData) {
                     throw new Error('Команда с таким никнеймом уже существует');
                 }
 
+                // Get current hackathon
+                const hackathon = await getCurrentHackathon()
+                if (!hackathon) {
+                    throw new Error('No active hackathon found')
+                }
+
                 const createdTeam = await tx.team.create({
                     data: {
                         name: newTeamName!,
                         nickname: newTeamNickname!,
+                        hackathonId: hackathon.id,
                     },
                 });
 
@@ -581,5 +602,272 @@ export async function changeTeam(formData: FormData) {
     } catch (error) {
         console.error('Error changing team:', error);
         throw error;
+    }
+}
+
+export async function createJoinRequest(participantId: string, teamId: string, message?: string) {
+    if (!participantId || !teamId) {
+        throw new Error('Participant ID and Team ID are required')
+    }
+
+    try {
+        // Get current hackathon
+        const hackathon = await getCurrentHackathon()
+        if (!hackathon) {
+            throw new Error('No active hackathon found')
+        }
+
+        // Check if participant is already in a team
+        const participant = await db.participant.findUnique({
+            where: { id: participantId }
+        })
+
+        if (!participant) {
+            throw new Error('Участник не найден')
+        }
+
+        if (participant.teamId) {
+            throw new Error('Вы уже состоите в команде')
+        }
+
+        // Check if team exists and has space
+        const team = await db.team.findUnique({
+            where: { id: teamId },
+            include: { 
+                members: true,
+                joinRequests: {
+                    where: { 
+                        status: 'PENDING',
+                        hackathonId: hackathon.id
+                    }
+                }
+            }
+        })
+
+        if (!team) {
+            throw new Error('Команда не найдена')
+        }
+
+        if (team.hackathonId !== hackathon.id) {
+            throw new Error('Команда принадлежит другому хакатону')
+        }
+
+        if (team.members.length >= hackathon.maxTeamSize) {
+            throw new Error('Команда переполнена')
+        }
+
+        // Check if team is in a joinable status
+        if (!['NEW', 'INCOMPLETED'].includes(team.status)) {
+            throw new Error('Команда не принимает новых участников')
+        }
+
+        // Check if participant already has a pending request for this team
+        const existingRequest = await db.joinRequest.findUnique({
+            where: {
+                participantId_teamId_hackathonId: {
+                    participantId: participantId,
+                    teamId: teamId,
+                    hackathonId: hackathon.id
+                }
+            }
+        })
+
+        if (existingRequest) {
+            throw new Error('У вас уже есть заявка на вступление в эту команду')
+        }
+
+        // Create the join request
+        await db.joinRequest.create({
+            data: {
+                participantId: participantId,
+                teamId: teamId,
+                hackathonId: hackathon.id,
+                message: message || null
+            }
+        })
+
+        revalidatePath('/space/team')
+    } catch (error) {
+        console.error('Error creating join request:', error)
+        throw error
+    }
+}
+
+export async function respondToJoinRequest(joinRequestId: string, action: 'approve' | 'decline', teamLeaderId: string) {
+    if (!joinRequestId || !action || !teamLeaderId) {
+        throw new Error('All parameters are required')
+    }
+
+    try {
+        await db.$transaction(async (tx) => {
+            // Get the join request
+            const joinRequest = await tx.joinRequest.findUnique({
+                where: { id: joinRequestId },
+                include: {
+                    participant: true,
+                    team: {
+                        include: {
+                            members: true,
+                            leader: true
+                        }
+                    }
+                }
+            })
+
+            if (!joinRequest) {
+                throw new Error('Заявка не найдена')
+            }
+
+            // Check if the current user is the team leader
+            if (joinRequest.team.leaderId !== teamLeaderId) {
+                throw new Error('Только лидер команды может управлять заявками')
+            }
+
+            // Check if request is still pending
+            if (joinRequest.status !== 'PENDING') {
+                throw new Error('Заявка уже обработана')
+            }
+
+            if (action === 'approve') {
+                // Check if team has space
+                if (joinRequest.team.members.length >= 4) {
+                    throw new Error('Команда переполнена')
+                }
+
+                // Check if participant is still available (not in another team)
+                const currentParticipant = await tx.participant.findUnique({
+                    where: { id: joinRequest.participantId }
+                })
+
+                if (currentParticipant?.teamId) {
+                    throw new Error('Участник уже вступил в другую команду')
+                }
+
+                // Approve the request and add participant to team
+                await tx.joinRequest.update({
+                    where: { id: joinRequestId },
+                    data: { status: 'APPROVED' }
+                })
+
+                await tx.participant.update({
+                    where: { id: joinRequest.participantId },
+                    data: { teamId: joinRequest.teamId }
+                })
+            } else {
+                // Decline the request
+                await tx.joinRequest.update({
+                    where: { id: joinRequestId },
+                    data: { status: 'DECLINED' }
+                })
+            }
+        })
+
+        revalidatePath('/space/team')
+        revalidatePath('/dashboard/teams')
+    } catch (error) {
+        console.error('Error responding to join request:', error)
+        throw error
+    }
+}
+
+export async function updateTeamInfo(teamId: string, name: string, nickname: string, leaderId: string) {
+    if (!teamId || !name || !nickname || !leaderId) {
+        throw new Error('All parameters are required')
+    }
+
+    try {
+        // Check if the leader is authorized to update this team
+        const team = await db.team.findUnique({
+            where: { id: teamId },
+            include: { leader: true }
+        })
+
+        if (!team) {
+            throw new Error('Команда не найдена')
+        }
+
+        if (team.leaderId !== leaderId) {
+            throw new Error('Только лидер команды может редактировать информацию о команде')
+        }
+
+        // Check if team status allows editing
+        const editableStatuses = ['NEW', 'INCOMPLETED', 'FINISHED', 'IN_REVIEW']
+        if (!editableStatuses.includes(team.status)) {
+            throw new Error('Команда в данном статусе не может быть отредактирована')
+        }
+
+        // If nickname is changing, check if it's available
+        if (team.nickname !== nickname) {
+            const existingTeam = await db.team.findUnique({
+                where: { nickname: nickname }
+            })
+
+            if (existingTeam) {
+                throw new Error('Команда с таким никнеймом уже существует')
+            }
+        }
+
+        // Update team
+        await db.team.update({
+            where: { id: teamId },
+            data: {
+                name: name,
+                nickname: nickname
+            }
+        })
+
+        revalidatePath('/space/team')
+        revalidatePath('/dashboard/teams')
+    } catch (error) {
+        console.error('Error updating team info:', error)
+        throw error
+    }
+}
+
+export async function removeTeamMember(teamId: string, memberId: string, leaderId: string) {
+    if (!teamId || !memberId || !leaderId) {
+        throw new Error('All parameters are required')
+    }
+
+    try {
+        // Check if the leader is authorized to remove members
+        const team = await db.team.findUnique({
+            where: { id: teamId },
+            include: { 
+                leader: true,
+                members: true
+            }
+        })
+
+        if (!team) {
+            throw new Error('Команда не найдена')
+        }
+
+        if (team.leaderId !== leaderId) {
+            throw new Error('Только лидер команды может удалять участников')
+        }
+
+        // Check if member exists in the team
+        const member = team.members.find(m => m.id === memberId)
+        if (!member) {
+            throw new Error('Участник не найден в команде')
+        }
+
+        // Can't remove the leader
+        if (memberId === leaderId) {
+            throw new Error('Лидер не может удалить себя из команды')
+        }
+
+        // Remove member from team
+        await db.participant.update({
+            where: { id: memberId },
+            data: { teamId: null }
+        })
+
+        revalidatePath('/space/team')
+        revalidatePath('/dashboard/teams')
+    } catch (error) {
+        console.error('Error removing team member:', error)
+        throw error
     }
 }

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 import { SignOutButton } from '@/components/sign-out-button';
 import { isOrganizer } from '@/lib/admin';
+import { getCurrentHackathon } from '@/lib/hackathon';
 
 // Force dynamic rendering since this page requires database access
 export const dynamic = 'force-dynamic'
@@ -11,7 +12,13 @@ export default async function TeamsPage() {
     const session = await auth();
     const userIsOrganizer = isOrganizer(session?.user?.email);
 
+    // Get current hackathon
+    const hackathon = await getCurrentHackathon();
+    
     const teams = await db.team.findMany({
+        where: hackathon ? {
+            hackathonId: hackathon.id
+        } : {},
         include: {
             leader: true,
             members: true,
@@ -33,14 +40,25 @@ export default async function TeamsPage() {
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Команды хакатона
+                                Команды {hackathon?.name || 'хакатона'}
                             </h1>
                             <p className="text-gray-700 font-medium">
                                 Все зарегистрированные команды участников
                             </p>
+                            {hackathon?.theme && (
+                                <p className="text-gray-600 text-sm mt-1">
+                                    Тема: {hackathon.theme}
+                                </p>
+                            )}
                         </div>
 
                         <div className="flex flex-wrap gap-4">
+                            <Link
+                                href="/participants"
+                                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                Участники
+                            </Link>
                             <Link
                                 href="/"
                                 className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
@@ -94,9 +112,10 @@ export default async function TeamsPage() {
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {teams.map((team) => (
-                                <div
+                                <Link
                                     key={team.id}
-                                    className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+                                    href={`/teams/${team.nickname}`}
+                                    className="bg-gray-50 rounded-lg p-6 hover:shadow-lg hover:border-blue-200 transition-all duration-200 border border-transparent"
                                 >
                                     <div className="mb-4">
                                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -142,7 +161,7 @@ export default async function TeamsPage() {
                                             </div>
                                         </div>
                                     )}
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
