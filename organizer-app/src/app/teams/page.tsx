@@ -54,6 +54,12 @@ export default async function TeamsPage() {
 
                         <div className="flex flex-wrap gap-4">
                             <Link
+                                href="/participants"
+                                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                                Участники
+                            </Link>
+                            <Link
                                 href="/"
                                 className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
                             >
@@ -106,9 +112,10 @@ export default async function TeamsPage() {
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {teams.map((team) => (
-                                <div
+                                <Link
                                     key={team.id}
-                                    className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow"
+                                    href={`/teams/${team.nickname}`}
+                                    className="bg-gray-50 rounded-lg p-6 hover:shadow-lg hover:border-blue-200 transition-all duration-200 border border-transparent"
                                 >
                                     <div className="mb-4">
                                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -154,7 +161,7 @@ export default async function TeamsPage() {
                                             </div>
                                         </div>
                                     )}
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}

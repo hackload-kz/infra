@@ -2,15 +2,14 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
+import Link from 'next/link'
 import { 
   Trophy,
-  Calendar,
   Users,
-  Check,
   Edit,
   Plus,
-  Settings,
-  Zap
+  UserPlus,
+  Search
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -86,136 +85,155 @@ export default async function PersonalCabinetPage() {
                 </div>
               )}
             </div>
-            <button className="w-full mt-6 bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-3 rounded-lg font-medium transition-colors duration-150">
+            <Link href="/space/info/edit" className="w-full mt-6 bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-3 rounded-lg font-medium transition-colors duration-150 text-center block">
               Редактировать профиль
-            </button>
+            </Link>
           </div>
         </div>
 
         {/* Main Content Area */}
         <div className="xl:col-span-2">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Команда</p>
-                  <p className="text-2xl font-bold text-white">
-                    {participant.team ? participant.team.name : 'Нет команды'}
-                  </p>
-                </div>
-                <div className="bg-amber-400/20 p-3 rounded-lg">
-                  <Users className="w-6 h-6 text-amber-400" />
-                </div>
+          {/* Profile Status Card */}
+          <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Статус профиля</h3>
+              <div className="bg-green-400/20 p-2 rounded-lg">
+                <div className="w-3 h-3 bg-green-400 rounded-full"></div>
               </div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Роль</p>
-                  <p className="text-2xl font-bold text-white">
-                    {participant.ledTeam ? 'Лидер' : 'Участник'}
-                  </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="bg-amber-400/20 p-3 rounded-lg mb-2 mx-auto w-fit">
+                  <Users className="w-6 h-6 text-amber-400" />
                 </div>
-                <div className="bg-amber-400/20 p-3 rounded-lg">
+                <p className="text-slate-400 text-sm">Команда</p>
+                <p className="text-lg font-semibold text-white">
+                  {participant.team ? participant.team.name : 'Нет команды'}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-amber-400/20 p-3 rounded-lg mb-2 mx-auto w-fit">
                   <Trophy className="w-6 h-6 text-amber-400" />
                 </div>
+                <p className="text-slate-400 text-sm">Роль</p>
+                <p className="text-lg font-semibold text-white">
+                  {participant.ledTeam ? 'Лидер команды' : 'Участник'}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-amber-400/20 p-3 rounded-lg mb-2 mx-auto w-fit">
+                  <Edit className="w-6 h-6 text-amber-400" />
+                </div>
+                <p className="text-slate-400 text-sm">Профиль</p>
+                <p className="text-lg font-semibold text-white">Активен</p>
               </div>
             </div>
           </div>
 
-          {/* Recent Activity */}
+          {/* Team Management Section */}
           <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mb-8">
-            <h3 className="text-xl font-semibold text-white mb-4">Последняя активность</h3>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 bg-slate-700/30 rounded-lg">
-                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <Check className="w-5 h-5 text-green-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-white font-medium">Регистрация на HackLoad 2025</p>
-                  <p className="text-slate-400 text-sm">
-                    {participant.createdAt.toLocaleDateString('ru-RU')}
+            <h3 className="text-xl font-semibold text-white mb-4">Управление командой</h3>
+            {participant.team ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-700/30 rounded-lg border border-amber-400/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-lg font-medium text-white">{participant.team.name}</h4>
+                    <span className="px-2 py-1 bg-amber-400/20 text-amber-400 text-sm rounded-full">
+                      {participant.ledTeam ? 'Лидер' : 'Участник'}
+                    </span>
+                  </div>
+                  <p className="text-slate-400 text-sm mb-4">
+                    {participant.team.comment || 'Описание команды отсутствует'}
                   </p>
+                  <div className="flex gap-3">
+                    <Link href="/space/team" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-medium transition-colors duration-150 text-sm">
+                      Управление командой
+                    </Link>
+                    {participant.ledTeam && (
+                      <Link href="/space/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150 text-sm">
+                        Найти участников
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
-              {participant.team && (
-                <div className="flex items-center space-x-4 p-4 bg-slate-700/30 rounded-lg">
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white font-medium">Присоединение к команде &quot;{participant.team.name}&quot;</p>
-                    <p className="text-slate-400 text-sm">
-                      {participant.team.createdAt.toLocaleDateString('ru-RU')}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div className="flex items-center space-x-4 p-4 bg-slate-700/30 rounded-lg">
-                <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
-                  <Edit className="w-5 h-5 text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-white font-medium">Обновление профиля</p>
-                  <p className="text-slate-400 text-sm">
-                    {participant.updatedAt.toLocaleDateString('ru-RU')}
-                  </p>
+            ) : (
+              <div className="p-6 bg-slate-700/30 rounded-lg border border-dashed border-slate-600 text-center">
+                <Users className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                <h4 className="text-lg font-medium text-white mb-2">Вы не состоите в команде</h4>
+                <p className="text-slate-400 mb-4">
+                  Создайте свою команду или присоединитесь к существующей
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Link href="/space/teams" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-medium transition-colors duration-150">
+                    Найти команду
+                  </Link>
+                  <Link href="/space/team" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150">
+                    Создать команду
+                  </Link>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Quick Actions */}
           <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
-            <h3 className="text-xl font-semibold text-white mb-4">Быстрые действия</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <button className="flex items-center space-x-3 p-4 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150">
-                <Plus className="w-5 h-5 text-amber-400" />
-                <span className="text-white">Создать команду</span>
-              </button>
-              <button className="flex items-center space-x-3 p-4 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150">
-                <Users className="w-5 h-5 text-amber-400" />
-                <span className="text-white">Найти команду</span>
-              </button>
-              <button className="flex items-center space-x-3 p-4 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150">
-                <Calendar className="w-5 h-5 text-amber-400" />
-                <span className="text-white">Мои события</span>
-              </button>
-              <button className="flex items-center space-x-3 p-4 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150">
-                <Settings className="w-5 h-5 text-amber-400" />
-                <span className="text-white">Настройки</span>
-              </button>
+            <h3 className="text-xl font-semibold text-white mb-6">Быстрые действия</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Edit Profile */}
+              <Link href="/space/info/edit" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                <div className="bg-amber-400/20 p-3 rounded-lg">
+                  <Edit className="w-6 h-6 text-amber-400" />
+                </div>
+                <span className="text-white text-center font-medium">Редактировать профиль</span>
+              </Link>
+              
+              {/* Team Management */}
+              {participant.team ? (
+                <Link href="/space/team" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                  <div className="bg-amber-400/20 p-3 rounded-lg">
+                    <Users className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <span className="text-white text-center font-medium">Редактировать команду</span>
+                </Link>
+              ) : (
+                <Link href="/space/team" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                  <div className="bg-amber-400/20 p-3 rounded-lg">
+                    <Plus className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <span className="text-white text-center font-medium">Создать команду</span>
+                </Link>
+              )}
+              
+              {/* Join Team */}
+              <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                <div className="bg-amber-400/20 p-3 rounded-lg">
+                  <UserPlus className="w-6 h-6 text-amber-400" />
+                </div>
+                <span className="text-white text-center font-medium">Присоединиться к команде</span>
+              </Link>
+              
+              {/* Find Participants (for team leaders) */}
+              {participant.ledTeam ? (
+                <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                  <div className="bg-amber-400/20 p-3 rounded-lg">
+                    <Search className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <span className="text-white text-center font-medium">Найти участника</span>
+                </Link>
+              ) : (
+                <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                  <div className="bg-amber-400/20 p-3 rounded-lg">
+                    <Search className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <span className="text-white text-center font-medium">Просмотр команд</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* HackLoad 2025 Registration Status */}
-      <div className="mt-12">
-        <div className="bg-gradient-to-r from-amber-400/20 to-amber-500/20 backdrop-blur-sm p-6 rounded-lg border border-amber-400/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center">
-                <Zap className="w-6 h-6 text-slate-900" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-white">HackLoad 2025</h3>
-                <p className="text-amber-200">Вы зарегистрированы на хакатон!</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-amber-200 text-sm">Дата проведения</p>
-                <p className="text-white font-semibold">15-17 марта 2025</p>
-              </div>
-              <button className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
-                Подробнее
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </PersonalCabinetLayout>
   )
 }
