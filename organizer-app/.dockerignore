@@ -1,14 +1,71 @@
+# Build optimization - exclude unnecessary files
 Dockerfile
 .dockerignore
 node_modules
 npm-debug.log
+*.log
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation (speeds up context)
 README.md
+MEMORY_OPTIMIZATIONS.md
+CLAUDE.md
+DEPLOY.md
+GITHUB_SETUP.md
+*.md
+
+# Environment files
 .env
 .env.local
 .env.production.local
 .env.staging.local
+.env.development.local
+.env.test.local
+
+# Git
 .git
 .gitignore
+
+# Build outputs
 .next
+out
+dist
+build
 .vercel
-*.log
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+jest.config.js
+
+# Cache directories
+.cache
+.parcel-cache
+.npm
+.yarn
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+pids
+
+# Optional directories
+jspm_packages/
+.serverless/
+.fusebox/
+.dynamodb/
+
+# Test files
+test-*.sh
+test-*.md

@@ -15,10 +15,29 @@ export default async function TeamsPage() {
 
     // Получаем команды напрямую из БД на сервере
     const teams = await db.team.findMany({
-        include: {
-            members: true,
-            leader: true,
+        select: {
+            id: true,
+            name: true,
+            nickname: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            _count: {
+                select: {
+                    members: true
+                }
+            },
+            leader: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                }
+            },
+            // Don't load all members data - just count
+            members: false,
         },
+        take: 200, // Limit admin teams view
         orderBy: { createdAt: 'desc' },
     });
 

@@ -26,14 +26,14 @@ export default async function PublicParticipantsPage() {
     select: {
       id: true,
       name: true,
-      email: true,
+      email: false, // Don't expose emails publicly
       city: true,
       company: true,
-      telegram: true,
+      telegram: false, // Don't expose telegram publicly
       experienceLevel: true,
       technologies: true,
-      cloudServices: true,
-      cloudProviders: true,
+      cloudServices: false, // Don't load large JSON in list view
+      cloudProviders: false, // Don't load large JSON in list view
       team: {
         select: {
           id: true,
@@ -42,6 +42,7 @@ export default async function PublicParticipantsPage() {
         }
       }
     },
+    take: 100, // Limit to 100 participants
     orderBy: {
       createdAt: 'desc'
     }

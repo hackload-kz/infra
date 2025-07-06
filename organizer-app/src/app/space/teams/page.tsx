@@ -54,10 +54,12 @@ export default async function SpaceTeamsPage() {
             company: true,
             telegram: true,
             experienceLevel: true,
-            technologies: true,
-            cloudServices: true,
-            cloudProviders: true,
-          }
+            // Don't load large JSON fields in team browsing
+            technologies: false,
+            cloudServices: false,
+            cloudProviders: false,
+          },
+          take: 5, // Limit members shown per team
         },
         leader: {
           select: {
@@ -75,6 +77,7 @@ export default async function SpaceTeamsPage() {
           }
         }
       },
+      take: 50, // Limit teams shown for browsing
       orderBy: {
         createdAt: 'desc'
       }
