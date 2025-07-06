@@ -2,6 +2,8 @@
 
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { TeamStatus } from '@prisma/client'
+
 
 export async function createTeam(formData: FormData) {
     const name = formData.get('name') as string
@@ -209,32 +211,57 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 const isCurrentLeader = !!participant.ledTeam;
                 const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
 
-                if (isCurrentLeader && remainingMembers.length > 0) {
-                    if (!newLeaderId) {
-                        throw new Error('Вы должны выбрать нового лидера для текущей команды');
-                    }
-                    
-                    const newLeader = remainingMembers.find(m => m.id === newLeaderId);
-                    if (!newLeader) {
-                        throw new Error('Выбранный лидер не является участником команды');
-                    }
+                if (isCurrentLeader) {
+                    if (remainingMembers.length === 0) {
+                        // Delete empty team and remove leadership
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { 
+                                ledTeamId: null,
+                                teamId: null,
+                            },
+                        });
+                        
+                        await tx.team.delete({
+                            where: { id: currentTeam.id },
+                        });
+                    } else {
+                        // Transfer leadership
+                        if (!newLeaderId) {
+                            throw new Error('Вы должны выбрать нового лидера для текущей команды');
+                        }
+                        
+                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        if (!newLeader) {
+                            throw new Error('Выбранный лидер не является участником команды');
+                        }
 
-                    // First, remove current leader's ledTeamId
+                        // First, remove current leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: participantId },
+                            data: { 
+                                ledTeamId: null,
+                                teamId: null,
+                            },
+                        });
+
+                        // Then assign new leader's ledTeamId
+                        await tx.participant.update({
+                            where: { id: newLeaderId },
+                            data: { ledTeamId: currentTeam.id },
+                        });
+
+                        // Finally, update team leader
+                        await tx.team.update({
+                            where: { id: currentTeam.id },
+                            data: { leaderId: newLeaderId },
+                        });
+                    }
+                } else {
+                    // Regular member leaving
                     await tx.participant.update({
                         where: { id: participantId },
-                        data: { ledTeamId: null },
-                    });
-
-                    // Then assign new leader's ledTeamId
-                    await tx.participant.update({
-                        where: { id: newLeaderId },
-                        data: { ledTeamId: currentTeam.id },
-                    });
-
-                    // Finally, update team leader
-                    await tx.team.update({
-                        where: { id: currentTeam.id },
-                        data: { leaderId: newLeaderId },
+                        data: { teamId: null },
                     });
                 }
             }
@@ -357,6 +384,24 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
     } catch (error) {
         console.error('Error joining team:', error);
         throw error;
+    }
+}
+
+export async function updateTeamStatusById(teamId: string, status: TeamStatus) {
+    if (!teamId || !status) {
+        throw new Error('Team ID and status are required')
+    }
+
+    try {
+        await db.team.update({
+            where: { id: teamId },
+            data: { status },
+        })
+
+        revalidatePath('/dashboard/teams')
+    } catch (error) {
+        console.error('Error updating team status:', error)
+        throw new Error('Failed to update team status')
     }
 }
 

@@ -13,12 +13,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TeamStatus {
+  NEW
+  INCOMPLETED
+  FINISHED
+  IN_REVIEW
+  APPROVED
+  CANCELED
+  REJECTED
+}
+
+enum TeamLevel {
+  BEGINNER
+  ADVANCED
+}
+
 model Team {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
-  nickname  String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  nickname  String     @unique
+  status    TeamStatus @default(NEW)
+  level     TeamLevel?
+  comment   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   // Relations
   leader   Participant?  @relation("TeamLeader")
