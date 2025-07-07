@@ -150,7 +150,7 @@ export default async function PersonalCabinetPage() {
                       Управление командой
                     </Link>
                     {participant.ledTeam && (
-                      <Link href="/space/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150 text-sm">
+                      <Link href="/space/participants" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150 text-sm">
                         Найти участников
                       </Link>
                     )}
@@ -215,7 +215,7 @@ export default async function PersonalCabinetPage() {
               
               {/* Find Participants (for team leaders) */}
               {participant.ledTeam ? (
-                <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+                <Link href="/space/participants" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
                   <div className="bg-amber-400/20 p-3 rounded-lg">
                     <Search className="w-6 h-6 text-amber-400" />
                   </div>

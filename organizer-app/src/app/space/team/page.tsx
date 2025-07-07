@@ -276,7 +276,7 @@ export default async function ProfileTeamPage() {
                         </div>
                       </div>
                       <Link 
-                        href={`/dashboard/participants/${member.id}`}
+                        href={`/space/participants/${member.id}`}
                         className="text-slate-400 hover:text-amber-400 transition-colors"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -313,6 +313,7 @@ export default async function ProfileTeamPage() {
               <JoinRequestsManagement 
                 joinRequests={participant.team.joinRequests}
                 teamLeaderId={participant.id}
+                baseUrl="/space"
               />
             )}
           </>
