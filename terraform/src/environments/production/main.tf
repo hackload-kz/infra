@@ -7,7 +7,7 @@ module "hub" {
   cnpg_backup_destination = "https://hackloadprodcnpg.blob.core.windows.net/backups"
   cnpg_backup_retention   = "30d"
 
-  hub_image_tag            = "sha-40b5bd2"
+  hub_image_tag            = "sha-0d9d373"
   hub_host                 = "hub.hackload.kz"
   hub_replicas             = 2
   hub_db_connection_string = var.hub_db_connection_string

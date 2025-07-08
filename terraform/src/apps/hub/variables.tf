@@ -129,12 +129,6 @@ variable "hub_admin_users" {
   sensitive   = true
 }
 
-variable "hub_auth_trust_host" {
-  description = "AUTH_TRUST_HOST for NextAuth.js"
-  type        = string
-  default     = "true"
-}
-
 # variable "openstack_auth_url" {
 #   description = "OpenStack authentication URL"
 #   type        = string

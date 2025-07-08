@@ -28,6 +28,8 @@ resource "kubernetes_secret" "registry_credentials" {
   }
 }
 
+# Note: This deployment resource is managed by GitHub Actions kubectl deployment
+# The deployment is ignored by Terraform to avoid conflicts with CI/CD pipeline
 resource "kubernetes_deployment" "hub" {
   metadata {
     name      = "hub"
@@ -152,6 +154,13 @@ resource "kubernetes_deployment" "hub" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      spec[0].template[0].spec[0].container[0].image,
+      spec[0].replicas,
+    ]
   }
 }
 

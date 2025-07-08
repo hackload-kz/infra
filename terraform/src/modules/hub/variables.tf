@@ -139,9 +139,3 @@ variable "admin_users" {
   type        = string
   sensitive   = true
 }
-
-variable "auth_trust_host" {
-  description = "AUTH_TRUST_HOST for NextAuth.js"
-  type        = string
-  default     = "true"
-}
