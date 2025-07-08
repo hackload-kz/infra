@@ -42,9 +42,10 @@ interface JoinRequest {
 interface JoinRequestsManagementProps {
   joinRequests: JoinRequest[]
   teamLeaderId: string
+  baseUrl?: string // Base URL for participant profiles, defaults to '/dashboard'
 }
 
-export function JoinRequestsManagement({ joinRequests, teamLeaderId }: JoinRequestsManagementProps) {
+export function JoinRequestsManagement({ joinRequests, teamLeaderId, baseUrl = '/dashboard' }: JoinRequestsManagementProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -234,7 +235,7 @@ export function JoinRequestsManagement({ joinRequests, teamLeaderId }: JoinReque
             {/* Full Profile Link */}
             <div className="pt-4 border-t border-slate-600/30">
               <Link 
-                href={`/dashboard/participants/${request.participant.id}`}
+                href={`${baseUrl}/participants/${request.participant.id}`}
                 className="text-amber-400 hover:text-amber-300 text-sm transition-colors"
               >
                 Посмотреть полный профиль участника →

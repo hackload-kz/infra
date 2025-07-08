@@ -374,7 +374,7 @@ export default async function TeamDetailPage({ params }: Props) {
                     {/* Link to profile */}
                     <div className="mt-3 pt-3 border-t border-slate-600/30">
                       <Link 
-                        href={`/dashboard/participants/${member.id}`}
+                        href={`/space/participants/${member.id}`}
                         className="text-amber-400 hover:text-amber-300 text-xs transition-colors"
                       >
                         Посмотреть полный профиль →

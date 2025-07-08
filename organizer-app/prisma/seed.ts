@@ -1,3 +1,4 @@
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -29,6 +30,27 @@ async function main() {
   })
 
   console.log(`✅ Created default hackathon: ${defaultHackathon.name}`)
+
+  // Update existing teams to belong to the default hackathon
+  const teamsWithoutHackathon = await prisma.team.findMany({
+    where: {
+      hackathonId: undefined
+    }
+  })
+
+  if (teamsWithoutHackathon.length > 0) {
+    await prisma.team.updateMany({
+      where: {
+        hackathonId: undefined
+      },
+      data: {
+        hackathonId: defaultHackathon.id
+      }
+    })
+    console.log(`✅ Updated ${teamsWithoutHackathon.length} existing teams to belong to default hackathon`)
+  } else {
+    console.log('ℹ️  No teams found without hackathon assignment')
+  }
 
   // Create hackathon participations for existing participants
   const existingParticipants = await prisma.participant.findMany({

@@ -638,7 +638,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               </button>
 
               <Link
-                href="/space/teams"
+                href={currentTeam?.members.length < 4 ? "/space/participants" : "/space/teams"}
                 className="flex items-center space-x-3 p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all duration-150 border border-blue-500/30"
               >
                 {currentTeam?.members.length < 4 ? (
