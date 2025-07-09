@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { SearchableSelect } from './ui/searchable-select';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 interface Participant {
@@ -24,17 +24,32 @@ interface MessageComposeProps {
   hackathonId: string;
   onSuccess: () => void;
   onCancel: () => void;
+  prefilledRecipientType?: 'participant' | 'team';
+  prefilledRecipientId?: string;
 }
 
-export function MessageCompose({ hackathonId, onSuccess, onCancel }: MessageComposeProps) {
+export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledRecipientType, prefilledRecipientId }: MessageComposeProps) {
   const [subject, setSubject] = useState('');
   const [messageBody, setMessageBody] = useState('');
-  const [recipientType, setRecipientType] = useState<'participant' | 'team'>('participant');
-  const [recipientId, setRecipientId] = useState('');
-  const [teamId, setTeamId] = useState('');
+  const [recipientType, setRecipientType] = useState<'participant' | 'team'>(prefilledRecipientType || 'participant');
+  const [recipientId, setRecipientId] = useState(prefilledRecipientType === 'participant' ? (prefilledRecipientId || '') : '');
+  const [teamId, setTeamId] = useState(prefilledRecipientType === 'team' ? (prefilledRecipientId || '') : '');
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Options for searchable selects
+  const participantOptions = participants.map(p => ({
+    value: p.id,
+    label: p.name,
+    sublabel: p.email
+  }));
+
+  const teamOptions = teams.map(t => ({
+    value: t.id,
+    label: t.name,
+    sublabel: `${t.members?.length || 0} участников`
+  }));
 
   useEffect(() => {
     fetchParticipants();
@@ -139,6 +154,7 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel }: MessageComp
               id="recipientType"
               value={recipientType}
               onChange={(e) => setRecipientType(e.target.value as 'participant' | 'team')}
+              disabled={!!prefilledRecipientType}
               className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="participant">Участнику</option>
@@ -149,40 +165,28 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel }: MessageComp
           {recipientType === 'participant' && (
             <div>
               <Label htmlFor="recipient">Получатель *</Label>
-              <select
-                id="recipient"
+              <SearchableSelect
+                options={participantOptions}
                 value={recipientId}
-                onChange={(e) => setRecipientId(e.target.value)}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={setRecipientId}
+                placeholder="Поиск участника по имени или email..."
+                disabled={!!prefilledRecipientId}
                 required
-              >
-                <option value="">Выберите участника</option>
-                {participants.map((participant) => (
-                  <option key={participant.id} value={participant.id}>
-                    {participant.name} ({participant.email})
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           )}
 
           {recipientType === 'team' && (
             <div>
               <Label htmlFor="team">Команда *</Label>
-              <select
-                id="team"
+              <SearchableSelect
+                options={teamOptions}
                 value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={setTeamId}
+                placeholder="Поиск команды по названию..."
+                disabled={!!prefilledRecipientId}
                 required
-              >
-                <option value="">Выберите команду</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>
-                    {team.name} ({team.members?.length || 0} участников)
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           )}
 

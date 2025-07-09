@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Edit, Users } from 'lucide-react'
 import { TeamStatus, TeamLevel } from '@prisma/client'
+import { TeamPageClient } from '@/components/team-page-client'
 
 interface TeamPageProps {
     params: Promise<{
@@ -55,6 +56,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
         include: {
             leader: true,
             members: true,
+            hackathon: true,
         },
     });
 
@@ -75,12 +77,19 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     </Link>
                 </div>
                 {isAdmin && (
-                    <Link href={`/dashboard/teams/${team.nickname}/edit`}>
-                        <Button>
-                            <Edit className="w-4 h-4 mr-2" />
-                            Редактировать
-                        </Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <TeamPageClient
+                            teamId={team.id}
+                            teamName={team.name}
+                            hackathonId={team.hackathon.id}
+                        />
+                        <Link href={`/dashboard/teams/${team.nickname}/edit`}>
+                            <Button>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Редактировать
+                            </Button>
+                        </Link>
+                    </div>
                 )}
             </div>
 

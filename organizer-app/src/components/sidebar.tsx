@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Users, Home, UserCheck, Calendar, MessageSquare } from 'lucide-react'
+import { LogoutButton } from './logout-button'
 
 const navigation = [
     { name: 'Главная', href: '/dashboard', icon: Home },
@@ -43,6 +44,15 @@ export function Sidebar() {
                     )
                 })}
             </nav>
+            
+            {/* Logout Button */}
+            <div className="px-4 pb-6 border-t border-gray-700 pt-4">
+                <LogoutButton 
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-white"
+                />
+            </div>
         </div>
     )
 }

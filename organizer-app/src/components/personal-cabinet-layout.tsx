@@ -18,6 +18,7 @@ import {
   HelpCircle,
   Search
 } from 'lucide-react'
+import { LogoutButton } from './logout-button'
 
 interface PersonalCabinetLayoutProps {
   children: React.ReactNode
@@ -160,7 +161,12 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-slate-800/50">
+          <div className="p-4 border-t border-slate-800/50 space-y-3">
+            <LogoutButton 
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-slate-300 hover:bg-slate-800/50 hover:text-white"
+            />
             <div className="text-xs text-slate-500 text-center">
               HackLoad 2025
             </div>
@@ -193,6 +199,13 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
                   <Bell className="w-5 h-5" />
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
                 </button>
+                
+                {/* Logout Button */}
+                <LogoutButton 
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                />
               </div>
             </div>
           </div>

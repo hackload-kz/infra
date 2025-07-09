@@ -25,6 +25,9 @@ interface Team {
     updatedAt: string | Date
     members?: Participant[]
     leader?: Participant | null
+    _count?: {
+        members: number
+    }
 }
 
 const statusLabels: Record<TeamStatus, string> = {
@@ -190,7 +193,7 @@ function TeamsForm({ teams }: TeamsFormProps) {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                            {team.members?.length || 0} / 4
+                                            {team._count?.members || team.members?.length || 0} / 4
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {new Date(team.createdAt).toLocaleDateString()}

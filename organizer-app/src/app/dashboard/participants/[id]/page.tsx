@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, User, Mail, Building, MapPin, Award } from 'lucide-react'
+import { ParticipantPageClient } from '@/components/participant-page-client'
 
 interface ParticipantPageProps {
     params: Promise<{
@@ -19,6 +20,11 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
             user: true,
             team: true,
             ledTeam: true,
+            hackathonParticipations: {
+                include: {
+                    hackathon: true
+                }
+            }
         },
     });
 
@@ -26,16 +32,31 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
         notFound()
     }
 
+    // Get the current hackathon (assuming hackload-2025 for now)
+    const hackathon = await db.hackathon.findFirst({
+        where: { slug: 'hackload-2025' }
+    });
+
+    if (!hackathon) {
+        notFound()
+    }
+
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between">
                 <Link href="/dashboard/teams">
                     <Button variant="outline" size="sm">
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Назад к командам
                     </Button>
                 </Link>
+                
+                <ParticipantPageClient
+                    participantId={participant.id}
+                    participantName={participant.name}
+                    hackathonId={hackathon.id}
+                />
             </div>
 
             {/* Participant Header */}
