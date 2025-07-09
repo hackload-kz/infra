@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
+import { MessageNotifications } from '@/components/message-notifications'
 import Link from 'next/link'
 import { 
   Trophy,
@@ -30,12 +31,22 @@ export default async function PersonalCabinetPage() {
       user: true,
       team: true,
       ledTeam: true,
+      hackathonParticipations: {
+        include: {
+          hackathon: true
+        }
+      }
     },
   })
 
   if (!participant) {
     redirect('/login')
   }
+
+  // Get the current hackathon (assuming hackload-2025 for now)
+  const hackathon = await db.hackathon.findFirst({
+    where: { slug: 'hackload-2025' }
+  })
 
   const user = {
     name: participant.name,
@@ -129,6 +140,13 @@ export default async function PersonalCabinetPage() {
               </div>
             </div>
           </div>
+
+          {/* Message Notifications */}
+          {hackathon && (
+            <div className="mb-8">
+              <MessageNotifications hackathonId={hackathon.id} />
+            </div>
+          )}
 
           {/* Team Management Section */}
           <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mb-8">

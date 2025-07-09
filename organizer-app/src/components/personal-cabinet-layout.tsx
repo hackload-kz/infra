@@ -113,8 +113,7 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
             {sidebarItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
-              const isDisabled = item.href === '/space/messages' || 
-                               item.href === '/space/notifications' ||
+              const isDisabled = item.href === '/space/notifications' ||
                                item.href === '/space/calendar' ||
                                item.href === '/space/tasks' ||
                                item.href === '/space/journal'

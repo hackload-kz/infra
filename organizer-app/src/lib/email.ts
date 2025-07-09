@@ -118,17 +118,27 @@ class EmailService {
     try {
       const htmlContent = this.getDefaultHtmlTemplate(body);
       
+      // Check if we're in production environment
+      const isProduction = process.env.NODE_ENV === 'production';
+      const defaultTestEmail = process.env.DEFAULT_TEST_EMAIL || 'test@hackload.kz';
+      
+      // In non-production, send all emails to default test email
+      const actualRecipient = isProduction ? recipient : defaultTestEmail;
+      
+      // Modify subject to indicate original recipient in non-production
+      const actualSubject = isProduction ? subject : `[TEST for ${recipient}] ${subject}`;
+      
       const mailOptions = {
         from: `${this.config.senderName} <${this.config.senderEmail}>`,
-        to: recipient,
-        subject: subject,
+        to: actualRecipient,
+        subject: actualSubject,
         html: htmlContent
       };
 
       await this.transporter.sendMail(mailOptions);
       
-      // Log email sent
-      console.log(`[EMAIL SENT] ${new Date().toISOString()} | To: ${recipient} | Subject: ${subject}`);
+      // Log email sent with both original and actual recipient
+      console.log(`[EMAIL SENT] ${new Date().toISOString()} | Original: ${recipient} | Actual: ${actualRecipient} | Subject: ${actualSubject}`);
       
       return true;
     } catch (error) {

@@ -28,6 +28,11 @@ enum JoinRequestStatus {
   DECLINED
 }
 
+enum MessageStatus {
+  UNREAD
+  READ
+}
+
 model Hackathon {
   id          String @id @default(cuid())
   name        String
@@ -58,6 +63,7 @@ model Hackathon {
   teams            Team[]
   participations   HackathonParticipation[]
   joinRequests     JoinRequest[]
+  messages         Message[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -104,6 +110,7 @@ model Team {
   leader    Participant?  @relation("TeamLeader")
   members   Participant[] @relation("TeamMembers")
   joinRequests JoinRequest[] @relation("TeamJoinRequests")
+  messages  Message[]
 
   @@map("teams")
 }
@@ -143,6 +150,8 @@ model Participant {
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   hackathonParticipations HackathonParticipation[]
   joinRequests        JoinRequest[] @relation("ParticipantJoinRequests")
+  sentMessages        Message[] @relation("MessageSender")
+  receivedMessages    Message[] @relation("MessageRecipient")
 
   @@map("participants")
 }
@@ -168,4 +177,35 @@ model JoinRequest {
   // Unique constraint to prevent duplicate requests within same hackathon
   @@unique([participantId, teamId, hackathonId])
   @@map("join_requests")
+}
+
+model Message {
+  id          String        @id @default(cuid())
+  subject     String
+  body        String        // HTML content
+  status      MessageStatus @default(UNREAD)
+  
+  // Relations
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId String
+  
+  sender      Participant? @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+  senderId    String?
+  
+  recipient   Participant @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId String
+  
+  // For threading replies
+  parentMessage   Message? @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: Cascade)
+  parentMessageId String?
+  replies         Message[] @relation("MessageReplies")
+  
+  // Team message (if sent to entire team)
+  team     Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId   String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("messages")
 }

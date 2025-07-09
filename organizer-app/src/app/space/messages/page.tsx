@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
-import { MessageSquare } from 'lucide-react'
+import { MessageList } from '@/components/message-list'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,10 +21,24 @@ export default async function SpaceMessagesPage() {
       user: true,
       team: true,
       ledTeam: true,
+      hackathonParticipations: {
+        include: {
+          hackathon: true
+        }
+      }
     },
   })
 
   if (!participant) {
+    redirect('/login')
+  }
+
+  // Get the current hackathon (assuming hackload-2025 for now)
+  const hackathon = await db.hackathon.findFirst({
+    where: { slug: 'hackload-2025' }
+  })
+
+  if (!hackathon) {
     redirect('/login')
   }
 
@@ -36,16 +50,19 @@ export default async function SpaceMessagesPage() {
 
   return (
     <PersonalCabinetLayout user={user}>
-      <div className="text-center py-16">
-        <div className="w-24 h-24 bg-slate-800/50 rounded-full mx-auto mb-6 flex items-center justify-center">
-          <MessageSquare className="w-12 h-12 text-slate-400" />
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            <span className="text-amber-400">Сообщения</span>
+          </h1>
+          <p className="text-slate-400">
+            Ваши сообщения от организаторов и участников команды
+          </p>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-4">
-          <span className="text-amber-400">Сообщения</span>
-        </h1>
-        <p className="text-slate-400 mb-8 max-w-md mx-auto">
-          Система сообщений находится в разработке. Здесь будет чат с командой и организаторами.
-        </p>
+        
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <MessageList hackathonId={hackathon.id} />
+        </div>
       </div>
     </PersonalCabinetLayout>
   )
