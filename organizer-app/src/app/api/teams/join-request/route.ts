@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { messageService } from '@/lib/messages'
+import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 
 const createJoinRequestSchema = z.object({
   teamId: z.string().min(1, 'Team ID is required'),
@@ -56,9 +58,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Team is not accepting new members' }, { status: 400 })
     }
 
-    // Get current hackathon
-    const { getCurrentHackathon } = await import('@/lib/hackathon')
-    const hackathon = await getCurrentHackathon()
+    // Get current hackathon (using same logic as dashboard)
+    const hackathon = await db.hackathon.findFirst({
+      where: { slug: 'hackload-2025' }
+    })
     if (!hackathon) {
       return NextResponse.json({ error: 'No active hackathon found' }, { status: 400 })
     }
@@ -88,9 +91,57 @@ export async function POST(request: NextRequest) {
       },
       include: {
         participant: true,
-        team: true
+        team: {
+          include: {
+            leader: true
+          }
+        }
       }
     })
+
+    // Send notification message to team
+    try {
+      console.log('📧 Starting join request notification process...')
+      console.log('📧 Team ID:', teamId)
+      console.log('📧 Team members count:', team.members.length)
+      console.log('📧 Hackathon ID:', hackathon.id)
+      console.log('📧 Participant ID:', participant.id)
+      
+      const joinRequestUrl = `https://hub.hackload.kz/space/team`
+      const participantProfileUrl = `https://hub.hackload.kz/space/participants/${participant.id}`
+      
+      const messageTemplate = generateJoinRequestNotificationMessage({
+        participant,
+        team: joinRequest.team,
+        joinRequest,
+        joinRequestUrl,
+        participantProfileUrl
+      })
+
+      console.log('📧 Generated message body length:', messageTemplate.text.length)
+      console.log('📧 Message subject:', `🔔 Новая заявка на вступление в команду "${team.name}"`)
+
+      const messages = await messageService.sendToTeam(
+        teamId,
+        `🔔 Новая заявка на вступление в команду "${team.name}"`,
+        messageTemplate.text,
+        undefined, // system message
+        hackathon.id,
+        messageTemplate.html // HTML version for emails
+      )
+
+      console.log('📧 Successfully sent notifications to team members:', messages.length)
+      console.log('📧 Message IDs:', messages.map(m => m.id))
+    } catch (error) {
+      console.error('❌ Failed to send join request notification:', error)
+      console.error('❌ Error details:', {
+        teamId,
+        participantId: participant.id,
+        hackathonId: hackathon.id,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      })
+      // Don't fail the request creation if notification fails
+    }
 
     return NextResponse.json(joinRequest, { status: 201 })
   } catch (error) {

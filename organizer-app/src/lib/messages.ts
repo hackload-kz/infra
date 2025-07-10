@@ -11,6 +11,7 @@ export interface CreateMessageInput {
   teamId?: string;
   hackathonId: string;
   parentMessageId?: string;
+  htmlBody?: string; // Optional HTML version for emails
 }
 
 export interface MessageWithRelations {
@@ -74,7 +75,7 @@ export interface MessageWithRelations {
 
 class MessageService {
   async createMessage(input: CreateMessageInput): Promise<MessageWithRelations> {
-    const { recipientId, teamId, hackathonId, senderId, subject, body, parentMessageId } = input;
+    const { recipientId, teamId, hackathonId, senderId, subject, body, parentMessageId, htmlBody } = input;
 
     try {
       // If it's a team message, create individual messages for each team member
@@ -217,7 +218,7 @@ class MessageService {
       );
 
       // Send email notification
-      await this.sendEmailNotification(message);
+      await this.sendEmailNotification(message, htmlBody);
 
       return message;
     } catch (error) {
@@ -714,39 +715,108 @@ class MessageService {
     return allMessages;
   }
 
-  async sendToTeam(teamId: string, subject: string, body: string, senderId?: string, hackathonId?: string): Promise<MessageWithRelations[]> {
+  async sendToTeam(teamId: string, subject: string, body: string, senderId?: string, hackathonId?: string, htmlBody?: string): Promise<MessageWithRelations[]> {
+    console.log('📧 MessageService.sendToTeam called with:', {
+      teamId,
+      subject,
+      senderId,
+      hackathonId,
+      bodyLength: body.length
+    });
+
     const team = await db.team.findUnique({
       where: { id: teamId },
       include: { 
         members: true,
+        leader: true,
         hackathon: true
       }
     });
 
     if (!team) {
+      console.error('❌ Team not found:', teamId);
       throw new Error('Team not found');
     }
 
+    console.log('📧 Team found:', {
+      name: team.name,
+      membersCount: team.members.length,
+      leader: team.leader ? { id: team.leader.id, name: team.leader.name, email: team.leader.email } : null,
+      hackathonId: team.hackathonId,
+      members: team.members.map(m => ({ id: m.id, name: m.name, email: m.email }))
+    });
+
+    const finalHackathonId = hackathonId || team.hackathonId;
+    console.log('📧 Using hackathon ID:', finalHackathonId);
+
+    // Build recipient list: include leader and all members (avoid duplicates)
+    const recipients: Array<{ id: string; name: string; email: string }> = [];
+    
+    // Add leader if exists
+    if (team.leader) {
+      recipients.push({
+        id: team.leader.id,
+        name: team.leader.name,
+        email: team.leader.email
+      });
+    }
+    
+    // Add members (excluding leader if they're also a member)
+    team.members.forEach(member => {
+      if (!recipients.find(r => r.id === member.id)) {
+        recipients.push({
+          id: member.id,
+          name: member.name,
+          email: member.email
+        });
+      }
+    });
+
+    console.log('📧 Final recipients:', recipients);
+
+    if (recipients.length === 0) {
+      console.warn('⚠️ No recipients found for team:', teamId);
+      return [];
+    }
+
     const messages = await Promise.all(
-      team.members.map(member => 
-        this.createMessage({
-          subject,
-          body,
-          senderId,
-          recipientId: member.id,
-          hackathonId: hackathonId || team.hackathonId,
-          teamId
-        })
-      )
+      recipients.map(async (recipient, index) => {
+        console.log(`📧 Creating message ${index + 1}/${recipients.length} for recipient:`, {
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          recipientEmail: recipient.email
+        });
+        
+        try {
+          const message = await this.createMessage({
+            subject,
+            body,
+            senderId,
+            recipientId: recipient.id,
+            hackathonId: finalHackathonId,
+            teamId,
+            htmlBody
+          });
+          
+          console.log(`✅ Message created successfully for ${recipient.name}:`, message.id);
+          return message;
+        } catch (error) {
+          console.error(`❌ Failed to create message for ${recipient.name}:`, error);
+          throw error;
+        }
+      })
     );
 
+    console.log('📧 All team messages created successfully:', messages.length);
     return messages;
   }
 
-  private async sendEmailNotification(message: MessageWithRelations): Promise<void> {
+  private async sendEmailNotification(message: MessageWithRelations, htmlBody?: string): Promise<void> {
     try {
       const subject = `New Message: ${message.subject}`;
-      const emailBody = `
+      
+      // Use provided HTML body if available, otherwise create default
+      const emailBody = htmlBody || `
         <h2>You have received a new message</h2>
         <p><strong>From:</strong> ${message.sender?.name || 'System'}</p>
         <p><strong>Subject:</strong> ${message.subject}</p>
@@ -760,7 +830,7 @@ class MessageService {
         </p>
       `;
 
-      await emailService.sendEmail(message.recipient.email, subject, emailBody);
+      await emailService.sendHtmlEmail(message.recipient.email, subject, emailBody);
     } catch (error) {
       console.error('Failed to send email notification:', error);
       // Don't throw error - message creation should succeed even if email fails

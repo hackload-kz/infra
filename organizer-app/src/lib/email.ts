@@ -147,6 +147,39 @@ class EmailService {
     }
   }
 
+  async sendHtmlEmail(recipient: string, subject: string, htmlBody: string): Promise<boolean> {
+    try {
+      const htmlContent = this.getDefaultHtmlTemplate(htmlBody);
+      
+      // Check if we're in production environment
+      const isProduction = process.env.NODE_ENV === 'production';
+      const defaultTestEmail = process.env.DEFAULT_TEST_EMAIL || 'test@hackload.kz';
+      
+      // In non-production, send all emails to default test email
+      const actualRecipient = isProduction ? recipient : defaultTestEmail;
+      
+      // Modify subject to indicate original recipient in non-production
+      const actualSubject = isProduction ? subject : `[TEST for ${recipient}] ${subject}`;
+      
+      const mailOptions = {
+        from: `${this.config.senderName} <${this.config.senderEmail}>`,
+        to: actualRecipient,
+        subject: actualSubject,
+        html: htmlContent
+      };
+
+      await this.transporter.sendMail(mailOptions);
+      
+      // Log email sent with both original and actual recipient
+      console.log(`[EMAIL SENT HTML] ${new Date().toISOString()} | Original: ${recipient} | Actual: ${actualRecipient} | Subject: ${actualSubject}`);
+      
+      return true;
+    } catch (error) {
+      console.error('HTML email sending failed:', error);
+      return false;
+    }
+  }
+
   async sendWelcomeEmail(recipient: string, participantName: string): Promise<boolean> {
     const subject = 'Welcome to Hackload Hackathon 2025!';
     const body = `

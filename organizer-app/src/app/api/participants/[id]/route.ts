@@ -10,7 +10,12 @@ export async function PUT(
     try {
         const session = await auth()
         
-        if (!session || !isOrganizer(session.user?.email)) {
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const isAdmin = await isOrganizer(session.user.email)
+        if (!isAdmin) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 

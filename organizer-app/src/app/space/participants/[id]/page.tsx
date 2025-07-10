@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
+import { ParticipantInvitationClient } from '@/components/participant-invitation-client'
 import Link from 'next/link'
 import { 
   Users,
@@ -34,7 +35,7 @@ export default async function ParticipantProfilePage({ params }: Props) {
     redirect('/login')
   }
 
-  const [currentParticipant, targetParticipant] = await Promise.all([
+  const [currentParticipant, targetParticipant, hackathon] = await Promise.all([
     db.participant.findFirst({
       where: { 
         user: { email: session.user.email } 
@@ -88,6 +89,9 @@ export default async function ParticipantProfilePage({ params }: Props) {
           }
         }
       }
+    }),
+    db.hackathon.findFirst({
+      where: { slug: 'hackload-2025' }
     })
   ])
 
@@ -95,7 +99,7 @@ export default async function ParticipantProfilePage({ params }: Props) {
     redirect('/login')
   }
 
-  if (!targetParticipant) {
+  if (!targetParticipant || !hackathon) {
     notFound()
   }
 
@@ -216,7 +220,27 @@ export default async function ParticipantProfilePage({ params }: Props) {
             {currentTeam && isCurrentUserLeader && teamHasSpace && !targetParticipant.team && (
               <div className="border-t border-slate-700/30 pt-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Пригласить в команду</h3>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
+                  <ParticipantInvitationClient
+                    team={{
+                      id: currentTeam.id,
+                      name: currentTeam.name,
+                      nickname: currentTeam.nickname || ''
+                    }}
+                    teamLeader={{
+                      id: currentParticipant.id,
+                      name: currentParticipant.name,
+                      email: currentParticipant.email,
+                      telegram: currentParticipant.telegram
+                    }}
+                    targetParticipant={{
+                      id: targetParticipant.id,
+                      name: targetParticipant.name,
+                      email: targetParticipant.email
+                    }}
+                    hackathonId={hackathon.id}
+                  />
+                  
                   {targetParticipant.telegram ? (
                     <a
                       href={`https://t.me/${targetParticipant.telegram.replace('@', '')}`}

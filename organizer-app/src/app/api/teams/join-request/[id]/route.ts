@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { messageService } from '@/lib/messages'
+import { generateJoinRequestResponseMessage } from '@/lib/message-templates'
 
 const updateJoinRequestSchema = z.object({
   action: z.enum(['approve', 'decline'])
@@ -90,6 +92,35 @@ export async function PUT(
         where: { id: resolvedParams.id },
         data: { status: 'DECLINED' }
       })
+    }
+
+    // Send result message to participant
+    try {
+      const joinRequestUrl = `https://hub.hackload.kz/space/teams`
+      
+      const messageTemplate = generateJoinRequestResponseMessage({
+        participant: joinRequest.participant,
+        team: joinRequest.team,
+        joinRequest,
+        joinRequestUrl,
+        decision: action === 'approve' ? 'approved' : 'declined'
+      })
+
+      const messageSubject = action === 'approve' 
+        ? `🎉 Ваша заявка на вступление в команду "${joinRequest.team.name}" одобрена!`
+        : `❌ Ваша заявка на вступление в команду "${joinRequest.team.name}" отклонена`
+
+      await messageService.createMessage({
+        subject: messageSubject,
+        body: messageTemplate.text,
+        senderId: undefined, // system message
+        recipientId: joinRequest.participant.id,
+        hackathonId: joinRequest.hackathonId,
+        htmlBody: messageTemplate.html
+      })
+    } catch (error) {
+      console.error('Failed to send join request response notification:', error)
+      // Don't fail the request update if notification fails
     }
 
     // Return updated join request
