@@ -133,6 +133,8 @@ model Participant {
   city                String?
   company             String?
   telegram            String?  // Telegram username or profile link
+  githubUrl           String?  // GitHub or GitLab profile URL
+  linkedinUrl         String?  // LinkedIn profile URL
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
   userId              String   @unique

@@ -47,6 +47,12 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                     Компания
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    GitHub/GitLab
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    LinkedIn
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Действия
                                 </th>
                             </tr>
@@ -80,6 +86,34 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {participant.company || '-'}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {participant.githubUrl ? (
+                                            <a 
+                                                href={participant.githubUrl} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-900"
+                                            >
+                                                Профиль
+                                            </a>
+                                        ) : (
+                                            '-'
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {participant.linkedinUrl ? (
+                                            <a 
+                                                href={participant.linkedinUrl} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-900"
+                                            >
+                                                Профиль
+                                            </a>
+                                        ) : (
+                                            '-'
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <div className="flex space-x-2">

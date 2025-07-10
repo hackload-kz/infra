@@ -11,6 +11,8 @@ interface Participant {
     city: string | null
     company: string | null
     telegram?: string | null
+    githubUrl?: string | null
+    linkedinUrl?: string | null
     experienceLevel?: string | null
     technologies?: string | null
     cloudServices?: string | null
@@ -31,6 +33,8 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
         city: participant.city || '',
         company: participant.company || '',
         telegram: participant.telegram || '',
+        githubUrl: participant.githubUrl || '',
+        linkedinUrl: participant.linkedinUrl || '',
         experienceLevel: participant.experienceLevel || '',
         technologies: participant.technologies ? JSON.parse(participant.technologies) : [],
         cloudServices: participant.cloudServices ? JSON.parse(participant.cloudServices) : [],
@@ -155,6 +159,40 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
                             />
                             <p className="text-slate-500 text-xs mt-1">
                                 Введите @username или полную ссылку на профиль
+                            </p>
+                        </div>
+
+                        <div>
+                            <label htmlFor="githubUrl" className="block text-sm font-medium text-slate-300 mb-2">
+                                GitHub / GitLab
+                            </label>
+                            <input
+                                id="githubUrl"
+                                type="url"
+                                value={formData.githubUrl}
+                                onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
+                                placeholder="https://github.com/username или https://gitlab.com/username"
+                                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
+                            />
+                            <p className="text-slate-500 text-xs mt-1">
+                                Ссылка на ваш профиль GitHub или GitLab (опционально)
+                            </p>
+                        </div>
+
+                        <div>
+                            <label htmlFor="linkedinUrl" className="block text-sm font-medium text-slate-300 mb-2">
+                                LinkedIn
+                            </label>
+                            <input
+                                id="linkedinUrl"
+                                type="url"
+                                value={formData.linkedinUrl}
+                                onChange={(e) => setFormData(prev => ({ ...prev, linkedinUrl: e.target.value }))}
+                                placeholder="https://linkedin.com/in/username"
+                                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
+                            />
+                            <p className="text-slate-500 text-xs mt-1">
+                                Ссылка на ваш профиль LinkedIn (опционально)
                             </p>
                         </div>
                     </div>

@@ -14,6 +14,8 @@ interface FormParticipant {
   city: string | null
   company: string | null
   telegram?: string | null
+  githubUrl?: string | null
+  linkedinUrl?: string | null
   experienceLevel?: string | null
   technologies?: string | null
   cloudServices?: string | null
@@ -74,6 +76,8 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
       city: null,
       company: null,
       telegram: null,
+      githubUrl: null,
+      linkedinUrl: null,
       experienceLevel: null,
       technologies: null,
       cloudServices: null,
@@ -91,6 +95,8 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
       city: user.participant.city,
       company: user.participant.company,
       telegram: user.participant.telegram,
+      githubUrl: user.participant.githubUrl,
+      linkedinUrl: user.participant.linkedinUrl,
       experienceLevel: user.participant.experienceLevel,
       technologies: user.participant.technologies,
       cloudServices: user.participant.cloudServices,

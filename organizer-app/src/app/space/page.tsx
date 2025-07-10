@@ -95,6 +95,32 @@ export default async function PersonalCabinetPage() {
                   <span className="text-slate-300">{participant.city}</span>
                 </div>
               )}
+              {participant.githubUrl && (
+                <div className="flex items-center space-x-3">
+                  <div className="w-5 h-5 text-amber-400">💻</div>
+                  <a 
+                    href={participant.githubUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-slate-300 hover:text-amber-400 transition-colors truncate"
+                  >
+                    GitHub/GitLab
+                  </a>
+                </div>
+              )}
+              {participant.linkedinUrl && (
+                <div className="flex items-center space-x-3">
+                  <div className="w-5 h-5 text-amber-400">💼</div>
+                  <a 
+                    href={participant.linkedinUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-slate-300 hover:text-amber-400 transition-colors truncate"
+                  >
+                    LinkedIn
+                  </a>
+                </div>
+              )}
             </div>
             <Link href="/space/info/edit" className="w-full mt-6 bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-3 rounded-lg font-medium transition-colors duration-150 text-center block">
               Редактировать профиль

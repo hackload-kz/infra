@@ -21,6 +21,8 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
         name: participant.name || '',
         city: participant.city || '',
         company: participant.company || '',
+        githubUrl: participant.githubUrl || '',
+        linkedinUrl: participant.linkedinUrl || '',
         experienceLevel: participant.experienceLevel || '',
         technologies: participant.technologies ? JSON.parse(participant.technologies) : [],
         cloudServices: participant.cloudServices ? JSON.parse(participant.cloudServices) : [],
@@ -140,6 +142,32 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
                         value={formData.company}
                         onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                         placeholder="Название компании"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="githubUrl" className="block text-sm font-semibold text-gray-800 mb-1">
+                        GitHub / GitLab
+                    </label>
+                    <Input
+                        id="githubUrl"
+                        type="url"
+                        value={formData.githubUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
+                        placeholder="https://github.com/username или https://gitlab.com/username"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="linkedinUrl" className="block text-sm font-semibold text-gray-800 mb-1">
+                        LinkedIn
+                    </label>
+                    <Input
+                        id="linkedinUrl"
+                        type="url"
+                        value={formData.linkedinUrl}
+                        onChange={(e) => setFormData(prev => ({ ...prev, linkedinUrl: e.target.value }))}
+                        placeholder="https://linkedin.com/in/username"
                     />
                 </div>
 
