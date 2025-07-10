@@ -148,6 +148,16 @@ src/
 #### Participant Management
 - `GET/PUT /api/participant/profile` - User profile operations
 - `GET /api/participants/[id]` - Get participant details
+- `GET /api/participants` - List participants (admin-only)
+
+#### Messaging System
+- `GET/POST /api/messages` - List/send messages
+- `GET/PUT /api/messages/[id]` - Get/update message
+- `POST /api/messages/[id]/reply` - Reply to message
+- `PUT /api/messages/[id]/read` - Mark message as read
+- `GET /api/messages/[id]/conversation` - Get conversation thread
+- `GET /api/messages/unread-count` - Get unread message count
+- `POST /api/team-invitation` - Send team invitation
 
 #### Cabinet URLs (Future Implementation)
 - **Admin Cabinet**: `/[hackathon-slug]/dashboard` (e.g., `/hackload-2025/dashboard`)
@@ -180,6 +190,14 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 ADMIN_USERS=admin1@example.com,admin2@example.com
+
+# Email Configuration (Optional - for message notifications)
+SMTP_SERVER=smtp.yandex.ru
+SMTP_PORT=465
+SENDER_EMAIL=your-email@domain.com
+SENDER_PASSWORD=your-app-password
+SENDER_NAME=Hackload Hackathon
+DEFAULT_TEST_EMAIL=test@hackload.kz
 ```
 
 ## Docker & Deployment
@@ -267,3 +285,80 @@ model Team {
 - **Theme**: "Building a ticket selling system"
 - **Dates**: January 15-17, 2025
 - **Registration**: Until January 14, 2025
+
+## Messaging System
+
+### Overview
+The application includes a comprehensive messaging system for team communication, join requests, and administrative notifications.
+
+### Architecture
+- **Message Model**: Core message entity with subject, body, and metadata
+- **Message Status**: UNREAD, READ status tracking
+- **Recipients**: Individual participants or team broadcasts
+- **HTML Templates**: Rich email formatting with professional styling
+- **Email Integration**: Automatic email notifications via SMTP
+
+### Key Features
+
+#### Message Types
+1. **System Messages**: Automated notifications (join requests, approvals, etc.)
+2. **Team Messages**: Broadcast messages to all team members
+3. **Individual Messages**: Direct participant-to-participant communication
+4. **Administrative Messages**: Organizer broadcasts to participants/teams
+
+#### Message Templates
+Located in `src/lib/message-templates.ts`:
+- **Join Request Notifications**: Rich HTML templates for team leaders
+- **Join Request Responses**: Approval/decline notifications for participants
+- **Team Invitations**: Professional invitation messages
+- **All templates**: Support both text and HTML versions for email compatibility
+
+#### Message Service (`src/lib/messages.ts`)
+- **Message Creation**: Unified interface for all message types
+- **Team Broadcasting**: Send to team leaders + members (avoiding duplicates)
+- **Email Integration**: Automatic HTML email notifications
+- **Conversation Threading**: Support for message replies and conversations
+- **Bulk Operations**: Efficient handling of team-wide notifications
+
+### Join Request Workflow
+1. **Participant submits join request** via `/space/teams`
+2. **System creates JoinRequest record** with participant message
+3. **Notification sent to team leader** (and members if any exist)
+4. **Team leader reviews** in `/space/team` or `/dashboard/messages`
+5. **Leader approves/declines** request
+6. **Participant receives response** notification
+7. **If approved**: Participant automatically added to team
+
+### Message Components
+- **MessageCompose**: Unified message composition with recipient selection
+- **SearchableSelect**: Efficient participant/team filtering
+- **MessagePopup**: Modal interface for contextual messaging
+- **MessageItem**: Rich message display with conversation threading
+- **LogoutButton**: Consistent logout functionality across platforms
+
+### Server Actions (`src/lib/actions.ts`)
+Enhanced team management actions with integrated messaging:
+- **createJoinRequest**: Creates join request and sends notification to team leader
+- **respondToJoinRequest**: Handles approval/decline with participant notification
+- **Team Management**: Create, join, leave teams with proper leadership transfer
+- **Message Integration**: All team actions automatically trigger relevant notifications
+
+### Email Configuration
+- **SMTP Support**: Configurable email server (Yandex, Gmail, etc.)
+- **HTML Templates**: Professional email formatting with inline CSS
+- **Development Mode**: All emails redirect to test address in non-production
+- **Error Handling**: Message creation succeeds even if email delivery fails
+- **Logging**: Comprehensive email delivery tracking
+
+### Dashboard Integration
+- **Admin Messages**: `/dashboard/messages` - view all system messages
+- **Message Buttons**: Contextual messaging on team/participant pages
+- **Logout Functionality**: Consistent across dashboard and space areas
+- **Searchable Recipients**: Efficient user selection in message forms
+
+### Security & Performance
+- **Role-based Access**: Admin vs participant message permissions
+- **Hackathon Isolation**: Messages scoped to specific hackathons
+- **Efficient Queries**: Optimized database queries with proper includes
+- **Error Handling**: Graceful fallbacks for email delivery issues
+- **Logging**: Comprehensive debugging for message delivery tracking

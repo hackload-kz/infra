@@ -4,6 +4,8 @@ import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { TeamStatus } from '@prisma/client'
 import { getCurrentHackathon } from '@/lib/hackathon'
+import { messageService } from '@/lib/messages'
+import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 
 
 export async function createTeam(formData: FormData) {
@@ -635,6 +637,7 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             where: { id: teamId },
             include: { 
                 members: true,
+                leader: true,
                 joinRequests: {
                     where: { 
                         status: 'PENDING',
@@ -677,7 +680,7 @@ export async function createJoinRequest(participantId: string, teamId: string, m
         }
 
         // Create the join request
-        await db.joinRequest.create({
+        const joinRequest = await db.joinRequest.create({
             data: {
                 participantId: participantId,
                 teamId: teamId,
@@ -685,6 +688,33 @@ export async function createJoinRequest(participantId: string, teamId: string, m
                 message: message || null
             }
         })
+
+        // Send notification to team leader
+        if (team.leader) {
+            try {
+                // Generate notification message
+                const messageTemplate = generateJoinRequestNotificationMessage({
+                    participant,
+                    team,
+                    joinRequest,
+                    joinRequestUrl: '/space/team', // URL to team management page
+                    participantProfileUrl: `/profile/${participant.id}` // URL to participant profile
+                })
+
+                // Send message to team leader
+                await messageService.createMessage({
+                    subject: `🔔 Новая заявка на вступление в команду "${team.name}"`,
+                    body: messageTemplate.text,
+                    htmlBody: messageTemplate.html,
+                    recipientId: team.leader.id,
+                    hackathonId: hackathon.id,
+                    teamId: team.id
+                })
+            } catch (messageError) {
+                // Log the error but don't fail the join request creation
+                console.error('Error sending join request notification:', messageError)
+            }
+        }
 
         revalidatePath('/space/team')
     } catch (error) {
