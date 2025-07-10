@@ -23,29 +23,42 @@ export default async function ProfileInfoPage() {
     redirect('/login')
   }
 
-  const participant = await db.participant.findFirst({
-    where: { 
-      user: { email: session.user.email } 
-    },
+  // Check if user exists and has a participant profile
+  const user = await db.user.findUnique({
+    where: { email: session.user.email },
     include: {
-      user: true,
-      team: true,
-      ledTeam: true,
+      participant: {
+        include: {
+          user: true,
+          team: true,
+          ledTeam: true,
+        },
+      },
     },
   })
 
-  if (!participant) {
-    redirect('/login')
+  // User should exist because OAuth creates them in auth.config.ts
+  // If for some reason they don't exist, something went wrong
+  if (!user) {
+    console.error('User not found in database after OAuth login:', session.user.email);
+    redirect('/login');
   }
 
-  const user = {
+  // If user exists but doesn't have a participant profile, redirect to edit
+  if (!user.participant) {
+    redirect('/space/info/edit?first=true');
+  }
+
+  const participant = user.participant;
+
+  const userForLayout = {
     name: participant.name,
     email: participant.email,
     image: session.user?.image || undefined
   }
 
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={userForLayout}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">

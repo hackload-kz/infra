@@ -10,7 +10,8 @@ interface EmailConfig {
 
 class EmailService {
   private config: EmailConfig;
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null = null;
+  private isConfigured: boolean = false;
 
   constructor() {
     this.config = {
@@ -21,22 +22,24 @@ class EmailService {
       port: parseInt(process.env.SMTP_PORT || '465')
     };
 
-    if (!this.config.senderEmail || !this.config.senderPassword) {
-      throw new Error('SENDER_EMAIL and SENDER_PASSWORD environment variables are required');
+    // Only initialize transporter if we have valid config
+    if (this.config.senderEmail && this.config.senderPassword) {
+      this.isConfigured = true;
+      this.transporter = nodemailer.createTransport({
+        host: this.config.smtpServer,
+        port: this.config.port,
+        secure: true, // SSL
+        auth: {
+          user: this.config.senderEmail,
+          pass: this.config.senderPassword
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+    } else {
+      console.warn('Email service not configured: SENDER_EMAIL and SENDER_PASSWORD environment variables are missing');
     }
-
-    this.transporter = nodemailer.createTransport({
-      host: this.config.smtpServer,
-      port: this.config.port,
-      secure: true, // SSL
-      auth: {
-        user: this.config.senderEmail,
-        pass: this.config.senderPassword
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
   }
 
   private getDefaultHtmlTemplate(body: string): string {
@@ -115,6 +118,11 @@ class EmailService {
   }
 
   async sendEmail(recipient: string, subject: string, body: string): Promise<boolean> {
+    if (!this.isConfigured || !this.transporter) {
+      console.warn('Email service not configured, skipping email send');
+      return false;
+    }
+
     try {
       const htmlContent = this.getDefaultHtmlTemplate(body);
       
@@ -148,6 +156,11 @@ class EmailService {
   }
 
   async sendHtmlEmail(recipient: string, subject: string, htmlBody: string): Promise<boolean> {
+    if (!this.isConfigured || !this.transporter) {
+      console.warn('Email service not configured, skipping HTML email send');
+      return false;
+    }
+
     try {
       const htmlContent = this.getDefaultHtmlTemplate(htmlBody);
       
@@ -181,6 +194,11 @@ class EmailService {
   }
 
   async sendWelcomeEmail(recipient: string, participantName: string): Promise<boolean> {
+    if (!this.isConfigured) {
+      console.warn('Email service not configured, skipping welcome email');
+      return false;
+    }
+
     const subject = 'Welcome to Hackload Hackathon 2025!';
     const body = `
       <h2>Welcome, ${participantName}!</h2>
@@ -204,6 +222,11 @@ class EmailService {
   }
 
   async sendTeamInvitation(recipient: string, teamName: string, inviterName: string): Promise<boolean> {
+    if (!this.isConfigured) {
+      console.warn('Email service not configured, skipping team invitation email');
+      return false;
+    }
+
     const subject = `Team Invitation: Join "${teamName}"`;
     const body = `
       <h2>You've been invited to join a team!</h2>

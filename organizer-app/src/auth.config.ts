@@ -83,7 +83,7 @@ export default {
 
       // Already logged in users trying to access login/register
       if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/register")) {
-        return Response.redirect(new URL("/profile", nextUrl));
+        return Response.redirect(new URL("/space/", nextUrl));
       }
 
       return true;

@@ -10,12 +10,20 @@ export default auth((req) => {
             return Response.redirect(new URL('/login', req.url));
         }
         if (req.auth?.user?.role !== 'admin') {
-            return Response.redirect(new URL('/profile', req.url));
+            return Response.redirect(new URL('/space/', req.url));
         }
         return;
     }
 
-    // Profile route - require authentication
+    // Space routes - require authentication
+    if (pathname.startsWith('/space')) {
+        if (!isLoggedIn) {
+            return Response.redirect(new URL('/login', req.url));
+        }
+        return;
+    }
+
+    // Profile route - require authentication (legacy support)
     if (pathname.startsWith('/profile')) {
         if (!isLoggedIn) {
             return Response.redirect(new URL('/login', req.url));
@@ -25,7 +33,11 @@ export default auth((req) => {
 
     // Redirect authenticated users away from auth pages
     if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
-        return Response.redirect(new URL('/profile', req.url));
+        if (req.auth?.user?.role === 'admin') {
+            return Response.redirect(new URL('/dashboard', req.url));
+        } else {
+            return Response.redirect(new URL('/space/', req.url));
+        }
     }
 });
 

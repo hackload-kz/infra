@@ -239,31 +239,83 @@ export async function PUT(request: NextRequest) {
             },
         });
 
-        if (!user || !user.participant) {
+        if (!user) {
             return NextResponse.json(
-                { error: 'Профиль участника не найден' },
+                { error: 'Пользователь не найден' },
                 { status: 404 }
             );
         }
 
-        // Update participant profile (personal data only, no team changes)
-        const updatedParticipant = await db.participant.update({
-            where: { id: user.participant!.id },
-            data: {
-                name,
-                city: city || null,
-                company: company || null,
-                telegram: telegram || null,
-                // Experience fields
-                experienceLevel: experienceLevel || null,
-                technologies: technologies ? JSON.stringify(technologies) : null,
-                cloudServices: cloudServices ? JSON.stringify(cloudServices) : null,
-                cloudProviders: cloudProviders ? JSON.stringify(cloudProviders) : null,
-                otherTechnologies: otherTechnologies || null,
-                otherCloudServices: otherCloudServices || null,
-                otherCloudProviders: otherCloudProviders || null,
-            },
-        });
+        let updatedParticipant;
+        let isNewParticipant = false;
+
+        if (!user.participant) {
+            // Create new participant profile (first-time users)
+            isNewParticipant = true;
+            
+            // Get current hackathon for new participants
+            const { getCurrentHackathon } = await import('@/lib/hackathon')
+            const hackathon = await getCurrentHackathon()
+            if (!hackathon) {
+                return NextResponse.json(
+                    { error: 'No active hackathon found' },
+                    { status: 400 }
+                );
+            }
+
+            const result = await db.$transaction(async (tx) => {
+                // Create participant
+                const participant = await tx.participant.create({
+                    data: {
+                        name,
+                        email: session.user.email!,
+                        city: city || null,
+                        company: company || null,
+                        telegram: telegram || null,
+                        userId: user.id,
+                        // Experience fields
+                        experienceLevel: experienceLevel || null,
+                        technologies: technologies ? JSON.stringify(technologies) : null,
+                        cloudServices: cloudServices ? JSON.stringify(cloudServices) : null,
+                        cloudProviders: cloudProviders ? JSON.stringify(cloudProviders) : null,
+                        otherTechnologies: otherTechnologies || null,
+                        otherCloudServices: otherCloudServices || null,
+                        otherCloudProviders: otherCloudProviders || null,
+                    },
+                });
+
+                // Create hackathon participation
+                await tx.hackathonParticipation.create({
+                    data: {
+                        participantId: participant.id,
+                        hackathonId: hackathon.id,
+                    },
+                });
+
+                return participant;
+            });
+
+            updatedParticipant = result;
+        } else {
+            // Update existing participant profile
+            updatedParticipant = await db.participant.update({
+                where: { id: user.participant.id },
+                data: {
+                    name,
+                    city: city || null,
+                    company: company || null,
+                    telegram: telegram || null,
+                    // Experience fields
+                    experienceLevel: experienceLevel || null,
+                    technologies: technologies ? JSON.stringify(technologies) : null,
+                    cloudServices: cloudServices ? JSON.stringify(cloudServices) : null,
+                    cloudProviders: cloudProviders ? JSON.stringify(cloudProviders) : null,
+                    otherTechnologies: otherTechnologies || null,
+                    otherCloudServices: otherCloudServices || null,
+                    otherCloudProviders: otherCloudProviders || null,
+                },
+            });
+        }
 
         // Fetch updated participant with relations
         const participantWithRelations = await db.participant.findUnique({
@@ -275,7 +327,7 @@ export async function PUT(request: NextRequest) {
         });
 
         return NextResponse.json({
-            message: 'Профиль обновлен успешно',
+            message: isNewParticipant ? 'Профиль создан успешно' : 'Профиль обновлен успешно',
             participant: {
                 id: updatedParticipant.id,
                 name: updatedParticipant.name,
@@ -289,6 +341,7 @@ export async function PUT(request: NextRequest) {
                 nickname: participantWithRelations.team.nickname,
                 isLeader: !!participantWithRelations.ledTeam,
             } : null,
+            isNewParticipant,
         });
 
     } catch (error) {
