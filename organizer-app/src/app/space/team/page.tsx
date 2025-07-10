@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { SpaceTeamManagement } from '@/components/space-team-management'
 import { JoinRequestsManagement } from '@/components/join-requests-management'
@@ -30,6 +31,9 @@ export default async function ProfileTeamPage() {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   const [participant, availableTeams] = await Promise.all([
     db.participant.findFirst({
@@ -116,13 +120,19 @@ export default async function ProfileTeamPage() {
     })
   ])
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Организатор',
+    email: session.user.email,
     image: session.user?.image || undefined
   }
 
@@ -156,8 +166,28 @@ export default async function ProfileTeamPage() {
         <div className="w-16 h-1 bg-amber-400 rounded-full"></div>
       </div>
 
-      <div className="space-y-8">
-        {participant.team ? (
+      {!participant && userIsOrganizer && (
+        <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-6 mb-8">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-white mb-2">Режим организатора</h2>
+            <p className="text-amber-200 mb-4">
+              Вы просматриваете страницу управления командой как организатор. Чтобы создать команду как участник, необходимо зарегистрироваться как участник.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/space/info/edit" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-medium transition-colors duration-150">
+                Зарегистрироваться как участник
+              </Link>
+              <Link href="/dashboard/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150">
+                Управление командами в дашборде
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {participant && (
+        <div className="space-y-8">
+          {participant.team ? (
           <>
             {/* Team Header */}
             <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
@@ -336,7 +366,8 @@ export default async function ProfileTeamPage() {
           participant={participant}
           availableTeams={availableTeams}
         />
-      </div>
+        </div>
+      )}
     </PersonalCabinetLayout>
   )
 }

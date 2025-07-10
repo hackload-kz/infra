@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import Link from 'next/link'
 import { 
@@ -22,6 +23,9 @@ export default async function SpaceTeamsPage() {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   const [participant, teams] = await Promise.all([
     db.participant.findFirst({
@@ -84,13 +88,19 @@ export default async function SpaceTeamsPage() {
     })
   ])
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Организатор',
+    email: session.user.email,
     image: session.user?.image || undefined
   }
 
@@ -116,13 +126,13 @@ export default async function SpaceTeamsPage() {
 
   // Filter teams that user can join (not their own team, has space, accepting members)
   const joinableTeams = teams.filter(team => 
-    team.id !== participant.teamId && 
+    team.id !== participant?.teamId && 
     team.members.length < 4 &&
     ['NEW', 'INCOMPLETED'].includes(team.status)
   )
 
   // Get pending join requests for this participant
-  const pendingRequests = participant.joinRequests || []
+  const pendingRequests = participant?.joinRequests || []
 
   return (
     <PersonalCabinetLayout user={user}>
@@ -138,12 +148,24 @@ export default async function SpaceTeamsPage() {
       </div>
 
       {/* User Status */}
-      {participant.teamId && (
+      {participant?.teamId && (
         <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 mb-8">
           <div className="flex items-center space-x-2">
             <Info className="w-5 h-5 text-blue-400" />
             <p className="text-blue-200">
               Вы уже состоите в команде. Для присоединения к другой команде сначала покиньте текущую.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Organizer Notice */}
+      {userIsOrganizer && !participant && (
+        <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4 mb-8">
+          <div className="flex items-center space-x-2">
+            <Info className="w-5 h-5 text-amber-400" />
+            <p className="text-amber-200">
+              Вы просматриваете команды как организатор. Для участия в хакатоне необходимо зарегистрироваться как участник.
             </p>
           </div>
         </div>
@@ -293,7 +315,7 @@ export default async function SpaceTeamsPage() {
                       Подробнее
                     </Link>
                     
-                    {!participant.teamId && !pendingRequests.some(req => req.teamId === team.id) && (
+                    {participant && !participant.teamId && !pendingRequests.some(req => req.teamId === team.id) && (
                       <Link
                         href={`/space/teams/${team.id}/join`}
                         className="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150 text-center"

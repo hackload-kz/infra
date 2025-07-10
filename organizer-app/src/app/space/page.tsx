@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { MessageNotifications } from '@/components/message-notifications'
 import Link from 'next/link'
@@ -22,6 +23,9 @@ export default async function PersonalCabinetPage() {
     redirect('/login')
   }
 
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
+
   // Get user participant data
   const participant = await db.participant.findFirst({
     where: { 
@@ -39,7 +43,8 @@ export default async function PersonalCabinetPage() {
     },
   })
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
@@ -48,10 +53,100 @@ export default async function PersonalCabinetPage() {
     where: { slug: 'hackload-2025' }
   })
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
     image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Организатор',
+    email: session.user.email,
+    image: session.user?.image || undefined
+  }
+
+  // If user is an organizer without participant data, show organizer view
+  if (userIsOrganizer && !participant) {
+    return (
+      <PersonalCabinetLayout user={user}>
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">
+            Личный <span className="text-amber-400">кабинет</span>
+          </h1>
+          <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full"></div>
+        </div>
+
+        {/* Organizer Notice */}
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mb-8">
+          <div className="text-center">
+            <div className="w-24 h-24 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <div className="w-12 h-12 text-slate-900 font-bold text-2xl">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold text-white mb-2">{user.name}</h2>
+            <p className="text-amber-400 font-medium mb-4">Организатор</p>
+            <p className="text-slate-300 mb-6">
+              Вы авторизованы как организатор. У вас есть доступ к панели управления и всем функциям участников.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/dashboard" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
+                Панель управления
+              </Link>
+              <Link href="/space/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-150">
+                Просмотреть команды
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Message Notifications */}
+        {hackathon && (
+          <div className="mb-8">
+            <MessageNotifications hackathonId={hackathon.id} />
+          </div>
+        )}
+
+        {/* Organizer Quick Actions */}
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+          <h3 className="text-xl font-semibold text-white mb-6">Быстрые действия</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link href="/dashboard" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+              <div className="bg-amber-400/20 p-3 rounded-lg">
+                <Edit className="w-6 h-6 text-amber-400" />
+              </div>
+              <span className="text-white text-center font-medium">Панель управления</span>
+            </Link>
+            
+            <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+              <div className="bg-amber-400/20 p-3 rounded-lg">
+                <Users className="w-6 h-6 text-amber-400" />
+              </div>
+              <span className="text-white text-center font-medium">Просмотреть команды</span>
+            </Link>
+            
+            <Link href="/space/participants" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+              <div className="bg-amber-400/20 p-3 rounded-lg">
+                <UserPlus className="w-6 h-6 text-amber-400" />
+              </div>
+              <span className="text-white text-center font-medium">Участники</span>
+            </Link>
+            
+            <Link href="/space/messages" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
+              <div className="bg-amber-400/20 p-3 rounded-lg">
+                <Search className="w-6 h-6 text-amber-400" />
+              </div>
+              <span className="text-white text-center font-medium">Сообщения</span>
+            </Link>
+          </div>
+        </div>
+      </PersonalCabinetLayout>
+    )
+  }
+
+  // At this point, participant should exist, but let's add a type guard for TypeScript
+  if (!participant) {
+    throw new Error('Participant should exist at this point in the code flow')
   }
 
   return (

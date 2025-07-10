@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { SpaceEditProfileForm } from '@/components/space-edit-profile-form'
 
@@ -39,6 +40,9 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
     redirect('/login')
   }
 
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
+
   // Check if user exists and has a participant profile
   const user = await db.user.findUnique({
     where: { email: session.user.email },
@@ -60,7 +64,8 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
   }
 
   // If user doesn't have a participant profile and this is NOT their first time, redirect to info
-  if (!user.participant && !first) {
+  // But allow organizers to access this page
+  if (!user.participant && !first && !userIsOrganizer) {
     redirect('/space/info');
   }
 

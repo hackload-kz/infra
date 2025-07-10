@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { 
   CheckSquare, 
@@ -18,6 +19,9 @@ export default async function SpaceTasksPage() {
     redirect('/login')
   }
 
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
+
   const participant = await db.participant.findFirst({
     where: { 
       user: { email: session.user.email } 
@@ -29,13 +33,19 @@ export default async function SpaceTasksPage() {
     },
   })
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Organizer',
+    email: session.user.email || '',
     image: session.user?.image || undefined
   }
 
@@ -57,7 +67,7 @@ export default async function SpaceTasksPage() {
       status: 'in_progress',
       priority: 'high',
       dueDate: '2025-02-10',
-      assignee: participant.ledTeam ? 'Вы' : 'Лидер команды'
+      assignee: participant?.ledTeam ? 'Вы' : 'Лидер команды'
     },
     {
       id: 3,

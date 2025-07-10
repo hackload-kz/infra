@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { MessageList } from '@/components/message-list'
 
@@ -12,6 +13,9 @@ export default async function SpaceMessagesPage() {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   const participant = await db.participant.findFirst({
     where: { 
@@ -29,7 +33,8 @@ export default async function SpaceMessagesPage() {
     },
   })
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
@@ -42,9 +47,14 @@ export default async function SpaceMessagesPage() {
     redirect('/login')
   }
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Организатор',
+    email: session.user.email,
     image: session.user?.image || undefined
   }
 

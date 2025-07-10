@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { 
   Mail,
@@ -22,6 +23,9 @@ export default async function ProfileInfoPage() {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   // Check if user exists and has a participant profile
   const user = await db.user.findUnique({
@@ -45,15 +49,21 @@ export default async function ProfileInfoPage() {
   }
 
   // If user exists but doesn't have a participant profile, redirect to edit
-  if (!user.participant) {
+  // But allow organizers to view the page even without participant profile
+  if (!user.participant && !userIsOrganizer) {
     redirect('/space/info/edit?first=true');
   }
 
   const participant = user.participant;
 
-  const userForLayout = {
+  // For organizers without participant data, create a fallback user object
+  const userForLayout = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Организатор',
+    email: session.user.email,
     image: session.user?.image || undefined
   }
 
@@ -67,8 +77,31 @@ export default async function ProfileInfoPage() {
         <div className="w-16 h-1 bg-amber-400 rounded-full"></div>
       </div>
 
-      {/* Profile Information */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {!participant && userIsOrganizer ? (
+        <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-lg border border-slate-700/30 text-center">
+          <div className="w-24 h-24 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <div className="w-12 h-12 text-slate-900 font-bold text-2xl">
+              {userForLayout.name.charAt(0).toUpperCase()}
+            </div>
+          </div>
+          <h2 className="text-2xl font-semibold text-white mb-2">{userForLayout.name}</h2>
+          <p className="text-amber-400 font-medium mb-4">Организатор</p>
+          <p className="text-slate-300 mb-6 max-w-md mx-auto">
+            Вы авторизованы как организатор. Чтобы участвовать в хакатоне как участник, необходимо создать профиль участника.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Link href="/space/info/edit?first=true" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
+              Создать профиль участника
+            </Link>
+            <Link href="/dashboard" className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-150">
+              Панель управления
+            </Link>
+          </div>
+        </div>
+      ) : participant ? (
+        <>
+          {/* Profile Information */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Basic Information */}
         <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
           <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
@@ -235,16 +268,18 @@ export default async function ProfileInfoPage() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-8">
-        <Link
-          href="/space/info/edit"
-          className="inline-flex items-center space-x-2 bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
-        >
-          <Edit className="w-4 h-4" />
-          <span>Редактировать профиль</span>
-        </Link>
-      </div>
+          {/* Action Buttons */}
+          <div className="mt-8">
+            <Link
+              href="/space/info/edit"
+              className="inline-flex items-center space-x-2 bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
+            >
+              <Edit className="w-4 h-4" />
+              <span>Редактировать профиль</span>
+            </Link>
+          </div>
+        </>
+      ) : null}
     </PersonalCabinetLayout>
   )
 }

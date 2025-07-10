@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { Bell } from 'lucide-react'
 
@@ -13,6 +14,9 @@ export default async function SpaceNotificationsPage() {
     redirect('/login')
   }
 
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
+
   const participant = await db.participant.findFirst({
     where: { 
       user: { email: session.user.email } 
@@ -24,13 +28,19 @@ export default async function SpaceNotificationsPage() {
     },
   })
 
-  if (!participant) {
+  // If no participant found and user is not an organizer, redirect to login
+  if (!participant && !userIsOrganizer) {
     redirect('/login')
   }
 
-  const user = {
+  // For organizers without participant data, create a fallback user object
+  const user = participant ? {
     name: participant.name,
     email: participant.email,
+    image: session.user?.image || undefined
+  } : {
+    name: session.user.name || 'Organizer',
+    email: session.user.email || '',
     image: session.user?.image || undefined
   }
 
