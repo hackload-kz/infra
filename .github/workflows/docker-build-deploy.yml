@@ -27,6 +27,43 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # Check if base image needs to be built first
+    - name: Check base image availability
+      id: check-base
+      run: |
+        PACKAGE_HASH=$(sha256sum organizer-app/package.json organizer-app/package-lock.json | sha256sum | cut -d' ' -f1)
+        echo "package-hash=$PACKAGE_HASH" >> $GITHUB_OUTPUT
+        
+        # Check if base image with this hash exists
+        if docker manifest inspect ghcr.io/${{ github.repository }}-base:pkg-$PACKAGE_HASH > /dev/null 2>&1; then
+          echo "base-image-available=true" >> $GITHUB_OUTPUT
+          echo "base-image-tag=pkg-$PACKAGE_HASH" >> $GITHUB_OUTPUT
+        else
+          echo "base-image-available=false" >> $GITHUB_OUTPUT
+          echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+        fi
+
+    # Trigger base image build if needed
+    - name: Trigger base image build
+      if: steps.check-base.outputs.base-image-available == 'false'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          await github.rest.actions.createWorkflowDispatch({
+            owner,
+            repo,
+            workflow_id: 'base-image-build.yml',
+            ref: context.ref,
+            inputs: {
+              force_rebuild: 'true'
+            }
+          });
+          
+          // Wait for base image build to complete
+          console.log('Waiting for base image build to complete...');
+          await new Promise(resolve => setTimeout(resolve, 30000)); // Wait 30 seconds
+
     # Оптимизация: Кэширование Node.js зависимостей
     - name: Cache Node.js dependencies
       uses: actions/cache@v4
@@ -47,6 +84,11 @@ jobs:
           network=host
           env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
           env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
+        config-inline: |
+          [worker.oci]
+            max-parallelism = 4
+          [worker.containerd]
+            max-parallelism = 4
 
     - name: Log in to Container Registry
       uses: docker/login-action@v3
@@ -54,6 +96,13 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Предварительно подгружаем кэш образа для лучшей производительности
+    - name: Prime cache
+      continue-on-error: true
+      run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache || true
 
     - name: Extract metadata
       id: meta
@@ -70,19 +119,27 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: organizer-app
+        file: organizer-app/Dockerfile.optimized
         # Оптимизация: собираем только AMD64 для быстроты (можно добавить ARM64 позже)
         platforms: linux/amd64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # Многоуровневое кэширование
+        # Многоуровневое кэширование с улучшенной конфигурацией
         cache-from: |
-          type=gha,scope=main
-          type=gha,scope=${{ github.ref_name }}
-        cache-to: type=gha,mode=max,scope=${{ github.ref_name }}
+          type=gha,scope=buildkit-${{ github.ref_name }}
+          type=gha,scope=buildkit-main
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+        cache-to: |
+          type=gha,mode=max,scope=buildkit-${{ github.ref_name }}
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
         # Оптимизация Docker Buildx
         build-args: |
           BUILDKIT_INLINE_CACHE=1
+          BASE_IMAGE_TAG=${{ steps.check-base.outputs.base-image-tag }}
+        # Увеличиваем параллелизм
+        build-contexts: |
+          alpine=docker-image://alpine:latest
 
     - name: Generate deployment artifact
       env:
