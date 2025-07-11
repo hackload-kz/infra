@@ -61,11 +61,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set workspace permissions
-      run: |
-        # Fix permissions for container user
-        chown -R $(id -u):$(id -g) /github/workspace
-        chmod -R 755 /github/workspace
 
     - name: Generate Prisma Client
       working-directory: organizer-app
