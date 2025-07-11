@@ -12,6 +12,9 @@ on:
       - 'organizer-app/package.json'
       - 'organizer-app/package-lock.json'
       - 'organizer-app/Dockerfile.base'
+  schedule:
+    # Run daily at 2 AM UTC to rebuild base image if needed
+    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       force_rebuild:
@@ -71,10 +74,31 @@ jobs:
         # Check if image with this hash exists
         if docker manifest inspect ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:pkg-$PACKAGE_HASH > /dev/null 2>&1; then
           echo "needs-rebuild=false" >> $GITHUB_OUTPUT
-          echo "Base image with package hash $PACKAGE_HASH already exists"
+          echo "✅ Base image with package hash $PACKAGE_HASH already exists"
+          
+          # For scheduled runs, check if we should rebuild for security updates
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            # Check if the latest tag is older than 7 days
+            LATEST_DATE=$(docker manifest inspect ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest 2>/dev/null | jq -r '.history[0].v1Compatibility' | jq -r '.created' 2>/dev/null || echo "")
+            if [[ -n "$LATEST_DATE" ]]; then
+              LATEST_TIMESTAMP=$(date -d "$LATEST_DATE" +%s 2>/dev/null || echo "0")
+              CURRENT_TIMESTAMP=$(date +%s)
+              AGE_DAYS=$(( (CURRENT_TIMESTAMP - LATEST_TIMESTAMP) / 86400 ))
+              
+              if [[ $AGE_DAYS -gt 7 ]]; then
+                echo "needs-rebuild=true" >> $GITHUB_OUTPUT
+                echo "🔄 Base image is $AGE_DAYS days old, rebuilding for security updates"
+              else
+                echo "🆕 Base image is only $AGE_DAYS days old, skipping rebuild"
+              fi
+            else
+              echo "needs-rebuild=true" >> $GITHUB_OUTPUT
+              echo "🔄 Could not determine base image age, rebuilding for safety"
+            fi
+          fi
         else
           echo "needs-rebuild=true" >> $GITHUB_OUTPUT
-          echo "Base image with package hash $PACKAGE_HASH does not exist"
+          echo "❌ Base image with package hash $PACKAGE_HASH does not exist"
         fi
 
     - name: Build and push base image
@@ -106,7 +130,11 @@ jobs:
         echo "- **Image**: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
         echo "- **Package Hash**: ${{ steps.check-rebuild.outputs.package-hash }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Tags**: ${{ steps.base-meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Size**: $(docker image inspect ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest --format='{{.Size}}' | numfmt --to=iec)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          echo "- **Rebuild Reason**: Daily security update check" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "- **Size**: $(docker image inspect ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest --format='{{.Size}}' | numfmt --to=iec 2>/dev/null || echo 'Unknown')" >> $GITHUB_STEP_SUMMARY
 
     - name: Skip rebuild notification
       if: steps.check-rebuild.outputs.needs-rebuild == 'false' && github.event.inputs.force_rebuild != 'true'
@@ -114,3 +142,7 @@ jobs:
         echo "### Base Image Build Skipped" >> $GITHUB_STEP_SUMMARY
         echo "- **Reason**: Base image with package hash ${{ steps.check-rebuild.outputs.package-hash }} already exists" >> $GITHUB_STEP_SUMMARY
         echo "- **Existing Image**: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:pkg-${{ steps.check-rebuild.outputs.package-hash }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          echo "- **Note**: Scheduled rebuild skipped as base image is recent (less than 7 days old)" >> $GITHUB_STEP_SUMMARY
+        fi
