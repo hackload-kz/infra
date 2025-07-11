@@ -133,17 +133,6 @@ jobs:
         echo "base-image-tag=latest" >> $GITHUB_OUTPUT
       id: fallback-base
 
-    # Оптимизация: Кэширование Node.js зависимостей
-    - name: Cache Node.js dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          organizer-app/node_modules
-          ~/.npm
-          ~/.cache/npm
-        key: npm-${{ runner.os }}-${{ hashFiles('organizer-app/package-lock.json') }}
-        restore-keys: |
-          npm-${{ runner.os }}-
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -159,13 +148,12 @@ jobs:
           [worker.containerd]
             max-parallelism = 4
 
-    # Предварительно подгружаем кэш образа для лучшей производительности
-    - name: Prime cache
+    # Pre-pull base image for better performance
+    - name: Prime base image cache
       continue-on-error: true
       run: |
+        docker pull ${{ steps.check-base.outputs.base-image-repo }}:${{ steps.final-base-tag.outputs.final-base-tag }} || true
         docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
-        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache || true
-        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest || true
 
     - name: Extract metadata
       id: meta
@@ -197,14 +185,11 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # Многоуровневое кэширование с улучшенной конфигурацией
+        # Registry-based layer caching optimized for base image strategy
         cache-from: |
-          type=gha,scope=buildkit-${{ github.ref_name }}
-          type=gha,scope=buildkit-main
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
         cache-to: |
-          type=gha,mode=max,scope=buildkit-${{ github.ref_name }}
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache,mode=max
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
         # Оптимизация Docker Buildx
         build-args: |
           BUILDKIT_INLINE_CACHE=1

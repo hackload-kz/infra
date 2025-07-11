@@ -114,11 +114,8 @@ jobs:
           ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:pkg-${{ steps.check-rebuild.outputs.package-hash }}
         labels: ${{ steps.base-meta.outputs.labels }}
         cache-from: |
-          type=gha,scope=base-image-${{ github.ref_name }}
-          type=gha,scope=base-image-main
           type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache
         cache-to: |
-          type=gha,mode=max,scope=base-image-${{ github.ref_name }}
           type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache,mode=max
         build-args: |
           BUILDKIT_INLINE_CACHE=1
