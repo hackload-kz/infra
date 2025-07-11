@@ -164,7 +164,8 @@ jobs:
       continue-on-error: true
       run: |
         docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
-        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache || true
+        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache || true
+        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest || true
 
     - name: Extract metadata
       id: meta
@@ -200,10 +201,10 @@ jobs:
         cache-from: |
           type=gha,scope=buildkit-${{ github.ref_name }}
           type=gha,scope=buildkit-main
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache
         cache-to: |
           type=gha,mode=max,scope=buildkit-${{ github.ref_name }}
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache,mode=max
         # Оптимизация Docker Buildx
         build-args: |
           BUILDKIT_INLINE_CACHE=1

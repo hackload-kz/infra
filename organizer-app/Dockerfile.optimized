@@ -8,9 +8,9 @@ WORKDIR /app
 
 # Copy configuration files for build
 COPY next.config.ts ./
-COPY tailwind.config.ts ./
+COPY tailwind.config.js ./
 COPY tsconfig.json ./
-COPY postcss.config.js ./
+COPY postcss.config.mjs ./
 
 # Copy Prisma schema and generate client
 COPY prisma ./prisma/
