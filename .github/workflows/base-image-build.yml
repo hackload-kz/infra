@@ -113,10 +113,6 @@ jobs:
           ${{ steps.base-meta.outputs.tags }}
           ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:pkg-${{ steps.check-rebuild.outputs.package-hash }}
         labels: ${{ steps.base-meta.outputs.labels }}
-        cache-from: |
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache
-        cache-to: |
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache,mode=max
         build-args: |
           BUILDKIT_INLINE_CACHE=1
 

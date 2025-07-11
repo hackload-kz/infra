@@ -148,12 +148,6 @@ jobs:
           [worker.containerd]
             max-parallelism = 4
 
-    # Pre-pull base image for better performance
-    - name: Prime base image cache
-      continue-on-error: true
-      run: |
-        docker pull ${{ steps.check-base.outputs.base-image-repo }}:${{ steps.final-base-tag.outputs.final-base-tag }} || true
-        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
 
     - name: Extract metadata
       id: meta
@@ -185,14 +179,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # Registry-based layer caching optimized for base image strategy
-        cache-from: |
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-        cache-to: |
-          type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
-        # Оптимизация Docker Buildx
+        # Build arguments for base image
         build-args: |
-          BUILDKIT_INLINE_CACHE=1
           BASE_IMAGE_TAG=${{ steps.final-base-tag.outputs.final-base-tag }}
         # Увеличиваем параллелизм
         build-contexts: |
