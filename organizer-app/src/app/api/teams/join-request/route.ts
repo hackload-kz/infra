@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
+import { logger, LogAction } from '@/lib/logger'
 
 const createJoinRequestSchema = z.object({
   teamId: z.string().min(1, 'Team ID is required'),
@@ -13,7 +14,14 @@ const createJoinRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
+    
+    await logger.logApiCall('POST', '/api/teams/join-request', session?.user?.email || undefined);
+    
     if (!session?.user?.email) {
+      await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+        userEmail: session?.user?.email || undefined,
+        metadata: { endpoint: '/api/teams/join-request', method: 'POST' }
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -99,6 +107,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    await logger.logCreate('JoinRequest', joinRequest.id, session.user.email, 'Join request created', {
+      teamId: teamId,
+      participantId: participant.id,
+      hackathonId: hackathon.id
+    });
+
     // Send notification message to team
     try {
       console.log('📧 Starting join request notification process...')
@@ -146,6 +160,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(joinRequest, { status: 201 })
   } catch (error) {
     console.error('Error creating join request:', error)
+    
+    const session = await auth();
+    await logger.logApiError('POST', '/api/teams/join-request', error as Error, session?.user?.email || undefined);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 })

@@ -3,12 +3,19 @@ import { auth } from '@/auth';
 import { messageService } from '@/lib/messages';
 import { db } from '@/lib/db';
 import { isOrganizer } from '@/lib/admin';
-import { logger } from '@/lib/logger';
+import { logger, LogAction } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
+    
+    await logger.logApiCall('GET', '/api/messages', session?.user?.email || undefined);
+    
     if (!session?.user?.email) {
+      await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+        userEmail: session?.user?.email || undefined,
+        metadata: { endpoint: '/api/messages', method: 'GET' }
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -54,7 +61,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
+    
+    await logger.logApiCall('POST', '/api/messages', session?.user?.email || undefined);
+    
     if (!session?.user?.email) {
+      await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+        userEmail: session?.user?.email || undefined,
+        metadata: { endpoint: '/api/messages', method: 'POST' }
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -87,9 +101,18 @@ export async function POST(request: NextRequest) {
       hackathonId
     });
 
+    await logger.logCreate('Message', message.id, session.user.email, 'Message created by admin', {
+      recipientId,
+      teamId,
+      hackathonId,
+      subject
+    });
+
     return NextResponse.json({ message });
   } catch (error) {
     console.error('Error creating message:', error);
+    const session = await auth();
+    await logger.logApiError('POST', '/api/messages', error as Error, session?.user?.email || undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

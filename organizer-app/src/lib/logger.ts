@@ -167,6 +167,30 @@ class Logger {
       metadata: { stack: error.stack }
     });
   }
+
+  // API-specific logging methods
+  async logApiCall(method: string, endpoint: string, userEmail?: string, participantId?: string): Promise<void> {
+    await this.debug(LogAction.READ, 'API', `${method} ${endpoint}`, {
+      userEmail,
+      entityId: participantId,
+      metadata: { method, endpoint }
+    });
+  }
+
+  async logApiSuccess(method: string, endpoint: string, userEmail?: string, entityId?: string): Promise<void> {
+    await this.info(LogAction.READ, 'API', `${method} ${endpoint} - Success`, {
+      userEmail,
+      entityId,
+      metadata: { method, endpoint }
+    });
+  }
+
+  async logApiError(method: string, endpoint: string, error: Error, userEmail?: string): Promise<void> {
+    await this.error(LogAction.UPDATE, 'API', `${method} ${endpoint} - Error: ${error.message}`, {
+      userEmail,
+      metadata: { method, endpoint, stack: error.stack }
+    });
+  }
 }
 
 export const logger = new Logger();

@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestResponseMessage } from '@/lib/message-templates'
+import { logger, LogAction } from '@/lib/logger'
 
 const updateJoinRequestSchema = z.object({
   action: z.enum(['approve', 'decline'])
@@ -15,11 +16,19 @@ export async function PUT(
 ) {
   try {
     const session = await auth()
+    const resolvedParams = await params
+    
+    await logger.logApiCall('PUT', `/api/teams/join-request/${resolvedParams.id}`, session?.user?.email || undefined);
+    
     if (!session?.user?.email) {
+      await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+        userEmail: session?.user?.email || undefined,
+        entityId: resolvedParams.id,
+        metadata: { endpoint: `/api/teams/join-request/${resolvedParams.id}`, method: 'PUT' }
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const resolvedParams = await params
     const body = await request.json()
     const { action } = updateJoinRequestSchema.parse(body)
 
@@ -94,6 +103,15 @@ export async function PUT(
       })
     }
 
+    await logger.logStatusChange('JoinRequest', resolvedParams.id, session.user.email, 'PENDING', action === 'approve' ? 'APPROVED' : 'DECLINED');
+    
+    if (action === 'approve') {
+      await logger.logUpdate('Participant', joinRequest.participantId, session.user.email, 'Participant joined team', {
+        teamId: joinRequest.teamId,
+        teamName: joinRequest.team.name
+      });
+    }
+
     // Send result message to participant
     try {
       const joinRequestUrl = `https://hub.hackload.kz/space/teams`
@@ -135,6 +153,10 @@ export async function PUT(
     return NextResponse.json(updatedJoinRequest)
   } catch (error) {
     console.error('Error updating join request:', error)
+    
+    const session = await auth();
+    const resolvedParams = await params;
+    await logger.logApiError('PUT', `/api/teams/join-request/${resolvedParams.id}`, error as Error, session?.user?.email || undefined);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 })

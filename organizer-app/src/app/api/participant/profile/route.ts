@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
+import { logger, LogAction } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
         const session = await auth();
+        
+        await logger.logApiCall('POST', '/api/participant/profile', session?.user?.email || undefined);
 
         if (!session?.user?.email) {
+            await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+                userEmail: session?.user?.email || undefined,
+                metadata: { endpoint: '/api/participant/profile', method: 'POST' }
+            });
             return NextResponse.json(
                 { error: 'Не авторизован' },
                 { status: 401 }
@@ -58,6 +65,10 @@ export async function POST(request: NextRequest) {
         }
 
         if (user.participant) {
+            await logger.warn(LogAction.CREATE, 'Participant', 'Profile already exists', {
+                userEmail: session.user.email,
+                entityId: user.participant.id
+            });
             return NextResponse.json(
                 { error: 'Профиль участника уже создан' },
                 { status: 400 }
@@ -161,6 +172,18 @@ export async function POST(request: NextRequest) {
             };
         });
 
+        await logger.logCreate('Participant', result.participant.id, session.user.email, 'Participant profile created successfully', {
+            teamId: result.team?.id,
+            isLeader: result.isLeader
+        });
+
+        if (result.team && result.isLeader) {
+            await logger.logCreate('Team', result.team.id, session.user.email, 'New team created', {
+                teamName: result.team.name,
+                teamNickname: result.team.nickname
+            });
+        }
+
         return NextResponse.json({
             message: 'Профиль создан успешно',
             participant: {
@@ -180,6 +203,9 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Profile creation error:', error);
+        
+        const session = await auth();
+        await logger.logApiError('POST', '/api/participant/profile', error as Error, session?.user?.email || undefined);
 
         if (error instanceof Error) {
             return NextResponse.json(
@@ -198,8 +224,14 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const session = await auth();
+        
+        await logger.logApiCall('PUT', '/api/participant/profile', session?.user?.email || undefined);
 
         if (!session?.user?.email) {
+            await logger.warn(LogAction.READ, 'API', 'Unauthorized access attempt', {
+                userEmail: session?.user?.email || undefined,
+                metadata: { endpoint: '/api/participant/profile', method: 'PUT' }
+            });
             return NextResponse.json(
                 { error: 'Не авторизован' },
                 { status: 401 }
@@ -304,6 +336,8 @@ export async function PUT(request: NextRequest) {
             });
 
             updatedParticipant = result;
+            
+            await logger.logCreate('Participant', result.id, session.user.email, 'First-time participant profile created');
         } else {
             // Update existing participant profile
             updatedParticipant = await db.participant.update({
@@ -325,6 +359,8 @@ export async function PUT(request: NextRequest) {
                     otherCloudProviders: otherCloudProviders || null,
                 },
             });
+            
+            await logger.logUpdate('Participant', user.participant.id, session.user.email, 'Participant profile updated');
         }
 
         // Fetch updated participant with relations
@@ -356,6 +392,9 @@ export async function PUT(request: NextRequest) {
 
     } catch (error) {
         console.error('Profile update error:', error);
+        
+        const session = await auth();
+        await logger.logApiError('PUT', '/api/participant/profile', error as Error, session?.user?.email || undefined);
 
         if (error instanceof Error) {
             return NextResponse.json(
