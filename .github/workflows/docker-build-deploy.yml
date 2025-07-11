@@ -11,10 +11,20 @@ on:
         description: 'Docker image tag to deploy'
         required: false
         default: ''
+      base_image_tag:
+        description: 'Base image tag to use (e.g., latest, stable, pkg-hash)'
+        required: false
+        default: ''
+      force_base_rebuild:
+        description: 'Force rebuild base image even if it exists'
+        required: false
+        default: false
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  BASE_IMAGE_NAME: hackload-kz/infra-base
 
 jobs:
   build-and-push:
@@ -26,6 +36,102 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Determine base image tag to use
+    - name: Determine base image strategy
+      id: check-base
+      run: |
+        BASE_IMAGE_REPO="ghcr.io/${{ env.BASE_IMAGE_NAME }}"
+        PACKAGE_HASH=$(sha256sum organizer-app/package.json organizer-app/package-lock.json | sha256sum | cut -d' ' -f1)
+        echo "package-hash=$PACKAGE_HASH" >> $GITHUB_OUTPUT
+        echo "base-image-repo=$BASE_IMAGE_REPO" >> $GITHUB_OUTPUT
+        echo "🏷️ Using base image repository: $BASE_IMAGE_REPO"
+        
+        # Check if custom base image tag is provided
+        if [[ -n "${{ github.event.inputs.base_image_tag }}" ]]; then
+          CUSTOM_TAG="${{ github.event.inputs.base_image_tag }}"
+          echo "base-image-tag=$CUSTOM_TAG" >> $GITHUB_OUTPUT
+          echo "using-custom-tag=true" >> $GITHUB_OUTPUT
+          echo "🎯 Using custom base image tag: $CUSTOM_TAG"
+          
+          # Check if custom tag exists with better error handling
+          echo "🔍 Checking if base image exists: $BASE_IMAGE_REPO:$CUSTOM_TAG"
+          if docker manifest inspect "$BASE_IMAGE_REPO:$CUSTOM_TAG" > /dev/null 2>&1; then
+            echo "base-image-available=true" >> $GITHUB_OUTPUT
+            echo "✅ Custom base image $CUSTOM_TAG exists"
+          else
+            echo "base-image-available=false" >> $GITHUB_OUTPUT
+            echo "❌ Custom base image $CUSTOM_TAG does not exist"
+            echo "🔍 Trying to list available tags..."
+            docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" | head -10 || echo "Could not list tags"
+          fi
+        else
+          echo "using-custom-tag=false" >> $GITHUB_OUTPUT
+          # Use automatic logic based on package hash
+          PKG_TAG="pkg-$PACKAGE_HASH"
+          
+          if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
+            echo "base-image-available=true" >> $GITHUB_OUTPUT
+            echo "base-image-tag=$PKG_TAG" >> $GITHUB_OUTPUT
+            echo "✅ Base image with package hash exists: $PKG_TAG"
+          else
+            echo "base-image-available=false" >> $GITHUB_OUTPUT
+            echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+            echo "❌ Base image with package hash does not exist: $PKG_TAG"
+            echo "💡 Will use 'latest' and potentially trigger rebuild"
+          fi
+        fi
+
+    # Trigger base image build if needed
+    - name: Trigger base image build
+      if: |
+        (steps.check-base.outputs.base-image-available == 'false' && steps.check-base.outputs.using-custom-tag == 'false') ||
+        github.event.inputs.force_base_rebuild == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const usingCustomTag = '${{ steps.check-base.outputs.using-custom-tag }}';
+          const forceRebuild = '${{ github.event.inputs.force_base_rebuild }}';
+          
+          console.log('🔨 Triggering base image build...');
+          console.log(`Using custom tag: ${usingCustomTag}`);
+          console.log(`Force rebuild: ${forceRebuild}`);
+          
+          await github.rest.actions.createWorkflowDispatch({
+            owner,
+            repo,
+            workflow_id: 'base-image-build.yml',
+            ref: context.ref,
+            inputs: {
+              force_rebuild: forceRebuild || 'true'
+            }
+          });
+          
+          // Wait for base image build to complete
+          console.log('⏳ Waiting for base image build to complete...');
+          await new Promise(resolve => setTimeout(resolve, 45000)); // Wait 45 seconds
+          
+          console.log('✅ Base image build trigger completed');
+
+    # Fallback: Use latest if custom tag doesn't exist and we can't rebuild
+    - name: Fallback to latest base image
+      if: |
+        steps.check-base.outputs.base-image-available == 'false' && 
+        steps.check-base.outputs.using-custom-tag == 'true' &&
+        github.event.inputs.force_base_rebuild != 'true'
+      run: |
+        echo "⚠️ Custom base image tag not available and no rebuild forced"
+        echo "🔄 Falling back to 'latest' base image"
+        echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+      id: fallback-base
 
     # Оптимизация: Кэширование Node.js зависимостей
     - name: Cache Node.js dependencies
@@ -47,13 +153,19 @@ jobs:
           network=host
           env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
           env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
+        config-inline: |
+          [worker.oci]
+            max-parallelism = 4
+          [worker.containerd]
+            max-parallelism = 4
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    # Предварительно подгружаем кэш образа для лучшей производительности
+    - name: Prime cache
+      continue-on-error: true
+      run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true
+        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache || true
+        docker pull ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:latest || true
 
     - name: Extract metadata
       id: meta
@@ -66,23 +178,40 @@ jobs:
           type=sha,prefix=sha-
           type=raw,value=latest,enable={{is_default_branch}}
 
+    # Final base image tag resolution
+    - name: Resolve final base image tag
+      id: final-base-tag
+      run: |
+        FINAL_TAG="${{ steps.fallback-base.outputs.base-image-tag || steps.check-base.outputs.base-image-tag }}"
+        echo "final-base-tag=$FINAL_TAG" >> $GITHUB_OUTPUT
+        echo "🎯 Final base image tag: $FINAL_TAG"
+        echo "📦 Full base image: ${{ steps.check-base.outputs.base-image-repo }}:$FINAL_TAG"
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: organizer-app
+        file: organizer-app/Dockerfile.optimized
         # Оптимизация: собираем только AMD64 для быстроты (можно добавить ARM64 позже)
         platforms: linux/amd64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # Многоуровневое кэширование
+        # Многоуровневое кэширование с улучшенной конфигурацией
         cache-from: |
-          type=gha,scope=main
-          type=gha,scope=${{ github.ref_name }}
-        cache-to: type=gha,mode=max,scope=${{ github.ref_name }}
+          type=gha,scope=buildkit-${{ github.ref_name }}
+          type=gha,scope=buildkit-main
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache
+        cache-to: |
+          type=gha,mode=max,scope=buildkit-${{ github.ref_name }}
+          type=registry,ref=${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:buildcache,mode=max
         # Оптимизация Docker Buildx
         build-args: |
           BUILDKIT_INLINE_CACHE=1
+          BASE_IMAGE_TAG=${{ steps.final-base-tag.outputs.final-base-tag }}
+        # Увеличиваем параллелизм
+        build-contexts: |
+          alpine=docker-image://alpine:latest
 
     - name: Generate deployment artifact
       env:
@@ -95,6 +224,18 @@ jobs:
       with:
         name: deployment-info
         path: deployment.env
+
+    - name: Build Summary
+      run: |
+        echo "### 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Application Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Base Image Used**: ${{ steps.check-base.outputs.base-image-repo }}:${{ steps.final-base-tag.outputs.final-base-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Package Hash**: ${{ steps.check-base.outputs.package-hash }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Custom Tag Used**: ${{ steps.check-base.outputs.using-custom-tag }}" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ steps.check-base.outputs.using-custom-tag }}" == "true" ]]; then
+          echo "- **Custom Tag**: ${{ github.event.inputs.base_image_tag }}" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "- **Base Image Available**: ${{ steps.check-base.outputs.base-image-available }}" >> $GITHUB_STEP_SUMMARY
 
   deploy:
     runs-on: [self-hosted]

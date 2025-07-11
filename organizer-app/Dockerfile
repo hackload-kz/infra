@@ -1,44 +1,57 @@
 # Используем официальный Node.js образ
 FROM node:20-alpine AS base
 
-# Устанавливаем зависимости только когда нужно
-FROM base AS deps
+# Устанавливаем системные зависимости
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Оптимизация npm для быстрой установки
-RUN npm config set registry https://registry.npmjs.org/
-RUN npm config set fetch-retries 3
-RUN npm config set fetch-retry-mintimeout 10000
-RUN npm config set fetch-retry-maxtimeout 60000
+# Глобальные оптимизации npm
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set fetch-retries 3 && \
+    npm config set fetch-retry-mintimeout 10000 && \
+    npm config set fetch-retry-maxtimeout 60000 && \
+    npm config set progress false && \
+    npm config set loglevel error
 
+# Этап установки production зависимостей
+FROM base AS deps
+# Копируем только файлы зависимостей для лучшего кэширования
+COPY package.json package-lock.json* ./
+# Устанавливаем production зависимости с оптимизацией
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/app/.npm \
+    npm ci --omit=dev --silent --no-audit --no-fund
+
+# Этап сборки
+FROM base AS builder
 # Копируем файлы зависимостей
 COPY package.json package-lock.json* ./
-
-# Используем npm ci без verbose для быстрой установки
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --silent
-
-# Пересборка исходного кода только когда нужно
-FROM base AS builder
-WORKDIR /app
-
 # Устанавливаем все зависимости (включая dev) для сборки
-COPY package.json package-lock.json* ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --silent
+    --mount=type=cache,target=/app/.npm \
+    npm ci --silent --no-audit --no-fund
 
-# Копируем исходный код
-COPY . .
+# Копируем только необходимые файлы для сборки
+COPY next.config.ts ./
+COPY tailwind.config.ts ./
+COPY tsconfig.json ./
+COPY postcss.config.js ./
+COPY prisma ./prisma/
 
 # Генерируем Prisma Client
 RUN npx prisma generate
 
-# Отключаем телеметрию Next.js во время сборки
-ENV NEXT_TELEMETRY_DISABLED=1
+# Копируем исходный код
+COPY src ./src/
+COPY public ./public/
 
-# Собираем приложение
-RUN npm run build
+# Оптимизации сборки
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=1
+
+# Собираем приложение с оптимизациями
+RUN npm run build:docker
 
 # Production образ, копируем только необходимые файлы
 FROM base AS runner
@@ -47,11 +60,18 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Создаем пользователя и группу для безопасности
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Устанавливаем необходимые системные пакеты
+RUN apk add --no-cache netcat-openbsd wget
+
+# Копируем production зависимости из deps stage
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Копируем публичные файлы
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Автоматически используем output traces для уменьшения размера образа
 # https://nextjs.org/docs/advanced-features/output-file-tracing
@@ -59,17 +79,15 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Копируем Prisma схему и сгенерированный клиент
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
 # Копируем скрипт запуска
 COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh && chown nextjs:nodejs docker-entrypoint.sh
 
-# Устанавливаем netcat для проверки подключения к БД и wget для healthcheck
-USER root
-RUN apk add --no-cache netcat-openbsd wget
+# Переключаемся на непривилегированного пользователя
 USER nextjs
 
 EXPOSE 3300

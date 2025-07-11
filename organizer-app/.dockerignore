@@ -1,5 +1,5 @@
 # Build optimization - exclude unnecessary files
-Dockerfile
+Dockerfile*
 .dockerignore
 node_modules
 npm-debug.log
@@ -16,16 +16,13 @@ GITHUB_SETUP.md
 *.md
 
 # Environment files
-.env
-.env.local
-.env.production.local
-.env.staging.local
-.env.development.local
-.env.test.local
+.env*
+!.env.example
 
 # Git
 .git
 .gitignore
+.gitattributes
 
 # Build outputs
 .next
@@ -47,12 +44,16 @@ Thumbs.db
 coverage
 .nyc_output
 jest.config.js
+__tests__
+**/*.test.*
+**/*.spec.*
 
 # Cache directories
 .cache
 .parcel-cache
 .npm
 .yarn
+.pnpm-store
 
 # Runtime data
 *.pid
@@ -69,3 +70,39 @@ jspm_packages/
 # Test files
 test-*.sh
 test-*.md
+test-*.js
+
+# Development only files
+.eslintrc*
+.prettierrc*
+.editorconfig
+.gitkeep
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Webpack
+webpack.config.js
+webpack.*.js
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Application specific
+deployment/
+scripts/
+docs/
+examples/

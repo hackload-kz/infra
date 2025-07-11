@@ -1,0 +1,59 @@
+# Optimized Dockerfile using pre-built base image
+ARG BASE_IMAGE_TAG=latest
+FROM ghcr.io/hackload-kz/infra-base:${BASE_IMAGE_TAG} AS base
+
+# Build stage - use the pre-built base image
+FROM base AS builder
+WORKDIR /app
+
+# Copy configuration files for build
+COPY next.config.ts ./
+COPY tailwind.config.js ./
+COPY tsconfig.json ./
+COPY postcss.config.mjs ./
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN npx prisma generate
+
+# Copy source code
+COPY src ./src/
+COPY public ./public/
+
+# Build the application
+RUN npm run build:docker
+
+# Production stage - also use the base image but with minimal runtime
+FROM base AS runtime
+WORKDIR /app
+
+# Copy built application from builder stage
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Copy Prisma files
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh && chown nextjs:nodejs docker-entrypoint.sh
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3300
+
+# Set runtime environment
+ENV PORT=3300
+ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3300/api/health || exit 1
+
+# Start the application
+CMD ["./docker-entrypoint.sh"]
