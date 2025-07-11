@@ -5,6 +5,8 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_call:
+    # Allow this workflow to be called from other workflows
 
 env:
   REGISTRY: ghcr.io
@@ -36,6 +38,7 @@ jobs:
         BASE_IMAGE_REPO="ghcr.io/${{ env.BASE_IMAGE_NAME }}"
         
         echo "🔍 Checking for base image with package hash: $PKG_TAG"
+        echo "📦 Package hash: $PACKAGE_HASH"
         
         # Check if package-specific base image exists
         if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
@@ -43,9 +46,17 @@ jobs:
           echo "full=$BASE_IMAGE_REPO:$PKG_TAG" >> $GITHUB_OUTPUT
           echo "✅ Using package-specific base image: $PKG_TAG"
         else
-          echo "tag=latest" >> $GITHUB_OUTPUT
-          echo "full=$BASE_IMAGE_REPO:latest" >> $GITHUB_OUTPUT
-          echo "⚠️ Package-specific base image not found, using latest"
+          echo "❌ Package-specific base image not found: $PKG_TAG"
+          echo "🔍 Checking latest base image..."
+          if docker manifest inspect "$BASE_IMAGE_REPO:latest" > /dev/null 2>&1; then
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "full=$BASE_IMAGE_REPO:latest" >> $GITHUB_OUTPUT
+            echo "⚠️ Using latest base image (may not have current dependencies)"
+          else
+            echo "❌ No base image found, this will likely fail"
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "full=$BASE_IMAGE_REPO:latest" >> $GITHUB_OUTPUT
+          fi
         fi
 
   lint-and-type-check:
@@ -61,6 +72,28 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Check dependencies
+      working-directory: organizer-app
+      run: |
+        echo "Checking installed packages..."
+        npm list --depth=0 || echo "Some packages missing"
+        echo "Checking if ESLint is available..."
+        npx eslint --version || echo "ESLint not found"
+
+    - name: Install missing dependencies if needed
+      working-directory: organizer-app
+      run: |
+        # Check if node_modules exists and has content
+        if [ ! -d "node_modules" ] || [ -z "$(ls -A node_modules)" ]; then
+          echo "node_modules is empty or missing, installing dependencies..."
+          npm ci --include=dev --silent --no-audit --no-fund
+        else
+          echo "node_modules exists, checking for missing packages..."
+          npm list eslint > /dev/null 2>&1 || {
+            echo "ESLint missing, installing dependencies..."
+            npm ci --include=dev --silent --no-audit --no-fund
+          }
+        fi
 
     - name: Generate Prisma Client
       working-directory: organizer-app
@@ -73,6 +106,15 @@ jobs:
     - name: Type check
       working-directory: organizer-app
       run: npx tsc --noEmit
+
+    - name: Run tests
+      working-directory: organizer-app
+      run: npm run test:coverage
+      env:
+        DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+        NEXTAUTH_URL: "http://localhost:3000"
+        NEXTAUTH_SECRET: "test-secret-key-for-testing-only"
+        ADMIN_USERS: "admin@hackload.kz,organizer@hackload.kz"
 
     - name: Build application
       working-directory: organizer-app
@@ -94,6 +136,7 @@ jobs:
         echo "### Code Quality Summary" >> $GITHUB_STEP_SUMMARY
         echo "- **ESLint**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **TypeScript**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Tests**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Build**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image**: ${{ needs.determine-base-image.outputs.base-image-full }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Tag**: ${{ needs.determine-base-image.outputs.base-image-tag }}" >> $GITHUB_STEP_SUMMARY

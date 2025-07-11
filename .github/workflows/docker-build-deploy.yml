@@ -27,8 +27,15 @@ env:
   BASE_IMAGE_NAME: hackload-kz/infra-base
 
 jobs:
+  quality-gate:
+    uses: ./.github/workflows/code-quality.yml
+    permissions:
+      contents: read
+      packages: read
+
   build-and-push:
     runs-on: [self-hosted]
+    needs: [quality-gate]
     permissions:
       contents: read
       packages: write
@@ -201,6 +208,7 @@ jobs:
     - name: Build Summary
       run: |
         echo "### 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Quality Gate**: ${{ needs.quality-gate.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Application Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Used**: ${{ steps.check-base.outputs.base-image-repo }}:${{ steps.final-base-tag.outputs.final-base-tag }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Package Hash**: ${{ steps.check-base.outputs.package-hash }}" >> $GITHUB_STEP_SUMMARY

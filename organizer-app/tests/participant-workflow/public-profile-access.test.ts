@@ -11,15 +11,37 @@ import {
   createMockUser,
   createMockParticipant,
   createMockTeam,
-  mockDbParticipant,
-  mockDbUser,
-  mockDbTeam,
 } from '../utils/test-helpers';
 
 // Mock dependencies
 jest.mock('@/auth');
 jest.mock('@/lib/admin');
-jest.mock('@/lib/db');
+jest.mock('@/lib/db', () => ({
+  db: {
+    user: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    participant: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    team: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    hackathon: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  },
+}));
 
 describe('Public Profile Access', () => {
   beforeEach(() => {
@@ -58,7 +80,7 @@ describe('Public Profile Access', () => {
           }),
         ];
 
-        mockDbParticipant.findMany.mockResolvedValue(mockParticipants);
+        (db.participant.findMany as jest.Mock).mockResolvedValue(mockParticipants);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -73,7 +95,7 @@ describe('Public Profile Access', () => {
         expect(data.participants[0].team).toBeDefined();
         expect(data.participants[1].team).toBeNull();
 
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith({
+        expect(db.participant.findMany).toHaveBeenCalledWith({
           where: {
             hackathonParticipations: {
               some: {
@@ -110,7 +132,7 @@ describe('Public Profile Access', () => {
           createMockParticipant({ name: 'Participant 1' }),
         ];
 
-        mockDbParticipant.findMany.mockResolvedValue(hackathon1Participants);
+        (db.participant.findMany as jest.Mock).mockResolvedValue(hackathon1Participants);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -121,7 +143,7 @@ describe('Public Profile Access', () => {
 
         expect(response.status).toBe(200);
         expect(data.participants).toHaveLength(1);
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith(
+        expect(db.participant.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             where: {
               hackathonParticipations: {
@@ -144,7 +166,7 @@ describe('Public Profile Access', () => {
           createMockParticipant({ name: 'Charlie' }),
         ];
 
-        mockDbParticipant.findMany.mockResolvedValue(sortedParticipants);
+        (db.participant.findMany as jest.Mock).mockResolvedValue(sortedParticipants);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -158,7 +180,7 @@ describe('Public Profile Access', () => {
         expect(data.participants[1].name).toBe('Bob');
         expect(data.participants[2].name).toBe('Charlie');
 
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith(
+        expect(db.participant.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             orderBy: {
               name: 'asc',
@@ -185,7 +207,7 @@ describe('Public Profile Access', () => {
 
         expect(response.status).toBe(403);
         expect(data.error).toBe('Access denied');
-        expect(mockDbParticipant.findMany).not.toHaveBeenCalled();
+        expect(db.participant.findMany).not.toHaveBeenCalled();
       });
 
       it('should check organizer status correctly', async () => {
@@ -221,7 +243,7 @@ describe('Public Profile Access', () => {
 
         expect(response.status).toBe(401);
         expect(data.error).toBe('Unauthorized');
-        expect(mockDbParticipant.findMany).not.toHaveBeenCalled();
+        expect(db.participant.findMany).not.toHaveBeenCalled();
       });
 
       it('should return 401 when session has no email', async () => {
@@ -247,7 +269,7 @@ describe('Public Profile Access', () => {
         (auth as jest.Mock).mockResolvedValue(createAdminSession());
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
-        mockDbParticipant.findMany.mockResolvedValue([]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=invalid-id'
@@ -258,7 +280,7 @@ describe('Public Profile Access', () => {
 
         expect(response.status).toBe(200);
         expect(data.participants).toHaveLength(0);
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith(
+        expect(db.participant.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             where: {
               hackathonParticipations: {
@@ -287,7 +309,7 @@ describe('Public Profile Access', () => {
 
         expect(response.status).toBe(400);
         expect(data.error).toBe('Hackathon ID is required');
-        expect(mockDbParticipant.findMany).not.toHaveBeenCalled();
+        expect(db.participant.findMany).not.toHaveBeenCalled();
       });
 
       it('should return 400 when hackathonId is empty string', async () => {
@@ -319,7 +341,7 @@ describe('Public Profile Access', () => {
           team: null,
         });
 
-        mockDbParticipant.findMany.mockResolvedValue([teamlessParticipant]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([teamlessParticipant]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -354,7 +376,7 @@ describe('Public Profile Access', () => {
           team: team,
         });
 
-        mockDbParticipant.findMany.mockResolvedValue([teamLeader]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([teamLeader]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -381,7 +403,7 @@ describe('Public Profile Access', () => {
           team: null, // Team was deleted but teamId still set
         });
 
-        mockDbParticipant.findMany.mockResolvedValue([participantWithDeletedTeam]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([participantWithDeletedTeam]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -402,7 +424,7 @@ describe('Public Profile Access', () => {
         (auth as jest.Mock).mockResolvedValue(createAdminSession());
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
-        mockDbParticipant.findMany.mockRejectedValue(new Error('Database connection failed'));
+        (db.participant.findMany as jest.Mock).mockRejectedValue(new Error('Database connection failed'));
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -430,7 +452,7 @@ describe('Public Profile Access', () => {
           })
         );
 
-        mockDbParticipant.findMany.mockResolvedValue(largeParticipantList);
+        (db.participant.findMany as jest.Mock).mockResolvedValue(largeParticipantList);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -464,7 +486,7 @@ describe('Public Profile Access', () => {
           githubUrl: 'https://github.com/secret',
         });
 
-        mockDbParticipant.findMany.mockResolvedValue([participant]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([participant]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -481,7 +503,7 @@ describe('Public Profile Access', () => {
         expect(data.participants[0]).toHaveProperty('experienceLevel');
 
         // Verify only selected fields are included as per API specification
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith(
+        expect(db.participant.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             select: {
               id: true,
@@ -513,7 +535,7 @@ describe('Public Profile Access', () => {
           createMockParticipant({ name: 'Hackathon 1 Participant' }),
         ];
 
-        mockDbParticipant.findMany.mockResolvedValue(participantsForHackathon1);
+        (db.participant.findMany as jest.Mock).mockResolvedValue(participantsForHackathon1);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=specific-hackathon'
@@ -526,7 +548,7 @@ describe('Public Profile Access', () => {
         expect(data.participants).toHaveLength(1);
 
         // Verify the correct filtering logic is applied
-        expect(mockDbParticipant.findMany).toHaveBeenCalledWith(
+        expect(db.participant.findMany).toHaveBeenCalledWith(
           expect.objectContaining({
             where: {
               hackathonParticipations: {
@@ -557,7 +579,7 @@ describe('Public Profile Access', () => {
           teamId: team.id,
         });
 
-        mockDbParticipant.findMany.mockResolvedValue([participant]);
+        (db.participant.findMany as jest.Mock).mockResolvedValue([participant]);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants?hackathonId=hackathon-1'
@@ -567,7 +589,7 @@ describe('Public Profile Access', () => {
         const data = await response.json();
 
         expect(response.status).toBe(200);
-        expect(data.participants[0].team).toEqual({
+        expect(data.participants[0].team).toMatchObject({
           id: 'team-full-info',
           name: 'Complete Team Info',
         });

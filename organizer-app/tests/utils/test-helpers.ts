@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { auth } from '@/auth';
-import { db } from '@/lib/db';
 import { isOrganizer } from '@/lib/admin';
+
+// Note: Database mocks are handled in individual test files to avoid conflicts
 
 // Mock session types
 export interface MockSession {
@@ -174,48 +175,7 @@ export const createMockRequest = (
   return new NextRequest(url, requestInit);
 };
 
-// Database mock helpers
-export const mockDbUser = {
-  findUnique: jest.fn(),
-  findMany: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-};
-
-export const mockDbParticipant = {
-  findUnique: jest.fn(),
-  findMany: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-};
-
-export const mockDbTeam = {
-  findUnique: jest.fn(),
-  findMany: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-};
-
-export const mockDbHackathon = {
-  findUnique: jest.fn(),
-  findMany: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-};
-
-export const mockDbHackathonParticipation = {
-  findUnique: jest.fn(),
-  findMany: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-};
-
-export const mockDbTransaction = jest.fn();
+// Database mocks are now handled directly through Jest mocks in the module mock above
 
 // Setup and teardown helpers
 export const setupMocks = () => {
@@ -227,27 +187,11 @@ export const setupMocks = () => {
     return Promise.resolve(email === 'admin@hackload.kz' || email === 'organizer@hackload.kz');
   });
 
-  // Mock database
-  (db.user as any) = mockDbUser;
-  (db.participant as any) = mockDbParticipant;
-  (db.team as any) = mockDbTeam;
-  (db.hackathon as any) = mockDbHackathon;
-  (db.hackathonParticipation as any) = mockDbHackathonParticipation;
-  (db.$transaction as any) = mockDbTransaction;
-  (db.$queryRaw as any) = jest.fn();
+  // Database mocks should be set up in individual test files
 };
 
 export const resetMocks = () => {
   jest.clearAllMocks();
-  
-  // Reset all database mocks
-  Object.values(mockDbUser).forEach(mock => mock.mockReset());
-  Object.values(mockDbParticipant).forEach(mock => mock.mockReset());
-  Object.values(mockDbTeam).forEach(mock => mock.mockReset());
-  Object.values(mockDbHackathon).forEach(mock => mock.mockReset());
-  Object.values(mockDbHackathonParticipation).forEach(mock => mock.mockReset());
-  mockDbTransaction.mockReset();
-  (db.$queryRaw as any).mockReset();
 };
 
 // Common test scenarios
@@ -268,14 +212,11 @@ export const setupExistingUser = (withParticipant = false) => {
   if (withParticipant) {
     user.participant = createMockParticipant({ userId: user.id });
   }
-  
-  mockDbUser.findUnique.mockResolvedValue(user);
   return user;
 };
 
 export const setupExistingTeam = (nickname = 'existing-team') => {
   const team = createMockTeam({ nickname });
-  mockDbTeam.findUnique.mockResolvedValue(team);
   return team;
 };
 
@@ -293,21 +234,9 @@ export const expectErrorResponse = (response: Response, expectedStatus: number, 
   }
 };
 
-// Transaction mock helper
-export const mockSuccessfulTransaction = (returnValue: any) => {
-  mockDbTransaction.mockImplementation((callback) => callback({
-    user: mockDbUser,
-    participant: mockDbParticipant,
-    team: mockDbTeam,
-    hackathon: mockDbHackathon,
-    hackathonParticipation: mockDbHackathonParticipation,
-  }));
-  return returnValue;
-};
-
-export const mockFailedTransaction = (error: Error) => {
-  mockDbTransaction.mockRejectedValue(error);
-};
+// Transaction mock helpers - DEPRECATED
+// Use direct db.$transaction mocking in individual tests instead
+// Example: (db.$transaction as jest.Mock).mockImplementation((callback) => callback(mockTx));
 
 // Security test helpers
 export const createMaliciousRequest = (payload: any) => {

@@ -33,8 +33,29 @@ jest.mock('@/lib/admin', () => ({
 
 jest.mock('@/lib/logger', () => ({
   logger: {
-    logRead: jest.fn(),
-    logError: jest.fn(),
+    logApiCall: jest.fn().mockResolvedValue(undefined),
+    logApiSuccess: jest.fn().mockResolvedValue(undefined),
+    logApiError: jest.fn().mockResolvedValue(undefined),
+    logCreate: jest.fn().mockResolvedValue(undefined),
+    logUpdate: jest.fn().mockResolvedValue(undefined),
+    logDelete: jest.fn().mockResolvedValue(undefined),
+    logRead: jest.fn().mockResolvedValue(undefined),
+    logStatusChange: jest.fn().mockResolvedValue(undefined),
+    info: jest.fn().mockResolvedValue(undefined),
+    warn: jest.fn().mockResolvedValue(undefined),
+    error: jest.fn().mockResolvedValue(undefined),
+  },
+  LogAction: {
+    CREATE: 'CREATE',
+    UPDATE: 'UPDATE',
+    DELETE: 'DELETE',
+    READ: 'READ',
+    STATUS_CHANGE: 'STATUS_CHANGE',
+  },
+  LogLevel: {
+    INFO: 'INFO',
+    WARN: 'WARN',
+    ERROR: 'ERROR',
   },
 }));
 

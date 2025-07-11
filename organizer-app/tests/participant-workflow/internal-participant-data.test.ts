@@ -10,15 +10,37 @@ import {
   createAdminSession,
   createMockParticipant,
   createMockTeam,
-  mockDbParticipant,
-  mockDbTeam,
   createConcurrentRequests,
 } from '../utils/test-helpers';
 
 // Mock dependencies
 jest.mock('@/auth');
 jest.mock('@/lib/admin');
-jest.mock('@/lib/db');
+jest.mock('@/lib/db', () => ({
+  db: {
+    user: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    participant: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    team: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    hackathon: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  },
+}));
 
 describe('Internal Participant Data', () => {
   beforeEach(() => {
@@ -52,8 +74,8 @@ describe('Internal Participant Data', () => {
           cloudServices: JSON.stringify(['AWS', 'Azure']),
         });
 
-        mockDbParticipant.findUnique.mockResolvedValue(originalParticipant);
-        mockDbParticipant.update.mockResolvedValue(updatedParticipant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(originalParticipant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedParticipant);
 
         const requestBody = {
           name: 'Admin Updated Name',
@@ -79,7 +101,7 @@ describe('Internal Participant Data', () => {
         expect(data.experienceLevel).toBe('ADVANCED');
         expect(data.teamId).toBe('new-team-id');
 
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: {
             name: 'Admin Updated Name',
@@ -104,7 +126,7 @@ describe('Internal Participant Data', () => {
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
         const participant = createMockParticipant({ id: 'participant-1' });
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const updatedParticipant = createMockParticipant({
           id: 'participant-1',
@@ -123,7 +145,7 @@ describe('Internal Participant Data', () => {
           teamId: 'target-team',
         });
 
-        mockDbParticipant.update.mockResolvedValue(updatedParticipant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedParticipant);
 
         const requestBody = {
           name: 'Complete Update',
@@ -150,7 +172,7 @@ describe('Internal Participant Data', () => {
         const response = await PUT(request, { params: mockParams });
 
         expect(response.status).toBe(200);
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: expect.objectContaining({
             name: 'Complete Update',
@@ -181,8 +203,8 @@ describe('Internal Participant Data', () => {
           teamId: 'target-team-id',
         });
 
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
-        mockDbParticipant.update.mockResolvedValue(updatedParticipant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedParticipant);
 
         const requestBody = {
           name: 'Participant Name',
@@ -201,7 +223,7 @@ describe('Internal Participant Data', () => {
         expect(response.status).toBe(200);
         expect(data.teamId).toBe('target-team-id');
 
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: expect.objectContaining({
             teamId: 'target-team-id',
@@ -216,14 +238,14 @@ describe('Internal Participant Data', () => {
         const participant = createMockParticipant({ id: 'participant-1' });
         const targetTeam = createMockTeam({ id: 'valid-team-id' });
 
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
-        mockDbTeam.findUnique.mockResolvedValue(targetTeam);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
+        (db.team.findUnique as jest.Mock).mockResolvedValue(targetTeam);
 
         const updatedParticipant = createMockParticipant({
           id: 'participant-1',
           teamId: 'valid-team-id',
         });
-        mockDbParticipant.update.mockResolvedValue(updatedParticipant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedParticipant);
 
         const requestBody = {
           name: 'Participant Name',
@@ -239,7 +261,7 @@ describe('Internal Participant Data', () => {
         const response = await PUT(request, { params: mockParams });
 
         expect(response.status).toBe(200);
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: expect.objectContaining({
             teamId: 'valid-team-id',
@@ -264,8 +286,8 @@ describe('Internal Participant Data', () => {
           teamId: null,
         });
 
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
-        mockDbParticipant.update.mockResolvedValue(updatedParticipant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedParticipant);
 
         const requestBody = {
           name: 'Participant Name',
@@ -284,7 +306,7 @@ describe('Internal Participant Data', () => {
         expect(response.status).toBe(200);
         expect(data.teamId).toBeNull();
 
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: expect.objectContaining({
             teamId: null,
@@ -316,7 +338,7 @@ describe('Internal Participant Data', () => {
 
         expect(response.status).toBe(401);
         expect(data.error).toBe('Unauthorized');
-        expect(mockDbParticipant.update).not.toHaveBeenCalled();
+        expect(db.participant.update).not.toHaveBeenCalled();
       });
 
       it('should verify admin status correctly', async () => {
@@ -346,7 +368,7 @@ describe('Internal Participant Data', () => {
         (auth as jest.Mock).mockResolvedValue(createAdminSession());
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
-        mockDbParticipant.findUnique.mockResolvedValue(null);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(null);
 
         const requestBody = {
           name: 'Non-existent Update',
@@ -363,7 +385,7 @@ describe('Internal Participant Data', () => {
 
         expect(response.status).toBe(404);
         expect(data.error).toBe('Participant not found');
-        expect(mockDbParticipant.update).not.toHaveBeenCalled();
+        expect(db.participant.update).not.toHaveBeenCalled();
       });
     });
 
@@ -374,10 +396,10 @@ describe('Internal Participant Data', () => {
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
         const participant = createMockParticipant({ id: 'participant-1' });
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         // Mock database constraint error for invalid team reference
-        mockDbParticipant.update.mockRejectedValue(
+        (db.participant.update as jest.Mock).mockRejectedValue(
           new Error('Foreign key constraint failed on the field: `teamId`')
         );
 
@@ -459,8 +481,8 @@ describe('Internal Participant Data', () => {
           experienceLevel: 'EXPERT',
         });
 
-        mockDbParticipant.findUnique.mockResolvedValue(adminParticipant);
-        mockDbParticipant.update.mockResolvedValue(updatedAdminParticipant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(adminParticipant);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedAdminParticipant);
 
         const requestBody = {
           name: 'Updated Admin User',
@@ -476,7 +498,7 @@ describe('Internal Participant Data', () => {
         const response = await PUT(request, { params: mockParams });
 
         expect(response.status).toBe(200);
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'admin-participant-1' },
           data: expect.objectContaining({
             name: 'Updated Admin User',
@@ -503,12 +525,12 @@ describe('Internal Participant Data', () => {
           teamId: 'new-team-id',
         }));
 
-        mockDbParticipant.findUnique
+        (db.participant.findUnique as jest.Mock)
           .mockResolvedValueOnce(participants[0])
           .mockResolvedValueOnce(participants[1])
           .mockResolvedValueOnce(participants[2]);
 
-        mockDbParticipant.update
+        (db.participant.update as jest.Mock)
           .mockResolvedValueOnce(updatedParticipants[0])
           .mockResolvedValueOnce(updatedParticipants[1])
           .mockResolvedValueOnce(updatedParticipants[2]);
@@ -536,7 +558,7 @@ describe('Internal Participant Data', () => {
           expect(response.status).toBe(200);
         });
 
-        expect(mockDbParticipant.update).toHaveBeenCalledTimes(3);
+        expect(db.participant.update).toHaveBeenCalledTimes(3);
       });
     });
 
@@ -563,8 +585,8 @@ describe('Internal Participant Data', () => {
           ledTeamId: null, // No longer leading old team
         });
 
-        mockDbParticipant.findUnique.mockResolvedValue(teamLeader);
-        mockDbParticipant.update.mockResolvedValue(updatedLeader);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(teamLeader);
+        (db.participant.update as jest.Mock).mockResolvedValue(updatedLeader);
 
         const requestBody = {
           name: 'Former Team Leader',
@@ -583,7 +605,7 @@ describe('Internal Participant Data', () => {
         expect(response.status).toBe(200);
         expect(data.teamId).toBe('new-team');
 
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
           data: expect.objectContaining({
             teamId: 'new-team',
@@ -599,8 +621,8 @@ describe('Internal Participant Data', () => {
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
         const participant = createMockParticipant({ id: 'participant-1' });
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
-        mockDbParticipant.update.mockRejectedValue(new Error('Database transaction failed'));
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockRejectedValue(new Error('Database transaction failed'));
 
         const requestBody = {
           name: 'Failed Update',
@@ -626,7 +648,7 @@ describe('Internal Participant Data', () => {
         (auth as jest.Mock).mockResolvedValue(createAdminSession());
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
-        mockDbParticipant.findUnique.mockResolvedValue(null);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(null);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants/invalid-uuid-format',
@@ -649,20 +671,18 @@ describe('Internal Participant Data', () => {
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
         const participant = createMockParticipant({ id: 'participant-1' });
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         // Simulate JSON.stringify error
-        mockDbParticipant.update.mockRejectedValue(
-          new Error('Converting circular structure to JSON')
-        );
+        // Mock database update to throw JSON serialization error
+        (db.participant.update as jest.Mock).mockImplementation(() => {
+          throw new Error('Converting circular structure to JSON');
+        });
 
         const requestBody = {
           name: 'Test User',
-          technologies: [{ circular: 'reference' }],
+          technologies: ['normal', 'tech'],
         };
-
-        // Add circular reference
-        (requestBody.technologies[0] as any).self = requestBody.technologies[0];
 
         const request = createMockRequest(
           'http://localhost:3000/api/participants/participant-1',

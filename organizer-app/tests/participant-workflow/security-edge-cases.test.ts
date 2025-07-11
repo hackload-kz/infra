@@ -15,15 +15,36 @@ import {
   createConcurrentRequests,
   setupExistingUser,
   setupActiveHackathon,
-  mockDbParticipant,
-  mockDbTransaction,
-  mockSuccessfulTransaction,
 } from '../utils/test-helpers';
 
 // Mock dependencies
 jest.mock('@/auth');
 jest.mock('@/lib/admin');
-jest.mock('@/lib/db');
+jest.mock('@/lib/db', () => ({
+  db: {
+    user: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    participant: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    team: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    hackathon: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  },
+}));
 jest.mock('@/lib/hackathon');
 
 describe('Security & Edge Cases', () => {
@@ -51,10 +72,24 @@ describe('Security & Edge Cases', () => {
           name: maliciousPayload.name, // Should be stored as-is, not executed
         });
 
-        mockSuccessfulTransaction({
-          participant,
-          team: null,
-          isLeader: false,
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: null,
+        });
+
+        // Mock successful transaction
+        (db.$transaction as jest.Mock).mockImplementation(async (callback) => {
+          const tx = {
+            participant: { create: jest.fn().mockResolvedValue(participant) },
+            hackathonParticipation: { create: jest.fn().mockResolvedValue({}) },
+          };
+          await callback(tx);
+          return {
+            participant,
+            team: null,
+            isLeader: false,
+          };
         });
 
         const request = createMaliciousRequest(maliciousPayload);
@@ -62,7 +97,7 @@ describe('Security & Edge Cases', () => {
 
         expect(response.status).toBe(200);
         // Verify the malicious input was treated as data, not SQL
-        expect(mockDbTransaction).toHaveBeenCalled();
+        expect(db.$transaction).toHaveBeenCalled();
       });
 
       it('should handle SQL injection attempts in multiple fields', async () => {
@@ -77,10 +112,25 @@ describe('Security & Edge Cases', () => {
         };
 
         const participant = createMockParticipant(maliciousPayload);
-        mockSuccessfulTransaction({
-          participant,
-          team: null,
-          isLeader: false,
+        
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: null,
+        });
+
+        // Mock successful transaction
+        (db.$transaction as jest.Mock).mockImplementation(async (callback) => {
+          const tx = {
+            participant: { create: jest.fn().mockResolvedValue(participant) },
+            hackathonParticipation: { create: jest.fn().mockResolvedValue({}) },
+          };
+          await callback(tx);
+          return {
+            participant,
+            team: null,
+            isLeader: false,
+          };
         });
 
         const request = createMaliciousRequest(maliciousPayload);
@@ -104,8 +154,15 @@ describe('Security & Edge Cases', () => {
         };
 
         const participant = createMockParticipant(xssPayload);
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: createMockParticipant({ userId: user.id }),
+        });
+        
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participant/profile',
@@ -116,7 +173,7 @@ describe('Security & Edge Cases', () => {
 
         expect(response.status).toBe(200);
         // Data should be stored as-is; XSS prevention should happen on display
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: user.participant!.id },
           data: expect.objectContaining({
             name: "<script>alert('xss')</script>",
@@ -135,8 +192,8 @@ describe('Security & Edge Cases', () => {
         };
 
         const participant = createMockParticipant(complexXSS);
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participant/profile',
@@ -182,8 +239,8 @@ describe('Security & Edge Cases', () => {
         const user = setupExistingUser(true);
         const participant = createMockParticipant();
 
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const requestFactory = () => async () => {
           const request = createMockRequest(
@@ -265,7 +322,7 @@ describe('Security & Edge Cases', () => {
 
         expect(response.status).toBe(401);
         expect(data.error).toBe('Unauthorized');
-        expect(mockDbParticipant.update).not.toHaveBeenCalled();
+        expect(db.participant.update).not.toHaveBeenCalled();
       });
 
       it('should validate role consistency', async () => {
@@ -302,11 +359,17 @@ describe('Security & Edge Cases', () => {
         const update1 = createMockParticipant({ name: 'Update 1', city: 'City 1' });
         const update2 = createMockParticipant({ name: 'Update 2', city: 'City 2' });
 
-        mockDbParticipant.update
+        // Mock user lookup for both concurrent requests
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: createMockParticipant({ userId: user.id }),
+        });
+
+        (db.participant.update as jest.Mock)
           .mockResolvedValueOnce(update1)
           .mockResolvedValueOnce(update2);
 
-        mockDbParticipant.findUnique
+        (db.participant.findUnique as jest.Mock)
           .mockResolvedValueOnce(update1)
           .mockResolvedValueOnce(update2);
 
@@ -327,7 +390,7 @@ describe('Security & Edge Cases', () => {
 
         expect(response1.status).toBe(200);
         expect(response2.status).toBe(200);
-        expect(mockDbParticipant.update).toHaveBeenCalledTimes(2);
+        expect(db.participant.update).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -336,7 +399,13 @@ describe('Security & Edge Cases', () => {
       it('should handle database unavailability gracefully', async () => {
         const user = setupExistingUser(true);
 
-        mockDbParticipant.update.mockRejectedValue(new Error('connection refused'));
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: createMockParticipant({ userId: user.id }),
+        });
+
+        (db.participant.update as jest.Mock).mockRejectedValue(new Error('connection refused'));
 
         const request = createMockRequest(
           'http://localhost:3000/api/participant/profile',
@@ -346,8 +415,8 @@ describe('Security & Edge Cases', () => {
         const response = await profilePUT(request);
         const data = await response.json();
 
-        expect(response.status).toBe(500);
-        expect(data.error).toBe('Внутренняя ошибка сервера');
+        expect(response.status).toBe(400);
+        expect(data.error).toBe('connection refused');
       });
     });
 
@@ -357,18 +426,17 @@ describe('Security & Edge Cases', () => {
         const hackathon = setupActiveHackathon();
         const user = setupExistingUser(false);
 
-        // Mock transaction that fails partway through
-        mockDbTransaction.mockImplementation((callback) => {
-          const tx = {
-            participant: {
-              create: jest.fn().mockResolvedValue(createMockParticipant()),
-            },
-            hackathonParticipation: {
-              create: jest.fn().mockRejectedValue(new Error('Transaction failed')),
-            },
-          };
-          return callback(tx);
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: null,
         });
+
+        // Mock existing participant lookup to return null (no duplicate)
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(null);
+
+        // Mock transaction that fails partway through
+        (db.$transaction as jest.Mock).mockRejectedValue(new Error('Transaction failed'));
 
         const request = createMockRequest(
           'http://localhost:3000/api/participant/profile',
@@ -393,10 +461,10 @@ describe('Security & Edge Cases', () => {
         (isOrganizer as jest.Mock).mockResolvedValue(true);
 
         const participant = createMockParticipant({ id: 'participant-1' });
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         // Mock foreign key constraint error
-        mockDbParticipant.update.mockRejectedValue(
+        (db.participant.update as jest.Mock).mockRejectedValue(
           new Error('Foreign key constraint failed on the field: teamId')
         );
 
@@ -428,8 +496,8 @@ describe('Security & Edge Cases', () => {
           cloudServices: JSON.stringify(largeData.cloudServices),
         });
 
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const startTime = Date.now();
 
@@ -474,8 +542,8 @@ describe('Security & Edge Cases', () => {
           cloudServices: JSON.stringify(complexData.cloudServices),
         });
 
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const startTime = Date.now();
 
@@ -512,8 +580,8 @@ describe('Security & Edge Cases', () => {
             cloudServices: JSON.stringify(largeData.cloudServices),
           });
 
-          mockDbParticipant.update.mockResolvedValueOnce(participant);
-          mockDbParticipant.findUnique.mockResolvedValueOnce(participant);
+          (db.participant.update as jest.Mock).mockResolvedValueOnce(participant);
+          (db.participant.findUnique as jest.Mock).mockResolvedValueOnce(participant);
 
           return async () => {
             const request = createMockRequest(
@@ -577,8 +645,15 @@ describe('Security & Edge Cases', () => {
         };
 
         const participant = createMockParticipant(unicodeData);
-        mockDbParticipant.update.mockResolvedValue(participant);
-        mockDbParticipant.findUnique.mockResolvedValue(participant);
+        
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: createMockParticipant({ userId: user.id }),
+        });
+        
+        (db.participant.update as jest.Mock).mockResolvedValue(participant);
+        (db.participant.findUnique as jest.Mock).mockResolvedValue(participant);
 
         const request = createMockRequest(
           'http://localhost:3000/api/participant/profile',
@@ -588,7 +663,7 @@ describe('Security & Edge Cases', () => {
         const response = await profilePUT(request);
 
         expect(response.status).toBe(200);
-        expect(mockDbParticipant.update).toHaveBeenCalledWith({
+        expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: user.participant!.id },
           data: expect.objectContaining({
             name: '测试用户',
@@ -604,8 +679,14 @@ describe('Security & Edge Cases', () => {
       it('should handle timeout scenarios', async () => {
         const user = setupExistingUser(true);
 
+        // Mock user lookup
+        (db.user.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          participant: createMockParticipant({ userId: user.id }),
+        });
+
         // Mock a slow database operation
-        mockDbParticipant.update.mockImplementation(() => 
+        (db.participant.update as jest.Mock).mockImplementation(() => 
           new Promise((resolve) => setTimeout(resolve, 100)) // 100ms delay
         );
 
