@@ -67,10 +67,19 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+      options: --user 1001:1001
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      
+    - name: Fix file permissions
+      run: |
+        # Fix ownership of files for non-root user
+        sudo chown -R 1001:1001 $GITHUB_WORKSPACE || true
+        # Ensure proper permissions for npm
+        mkdir -p ~/.npm
+        chmod 755 ~/.npm
 
     - name: Check dependencies
       working-directory: organizer-app
