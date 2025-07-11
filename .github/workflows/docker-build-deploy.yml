@@ -27,43 +27,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Check if base image needs to be built first
-    - name: Check base image availability
-      id: check-base
-      run: |
-        PACKAGE_HASH=$(sha256sum organizer-app/package.json organizer-app/package-lock.json | sha256sum | cut -d' ' -f1)
-        echo "package-hash=$PACKAGE_HASH" >> $GITHUB_OUTPUT
-        
-        # Check if base image with this hash exists
-        if docker manifest inspect ghcr.io/${{ github.repository }}-base:pkg-$PACKAGE_HASH > /dev/null 2>&1; then
-          echo "base-image-available=true" >> $GITHUB_OUTPUT
-          echo "base-image-tag=pkg-$PACKAGE_HASH" >> $GITHUB_OUTPUT
-        else
-          echo "base-image-available=false" >> $GITHUB_OUTPUT
-          echo "base-image-tag=latest" >> $GITHUB_OUTPUT
-        fi
-
-    # Trigger base image build if needed
-    - name: Trigger base image build
-      if: steps.check-base.outputs.base-image-available == 'false'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const { owner, repo } = context.repo;
-          await github.rest.actions.createWorkflowDispatch({
-            owner,
-            repo,
-            workflow_id: 'base-image-build.yml',
-            ref: context.ref,
-            inputs: {
-              force_rebuild: 'true'
-            }
-          });
-          
-          // Wait for base image build to complete
-          console.log('Waiting for base image build to complete...');
-          await new Promise(resolve => setTimeout(resolve, 30000)); // Wait 30 seconds
-
     # Оптимизация: Кэширование Node.js зависимостей
     - name: Cache Node.js dependencies
       uses: actions/cache@v4
