@@ -22,7 +22,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: ${{ github.repository }}-base
+  BASE_IMAGE_NAME: hackload-kz/infra-base
 
 jobs:
   build-base-image:

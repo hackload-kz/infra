@@ -6,8 +6,8 @@
 set -e
 
 REGISTRY="ghcr.io"
-REPO_NAME="hackload-infra/organizer-app"
-BASE_IMAGE_NAME="${REGISTRY}/${REPO_NAME}-base"
+REPO_NAME="hackload-kz/infra-base"
+BASE_IMAGE_NAME="${REGISTRY}/${REPO_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(dirname "$SCRIPT_DIR")"
 
