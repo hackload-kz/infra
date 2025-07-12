@@ -49,6 +49,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}      
+
     - name: Build temporary image with source code
       run: |
         BASE_IMAGE="${{ needs.determine-base-image.outputs.base-image-full }}"
