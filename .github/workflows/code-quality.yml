@@ -1,10 +1,10 @@
 name: Code Quality
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:
+    # Allow manual triggering of the workflow
   workflow_call:
     # Allow this workflow to be called from other workflows
 
