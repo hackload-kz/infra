@@ -49,59 +49,53 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run quality checks in container
+    - name: Build temporary image with source code
       run: |
-        # Use the base image in a more controlled way
         BASE_IMAGE="${{ needs.determine-base-image.outputs.base-image-full }}"
         echo "Using base image: $BASE_IMAGE"
         
-        # Run the entire quality check pipeline in one container execution
-        # Use root user to avoid permission issues, but set npm cache to writable location
-        docker run --rm \
-          --entrypoint="" \
-          -v "$GITHUB_WORKSPACE:/workspace" \
-          -w /workspace/organizer-app \
-          -e NPM_CONFIG_CACHE="/tmp/.npm" \
-          -e NPM_CONFIG_PREFIX="/tmp/.npm-global" \
-          -e DATABASE_URL="postgresql://test:test@localhost:5432/test" \
-          -e NEXTAUTH_URL="http://localhost:3000" \
-          -e NEXTAUTH_SECRET="test-secret-key-for-testing-only" \
-          -e ADMIN_USERS="admin@hackload.kz,organizer@hackload.kz" \
-          "$BASE_IMAGE" \
-          sh -c '
-            set -e
-            # Ensure npm directories are writable and add to PATH
-            mkdir -p /tmp/.npm /tmp/.npm-global/bin
-            export PATH="/tmp/.npm-global/bin:$PATH"
-            
-            echo "📦 Installing dependencies..."
-            echo "🔍 Checking file permissions..."
-            ls -la package.json package-lock.json || echo "Missing package files"
-            
-            echo "🔧 Running npm ci..."
-            if ! npm ci --include=dev --no-audit --no-fund 2>&1; then
-              echo "❌ npm ci failed, trying npm install..."
-              rm -rf node_modules package-lock.json
-              npm install --include=dev --no-audit --no-fund
-            fi
-            
-            echo "🏗️  Generating Prisma Client..."
-            npx prisma generate
-            
-            echo "🔍 Running ESLint..."
-            npm run lint
-            
-            echo "🔍 Type checking..."
-            npx tsc --noEmit
-            
-            echo "🧪 Running tests..."
-            npm run test:coverage
-            
-            echo "🏗️  Building application..."
-            npm run build
-            
+        # Create temporary Dockerfile that copies source and runs quality checks
+        cat > Dockerfile.quality << 'EOF'
+        ARG BASE_IMAGE
+        FROM $BASE_IMAGE
+        
+        # Copy source code to container
+        COPY organizer-app /app
+        WORKDIR /app
+        
+        # Set environment variables
+        ENV DATABASE_URL="postgresql://test:test@localhost:5432/test"
+        ENV NEXTAUTH_URL="http://localhost:3000"
+        ENV NEXTAUTH_SECRET="test-secret-key-for-testing-only"
+        ENV ADMIN_USERS="admin@hackload.kz,organizer@hackload.kz"
+        
+        # Run quality checks
+        RUN set -e && \
+            echo "📦 Installing dependencies..." && \
+            npm ci --include=dev --no-audit --no-fund && \
+            echo "🏗️  Generating Prisma Client..." && \
+            npx prisma generate && \
+            echo "🔍 Running ESLint..." && \
+            npm run lint && \
+            echo "🔍 Type checking..." && \
+            npx tsc --noEmit && \
+            echo "🧪 Running tests..." && \
+            npm run test:coverage && \
+            echo "🏗️  Building application..." && \
+            npm run build && \
             echo "✅ All quality checks passed!"
-          '
+        EOF
+        
+        # Build image - this will run all quality checks
+        docker build \
+          --build-arg BASE_IMAGE="$BASE_IMAGE" \
+          -f Dockerfile.quality \
+          -t quality-check:${{ github.run_id }} \
+          .
+        
+        # Clean up temporary files
+        rm -f Dockerfile.quality
+        docker rmi quality-check:${{ github.run_id }} || true
 
   quality-summary:
     runs-on: [self-hosted]
