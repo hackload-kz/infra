@@ -62,77 +62,63 @@ jobs:
   lint-and-type-check:
     runs-on: [self-hosted]
     needs: [determine-base-image]
-    container:
-      image: ${{ needs.determine-base-image.outputs.base-image-full }}
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-      options: --user 1001:1001
+    
+    # Alternative approach: run directly on runner and use Docker for individual steps
+    # This avoids the container user permission issues
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Fix file permissions
+
+    - name: Run quality checks in container
       run: |
-        # Fix ownership of files for non-root user
-        sudo chown -R 1001:1001 $GITHUB_WORKSPACE || true
-        # Ensure proper permissions for npm
-        mkdir -p ~/.npm
-        chmod 755 ~/.npm
-
-    - name: Check dependencies
-      working-directory: organizer-app
-      run: |
-        echo "Checking installed packages..."
-        npm list --depth=0 || echo "Some packages missing"
-        echo "Checking if ESLint is available..."
-        npx eslint --version || echo "ESLint not found"
-
-    - name: Install missing dependencies if needed
-      working-directory: organizer-app
-      run: |
-        # Check if node_modules exists and has content
-        if [ ! -d "node_modules" ] || [ -z "$(ls -A node_modules)" ]; then
-          echo "node_modules is empty or missing, installing dependencies..."
-          npm ci --include=dev --silent --no-audit --no-fund
-        else
-          echo "node_modules exists, checking for missing packages..."
-          npm list eslint > /dev/null 2>&1 || {
-            echo "ESLint missing, installing dependencies..."
-            npm ci --include=dev --silent --no-audit --no-fund
-          }
-        fi
-
-    - name: Generate Prisma Client
-      working-directory: organizer-app
-      run: npx prisma generate
-
-    - name: Run ESLint
-      working-directory: organizer-app
-      run: npm run lint
-
-    - name: Type check
-      working-directory: organizer-app
-      run: npx tsc --noEmit
-
-    - name: Run tests
-      working-directory: organizer-app
-      run: npm run test:coverage
-      env:
-        DATABASE_URL: "postgresql://test:test@localhost:5432/test"
-        NEXTAUTH_URL: "http://localhost:3000"
-        NEXTAUTH_SECRET: "test-secret-key-for-testing-only"
-        ADMIN_USERS: "admin@hackload.kz,organizer@hackload.kz"
-
-    - name: Build application
-      working-directory: organizer-app
-      run: npm run build
-      env:
-        DATABASE_URL: "postgresql://test:test@localhost:5432/test"
-        NEXTAUTH_URL: "http://localhost:3000"
-        NEXTAUTH_SECRET: "test-secret"
-        ADMIN_USERS: "test@example.com:password"
+        # Use the base image in a more controlled way
+        BASE_IMAGE="${{ needs.determine-base-image.outputs.base-image-full }}"
+        echo "Using base image: $BASE_IMAGE"
+        
+        # Run the entire quality check pipeline in one container execution
+        # This avoids the actions/checkout permission issues
+        docker run --rm \
+          -v "$GITHUB_WORKSPACE:/workspace" \
+          -w /workspace/organizer-app \
+          -e DATABASE_URL="postgresql://test:test@localhost:5432/test" \
+          -e NEXTAUTH_URL="http://localhost:3000" \
+          -e NEXTAUTH_SECRET="test-secret-key-for-testing-only" \
+          -e ADMIN_USERS="admin@hackload.kz,organizer@hackload.kz" \
+          "$BASE_IMAGE" \
+          bash -c "
+            set -e
+            echo '🔍 Checking dependencies...'
+            npm list --depth=0 || echo 'Some packages missing'
+            
+            echo '📦 Installing missing dependencies if needed...'
+            if [ ! -d 'node_modules' ] || [ -z '\$(ls -A node_modules)' ]; then
+              echo 'Installing dependencies...'
+              npm ci --include=dev --silent --no-audit --no-fund
+            else
+              npm list eslint > /dev/null 2>&1 || {
+                echo 'ESLint missing, installing dependencies...'
+                npm ci --include=dev --silent --no-audit --no-fund
+              }
+            fi
+            
+            echo '🏗️  Generating Prisma Client...'
+            npx prisma generate
+            
+            echo '🔍 Running ESLint...'
+            npm run lint
+            
+            echo '🔍 Type checking...'
+            npx tsc --noEmit
+            
+            echo '🧪 Running tests...'
+            npm run test:coverage
+            
+            echo '🏗️  Building application...'
+            npm run build
+            
+            echo '✅ All quality checks passed!'
+          "
 
   quality-summary:
     runs-on: [self-hosted]
