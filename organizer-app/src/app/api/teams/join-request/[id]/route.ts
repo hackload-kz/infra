@@ -133,8 +133,7 @@ export async function PUT(
         body: messageTemplate.text,
         senderId: undefined, // system message
         recipientId: joinRequest.participant.id,
-        hackathonId: joinRequest.hackathonId,
-        htmlBody: messageTemplate.html
+        hackathonId: joinRequest.hackathonId
       })
     } catch (error) {
       console.error('Failed to send join request response notification:', error)

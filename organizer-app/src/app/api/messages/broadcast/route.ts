@@ -4,6 +4,7 @@ import { messageService, MessageWithRelations } from '@/lib/messages';
 import { db } from '@/lib/db';
 import { isOrganizer } from '@/lib/admin';
 import { logger, LogAction } from '@/lib/logger';
+import { TeamStatus } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,12 +87,15 @@ export async function POST(request: NextRequest) {
 
     } else if (broadcastType === 'teams-by-status') {
       // Send to teams filtered by status
-      const teamFilter: { hackathonId: string; status?: string } = {
+      const teamFilter: {
+        hackathonId: string;
+        status?: TeamStatus;
+      } = {
         hackathonId: hackathonId
       };
 
       if (teamStatusFilter && teamStatusFilter !== 'all') {
-        teamFilter.status = teamStatusFilter;
+        teamFilter.status = teamStatusFilter as TeamStatus;
       }
 
       const teams = await db.team.findMany({

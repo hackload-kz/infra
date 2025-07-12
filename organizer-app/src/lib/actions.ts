@@ -705,7 +705,6 @@ export async function createJoinRequest(participantId: string, teamId: string, m
                 await messageService.createMessage({
                     subject: `🔔 Новая заявка на вступление в команду "${team.name}"`,
                     body: messageTemplate.text,
-                    htmlBody: messageTemplate.html,
                     recipientId: team.leader.id,
                     hackathonId: hackathon.id,
                     teamId: team.id

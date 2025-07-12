@@ -8,9 +8,10 @@ marked.setOptions({
   breaks: true, // Convert \n to <br>
 });
 
-// Create a JSDOM window for server-side DOMPurify
+// Create a JSDOM window for server-side DOMPurify  
 const window = new JSDOM('').window;
-const createDOMPurify = DOMPurify(window as unknown as Window);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createDOMPurify = DOMPurify(window as any);
 
 /**
  * Convert Markdown to HTML safely (server-side only with full sanitization)

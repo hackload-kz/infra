@@ -140,8 +140,7 @@ export async function POST(request: NextRequest) {
         `🔔 Новая заявка на вступление в команду "${team.name}"`,
         messageTemplate.text,
         undefined, // system message
-        hackathon.id,
-        messageTemplate.html // HTML version for emails
+        hackathon.id
       )
 
       console.log('📧 Successfully sent notifications to team members:', messages.length)

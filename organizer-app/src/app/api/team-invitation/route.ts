@@ -94,8 +94,7 @@ export async function POST(request: NextRequest) {
       body: messageTemplate.text,
       senderId: teamLeader.id,
       recipientId: targetParticipant.id,
-      hackathonId: hackathon.id,
-      htmlBody: messageTemplate.html
+      hackathonId: hackathon.id
     })
 
     return NextResponse.json({ success: true }, { status: 201 })
