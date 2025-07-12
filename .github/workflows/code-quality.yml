@@ -83,6 +83,7 @@ jobs:
           -v "$GITHUB_WORKSPACE:/workspace" \
           -w /workspace/organizer-app \
           --user "$(id -u):$(id -g)" \
+          -e HOME="/tmp/npm-home" \
           -e DATABASE_URL="postgresql://test:test@localhost:5432/test" \
           -e NEXTAUTH_URL="http://localhost:3000" \
           -e NEXTAUTH_SECRET="test-secret-key-for-testing-only" \
@@ -91,7 +92,7 @@ jobs:
           sh -c '
             set -e
             # Ensure npm cache directory is writable
-            mkdir -p ~/.npm
+            mkdir -p "$HOME/.npm"
             
             echo "📦 Installing dependencies..."
             if ! npm ci --include=dev --silent --no-audit --no-fund; then
@@ -133,16 +134,3 @@ jobs:
         echo "- **Build**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image**: ${{ needs.determine-base-image.outputs.base-image-full }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Tag**: ${{ needs.determine-base-image.outputs.base-image-tag }}" >> $GITHUB_STEP_SUMMARY
-
-  notify-failure:
-    runs-on: [self-hosted]
-    if: failure()
-    needs: [determine-base-image, lint-and-type-check]
-    steps:
-    - name: Notify on failure
-      run: |
-        echo "### ❌ Code Quality Workflow Failed" >> $GITHUB_STEP_SUMMARY
-        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
