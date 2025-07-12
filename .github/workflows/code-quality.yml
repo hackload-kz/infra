@@ -23,13 +23,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Determine base image tag
       id: base-image
       run: |
@@ -40,24 +33,10 @@ jobs:
         echo "🔍 Checking for base image with package hash: $PKG_TAG"
         echo "📦 Package hash: $PACKAGE_HASH"
         
-        # Check if package-specific base image exists
-        if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
-          echo "tag=$PKG_TAG" >> $GITHUB_OUTPUT
-          echo "full=$BASE_IMAGE_REPO:$PKG_TAG" >> $GITHUB_OUTPUT
-          echo "✅ Using package-specific base image: $PKG_TAG"
-        else
-          echo "❌ Package-specific base image not found: $PKG_TAG"
-          echo "🔍 Checking latest base image..."
-          if docker manifest inspect "$BASE_IMAGE_REPO:latest" > /dev/null 2>&1; then
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "full=$BASE_IMAGE_REPO:latest" >> $GITHUB_OUTPUT
-            echo "⚠️ Using latest base image (may not have current dependencies)"
-          else
-            echo "❌ No base image found, this will likely fail"
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "full=$BASE_IMAGE_REPO:latest" >> $GITHUB_OUTPUT
-          fi
-        fi
+        # Use package-specific base image tag
+        echo "tag=$PKG_TAG" >> $GITHUB_OUTPUT
+        echo "full=$BASE_IMAGE_REPO:$PKG_TAG" >> $GITHUB_OUTPUT
+        echo "✅ Using base image: $PKG_TAG"
 
   lint-and-type-check:
     runs-on: [self-hosted]
@@ -77,13 +56,13 @@ jobs:
         echo "Using base image: $BASE_IMAGE"
         
         # Run the entire quality check pipeline in one container execution
-        # Fix permissions by running as current user
+        # Use root user to avoid permission issues, but set npm cache to writable location
         docker run --rm \
           --entrypoint="" \
           -v "$GITHUB_WORKSPACE:/workspace" \
           -w /workspace/organizer-app \
-          --user "$(id -u):$(id -g)" \
-          -e HOME="/tmp/npm-home" \
+          -e NPM_CONFIG_CACHE="/tmp/.npm" \
+          -e NPM_CONFIG_PREFIX="/tmp/.npm-global" \
           -e DATABASE_URL="postgresql://test:test@localhost:5432/test" \
           -e NEXTAUTH_URL="http://localhost:3000" \
           -e NEXTAUTH_SECRET="test-secret-key-for-testing-only" \
@@ -91,14 +70,19 @@ jobs:
           "$BASE_IMAGE" \
           sh -c '
             set -e
-            # Ensure npm cache directory is writable
-            mkdir -p "$HOME/.npm"
+            # Ensure npm directories are writable and add to PATH
+            mkdir -p /tmp/.npm /tmp/.npm-global/bin
+            export PATH="/tmp/.npm-global/bin:$PATH"
             
             echo "📦 Installing dependencies..."
-            if ! npm ci --include=dev --silent --no-audit --no-fund; then
+            echo "🔍 Checking file permissions..."
+            ls -la package.json package-lock.json || echo "Missing package files"
+            
+            echo "🔧 Running npm ci..."
+            if ! npm ci --include=dev --no-audit --no-fund 2>&1; then
               echo "❌ npm ci failed, trying npm install..."
               rm -rf node_modules package-lock.json
-              npm install --include=dev --silent --no-audit --no-fund
+              npm install --include=dev --no-audit --no-fund
             fi
             
             echo "🏗️  Generating Prisma Client..."
