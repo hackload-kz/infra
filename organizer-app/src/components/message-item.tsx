@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { MessageReply } from './message-reply';
 import { formatDistanceToNow } from 'date-fns';
 import { Mail, MailOpen, Reply, Users } from 'lucide-react';
+import { markdownToHtml } from '@/lib/markdown';
 
 interface MessageItemProps {
   message: MessageWithRelations;
@@ -89,7 +90,7 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
                 lineHeight: '1.6',
                 fontSize: '14px'
               }}
-              dangerouslySetInnerHTML={{ __html: message.body }}
+              dangerouslySetInnerHTML={{ __html: markdownToHtml(message.body) }}
             />
             {message.body.length > 200 && (
               <button
@@ -117,7 +118,7 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
                       lineHeight: '1.6',
                       fontSize: '13px'
                     }}
-                    dangerouslySetInnerHTML={{ __html: reply.body }}
+                    dangerouslySetInnerHTML={{ __html: markdownToHtml(reply.body) }}
                   />
                 </div>
               ))}

@@ -16,6 +16,7 @@ import {
   Calendar,
   Eye
 } from 'lucide-react';
+import { markdownToHtml } from '@/lib/markdown';
 
 interface AdminMessageItemProps {
   message: MessageWithRelations;
@@ -129,7 +130,7 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
                 fontSize: '14px',
                 fontFamily: 'system-ui, -apple-system, sans-serif'
               }}
-              dangerouslySetInnerHTML={{ __html: message.body }}
+              dangerouslySetInnerHTML={{ __html: markdownToHtml(message.body) }}
             />
             {message.body.length > 300 && (
               <button
@@ -153,7 +154,7 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
                   <div key={reply.id} className="text-sm">
                     <span className="font-medium">{reply.sender?.name || 'Система'}:</span>
                     <span className="ml-2 text-gray-600">
-                      {reply.body.replace(/<[^>]*>/g, '').slice(0, 100)}...
+                      {markdownToHtml(reply.body).replace(/<[^>]*>/g, '').slice(0, 100)}...
                     </span>
                   </div>
                 ))}

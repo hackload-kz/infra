@@ -16,6 +16,7 @@ import {
   Mail,
   MailOpen
 } from 'lucide-react';
+import { markdownToHtml } from '@/lib/markdown';
 
 interface ConversationViewProps {
   message: MessageWithRelations;
@@ -185,7 +186,7 @@ export function ConversationView({ message, onClose, hackathonId }: Conversation
             <CardContent>
               <div 
                 className="prose prose-sm max-w-none text-gray-900"
-                dangerouslySetInnerHTML={{ __html: msg.body }}
+                dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.body) }}
               />
             </CardContent>
           </Card>
@@ -204,12 +205,12 @@ export function ConversationView({ message, onClose, hackathonId }: Conversation
                 <Textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
-                  placeholder="Введите ваш ответ (поддерживается HTML)"
+                  placeholder="Введите ваш ответ (поддерживается Markdown)"
                   rows={4}
                   required
                 />
                 <p className="text-sm text-gray-500 mt-1">
-                  Вы можете использовать HTML-форматирование в ответе
+                  Вы можете использовать Markdown-форматирование в ответе
                 </p>
               </div>
               <div className="flex gap-2">

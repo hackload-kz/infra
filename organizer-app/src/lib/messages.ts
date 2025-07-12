@@ -1,22 +1,22 @@
 import { db } from '@/lib/db';
 import { emailService } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { markdownToEmailHtml } from '@/lib/markdown-server';
 
 export interface CreateMessageInput {
   subject: string;
-  body: string;
+  body: string; // Markdown content
   senderId?: string;
   recipientId?: string;
   teamId?: string;
   hackathonId: string;
   parentMessageId?: string;
-  htmlBody?: string; // Optional HTML version for emails
 }
 
 export interface MessageWithRelations {
   id: string;
   subject: string;
-  body: string;
+  body: string; // Markdown content
   status: 'UNREAD' | 'READ';
   createdAt: Date;
   updatedAt: Date;
@@ -42,7 +42,7 @@ export interface MessageWithRelations {
   replies: {
     id: string;
     subject: string;
-    body: string;
+    body: string; // Markdown content
     status: 'UNREAD' | 'READ';
     createdAt: Date;
     updatedAt: Date;
@@ -74,7 +74,7 @@ export interface MessageWithRelations {
 
 class MessageService {
   async createMessage(input: CreateMessageInput): Promise<MessageWithRelations> {
-    const { recipientId, teamId, hackathonId, senderId, subject, body, parentMessageId, htmlBody } = input;
+    const { recipientId, teamId, hackathonId, senderId, subject, body, parentMessageId } = input;
 
     try {
       // If it's a team message, create individual messages for each team member
@@ -217,7 +217,7 @@ class MessageService {
       );
 
       // Send email notification
-      await this.sendEmailNotification(message, htmlBody);
+      await this.sendEmailNotification(message);
 
       return message;
     } catch (error) {
@@ -714,7 +714,7 @@ class MessageService {
     return allMessages;
   }
 
-  async sendToTeam(teamId: string, subject: string, body: string, senderId?: string, hackathonId?: string, htmlBody?: string): Promise<MessageWithRelations[]> {
+  async sendToTeam(teamId: string, subject: string, body: string, senderId?: string, hackathonId?: string): Promise<MessageWithRelations[]> {
     console.log('📧 MessageService.sendToTeam called with:', {
       teamId,
       subject,
@@ -794,7 +794,6 @@ class MessageService {
             recipientId: recipient.id,
             hackathonId: finalHackathonId,
             teamId,
-            htmlBody
           });
           
           console.log(`✅ Message created successfully for ${recipient.name}:`, message.id);
@@ -810,53 +809,29 @@ class MessageService {
     return messages;
   }
 
-  private async sendEmailNotification(message: MessageWithRelations, htmlBody?: string): Promise<void> {
+  private async sendEmailNotification(message: MessageWithRelations): Promise<void> {
     try {
       const subject = `Новое сообщение: ${message.subject}`;
       
-      // Use provided HTML body if available, otherwise format the message body
-      let emailBody: string;
+      // Convert markdown content to HTML for email
+      const htmlContent = markdownToEmailHtml(message.body);
       
-      if (htmlBody) {
-        // Use the provided HTML body (from WYSIWYG editor)
-        emailBody = `
-          <h2>📩 Вы получили новое сообщение</h2>
-          <p><strong>От:</strong> ${message.sender?.name || 'Система'}</p>
-          <p><strong>Тема:</strong> ${message.subject}</p>
-          <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
-            ${htmlBody}
-          </div>
-          <p style="text-align: center; margin-top: 25px;">
-            <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-              📱 Открыть в панели управления
-            </a>
-          </p>
-          <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
-            💡 Это уведомление отправлено системой Hackload. Для ответа перейдите в панель управления.
-          </p>
-        `;
-      } else {
-        // If message.body contains HTML tags, use it as HTML, otherwise treat as plain text
-        const isHtml = /<[a-z][\s\S]*>/i.test(message.body);
-        const bodyContent = isHtml ? message.body : message.body.replace(/\n/g, '<br>');
-        
-        emailBody = `
-          <h2>📩 Вы получили новое сообщение</h2>
-          <p><strong>От:</strong> ${message.sender?.name || 'Система'}</p>
-          <p><strong>Тема:</strong> ${message.subject}</p>
-          <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
-            ${bodyContent}
-          </div>
-          <p style="text-align: center; margin-top: 25px;">
-            <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-              📱 Открыть в панели управления
-            </a>
-          </p>
-          <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
-            💡 Это уведомление отправлено системой Hackload. Для ответа перейдите в панель управления.
-          </p>
-        `;
-      }
+      const emailBody = `
+        <h2>📩 Вы получили новое сообщение</h2>
+        <p><strong>От:</strong> ${message.sender?.name || 'Система'}</p>
+        <p><strong>Тема:</strong> ${message.subject}</p>
+        <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
+          ${htmlContent}
+        </div>
+        <p style="text-align: center; margin-top: 25px;">
+          <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            📱 Открыть в панели управления
+          </a>
+        </p>
+        <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
+          💡 Это уведомление отправлено системой Hackload. Для ответа перейдите в панель управления.
+        </p>
+      `;
 
       await emailService.sendHtmlEmail(message.recipient.email, subject, emailBody);
     } catch (error) {

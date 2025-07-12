@@ -42,8 +42,8 @@ interface MessageComposeProps {
 
 export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledRecipientType, prefilledRecipientId }: MessageComposeProps) {
   const [subject, setSubject] = useState('');
-  const [messageBody, setMessageBody] = useState('');
-  const [htmlBody, setHtmlBody] = useState('');
+  const [messageBody, setMessageBody] = useState(''); // This will store markdown
+  const [markdownContent, setMarkdownContent] = useState(''); // For the WYSIWYG editor
   const [useWysiwyg, setUseWysiwyg] = useState(true);
   const [recipientType, setRecipientType] = useState<RecipientType>(prefilledRecipientType || 'participant');
   const [recipientId, setRecipientId] = useState(prefilledRecipientType === 'participant' ? (prefilledRecipientId || '') : '');
@@ -134,7 +134,7 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const bodyContent = useWysiwyg ? htmlBody : messageBody;
+    const bodyContent = useWysiwyg ? markdownContent : messageBody;
     
     if (!subject || !bodyContent) {
       alert('Пожалуйста, заполните все обязательные поля');
@@ -164,7 +164,6 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
         subject: string;
         messageBody: string;
         hackathonId: string;
-        htmlBody?: string;
         recipientId?: string;
         teamId?: string;
         broadcastType?: string;
@@ -175,10 +174,8 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
         hackathonId,
       };
 
-      // Add HTML body if using WYSIWYG
-      if (useWysiwyg) {
-        requestBody.htmlBody = htmlBody;
-      }
+      // Content is always stored as markdown now
+      // No need for htmlBody - the server will convert markdown to HTML for emails
 
       // Handle different recipient types
       switch (recipientType) {
@@ -361,8 +358,8 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
             {useWysiwyg ? (
               <div className="mt-1 border border-gray-300 rounded-md bg-white">
                 <MDEditor
-                  value={htmlBody}
-                  onChange={(value) => setHtmlBody(value || '')}
+                  value={markdownContent}
+                  onChange={(value) => setMarkdownContent(value || '')}
                   preview="edit"
                   hideToolbar={false}
                   height={250}
@@ -374,7 +371,7 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
                 id="messageBody"
                 value={messageBody}
                 onChange={(e) => setMessageBody(e.target.value)}
-                placeholder="Введите ваше сообщение"
+                placeholder="Введите ваше сообщение в формате Markdown"
                 rows={10}
                 required
                 className="mt-1 font-mono text-sm text-gray-800 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -382,8 +379,8 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
             )}
             <p className="text-xs text-gray-600 mt-2 font-medium">
               {useWysiwyg 
-                ? '✨ Используйте визуальный редактор для красивого форматирования сообщения'
-                : '📝 Введите обычный текст или HTML-код для дополнительного форматирования'
+                ? '✨ Используйте визуальный редактор для создания Markdown-контента'
+                : '📝 Введите сообщение в формате Markdown (поддерживается **жирный**, *курсив*, списки, ссылки и др.)'
               }
             </p>
           </div>
