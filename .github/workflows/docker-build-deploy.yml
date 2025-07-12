@@ -24,7 +24,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  BASE_IMAGE_NAME: hackload-kz/infra-base
+  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || 'hackload-kz/infra-base' }}
 
 jobs:
   quality-gate:
@@ -122,11 +122,39 @@ jobs:
             }
           });
           
-          // Wait for base image build to complete
-          console.log('⏳ Waiting for base image build to complete...');
-          await new Promise(resolve => setTimeout(resolve, 45000)); // Wait 45 seconds
+          console.log('✅ Base image build triggered successfully');
+
+    # Wait for base image build completion
+    - name: Wait for base image build completion
+      if: |
+        (steps.check-base.outputs.base-image-available == 'false' && steps.check-base.outputs.using-custom-tag == 'false') ||
+        github.event.inputs.force_base_rebuild == 'true'
+      run: |
+        echo "⏳ Waiting for base image build to complete..."
+        
+        # Wait up to 10 minutes for the workflow to complete
+        for i in {1..60}; do
+          echo "Checking workflow status... (attempt $i/60)"
           
-          console.log('✅ Base image build trigger completed');
+          # Check if the base image is now available
+          PACKAGE_HASH="${{ steps.check-base.outputs.package-hash }}"
+          PKG_TAG="pkg-$PACKAGE_HASH"
+          BASE_IMAGE_REPO="${{ steps.check-base.outputs.base-image-repo }}"
+          
+          if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
+            echo "✅ Base image build completed successfully"
+            exit 0
+          fi
+          
+          if [[ $i -lt 60 ]]; then
+            sleep 10
+          fi
+        done
+        
+        echo "❌ Timeout waiting for base image build"
+        echo "🔍 Available base images:"
+        docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" | head -10 || true
+        exit 1
 
     # Fallback: Use latest if custom tag doesn't exist and we can't rebuild
     - name: Fallback to latest base image
@@ -303,3 +331,16 @@ jobs:
         echo "- **Deployment**: hub" >> $GITHUB_STEP_SUMMARY
         echo "- **Status**: $(kubectl get deployment hub -n hub -o jsonpath='{.status.conditions[?(@.type=="Available")].status}')" >> $GITHUB_STEP_SUMMARY
         echo "- **Ready Replicas**: $(kubectl get deployment hub -n hub -o jsonpath='{.status.readyReplicas}')/$(kubectl get deployment hub -n hub -o jsonpath='{.spec.replicas}')" >> $GITHUB_STEP_SUMMARY
+
+  notify-failure:
+    runs-on: [self-hosted]
+    if: failure()
+    needs: [quality-gate, build-and-push, deploy]
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "### ❌ Build and Deploy Workflow Failed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

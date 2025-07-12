@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: hackload-kz/infra-base
+  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || 'hackload-kz/infra-base' }}
 
 jobs:
   determine-base-image:
@@ -77,11 +77,12 @@ jobs:
         echo "Using base image: $BASE_IMAGE"
         
         # Run the entire quality check pipeline in one container execution
-        # This avoids the actions/checkout permission issues
+        # Fix permissions by running as current user
         docker run --rm \
           --entrypoint="" \
           -v "$GITHUB_WORKSPACE:/workspace" \
           -w /workspace/organizer-app \
+          --user "$(id -u):$(id -g)" \
           -e DATABASE_URL="postgresql://test:test@localhost:5432/test" \
           -e NEXTAUTH_URL="http://localhost:3000" \
           -e NEXTAUTH_SECRET="test-secret-key-for-testing-only" \
@@ -89,18 +90,14 @@ jobs:
           "$BASE_IMAGE" \
           sh -c '
             set -e
-            echo "🔍 Checking dependencies..."
-            npm list --depth=0 || echo "Some packages missing"
+            # Ensure npm cache directory is writable
+            mkdir -p ~/.npm
             
-            echo "📦 Installing missing dependencies if needed..."
-            if [ ! -d "node_modules" ] || [ -z "$(ls -A node_modules)" ]; then
-              echo "Installing dependencies..."
-              npm ci --include=dev --silent --no-audit --no-fund
-            else
-              npm list eslint > /dev/null 2>&1 || {
-                echo "ESLint missing, installing dependencies..."
-                npm ci --include=dev --silent --no-audit --no-fund
-              }
+            echo "📦 Installing dependencies..."
+            if ! npm ci --include=dev --silent --no-audit --no-fund; then
+              echo "❌ npm ci failed, trying npm install..."
+              rm -rf node_modules package-lock.json
+              npm install --include=dev --silent --no-audit --no-fund
             fi
             
             echo "🏗️  Generating Prisma Client..."
@@ -136,3 +133,16 @@ jobs:
         echo "- **Build**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image**: ${{ needs.determine-base-image.outputs.base-image-full }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Tag**: ${{ needs.determine-base-image.outputs.base-image-tag }}" >> $GITHUB_STEP_SUMMARY
+
+  notify-failure:
+    runs-on: [self-hosted]
+    if: failure()
+    needs: [determine-base-image, lint-and-type-check]
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "### ❌ Code Quality Workflow Failed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

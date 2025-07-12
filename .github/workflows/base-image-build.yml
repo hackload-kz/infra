@@ -25,7 +25,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: hackload-kz/infra-base
+  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || 'hackload-kz/infra-base' }}
 
 jobs:
   build-base-image:
@@ -139,3 +139,16 @@ jobs:
         if [[ "${{ github.event_name }}" == "schedule" ]]; then
           echo "- **Note**: Scheduled rebuild skipped as base image is recent (less than 7 days old)" >> $GITHUB_STEP_SUMMARY
         fi
+
+  notify-failure:
+    runs-on: [self-hosted]
+    if: failure()
+    needs: [build-base-image]
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "### ❌ Base Image Build Workflow Failed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
