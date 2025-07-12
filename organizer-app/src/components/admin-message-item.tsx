@@ -132,6 +132,17 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
               }}
               dangerouslySetInnerHTML={{ __html: markdownToHtml(message.body) }}
             />
+            <style jsx>{`
+              div :global(a) {
+                color: #2563eb !important;
+                text-decoration: underline !important;
+                font-weight: 500 !important;
+              }
+              div :global(a:hover) {
+                color: #1d4ed8 !important;
+                text-decoration: underline !important;
+              }
+            `}</style>
             {message.body.length > 300 && (
               <button
                 onClick={() => setExpanded(!expanded)}

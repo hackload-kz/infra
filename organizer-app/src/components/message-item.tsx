@@ -92,6 +92,17 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
               }}
               dangerouslySetInnerHTML={{ __html: markdownToHtml(message.body) }}
             />
+            <style jsx>{`
+              div :global(a) {
+                color: #2563eb !important;
+                text-decoration: underline !important;
+                font-weight: 500 !important;
+              }
+              div :global(a:hover) {
+                color: #1d4ed8 !important;
+                text-decoration: underline !important;
+              }
+            `}</style>
             {message.body.length > 200 && (
               <button
                 onClick={() => setExpanded(!expanded)}
@@ -120,6 +131,17 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
                     }}
                     dangerouslySetInnerHTML={{ __html: markdownToHtml(reply.body) }}
                   />
+                  <style jsx>{`
+                    div :global(a) {
+                      color: #2563eb !important;
+                      text-decoration: underline !important;
+                      font-weight: 500 !important;
+                    }
+                    div :global(a:hover) {
+                      color: #1d4ed8 !important;
+                      text-decoration: underline !important;
+                    }
+                  `}</style>
                 </div>
               ))}
             </div>

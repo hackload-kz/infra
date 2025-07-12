@@ -58,12 +58,12 @@ export function MessageReply({ messageId, onSuccess, onCancel }: MessageReplyPro
           id="replyBody"
           value={messageBody}
           onChange={(e) => setMessageBody(e.target.value)}
-          placeholder="Введите ваш ответ (поддерживается HTML)"
+          placeholder="Введите ваш ответ (поддерживается Markdown)"
           rows={4}
           required
         />
         <p className="text-sm text-gray-500 mt-1">
-          Вы можете использовать HTML-форматирование в ответе
+          Вы можете использовать Markdown-форматирование в ответе (**жирный**, *курсив*, [ссылки](url), списки и др.)
         </p>
       </div>
 

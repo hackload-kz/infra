@@ -188,6 +188,17 @@ export function ConversationView({ message, onClose, hackathonId }: Conversation
                 className="prose prose-sm max-w-none text-gray-900"
                 dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.body) }}
               />
+              <style jsx>{`
+                div :global(a) {
+                  color: #2563eb !important;
+                  text-decoration: underline !important;
+                  font-weight: 500 !important;
+                }
+                div :global(a:hover) {
+                  color: #1d4ed8 !important;
+                  text-decoration: underline !important;
+                }
+              `}</style>
             </CardContent>
           </Card>
         ))}
