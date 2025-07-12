@@ -3,6 +3,9 @@
 
 // Learn more: https://jestjs.io/docs/configuration#setupfilesafterenv-array
 
+// Import Jest DOM matchers for React Testing Library
+require('@testing-library/jest-dom')
+
 // Mock environment variables for testing
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only'

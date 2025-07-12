@@ -34,7 +34,7 @@ const customJestConfig = {
   
   // Handle ES modules from node_modules
   transformIgnorePatterns: [
-    'node_modules/(?!(next-auth|@auth|@next/env)/)',
+    'node_modules/(?!(next-auth|@auth|@next/env|marked)/)',
   ],
 }
 
