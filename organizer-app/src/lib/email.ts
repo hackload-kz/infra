@@ -199,22 +199,25 @@ class EmailService {
       return false;
     }
 
-    const subject = 'Welcome to Hackload Hackathon 2025!';
+    const subject = 'Добро пожаловать в Hackload Hackathon 2025!';
     const body = `
-      <h2>Welcome, ${participantName}!</h2>
-      <p>We're excited to have you join <strong>Hackload Hackathon 2025</strong>!</p>
-      <p>Here's what you can do next:</p>
+      <h2>Добро пожаловать, ${participantName}! 🎉</h2>
+      <p>Мы рады приветствовать вас в <strong>Hackload Hackathon 2025</strong>!</p>
+      <p>Вот что вы можете сделать дальше:</p>
       <ul>
-        <li>Complete your participant profile</li>
-        <li>Browse and join teams</li>
-        <li>Check the event schedule</li>
-        <li>Read the hackathon rules and guidelines</li>
+        <li>📝 Заполните ваш профиль участника</li>
+        <li>👥 Найдите команду или создайте собственную</li>
+        <li>📅 Ознакомьтесь с расписанием мероприятия</li>
+        <li>📋 Изучите правила и рекомендации хакатона</li>
       </ul>
-      <p>Visit your participant dashboard to get started:</p>
+      <p>Перейдите в вашу панель управления, чтобы начать:</p>
       <p style="text-align: center; margin: 20px 0;">
         <a href="https://hub.hackload.kz/space" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
-          Go to Dashboard
+          🚀 Перейти в панель управления
         </a>
+      </p>
+      <p style="color: #666; font-size: 14px; margin-top: 20px;">
+        Удачи в хакатоне! Мы уверены, что у вас все получится! 💪
       </p>
     `;
     
@@ -227,15 +230,18 @@ class EmailService {
       return false;
     }
 
-    const subject = `Team Invitation: Join "${teamName}"`;
+    const subject = `Приглашение в команду: "${teamName}"`;
     const body = `
-      <h2>You've been invited to join a team!</h2>
-      <p><strong>${inviterName}</strong> has invited you to join their team <strong>"${teamName}"</strong> for Hackload Hackathon 2025.</p>
-      <p>To accept or decline this invitation, please visit your dashboard:</p>
+      <h2>Вас пригласили в команду! 🎯</h2>
+      <p><strong>${inviterName}</strong> приглашает вас присоединиться к команде <strong>"${teamName}"</strong> для участия в Hackload Hackathon 2025.</p>
+      <p>Чтобы принять или отклонить это приглашение, перейдите в вашу панель управления:</p>
       <p style="text-align: center; margin: 20px 0;">
         <a href="https://hub.hackload.kz/space/team" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
-          View Invitation
+          👀 Просмотреть приглашение
         </a>
+      </p>
+      <p style="color: #666; font-size: 14px; margin-top: 20px;">
+        💡 Не упустите возможность стать частью отличной команды!
       </p>
     `;
     

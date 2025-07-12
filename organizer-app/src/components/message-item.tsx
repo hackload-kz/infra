@@ -84,13 +84,17 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
 
           <div className="mb-3">
             <div 
-              className={`prose prose-sm max-w-none text-gray-900 ${expanded ? '' : 'line-clamp-3'}`}
+              className={`prose prose-sm prose-blue max-w-none text-gray-900 ${expanded ? '' : 'line-clamp-3'}`}
+              style={{
+                lineHeight: '1.6',
+                fontSize: '14px'
+              }}
               dangerouslySetInnerHTML={{ __html: message.body }}
             />
             {message.body.length > 200 && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="text-blue-600 hover:text-blue-800 text-sm mt-1"
+                className="text-blue-600 hover:text-blue-800 text-sm mt-1 font-medium"
               >
                 {expanded ? 'Скрыть' : 'Показать больше'}
               </button>
@@ -108,7 +112,11 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
                     <span>{formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}</span>
                   </div>
                   <div 
-                    className="prose prose-sm max-w-none text-gray-900"
+                    className="prose prose-sm prose-blue max-w-none text-gray-900"
+                    style={{
+                      lineHeight: '1.6',
+                      fontSize: '13px'
+                    }}
                     dangerouslySetInnerHTML={{ __html: reply.body }}
                   />
                 </div>

@@ -123,13 +123,18 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
           {/* Message Body */}
           <div className="mb-4">
             <div 
-              className={`prose prose-sm max-w-none text-gray-900 ${expanded ? '' : 'line-clamp-3'}`}
+              className={`prose prose-sm prose-blue max-w-none text-gray-900 ${expanded ? '' : 'line-clamp-3'}`}
+              style={{
+                lineHeight: '1.6',
+                fontSize: '14px',
+                fontFamily: 'system-ui, -apple-system, sans-serif'
+              }}
               dangerouslySetInnerHTML={{ __html: message.body }}
             />
             {message.body.length > 300 && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="text-blue-600 hover:text-blue-800 text-sm mt-2"
+                className="text-blue-600 hover:text-blue-800 text-sm mt-2 font-medium"
               >
                 {expanded ? 'Скрыть' : 'Показать полностью'}
               </button>

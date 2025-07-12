@@ -1,7 +1,6 @@
 import { db } from '@/lib/db';
 import { emailService } from '@/lib/email';
 import { logger } from '@/lib/logger';
-import { MessageStatus } from '@prisma/client';
 
 export interface CreateMessageInput {
   subject: string;
@@ -18,7 +17,7 @@ export interface MessageWithRelations {
   id: string;
   subject: string;
   body: string;
-  status: MessageStatus;
+  status: 'UNREAD' | 'READ';
   createdAt: Date;
   updatedAt: Date;
   senderId: string | null;
@@ -44,7 +43,7 @@ export interface MessageWithRelations {
     id: string;
     subject: string;
     body: string;
-    status: MessageStatus;
+    status: 'UNREAD' | 'READ';
     createdAt: Date;
     updatedAt: Date;
     senderId: string | null;
@@ -137,7 +136,7 @@ class MessageService {
           hackathonId,
           teamId,
           parentMessageId,
-          status: MessageStatus.UNREAD
+          status: 'UNREAD'
         },
         include: {
           sender: {
@@ -433,7 +432,7 @@ class MessageService {
 
       await db.message.update({
         where: { id: messageId },
-        data: { status: MessageStatus.READ }
+        data: { status: 'READ' }
       });
 
       // Log status change
@@ -465,7 +464,7 @@ class MessageService {
 
       await db.message.update({
         where: { id: messageId },
-        data: { status: MessageStatus.UNREAD }
+        data: { status: 'UNREAD' }
       });
 
       // Log status change
@@ -516,7 +515,7 @@ class MessageService {
       where: {
         recipientId,
         hackathonId,
-        status: MessageStatus.UNREAD
+        status: 'UNREAD'
       }
     });
   }
@@ -813,22 +812,51 @@ class MessageService {
 
   private async sendEmailNotification(message: MessageWithRelations, htmlBody?: string): Promise<void> {
     try {
-      const subject = `New Message: ${message.subject}`;
+      const subject = `Новое сообщение: ${message.subject}`;
       
-      // Use provided HTML body if available, otherwise create default
-      const emailBody = htmlBody || `
-        <h2>You have received a new message</h2>
-        <p><strong>From:</strong> ${message.sender?.name || 'System'}</p>
-        <p><strong>Subject:</strong> ${message.subject}</p>
-        <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px;">
-          ${message.body}
-        </div>
-        <p>
-          <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-            View Message
-          </a>
-        </p>
-      `;
+      // Use provided HTML body if available, otherwise format the message body
+      let emailBody: string;
+      
+      if (htmlBody) {
+        // Use the provided HTML body (from WYSIWYG editor)
+        emailBody = `
+          <h2>📩 Вы получили новое сообщение</h2>
+          <p><strong>От:</strong> ${message.sender?.name || 'Система'}</p>
+          <p><strong>Тема:</strong> ${message.subject}</p>
+          <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
+            ${htmlBody}
+          </div>
+          <p style="text-align: center; margin-top: 25px;">
+            <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              📱 Открыть в панели управления
+            </a>
+          </p>
+          <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
+            💡 Это уведомление отправлено системой Hackload. Для ответа перейдите в панель управления.
+          </p>
+        `;
+      } else {
+        // If message.body contains HTML tags, use it as HTML, otherwise treat as plain text
+        const isHtml = /<[a-z][\s\S]*>/i.test(message.body);
+        const bodyContent = isHtml ? message.body : message.body.replace(/\n/g, '<br>');
+        
+        emailBody = `
+          <h2>📩 Вы получили новое сообщение</h2>
+          <p><strong>От:</strong> ${message.sender?.name || 'Система'}</p>
+          <p><strong>Тема:</strong> ${message.subject}</p>
+          <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 5px; background-color: #f9f9f9;">
+            ${bodyContent}
+          </div>
+          <p style="text-align: center; margin-top: 25px;">
+            <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              📱 Открыть в панели управления
+            </a>
+          </p>
+          <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
+            💡 Это уведомление отправлено системой Hackload. Для ответа перейдите в панель управления.
+          </p>
+        `;
+      }
 
       await emailService.sendHtmlEmail(message.recipient.email, subject, emailBody);
     } catch (error) {
