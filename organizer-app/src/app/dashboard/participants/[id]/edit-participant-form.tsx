@@ -147,14 +147,15 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
 
                 <div>
                     <label htmlFor="githubUrl" className="block text-sm font-semibold text-gray-800 mb-1">
-                        GitHub / GitLab
+                        GitHub *
                     </label>
                     <Input
                         id="githubUrl"
                         type="url"
+                        required
                         value={formData.githubUrl}
                         onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
-                        placeholder="https://github.com/username или https://gitlab.com/username"
+                        placeholder="https://github.com/username"
                     />
                 </div>
 

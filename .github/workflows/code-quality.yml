@@ -82,7 +82,7 @@ jobs:
             echo "🧪 Running tests..." && \
             npm run test:coverage && \
             echo "🏗️  Building application..." && \
-            npm run build && \
+            NODE_OPTIONS="--max_old_space_size=4096" npm run build && \
             echo "✅ All quality checks passed!"
         EOF
         

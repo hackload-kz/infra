@@ -164,18 +164,19 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
 
                         <div>
                             <label htmlFor="githubUrl" className="block text-sm font-medium text-slate-300 mb-2">
-                                GitHub / GitLab
+                                GitHub *
                             </label>
                             <input
                                 id="githubUrl"
                                 type="url"
+                                required
                                 value={formData.githubUrl}
                                 onChange={(e) => setFormData(prev => ({ ...prev, githubUrl: e.target.value }))}
-                                placeholder="https://github.com/username или https://gitlab.com/username"
+                                placeholder="https://github.com/username"
                                 className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
                             />
                             <p className="text-slate-500 text-xs mt-1">
-                                Ссылка на ваш профиль GitHub или GitLab (опционально)
+                                Ссылка на ваш профиль GitHub (обязательное поле)
                             </p>
                         </div>
 

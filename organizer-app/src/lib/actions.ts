@@ -2,10 +2,11 @@
 
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { TeamStatus } from '@prisma/client'
+import { TeamStatus, BannerType } from '@prisma/client'
 import { getCurrentHackathon } from '@/lib/hackathon'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
+import { dismissBanner } from '@/lib/banners'
 
 
 export async function createTeam(formData: FormData) {
@@ -897,6 +898,24 @@ export async function removeTeamMember(teamId: string, memberId: string, leaderI
         revalidatePath('/dashboard/teams')
     } catch (error) {
         console.error('Error removing team member:', error)
+        throw error
+    }
+}
+
+export async function dismissBannerAction(
+    participantId: string,
+    hackathonId: string,
+    bannerType: BannerType
+) {
+    if (!participantId || !hackathonId || !bannerType) {
+        throw new Error('All parameters are required')
+    }
+
+    try {
+        await dismissBanner(participantId, hackathonId, bannerType)
+        revalidatePath('/space')
+    } catch (error) {
+        console.error('Error dismissing banner:', error)
         throw error
     }
 }

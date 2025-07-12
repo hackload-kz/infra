@@ -108,7 +108,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                         rel="noopener noreferrer"
                                         className="hover:text-blue-600"
                                     >
-                                        GitHub/GitLab
+                                        GitHub
                                     </a>
                                 </div>
                             )}

@@ -4,6 +4,8 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { MessageNotifications } from '@/components/message-notifications'
+import { BannerList } from '@/components/banner-notification'
+import { getActiveBanners } from '@/lib/banners'
 import Link from 'next/link'
 import { 
   Trophy,
@@ -33,8 +35,16 @@ export default async function PersonalCabinetPage() {
     },
     include: {
       user: true,
-      team: true,
-      ledTeam: true,
+      team: {
+        include: {
+          members: true
+        }
+      },
+      ledTeam: {
+        include: {
+          members: true
+        }
+      },
       hackathonParticipations: {
         include: {
           hackathon: true
@@ -149,6 +159,27 @@ export default async function PersonalCabinetPage() {
     throw new Error('Participant should exist at this point in the code flow')
   }
 
+  // Get active banners for participant
+  const activeBanners = hackathon ? await getActiveBanners(
+    participant.id, 
+    hackathon.id,
+    {
+      id: participant.id,
+      telegram: participant.telegram,
+      githubUrl: participant.githubUrl,
+      team: participant.team ? {
+        id: participant.team.id,
+        name: participant.team.name,
+        members: participant.team.members
+      } : null,
+      ledTeam: participant.ledTeam ? {
+        id: participant.ledTeam.id,
+        name: participant.ledTeam.name,
+        members: participant.ledTeam.members
+      } : null
+    }
+  ) : []
+
   return (
     <PersonalCabinetLayout user={user}>
       {/* Page Title */}
@@ -158,6 +189,15 @@ export default async function PersonalCabinetPage() {
         </h1>
         <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full"></div>
       </div>
+
+      {/* Banner Notifications */}
+      {hackathon && (
+        <BannerList 
+          banners={activeBanners}
+          participantId={participant.id}
+          hackathonId={hackathon.id}
+        />
+      )}
 
       {/* Dashboard Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -199,7 +239,7 @@ export default async function PersonalCabinetPage() {
                     rel="noopener noreferrer" 
                     className="text-slate-300 hover:text-amber-400 transition-colors truncate"
                   >
-                    GitHub/GitLab
+                    GitHub
                   </a>
                 </div>
               )}
