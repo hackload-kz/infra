@@ -6,6 +6,97 @@
 // Import Jest DOM matchers for React Testing Library
 require('@testing-library/jest-dom')
 
+// Polyfill Web APIs for Node.js test environment
+const { TextEncoder, TextDecoder } = require('util')
+const { Readable } = require('stream')
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// Polyfill ReadableStream
+global.ReadableStream = class ReadableStream {
+  constructor(source) {
+    this.source = source
+  }
+}
+
+// Simple mock for Request and Response
+global.Request = class Request {
+  constructor(url, options = {}) {
+    // Create a URL-like object that works with NextRequest
+    Object.defineProperty(this, 'url', {
+      value: url,
+      writable: false,
+      enumerable: true,
+      configurable: false
+    })
+    this.method = options.method || 'GET'
+    this.headers = new Map(Object.entries(options.headers || {}))
+    this.body = options.body
+  }
+  
+  async json() {
+    return this.body ? JSON.parse(this.body) : null
+  }
+  
+  async text() {
+    return this.body || ''
+  }
+}
+
+global.Response = class Response {
+  constructor(body, options = {}) {
+    this.body = body
+    this.status = options.status || 200
+    this.statusText = options.statusText || 'OK'
+    this.headers = new Map(Object.entries(options.headers || {}))
+  }
+  
+  async json() {
+    return typeof this.body === 'string' ? JSON.parse(this.body) : this.body
+  }
+  
+  async text() {
+    return typeof this.body === 'string' ? this.body : JSON.stringify(this.body)
+  }
+  
+  static json(data, options = {}) {
+    return new Response(data, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    })
+  }
+  
+  static redirect(url, status = 302) {
+    return new Response(null, {
+      status,
+      headers: {
+        'Location': url.toString()
+      }
+    })
+  }
+}
+
+// Mock Headers
+global.Headers = class Headers extends Map {
+  constructor(init) {
+    super()
+    if (init) {
+      if (Array.isArray(init)) {
+        init.forEach(([key, value]) => this.set(key, value))
+      } else if (typeof init === 'object') {
+        Object.entries(init).forEach(([key, value]) => this.set(key, value))
+      }
+    }
+  }
+}
+
+// Mock fetch for tests
+global.fetch = jest.fn()
+
 // Mock environment variables for testing
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only'

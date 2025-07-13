@@ -5,7 +5,10 @@ import { BannerType } from '@prisma/client'
 
 // Mock the markdown library that causes ES module issues
 jest.mock('marked', () => {
-  const mockMarked = jest.fn().mockReturnValue('<p>mocked html</p>')
+  const mockMarked = jest.fn().mockReturnValue('<p>mocked html</p>') as jest.MockedFunction<any> & {
+    setOptions: jest.MockedFunction<any>
+    parse: jest.MockedFunction<any>
+  }
   mockMarked.setOptions = jest.fn()
   mockMarked.parse = jest.fn().mockReturnValue('<p>mocked html</p>')
   return {

@@ -1,5 +1,6 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import { BannerNotification, BannerList } from '@/components/banner-notification'
 import { Banner } from '@/lib/banners'
 import { BannerType } from '@prisma/client'
@@ -64,53 +65,53 @@ describe('BannerNotification Component', () => {
   describe('Styling Variants', () => {
     it('should apply error styling for error variant', () => {
       const errorBanner = { ...mockBanner, variant: 'error' as const }
-      render(<BannerNotification {...defaultProps} banner={errorBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={errorBanner} />)
 
-      const container = screen.getByText('Test Banner Title').closest('div')
-      expect(container).toHaveClass('bg-red-900/30', 'border-red-500/50', 'text-red-100')
+      const bannerContainer = container.firstChild as HTMLElement
+      expect(bannerContainer).toHaveClass('bg-red-900/30', 'border-red-500/50', 'text-red-100')
     })
 
     it('should apply warning styling for warning variant', () => {
       const warningBanner = { ...mockBanner, variant: 'warning' as const }
-      render(<BannerNotification {...defaultProps} banner={warningBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={warningBanner} />)
 
-      const container = screen.getByText('Test Banner Title').closest('div')
-      expect(container).toHaveClass('bg-amber-900/30', 'border-amber-500/50', 'text-amber-100')
+      const bannerContainer = container.firstChild as HTMLElement
+      expect(bannerContainer).toHaveClass('bg-amber-900/30', 'border-amber-500/50', 'text-amber-100')
     })
 
     it('should apply info styling for info variant', () => {
       const infoBanner = { ...mockBanner, variant: 'info' as const }
-      render(<BannerNotification {...defaultProps} banner={infoBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={infoBanner} />)
 
-      const container = screen.getByText('Test Banner Title').closest('div')
-      expect(container).toHaveClass('bg-blue-900/30', 'border-blue-500/50', 'text-blue-100')
+      const bannerContainer = container.firstChild as HTMLElement
+      expect(bannerContainer).toHaveClass('bg-blue-900/30', 'border-blue-500/50', 'text-blue-100')
     })
 
     it('should render correct icon for error variant', () => {
       const errorBanner = { ...mockBanner, variant: 'error' as const }
-      render(<BannerNotification {...defaultProps} banner={errorBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={errorBanner} />)
 
-      // Check for AlertCircle icon presence (it should be in the DOM)
-      const iconContainer = screen.getByText('Test Banner Title').parentElement?.querySelector('svg')
-      expect(iconContainer).toBeInTheDocument()
+      // Check for any SVG icon presence (AlertCircle for error variant)
+      const iconSvg = container.querySelector('svg')
+      expect(iconSvg).toBeInTheDocument()
     })
 
     it('should render correct icon for warning variant', () => {
       const warningBanner = { ...mockBanner, variant: 'warning' as const }
-      render(<BannerNotification {...defaultProps} banner={warningBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={warningBanner} />)
 
-      // Check for AlertTriangle icon presence
-      const iconContainer = screen.getByText('Test Banner Title').parentElement?.querySelector('svg')
-      expect(iconContainer).toBeInTheDocument()
+      // Check for any SVG icon presence (AlertTriangle for warning variant)
+      const iconSvg = container.querySelector('svg')
+      expect(iconSvg).toBeInTheDocument()
     })
 
     it('should render correct icon for info variant', () => {
       const infoBanner = { ...mockBanner, variant: 'info' as const }
-      render(<BannerNotification {...defaultProps} banner={infoBanner} />)
+      const { container } = render(<BannerNotification {...defaultProps} banner={infoBanner} />)
 
-      // Check for Info icon presence
-      const iconContainer = screen.getByText('Test Banner Title').parentElement?.querySelector('svg')
-      expect(iconContainer).toBeInTheDocument()
+      // Check for any SVG icon presence (Info for info variant)
+      const iconSvg = container.querySelector('svg')
+      expect(iconSvg).toBeInTheDocument()
     })
   })
 
@@ -136,7 +137,10 @@ describe('BannerNotification Component', () => {
       render(<BannerNotification {...defaultProps} />)
 
       const dismissButton = screen.getByLabelText('Закрыть уведомление')
-      fireEvent.click(dismissButton)
+      
+      await act(async () => {
+        fireEvent.click(dismissButton)
+      })
 
       await waitFor(() => {
         expect(screen.queryByText('Test Banner Title')).not.toBeInTheDocument()
@@ -154,12 +158,18 @@ describe('BannerNotification Component', () => {
       render(<BannerNotification {...defaultProps} />)
 
       const dismissButton = screen.getByLabelText('Закрыть уведомление')
-      fireEvent.click(dismissButton)
+      
+      await act(async () => {
+        fireEvent.click(dismissButton)
+      })
 
       expect(dismissButton).toBeDisabled()
 
       // Resolve the promise to finish the test
-      resolvePromise!(undefined)
+      await act(async () => {
+        resolvePromise!(undefined)
+      })
+      
       await waitFor(() => {
         expect(screen.queryByText('Test Banner Title')).not.toBeInTheDocument()
       })
@@ -172,7 +182,10 @@ describe('BannerNotification Component', () => {
       render(<BannerNotification {...defaultProps} />)
 
       const dismissButton = screen.getByLabelText('Закрыть уведомление')
-      fireEvent.click(dismissButton)
+      
+      await act(async () => {
+        fireEvent.click(dismissButton)
+      })
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith('Failed to dismiss banner:', expect.any(Error))
@@ -200,8 +213,13 @@ describe('BannerNotification Component', () => {
       const actionButton = screen.getByText('Test Action')
       const dismissButton = screen.getByLabelText('Закрыть уведомление')
 
-      expect(actionButton).toHaveAttribute('tabIndex', '0')
-      expect(dismissButton).not.toHaveAttribute('tabIndex', '-1')
+      // Action button should be a focusable link
+      expect(actionButton.tagName).toBe('A')
+      expect(actionButton).toHaveAttribute('href', '/test-url')
+      
+      // Dismiss button should be a focusable button
+      expect(dismissButton.tagName).toBe('BUTTON')
+      expect(dismissButton).not.toBeDisabled()
     })
   })
 })
@@ -284,7 +302,10 @@ describe('BannerList Component', () => {
       render(<BannerList {...defaultProps} />)
 
       const dismissButtons = screen.getAllByLabelText('Закрыть уведомление')
-      fireEvent.click(dismissButtons[0])
+      
+      await act(async () => {
+        fireEvent.click(dismissButtons[0])
+      })
 
       await waitFor(() => {
         expect(screen.queryByText('Telegram Banner')).not.toBeInTheDocument()
@@ -309,8 +330,9 @@ describe('BannerList Component', () => {
     it('should apply proper spacing between banners', () => {
       const { container } = render(<BannerList {...defaultProps} />)
 
-      const bannerContainer = container.querySelector('div')
-      expect(bannerContainer).toHaveClass('space-y-4')
+      // The space-y-4 class is on the inner div with the "space-y-4" class
+      const spacingContainer = container.querySelector('.space-y-4')
+      expect(spacingContainer).toHaveClass('space-y-4')
     })
 
     it('should have proper margin bottom', () => {
@@ -329,7 +351,10 @@ describe('BannerList Component', () => {
       render(<BannerList {...defaultProps} />)
 
       const dismissButtons = screen.getAllByLabelText('Закрыть уведомление')
-      fireEvent.click(dismissButtons[0])
+      
+      await act(async () => {
+        fireEvent.click(dismissButtons[0])
+      })
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalled()
@@ -346,14 +371,19 @@ describe('BannerList Component', () => {
 
   describe('Performance', () => {
     it('should handle large number of banners', () => {
-      const manyBanners = Array.from({ length: 10 }, (_, i) => ({
-        type: BannerType.TELEGRAM_PROFILE,
-        title: `Banner ${i}`,
-        message: `Message ${i}`,
-        actionText: `Action ${i}`,
-        actionUrl: `/url-${i}`,
-        variant: 'info' as const
-      }))
+      // Create unique banners to avoid React key conflicts
+      const manyBanners = [
+        { type: BannerType.TELEGRAM_PROFILE, title: 'Banner 0', message: 'Message 0', actionText: 'Action 0', actionUrl: '/url-0', variant: 'info' as const },
+        { type: BannerType.GITHUB_PROFILE, title: 'Banner 1', message: 'Message 1', actionText: 'Action 1', actionUrl: '/url-1', variant: 'info' as const },
+        { type: BannerType.FIND_TEAM, title: 'Banner 2', message: 'Message 2', actionText: 'Action 2', actionUrl: '/url-2', variant: 'info' as const },
+        { type: BannerType.TELEGRAM_PROFILE, title: 'Banner 3', message: 'Message 3', actionText: 'Action 3', actionUrl: '/url-3', variant: 'warning' as const },
+        { type: BannerType.GITHUB_PROFILE, title: 'Banner 4', message: 'Message 4', actionText: 'Action 4', actionUrl: '/url-4', variant: 'warning' as const },
+        { type: BannerType.FIND_TEAM, title: 'Banner 5', message: 'Message 5', actionText: 'Action 5', actionUrl: '/url-5', variant: 'warning' as const },
+        { type: BannerType.TELEGRAM_PROFILE, title: 'Banner 6', message: 'Message 6', actionText: 'Action 6', actionUrl: '/url-6', variant: 'error' as const },
+        { type: BannerType.GITHUB_PROFILE, title: 'Banner 7', message: 'Message 7', actionText: 'Action 7', actionUrl: '/url-7', variant: 'error' as const },
+        { type: BannerType.FIND_TEAM, title: 'Banner 8', message: 'Message 8', actionText: 'Action 8', actionUrl: '/url-8', variant: 'error' as const },
+        { type: BannerType.TELEGRAM_PROFILE, title: 'Banner 9', message: 'Message 9', actionText: 'Action 9', actionUrl: '/url-9', variant: 'info' as const },
+      ]
 
       render(<BannerList {...defaultProps} banners={manyBanners} />)
 

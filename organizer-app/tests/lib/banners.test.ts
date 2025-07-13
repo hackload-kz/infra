@@ -23,6 +23,12 @@ jest.mock('@/lib/db', () => ({
   },
 }))
 
+// Get typed mock instance  
+const mockDbDismissedBanner = {
+  findMany: db.dismissedBanner.findMany as jest.MockedFunction<typeof db.dismissedBanner.findMany>,
+  upsert: db.dismissedBanner.upsert as jest.MockedFunction<typeof db.dismissedBanner.upsert>,
+}
+
 
 describe('Banner Calculation Logic', () => {
   beforeEach(() => {
@@ -320,11 +326,11 @@ describe('Banner Calculation Logic', () => {
 
   describe('getActiveBanners', () => {
     beforeEach(() => {
-      db.dismissedBanner.findMany.mockReset()
+      mockDbDismissedBanner.findMany.mockClear()
     })
 
     it('should return all banners when none are dismissed', async () => {
-      db.dismissedBanner.findMany.mockResolvedValue([])
+      mockDbDismissedBanner.findMany.mockResolvedValue([])
 
       const participant = createMockParticipantForBanner({
         telegram: null,
@@ -336,7 +342,7 @@ describe('Banner Calculation Logic', () => {
       const banners = await getActiveBanners('participant-1', 'hackathon-1', participant)
 
       expect(banners).toHaveLength(3)
-      expect(db.dismissedBanner.findMany).toHaveBeenCalledWith({
+      expect(mockDbDismissedBanner.findMany).toHaveBeenCalledWith({
         where: {
           participantId: 'participant-1',
           hackathonId: 'hackathon-1'
@@ -348,8 +354,14 @@ describe('Banner Calculation Logic', () => {
     })
 
     it('should filter out dismissed banners', async () => {
-      db.dismissedBanner.findMany.mockResolvedValue([
-        { bannerType: BannerType.TELEGRAM_PROFILE }
+      mockDbDismissedBanner.findMany.mockResolvedValue([
+        { 
+          id: 'dismissed-1',
+          bannerType: BannerType.TELEGRAM_PROFILE,
+          participantId: 'participant-1',
+          hackathonId: 'hackathon-1',
+          dismissedAt: new Date()
+        }
       ])
 
       const participant = createMockParticipantForBanner({
@@ -368,10 +380,28 @@ describe('Banner Calculation Logic', () => {
     })
 
     it('should return empty array when all banners are dismissed', async () => {
-      db.dismissedBanner.findMany.mockResolvedValue([
-        { bannerType: BannerType.TELEGRAM_PROFILE },
-        { bannerType: BannerType.GITHUB_PROFILE },
-        { bannerType: BannerType.FIND_TEAM }
+      mockDbDismissedBanner.findMany.mockResolvedValue([
+        { 
+          id: 'dismissed-1',
+          bannerType: BannerType.TELEGRAM_PROFILE,
+          participantId: 'participant-1',
+          hackathonId: 'hackathon-1',
+          dismissedAt: new Date()
+        },
+        { 
+          id: 'dismissed-2',
+          bannerType: BannerType.GITHUB_PROFILE,
+          participantId: 'participant-1',
+          hackathonId: 'hackathon-1',
+          dismissedAt: new Date()
+        },
+        { 
+          id: 'dismissed-3',
+          bannerType: BannerType.FIND_TEAM,
+          participantId: 'participant-1',
+          hackathonId: 'hackathon-1',
+          dismissedAt: new Date()
+        }
       ])
 
       const participant = createMockParticipantForBanner({
@@ -387,7 +417,7 @@ describe('Banner Calculation Logic', () => {
     })
 
     it('should handle database errors gracefully', async () => {
-      db.dismissedBanner.findMany.mockRejectedValue(new Error('Database error'))
+      mockDbDismissedBanner.findMany.mockRejectedValue(new Error('Database error'))
 
       const participant = createMockParticipantForBanner({
         telegram: null,
@@ -402,11 +432,11 @@ describe('Banner Calculation Logic', () => {
 
   describe('dismissBanner', () => {
     beforeEach(() => {
-      db.dismissedBanner.upsert.mockReset()
+      mockDbDismissedBanner.upsert.mockClear()
     })
 
     it('should successfully dismiss a banner', async () => {
-      db.dismissedBanner.upsert.mockResolvedValue({
+      mockDbDismissedBanner.upsert.mockResolvedValue({
         id: 'dismissed-1',
         participantId: 'participant-1',
         hackathonId: 'hackathon-1',
@@ -416,7 +446,7 @@ describe('Banner Calculation Logic', () => {
 
       await dismissBanner('participant-1', 'hackathon-1', BannerType.TELEGRAM_PROFILE)
 
-      expect(db.dismissedBanner.upsert).toHaveBeenCalledWith({
+      expect(mockDbDismissedBanner.upsert).toHaveBeenCalledWith({
         where: {
           participantId_bannerType_hackathonId: {
             participantId: 'participant-1',
@@ -436,7 +466,7 @@ describe('Banner Calculation Logic', () => {
     })
 
     it('should handle already dismissed banner (idempotent)', async () => {
-      db.dismissedBanner.upsert.mockResolvedValue({
+      mockDbDismissedBanner.upsert.mockResolvedValue({
         id: 'dismissed-1',
         participantId: 'participant-1',
         hackathonId: 'hackathon-1',
@@ -449,7 +479,7 @@ describe('Banner Calculation Logic', () => {
     })
 
     it('should handle database errors', async () => {
-      db.dismissedBanner.upsert.mockRejectedValue(new Error('Database error'))
+      mockDbDismissedBanner.upsert.mockRejectedValue(new Error('Database error'))
 
       await expect(dismissBanner('participant-1', 'hackathon-1', BannerType.TELEGRAM_PROFILE)).rejects.toThrow('Database error')
     })

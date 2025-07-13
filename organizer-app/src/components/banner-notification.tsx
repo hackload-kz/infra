@@ -109,9 +109,9 @@ export function BannerList({ banners, participantId, hackathonId }: BannerListPr
   return (
     <div className="mb-8">
       <div className="space-y-4">
-        {banners.map((banner) => (
+        {banners.map((banner, index) => (
           <BannerNotification
-            key={banner.type}
+            key={`${banner.type}-${index}`}
             banner={banner}
             participantId={participantId}
             hackathonId={hackathonId}
