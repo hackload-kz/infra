@@ -10,9 +10,15 @@ require('@testing-library/jest-dom')
 // This tells React Testing Library to use the built-in act from React
 global.IS_REACT_ACT_ENVIRONMENT = true
 
-// Ensure React's act is available for React Testing Library
-if (typeof global.React === 'undefined') {
-  global.React = require('react')
+// Fix for React 19 + React Testing Library compatibility
+// React 19 moved act to the main React package, but React Testing Library
+// still looks for it in react-dom/test-utils
+const React = require('react')
+const ReactDOMTestUtils = require('react-dom/test-utils')
+
+// Polyfill act in react-dom/test-utils if it doesn't exist
+if (!ReactDOMTestUtils.act && React.act) {
+  ReactDOMTestUtils.act = React.act
 }
 
 // Polyfill Web APIs for Node.js test environment
