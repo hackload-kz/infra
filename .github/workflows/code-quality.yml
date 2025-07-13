@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || 'hackload-kz/infra-base' }}
+  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || github.repository }}-base
 
 jobs:
   determine-base-image:
@@ -82,6 +82,8 @@ jobs:
             npm ci --include=dev --no-audit --no-fund && \
             echo "🏗️  Generating Prisma Client..." && \
             npx prisma generate && \
+            echo "🔧 Ensuring React.act compatibility..." && \
+            node -e "const fs=require('fs'); const setup=fs.readFileSync('jest.setup.js','utf8'); if(!setup.includes('ReactDOMTestUtils.act')){console.error('React.act fix missing in jest.setup.js'); process.exit(1);}" && \
             echo "🔍 Running ESLint..." && \
             npm run lint && \
             echo "🔍 Type checking..." && \

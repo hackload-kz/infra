@@ -24,7 +24,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || 'hackload-kz/infra-base' }}
+  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || github.repository_owner }}/infra-base
 
 jobs:
   quality-gate:
@@ -39,6 +39,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: write
 
     steps:
     - name: Checkout repository
@@ -48,11 +49,11 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    # Determine base image tag to use
-    - name: Determine base image strategy
+    # Enhanced base image existence check and strategy
+    - name: Check base image availability
       id: check-base
       run: |
         BASE_IMAGE_REPO="ghcr.io/${{ env.BASE_IMAGE_NAME }}"
@@ -60,6 +61,37 @@ jobs:
         echo "package-hash=$PACKAGE_HASH" >> $GITHUB_OUTPUT
         echo "base-image-repo=$BASE_IMAGE_REPO" >> $GITHUB_OUTPUT
         echo "🏷️ Using base image repository: $BASE_IMAGE_REPO"
+        echo "🔢 Package hash: $PACKAGE_HASH"
+        
+        # Function to check if image exists
+        check_image_exists() {
+          local tag=$1
+          echo "🔍 Checking if image exists: $BASE_IMAGE_REPO:$tag"
+          
+          # Try multiple methods to check image existence
+          if docker manifest inspect "$BASE_IMAGE_REPO:$tag" > /dev/null 2>&1; then
+            echo "✅ Image exists via docker manifest: $tag"
+            return 0
+          fi
+          
+          # Fallback: try with crane
+          if command -v crane > /dev/null 2>&1; then
+            if crane manifest "$BASE_IMAGE_REPO:$tag" > /dev/null 2>&1; then
+              echo "✅ Image exists via crane: $tag"
+              return 0
+            fi
+          fi
+          
+          # Final fallback: try curl to check registry
+          if curl -sf -H "Authorization: Bearer $(echo '${{ secrets.GITHUB_TOKEN }}' | base64)" \
+                  "https://ghcr.io/v2/${{ env.BASE_IMAGE_NAME }}/manifests/$tag" > /dev/null 2>&1; then
+            echo "✅ Image exists via API: $tag"
+            return 0
+          fi
+          
+          echo "❌ Image does not exist: $tag"
+          return 1
+        }
         
         # Check if custom base image tag is provided
         if [[ -n "${{ github.event.inputs.base_image_tag }}" ]]; then
@@ -68,93 +100,179 @@ jobs:
           echo "using-custom-tag=true" >> $GITHUB_OUTPUT
           echo "🎯 Using custom base image tag: $CUSTOM_TAG"
           
-          # Check if custom tag exists with better error handling
-          echo "🔍 Checking if base image exists: $BASE_IMAGE_REPO:$CUSTOM_TAG"
-          if docker manifest inspect "$BASE_IMAGE_REPO:$CUSTOM_TAG" > /dev/null 2>&1; then
+          if check_image_exists "$CUSTOM_TAG"; then
             echo "base-image-available=true" >> $GITHUB_OUTPUT
-            echo "✅ Custom base image $CUSTOM_TAG exists"
+            echo "needs-base-build=false" >> $GITHUB_OUTPUT
           else
             echo "base-image-available=false" >> $GITHUB_OUTPUT
-            echo "❌ Custom base image $CUSTOM_TAG does not exist"
-            echo "🔍 Trying to list available tags..."
-            docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" | head -10 || echo "Could not list tags"
+            echo "needs-base-build=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Custom base image tag '$CUSTOM_TAG' not found"
           fi
         else
           echo "using-custom-tag=false" >> $GITHUB_OUTPUT
           # Use automatic logic based on package hash
           PKG_TAG="pkg-$PACKAGE_HASH"
           
-          if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
+          echo "🔍 Checking for package-specific base image: $PKG_TAG"
+          if check_image_exists "$PKG_TAG"; then
             echo "base-image-available=true" >> $GITHUB_OUTPUT
             echo "base-image-tag=$PKG_TAG" >> $GITHUB_OUTPUT
-            echo "✅ Base image with package hash exists: $PKG_TAG"
+            echo "needs-base-build=false" >> $GITHUB_OUTPUT
+            echo "✅ Found package-specific base image: $PKG_TAG"
           else
-            echo "base-image-available=false" >> $GITHUB_OUTPUT
-            echo "base-image-tag=latest" >> $GITHUB_OUTPUT
-            echo "❌ Base image with package hash does not exist: $PKG_TAG"
-            echo "💡 Will use 'latest' and potentially trigger rebuild"
+            echo "❌ Package-specific base image not found: $PKG_TAG"
+            
+            # Check if 'latest' exists as fallback
+            echo "🔍 Checking for 'latest' base image as fallback"
+            if check_image_exists "latest"; then
+              echo "base-image-available=true" >> $GITHUB_OUTPUT
+              echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+              echo "needs-base-build=true" >> $GITHUB_OUTPUT
+              echo "⚠️ Using 'latest' base image, but will trigger rebuild for package-specific version"
+            else
+              echo "base-image-available=false" >> $GITHUB_OUTPUT
+              echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+              echo "needs-base-build=true" >> $GITHUB_OUTPUT
+              echo "❌ No base image found at all - must build from scratch"
+            fi
           fi
         fi
+        
+        # Show available tags for debugging
+        echo "📋 Available base image tags:"
+        docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" 2>/dev/null | head -10 || echo "Could not list tags (image might not exist yet)"
 
     # Trigger base image build if needed
     - name: Trigger base image build
       if: |
-        (steps.check-base.outputs.base-image-available == 'false' && steps.check-base.outputs.using-custom-tag == 'false') ||
+        steps.check-base.outputs.needs-base-build == 'true' ||
         github.event.inputs.force_base_rebuild == 'true'
       uses: actions/github-script@v7
       with:
         script: |
           const { owner, repo } = context.repo;
-          const usingCustomTag = '${{ steps.check-base.outputs.using-custom-tag }}';
+          const needsBaseBuild = '${{ steps.check-base.outputs.needs-base-build }}';
           const forceRebuild = '${{ github.event.inputs.force_base_rebuild }}';
+          const baseImageAvailable = '${{ steps.check-base.outputs.base-image-available }}';
+          const packageHash = '${{ steps.check-base.outputs.package-hash }}';
           
           console.log('🔨 Triggering base image build...');
-          console.log(`Using custom tag: ${usingCustomTag}`);
+          console.log(`Needs base build: ${needsBaseBuild}`);
           console.log(`Force rebuild: ${forceRebuild}`);
+          console.log(`Base image available: ${baseImageAvailable}`);
+          console.log(`Package hash: ${packageHash}`);
           
-          await github.rest.actions.createWorkflowDispatch({
-            owner,
-            repo,
-            workflow_id: 'base-image-build.yml',
-            ref: context.ref,
-            inputs: {
-              force_rebuild: forceRebuild || 'true'
-            }
-          });
-          
-          console.log('✅ Base image build triggered successfully');
+          try {
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: 'base-image-build.yml',
+              ref: context.ref,
+              inputs: {
+                force_rebuild: forceRebuild === 'true' ? 'true' : 'false'
+              }
+            });
+            
+            console.log('✅ Base image build triggered successfully');
+            console.log(`API Response status: ${response.status}`);
+            
+            // Set output for the waiting step
+            core.setOutput('build-triggered', 'true');
+          } catch (error) {
+            console.error('❌ Failed to trigger base image build:', error);
+            core.setFailed(`Failed to trigger base image build: ${error.message}`);
+          }
 
     # Wait for base image build completion
     - name: Wait for base image build completion
+      id: wait-base-build
       if: |
-        (steps.check-base.outputs.base-image-available == 'false' && steps.check-base.outputs.using-custom-tag == 'false') ||
+        steps.check-base.outputs.needs-base-build == 'true' ||
         github.event.inputs.force_base_rebuild == 'true'
       run: |
         echo "⏳ Waiting for base image build to complete..."
         
-        # Wait up to 10 minutes for the workflow to complete
-        for i in {1..60}; do
-          echo "Checking workflow status... (attempt $i/60)"
+        PACKAGE_HASH="${{ steps.check-base.outputs.package-hash }}"
+        PKG_TAG="pkg-$PACKAGE_HASH"
+        BASE_IMAGE_REPO="${{ steps.check-base.outputs.base-image-repo }}"
+        USING_CUSTOM_TAG="${{ steps.check-base.outputs.using-custom-tag }}"
+        CUSTOM_TAG="${{ github.event.inputs.base_image_tag }}"
+        
+        # Determine what tag to wait for
+        if [[ "$USING_CUSTOM_TAG" == "true" && -n "$CUSTOM_TAG" ]]; then
+          TARGET_TAG="$CUSTOM_TAG"
+          echo "🎯 Waiting for custom tag: $TARGET_TAG"
+        else
+          TARGET_TAG="$PKG_TAG"
+          echo "🎯 Waiting for package-specific tag: $TARGET_TAG"
+        fi
+        
+        # Function to check if target image exists
+        check_target_image() {
+          local tag=$1
+          if docker manifest inspect "$BASE_IMAGE_REPO:$tag" > /dev/null 2>&1; then
+            return 0
+          fi
           
-          # Check if the base image is now available
-          PACKAGE_HASH="${{ steps.check-base.outputs.package-hash }}"
-          PKG_TAG="pkg-$PACKAGE_HASH"
-          BASE_IMAGE_REPO="${{ steps.check-base.outputs.base-image-repo }}"
+          # Also check with crane as fallback
+          if command -v crane > /dev/null 2>&1; then
+            if crane manifest "$BASE_IMAGE_REPO:$tag" > /dev/null 2>&1; then
+              return 0
+            fi
+          fi
           
-          if docker manifest inspect "$BASE_IMAGE_REPO:$PKG_TAG" > /dev/null 2>&1; then
-            echo "✅ Base image build completed successfully"
+          return 1
+        }
+        
+        # Wait up to 15 minutes for the workflow to complete
+        MAX_ATTEMPTS=90
+        SLEEP_INTERVAL=10
+        
+        for i in $(seq 1 $MAX_ATTEMPTS); do
+          echo "🔍 Checking build progress... (attempt $i/$MAX_ATTEMPTS)"
+          
+          if check_target_image "$TARGET_TAG"; then
+            echo "✅ Base image build completed successfully!"
+            echo "🏷️ Image available: $BASE_IMAGE_REPO:$TARGET_TAG"
+            
+            # Also check if latest tag was updated
+            if [[ "$TARGET_TAG" != "latest" ]]; then
+              if check_target_image "latest"; then
+                echo "✅ Latest tag also updated: $BASE_IMAGE_REPO:latest"
+              fi
+            fi
+            
             exit 0
           fi
           
-          if [[ $i -lt 60 ]]; then
-            sleep 10
+          # Show progress every 5th attempt
+          if [[ $((i % 5)) -eq 0 ]]; then
+            echo "📊 Progress update ($i/$MAX_ATTEMPTS attempts):"
+            echo "   Target: $BASE_IMAGE_REPO:$TARGET_TAG"
+            
+            # Show latest available tags
+            echo "📋 Current available tags:"
+            docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" 2>/dev/null | head -5 || echo "   Could not list tags"
+          fi
+          
+          if [[ $i -lt $MAX_ATTEMPTS ]]; then
+            sleep $SLEEP_INTERVAL
           fi
         done
         
-        echo "❌ Timeout waiting for base image build"
-        echo "🔍 Available base images:"
-        docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" | head -10 || true
-        exit 1
+        echo "❌ Timeout waiting for base image build (${MAX_ATTEMPTS} attempts over $((MAX_ATTEMPTS * SLEEP_INTERVAL / 60)) minutes)"
+        echo "🔍 Final available base images:"
+        docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" | head -10 || echo "Could not list tags"
+        
+        # Don't fail completely - we might be able to use 'latest' as fallback
+        if [[ "$TARGET_TAG" != "latest" ]] && check_target_image "latest"; then
+          echo "⚠️ Target image not found, but 'latest' is available"
+          echo "🔄 Will continue with 'latest' base image"
+          echo "base-image-tag=latest" >> $GITHUB_OUTPUT
+        else
+          echo "💥 No usable base image available - build cannot continue"
+          exit 1
+        fi
 
     # Fallback: Use latest if custom tag doesn't exist and we can't rebuild
     - name: Fallback to latest base image
@@ -199,10 +317,37 @@ jobs:
     - name: Resolve final base image tag
       id: final-base-tag
       run: |
-        FINAL_TAG="${{ steps.fallback-base.outputs.base-image-tag || steps.check-base.outputs.base-image-tag }}"
+        # Priority order: wait-step output -> fallback-step output -> check-base output
+        WAIT_TAG="${{ steps.wait-base-build.outputs.base-image-tag || '' }}"
+        FALLBACK_TAG="${{ steps.fallback-base.outputs.base-image-tag || '' }}"
+        CHECK_TAG="${{ steps.check-base.outputs.base-image-tag || 'latest' }}"
+        
+        if [[ -n "$WAIT_TAG" ]]; then
+          FINAL_TAG="$WAIT_TAG"
+          echo "🎯 Using tag from wait step: $FINAL_TAG"
+        elif [[ -n "$FALLBACK_TAG" ]]; then
+          FINAL_TAG="$FALLBACK_TAG"
+          echo "🎯 Using fallback tag: $FINAL_TAG"
+        else
+          FINAL_TAG="$CHECK_TAG"
+          echo "🎯 Using original check tag: $FINAL_TAG"
+        fi
+        
         echo "final-base-tag=$FINAL_TAG" >> $GITHUB_OUTPUT
-        echo "🎯 Final base image tag: $FINAL_TAG"
-        echo "📦 Full base image: ${{ steps.check-base.outputs.base-image-repo }}:$FINAL_TAG"
+        echo "📦 Final base image: ${{ steps.check-base.outputs.base-image-repo }}:$FINAL_TAG"
+        
+        # Verify the final image exists before proceeding
+        BASE_IMAGE_REPO="${{ steps.check-base.outputs.base-image-repo }}"
+        echo "🔍 Verifying final base image exists: $BASE_IMAGE_REPO:$FINAL_TAG"
+        
+        if docker manifest inspect "$BASE_IMAGE_REPO:$FINAL_TAG" > /dev/null 2>&1; then
+          echo "✅ Final base image verified and available"
+        else
+          echo "❌ Final base image not available: $BASE_IMAGE_REPO:$FINAL_TAG"
+          echo "📋 Available tags:"
+          docker run --rm gcr.io/go-containerregistry/crane:latest ls "$BASE_IMAGE_REPO" 2>/dev/null | head -10 || echo "Could not list tags"
+          exit 1
+        fi
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -237,14 +382,18 @@ jobs:
       run: |
         echo "### 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
         echo "- **Quality Gate**: ${{ needs.quality-gate.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Application Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Application Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Used**: ${{ steps.check-base.outputs.base-image-repo }}:${{ steps.final-base-tag.outputs.final-base-tag }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Package Hash**: ${{ steps.check-base.outputs.package-hash }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Custom Tag Used**: ${{ steps.check-base.outputs.using-custom-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Base Image Strategy**: ${{ steps.check-base.outputs.using-custom-tag == 'true' && 'Custom Tag' || 'Package Hash' }}" >> $GITHUB_STEP_SUMMARY
         if [[ "${{ steps.check-base.outputs.using-custom-tag }}" == "true" ]]; then
           echo "- **Custom Tag**: ${{ github.event.inputs.base_image_tag }}" >> $GITHUB_STEP_SUMMARY
         fi
-        echo "- **Base Image Available**: ${{ steps.check-base.outputs.base-image-available }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Base Image Was Available**: ${{ steps.check-base.outputs.base-image-available == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Base Build Triggered**: ${{ steps.check-base.outputs.needs-base-build == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ github.event.inputs.force_base_rebuild }}" == "true" ]]; then
+          echo "- **Force Rebuild**: ✅ Yes" >> $GITHUB_STEP_SUMMARY
+        fi
 
   deploy:
     runs-on: [self-hosted]
