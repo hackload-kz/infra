@@ -11,19 +11,51 @@ require('@testing-library/jest-dom')
 global.IS_REACT_ACT_ENVIRONMENT = true
 
 // Fix for React 19 + React Testing Library compatibility
-// Provide a working act implementation for react-dom/test-utils
-const ReactDOMTestUtils = require('react-dom/test-utils')
-
-// Provide act implementation that React Testing Library expects
-if (!ReactDOMTestUtils.act) {
-  ReactDOMTestUtils.act = function act(callback) {
-    const result = callback()
-    if (result && typeof result.then === 'function') {
-      return result
+// React 19 moved act from react-dom/test-utils to react, but RTL still expects it in the old location
+try {
+  const ReactDOMTestUtils = require('react-dom/test-utils')
+  const React = require('react')
+  
+  // If ReactDOMTestUtils.act doesn't exist, create it
+  if (!ReactDOMTestUtils.act) {
+    // Try to use React's act first
+    if (React.act) {
+      ReactDOMTestUtils.act = React.act
+    } else {
+      // Fallback implementation
+      ReactDOMTestUtils.act = function act(callback) {
+        const result = callback()
+        if (result && typeof result.then === 'function') {
+          return result
+        }
+        return Promise.resolve(result)
+      }
     }
-    return Promise.resolve(result)
   }
+  
+  // Also ensure React.act exists globally for testing-library
+  if (!React.act) {
+    React.act = ReactDOMTestUtils.act
+  }
+  
+} catch (error) {
+  console.warn('Failed to setup React.act compatibility:', error)
 }
+
+// Additional mock to ensure act is available everywhere
+jest.mock('react-dom/test-utils', () => {
+  const original = jest.requireActual('react-dom/test-utils')
+  return {
+    ...original,
+    act: original.act || function act(callback) {
+      const result = callback()
+      if (result && typeof result.then === 'function') {
+        return result
+      }
+      return Promise.resolve(result)
+    }
+  }
+})
 
 // Polyfill Web APIs for Node.js test environment
 const { TextEncoder, TextDecoder } = require('util')
