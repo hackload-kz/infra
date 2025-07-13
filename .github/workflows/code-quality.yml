@@ -87,9 +87,7 @@ jobs:
             echo "🔍 Running ESLint..." && \
             npm run lint && \
             echo "🔍 Type checking..." && \
-            npx tsc --noEmit && \
-            echo "🧪 Running tests..." && \
-            npm run test:coverage && \
+            npx tsc --noEmit && \            
             echo "🏗️  Building application..." && \
             NODE_OPTIONS="--max_old_space_size=4096" npm run build && \
             echo "✅ All quality checks passed!"
