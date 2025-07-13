@@ -40,6 +40,24 @@ enum BannerType {
   TEAM_NEEDS_MEMBERS
 }
 
+enum JournalEventType {
+  PARTICIPANT_CREATED
+  PROFILE_UPDATED
+  MESSAGE_RECEIVED
+  TEAM_CREATED
+  TEAM_UPDATED
+  TEAM_DELETED
+  JOIN_REQUEST_CREATED
+  JOIN_REQUEST_APPROVED
+  JOIN_REQUEST_REJECTED
+  JOINED_TEAM
+  LEFT_TEAM
+  INVITED_TO_TEAM
+  TEAM_STATUS_UPDATED
+  ADMIN_TEAM_EDIT
+  SYSTEM_EVENT
+}
+
 model Hackathon {
   id          String @id @default(cuid())
   name        String
@@ -72,6 +90,7 @@ model Hackathon {
   joinRequests     JoinRequest[]
   messages         Message[]
   dismissedBanners DismissedBanner[]
+  journalEntries   JournalEntry[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -163,6 +182,7 @@ model Participant {
   sentMessages        Message[] @relation("MessageSender")
   receivedMessages    Message[] @relation("MessageRecipient")
   dismissedBanners    DismissedBanner[]
+  journalEntries      JournalEntry[]
 
   @@map("participants")
 }
@@ -236,4 +256,26 @@ model DismissedBanner {
   
   @@unique([participantId, bannerType, hackathonId])
   @@map("dismissed_banners")
+}
+
+model JournalEntry {
+  id            String           @id @default(cuid())
+  eventType     JournalEventType
+  title         String           // Short description of the event
+  description   String?          // Optional longer description
+  entityId      String?          // ID of the related entity (team, message, etc.)
+  entityType    String?          // Type of entity (team, message, user, etc.)
+  isRead        Boolean          @default(false)
+  
+  // Relations
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+  
+  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathonId   String
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("journal_entries")
 }

@@ -19,6 +19,7 @@ import {
   Search
 } from 'lucide-react'
 import { LogoutButton } from './logout-button'
+import { JournalNotificationBell } from './journal-notification-bell'
 
 interface PersonalCabinetLayoutProps {
   children: React.ReactNode
@@ -116,8 +117,7 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
               const isActive = pathname === item.href
               const isDisabled = item.href === '/space/notifications' ||
                                item.href === '/space/calendar' ||
-                               item.href === '/space/tasks' ||
-                               item.href === '/space/journal'
+                               item.href === '/space/tasks'
               
               if (isDisabled) {
                 return (
@@ -194,11 +194,8 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                {/* Notifications */}
-                <button className="relative p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                </button>
+                {/* Journal Notifications */}
+                <JournalNotificationBell />
                 
                 {/* Logout Button */}
                 <LogoutButton 

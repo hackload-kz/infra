@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
-import { LogOut, Home, Users, User, Settings } from 'lucide-react'
+import { LogOut, Home, Users, User, Settings, FileText } from 'lucide-react'
+import { JournalNotificationBell } from '@/components/journal-notification-bell'
 
 interface HeaderProps {
     user?: {
@@ -46,10 +47,16 @@ export function Header({ user, title = "HackLoad 2025", isOrganizer = false }: H
                                     Команды
                                 </Link>
                                 {user && (
-                                    <Link href="/profile" className="flex items-center text-gray-600 hover:text-gray-900">
-                                        <User className="w-4 h-4 mr-1" />
-                                        Профиль
-                                    </Link>
+                                    <>
+                                        <Link href="/profile" className="flex items-center text-gray-600 hover:text-gray-900">
+                                            <User className="w-4 h-4 mr-1" />
+                                            Профиль
+                                        </Link>
+                                        <Link href="/journal" className="flex items-center text-gray-600 hover:text-gray-900">
+                                            <FileText className="w-4 h-4 mr-1" />
+                                            Журнал
+                                        </Link>
+                                    </>
                                 )}
                             </>
                         )}
@@ -58,6 +65,7 @@ export function Header({ user, title = "HackLoad 2025", isOrganizer = false }: H
                 <div className="flex items-center space-x-4">
                     {user ? (
                         <>
+                            {!isOrganizer && <JournalNotificationBell />}
                             <span className="text-sm text-gray-800 font-medium">
                                 {user?.name || user?.email}
                             </span>

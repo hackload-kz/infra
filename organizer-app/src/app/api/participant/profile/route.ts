@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { logger, LogAction } from '@/lib/logger';
+import { trackParticipantCreated, trackTeamCreated, trackProfileUpdated } from '@/lib/journal';
 
 export async function POST(request: NextRequest) {
     try {
@@ -177,11 +178,17 @@ export async function POST(request: NextRequest) {
             isLeader: result.isLeader
         });
 
+        // Track participant creation in journal
+        await trackParticipantCreated(result.participant.id);
+
         if (result.team && result.isLeader) {
             await logger.logCreate('Team', result.team.id, session.user.email, 'New team created', {
                 teamName: result.team.name,
                 teamNickname: result.team.nickname
             });
+
+            // Track team creation in journal
+            await trackTeamCreated(result.participant.id, result.team.id, result.team.name);
         }
 
         return NextResponse.json({
@@ -338,6 +345,9 @@ export async function PUT(request: NextRequest) {
             updatedParticipant = result;
             
             await logger.logCreate('Participant', result.id, session.user.email, 'First-time participant profile created');
+            
+            // Track participant creation in journal
+            await trackParticipantCreated(result.id);
         } else {
             // Update existing participant profile
             updatedParticipant = await db.participant.update({
@@ -361,6 +371,9 @@ export async function PUT(request: NextRequest) {
             });
             
             await logger.logUpdate('Participant', user.participant.id, session.user.email, 'Participant profile updated');
+            
+            // Track profile update in journal
+            await trackProfileUpdated(user.participant.id);
         }
 
         // Fetch updated participant with relations

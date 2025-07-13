@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { emailService } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { markdownToEmailHtml } from '@/lib/markdown-server';
+import { trackMessageReceived } from '@/lib/journal';
 
 export interface CreateMessageInput {
   subject: string;
@@ -215,6 +216,9 @@ class MessageService {
           hackathonId
         }
       );
+
+      // Track message received in journal
+      await trackMessageReceived(recipientId, message.id, message.sender?.name);
 
       // Send email notification
       await this.sendEmailNotification(message);

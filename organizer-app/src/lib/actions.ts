@@ -7,6 +7,14 @@ import { getCurrentHackathon } from '@/lib/hackathon'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 import { dismissBanner } from '@/lib/banners'
+import { 
+    trackTeamCreated, 
+    trackTeamUpdated,
+    trackJoinedTeam,
+    trackJoinRequestCreated,
+    trackJoinRequestApproved,
+    trackJoinRequestRejected,
+} from '@/lib/journal'
 
 
 export async function createTeam(formData: FormData) {
@@ -300,6 +308,9 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                     ledTeamId: createdTeam.id,
                 },
             });
+
+            // Track team creation
+            await trackTeamCreated(participantId, createdTeam.id, teamName);
         });
 
         revalidatePath('/profile');
@@ -394,6 +405,9 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
                     ledTeamId: null, // Regular member
                 },
             });
+
+            // Track joining team
+            await trackJoinedTeam(participantId, teamId, targetTeam.name);
         });
 
         revalidatePath('/profile');
@@ -690,6 +704,9 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             }
         })
 
+        // Track join request creation
+        await trackJoinRequestCreated(participantId, joinRequest.id, team.name)
+
         // Send notification to team leader
         if (team.leader) {
             try {
@@ -783,12 +800,19 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
                     where: { id: joinRequest.participantId },
                     data: { teamId: joinRequest.teamId }
                 })
+
+                // Track approval and joining
+                await trackJoinRequestApproved(joinRequest.participantId, joinRequestId, joinRequest.team.name)
+                await trackJoinedTeam(joinRequest.participantId, joinRequest.teamId, joinRequest.team.name)
             } else {
                 // Decline the request
                 await tx.joinRequest.update({
                     where: { id: joinRequestId },
                     data: { status: 'DECLINED' }
                 })
+
+                // Track rejection
+                await trackJoinRequestRejected(joinRequest.participantId, joinRequestId, joinRequest.team.name)
             }
         })
 
@@ -845,6 +869,9 @@ export async function updateTeamInfo(teamId: string, name: string, nickname: str
                 nickname: nickname
             }
         })
+
+        // Track team update
+        await trackTeamUpdated(leaderId, teamId, name)
 
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')
