@@ -6,9 +6,17 @@
 // Import Jest DOM matchers for React Testing Library
 require('@testing-library/jest-dom')
 
+// Configure React Testing Library with proper act support for React 19
+// This tells React Testing Library to use the built-in act from React
+global.IS_REACT_ACT_ENVIRONMENT = true
+
+// Ensure React's act is available for React Testing Library
+if (typeof global.React === 'undefined') {
+  global.React = require('react')
+}
+
 // Polyfill Web APIs for Node.js test environment
 const { TextEncoder, TextDecoder } = require('util')
-const { Readable } = require('stream')
 
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
