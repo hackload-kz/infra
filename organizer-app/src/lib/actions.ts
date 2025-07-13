@@ -196,8 +196,17 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
         throw new Error('Никнейм команды может содержать только буквы, цифры, дефисы и подчеркивания')
     }
 
+    let createdTeam: { id: string; name: string } | null = null;
+
     try {
-        await db.$transaction(async (tx) => {
+        // Get current hackathon first (outside transaction)
+        const hackathon = await getCurrentHackathon()
+        if (!hackathon) {
+            throw new Error('No active hackathon found')
+        }
+
+        // Use a more focused transaction with timeout configuration
+        const result = await db.$transaction(async (tx) => {
             const participant = await tx.participant.findUnique({
                 where: { id: participantId },
                 include: {
@@ -284,14 +293,8 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 }
             }
 
-            // Get current hackathon
-            const hackathon = await getCurrentHackathon()
-            if (!hackathon) {
-                throw new Error('No active hackathon found')
-            }
-
             // Create new team
-            const createdTeam = await tx.team.create({
+            const newTeam = await tx.team.create({
                 data: {
                     name: teamName,
                     nickname: teamNickname,
@@ -304,14 +307,25 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
             await tx.participant.update({
                 where: { id: participantId },
                 data: {
-                    teamId: createdTeam.id,
-                    ledTeamId: createdTeam.id,
+                    teamId: newTeam.id,
+                    ledTeamId: newTeam.id,
                 },
             });
 
-            // Track team creation
-            await trackTeamCreated(participantId, createdTeam.id, teamName);
+            return newTeam;
+        }, {
+            timeout: 10000, // Increase timeout to 10 seconds
         });
+
+        createdTeam = result;
+
+        // Track team creation outside transaction to avoid timeout issues
+        try {
+            await trackTeamCreated(participantId, createdTeam.id, teamName);
+        } catch (journalError) {
+            console.error('Ошибка при отслеживании создания команды в журнале:', journalError);
+            // Don't fail the main operation if journal tracking fails
+        }
 
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
@@ -406,9 +420,20 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
                 },
             });
 
-            // Track joining team
-            await trackJoinedTeam(participantId, teamId, targetTeam.name);
+        }, {
+            timeout: 10000, // Increase timeout to 10 seconds
         });
+
+        // Track joining team outside transaction to avoid timeout issues
+        try {
+            const targetTeam = await db.team.findUnique({ where: { id: teamId } });
+            if (targetTeam) {
+                await trackJoinedTeam(participantId, teamId, targetTeam.name);
+            }
+        } catch (journalError) {
+            console.error('Ошибка при отслеживании присоединения к команде в журнале:', journalError);
+            // Don't fail the main operation if journal tracking fails
+        }
 
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
@@ -704,8 +729,13 @@ export async function createJoinRequest(participantId: string, teamId: string, m
             }
         })
 
-        // Track join request creation
-        await trackJoinRequestCreated(participantId, joinRequest.id, team.name)
+        // Track join request creation (moved outside transaction to prevent timeout)
+        try {
+            await trackJoinRequestCreated(participantId, joinRequest.id, team.name);
+        } catch (journalError) {
+            console.error('Ошибка при отслеживании создания заявки на вступление в журнале:', journalError);
+            // Don't fail the main operation if journal tracking fails
+        }
 
         // Send notification to team leader
         if (team.leader) {
@@ -746,7 +776,7 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
     }
 
     try {
-        await db.$transaction(async (tx) => {
+        const requestData = await db.$transaction(async (tx) => {
             // Get the join request
             const joinRequest = await tx.joinRequest.findUnique({
                 where: { id: joinRequestId },
@@ -801,9 +831,14 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
                     data: { teamId: joinRequest.teamId }
                 })
 
-                // Track approval and joining
-                await trackJoinRequestApproved(joinRequest.participantId, joinRequestId, joinRequest.team.name)
-                await trackJoinedTeam(joinRequest.participantId, joinRequest.teamId, joinRequest.team.name)
+                // Return data for journal tracking
+                return {
+                    action: 'approve',
+                    participantId: joinRequest.participantId,
+                    teamId: joinRequest.teamId,
+                    teamName: joinRequest.team.name,
+                    joinRequestId
+                }
             } else {
                 // Decline the request
                 await tx.joinRequest.update({
@@ -811,10 +846,31 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
                     data: { status: 'DECLINED' }
                 })
 
-                // Track rejection
-                await trackJoinRequestRejected(joinRequest.participantId, joinRequestId, joinRequest.team.name)
+                // Return data for journal tracking
+                return {
+                    action: 'decline',
+                    participantId: joinRequest.participantId,
+                    teamId: joinRequest.teamId,
+                    teamName: joinRequest.team.name,
+                    joinRequestId
+                }
             }
-        })
+        }, {
+            timeout: 10000, // Increase timeout to 10 seconds
+        });
+
+        // Track journal events outside transaction to avoid timeout issues
+        try {
+            if (requestData.action === 'approve') {
+                await trackJoinRequestApproved(requestData.participantId, requestData.joinRequestId, requestData.teamName);
+                await trackJoinedTeam(requestData.participantId, requestData.teamId, requestData.teamName);
+            } else {
+                await trackJoinRequestRejected(requestData.participantId, requestData.joinRequestId, requestData.teamName);
+            }
+        } catch (journalError) {
+            console.error('Ошибка при отслеживании ответа на заявку в журнале:', journalError);
+            // Don't fail the main operation if journal tracking fails
+        }
 
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')
@@ -871,7 +927,12 @@ export async function updateTeamInfo(teamId: string, name: string, nickname: str
         })
 
         // Track team update
-        await trackTeamUpdated(leaderId, teamId, name)
+        try {
+            await trackTeamUpdated(leaderId, teamId, name);
+        } catch (journalError) {
+            console.error('Ошибка при отслеживании обновления команды в журнале:', journalError);
+            // Don't fail the main operation if journal tracking fails
+        }
 
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')

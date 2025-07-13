@@ -17,7 +17,7 @@ export async function createJournalEntry(data: JournalEventData) {
   try {
     const hackathon = await getCurrentHackathon()
     if (!hackathon) {
-      console.error('No active hackathon found for journal entry')
+      console.error('Активный хакатон не найден для записи в журнал')
       return
     }
 
@@ -28,7 +28,7 @@ export async function createJournalEntry(data: JournalEventData) {
       },
     })
   } catch (error) {
-    console.error('Error creating journal entry:', error)
+    console.error('Ошибка при создании записи в журнале:', error)
   }
 }
 
@@ -36,7 +36,7 @@ export async function markJournalEntriesAsRead(participantId: string) {
   try {
     const hackathon = await getCurrentHackathon()
     if (!hackathon) {
-      throw new Error('No active hackathon found')
+      throw new Error('Активный хакатон не найден')
     }
 
     await db.journalEntry.updateMany({
@@ -50,7 +50,7 @@ export async function markJournalEntriesAsRead(participantId: string) {
       },
     })
   } catch (error) {
-    console.error('Error marking journal entries as read:', error)
+    console.error('Ошибка при отметке записей журнала как прочитанных:', error)
     throw error
   }
 }
@@ -59,7 +59,7 @@ export async function getJournalEntries(participantId: string, page = 1, limit =
   try {
     const hackathon = await getCurrentHackathon()
     if (!hackathon) {
-      throw new Error('No active hackathon found')
+      throw new Error('Активный хакатон не найден')
     }
 
     const entries = await db.journalEntry.findMany({
@@ -76,7 +76,7 @@ export async function getJournalEntries(participantId: string, page = 1, limit =
 
     return entries
   } catch (error) {
-    console.error('Error fetching journal entries:', error)
+    console.error('Ошибка при получении записей журнала:', error)
     throw error
   }
 }
@@ -98,18 +98,18 @@ export async function getUnreadJournalCount(participantId: string): Promise<numb
 
     return count
   } catch (error) {
-    console.error('Error fetching unread journal count:', error)
+    console.error('Ошибка при получении количества непрочитанных записей журнала:', error)
     return 0
   }
 }
 
-// Helper functions for creating specific journal entries
+// Вспомогательные функции для создания конкретных записей журнала
 export async function trackParticipantCreated(participantId: string) {
   await createJournalEntry({
     participantId,
     eventType: 'PARTICIPANT_CREATED',
-    title: 'Welcome to the hackathon!',
-    description: `Your participant profile has been created.`,
+    title: 'Добро пожаловать в хакатон!',
+    description: `Ваш профиль участника был создан.`,
     entityId: participantId,
     entityType: 'participant',
   })
@@ -119,8 +119,8 @@ export async function trackProfileUpdated(participantId: string) {
   await createJournalEntry({
     participantId,
     eventType: 'PROFILE_UPDATED',
-    title: 'Profile updated',
-    description: 'Your profile information has been updated.',
+    title: 'Профиль обновлен',
+    description: 'Информация в вашем профиле была обновлена.',
     entityId: participantId,
     entityType: 'participant',
   })
@@ -130,8 +130,8 @@ export async function trackMessageReceived(participantId: string, messageId: str
   await createJournalEntry({
     participantId,
     eventType: 'MESSAGE_RECEIVED',
-    title: 'New message received',
-    description: senderName ? `You received a message from ${senderName}` : 'You received a new message',
+    title: 'Получено новое сообщение',
+    description: senderName ? `Вы получили сообщение от ${senderName}` : 'Вы получили новое сообщение',
     entityId: messageId,
     entityType: 'message',
   })
@@ -141,8 +141,8 @@ export async function trackTeamCreated(participantId: string, teamId: string, te
   await createJournalEntry({
     participantId,
     eventType: 'TEAM_CREATED',
-    title: 'Team created',
-    description: `You created team "${teamName}"`,
+    title: 'Команда создана',
+    description: `Вы создали команду "${teamName}"`,
     entityId: teamId,
     entityType: 'team',
   })
@@ -152,8 +152,8 @@ export async function trackTeamUpdated(participantId: string, teamId: string, te
   await createJournalEntry({
     participantId,
     eventType: 'TEAM_UPDATED',
-    title: 'Team updated',
-    description: `Team "${teamName}" has been updated`,
+    title: 'Команда обновлена',
+    description: `Команда "${teamName}" была обновлена`,
     entityId: teamId,
     entityType: 'team',
   })
@@ -163,8 +163,8 @@ export async function trackTeamDeleted(participantId: string, teamName: string) 
   await createJournalEntry({
     participantId,
     eventType: 'TEAM_DELETED',
-    title: 'Team deleted',
-    description: `Team "${teamName}" has been deleted`,
+    title: 'Команда удалена',
+    description: `Команда "${teamName}" была удалена`,
     entityType: 'team',
   })
 }
@@ -173,8 +173,8 @@ export async function trackJoinRequestCreated(participantId: string, requestId: 
   await createJournalEntry({
     participantId,
     eventType: 'JOIN_REQUEST_CREATED',
-    title: 'Join request sent',
-    description: `You sent a join request to team "${teamName}"`,
+    title: 'Заявка на вступление отправлена',
+    description: `Вы отправили заявку на вступление в команду "${teamName}"`,
     entityId: requestId,
     entityType: 'join_request',
   })
@@ -184,8 +184,8 @@ export async function trackJoinRequestApproved(participantId: string, requestId:
   await createJournalEntry({
     participantId,
     eventType: 'JOIN_REQUEST_APPROVED',
-    title: 'Join request approved',
-    description: `Your join request to team "${teamName}" has been approved`,
+    title: 'Заявка на вступление одобрена',
+    description: `Ваша заявка на вступление в команду "${teamName}" была одобрена`,
     entityId: requestId,
     entityType: 'join_request',
   })
@@ -195,8 +195,8 @@ export async function trackJoinRequestRejected(participantId: string, requestId:
   await createJournalEntry({
     participantId,
     eventType: 'JOIN_REQUEST_REJECTED',
-    title: 'Join request rejected',
-    description: `Your join request to team "${teamName}" has been rejected`,
+    title: 'Заявка на вступление отклонена',
+    description: `Ваша заявка на вступление в команду "${teamName}" была отклонена`,
     entityId: requestId,
     entityType: 'join_request',
   })
@@ -206,8 +206,8 @@ export async function trackJoinedTeam(participantId: string, teamId: string, tea
   await createJournalEntry({
     participantId,
     eventType: 'JOINED_TEAM',
-    title: 'Joined team',
-    description: `You joined team "${teamName}"`,
+    title: 'Вступление в команду',
+    description: `Вы вступили в команду "${teamName}"`,
     entityId: teamId,
     entityType: 'team',
   })
@@ -217,8 +217,8 @@ export async function trackLeftTeam(participantId: string, teamName: string) {
   await createJournalEntry({
     participantId,
     eventType: 'LEFT_TEAM',
-    title: 'Left team',
-    description: `You left team "${teamName}"`,
+    title: 'Выход из команды',
+    description: `Вы покинули команду "${teamName}"`,
     entityType: 'team',
   })
 }
@@ -227,8 +227,8 @@ export async function trackInvitedToTeam(participantId: string, teamId: string, 
   await createJournalEntry({
     participantId,
     eventType: 'INVITED_TO_TEAM',
-    title: 'Team invitation',
-    description: `You were invited to join team "${teamName}"`,
+    title: 'Приглашение в команду',
+    description: `Вас пригласили присоединиться к команде "${teamName}"`,
     entityId: teamId,
     entityType: 'team',
   })
@@ -238,8 +238,8 @@ export async function trackTeamStatusUpdated(participantId: string, teamId: stri
   await createJournalEntry({
     participantId,
     eventType: 'TEAM_STATUS_UPDATED',
-    title: 'Team status changed',
-    description: `Team "${teamName}" status changed to ${newStatus}`,
+    title: 'Статус команды изменен',
+    description: `Статус команды "${teamName}" изменен на ${newStatus}`,
     entityId: teamId,
     entityType: 'team',
   })
@@ -249,8 +249,8 @@ export async function trackAdminTeamEdit(participantId: string, teamId: string, 
   await createJournalEntry({
     participantId,
     eventType: 'ADMIN_TEAM_EDIT',
-    title: 'Team updated by admin',
-    description: `Team "${teamName}" was updated by an administrator`,
+    title: 'Команда обновлена администратором',
+    description: `Команда "${teamName}" была обновлена администратором`,
     entityId: teamId,
     entityType: 'team',
   })

@@ -24,7 +24,7 @@ export async function GET() {
     
     return NextResponse.json({ count })
   } catch (error) {
-    console.error('Error fetching unread journal count:', error)
+    console.error('Ошибка при получении количества непрочитанных записей журнала:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

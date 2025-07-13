@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ entries })
   } catch (error) {
-    console.error('Error fetching journal entries:', error)
+    console.error('Ошибка при получении записей журнала:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error marking journal entries as read:', error)
+    console.error('Ошибка при отметке записей журнала как прочитанных:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
