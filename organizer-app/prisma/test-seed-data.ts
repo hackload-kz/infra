@@ -1,4 +1,13 @@
 import { PrismaClient } from '@prisma/client'
+import { 
+  trackParticipantCreated, 
+  trackTeamCreated, 
+  trackJoinedTeam, 
+  trackJoinRequestCreated,
+  trackJoinRequestApproved,
+  trackJoinRequestRejected,
+  trackMessageReceived
+} from '../src/lib/journal'
 
 const prisma = new PrismaClient()
 
@@ -277,6 +286,13 @@ async function createTestData() {
           isActive: true
         }
       })
+      
+      // Track participant creation in journal
+      try {
+        await trackParticipantCreated(participant.id)
+      } catch (error) {
+        console.log(`⚠️  Warning: Could not create journal entry for participant ${participant.name}`)
+      }
     }
 
     createdParticipants.push(participant)
@@ -341,6 +357,13 @@ async function createTestData() {
         }
       })
 
+      // Track team creation in journal
+      try {
+        await trackTeamCreated(leader.id, team.id, team.name)
+      } catch (error) {
+        console.log(`⚠️  Warning: Could not create team creation journal entry for ${team.name}`)
+      }
+
       // Assign other members to the team
       for (let i = 1; i < teamMembers.length; i++) {
         const member = teamMembers[i]
@@ -348,6 +371,13 @@ async function createTestData() {
           where: { id: member.id },
           data: { teamId: team.id }
         })
+        
+        // Track team joining in journal
+        try {
+          await trackJoinedTeam(member.id, team.id, team.name)
+        } catch (error) {
+          console.log(`⚠️  Warning: Could not create team join journal entry for ${member.name}`)
+        }
       }
 
       participantIndex += teamSize
@@ -377,70 +407,265 @@ async function createTestData() {
 
   const joinRequestStatuses: ('PENDING' | 'APPROVED' | 'DECLINED')[] = ['PENDING', 'APPROVED', 'DECLINED']
 
-  for (let i = 0; i < Math.min(8, unassignedParticipants.length); i++) {
+  let createdJoinRequests = []
+  for (let i = 0; i < Math.min(12, unassignedParticipants.length); i++) {
     const participant = unassignedParticipants[i]
     const randomTeam = createdTeams[Math.floor(Math.random() * createdTeams.length)]
     const message = messages[Math.floor(Math.random() * messages.length)]
+    const status = joinRequestStatuses[Math.floor(Math.random() * joinRequestStatuses.length)]
 
-    await prisma.joinRequest.create({
+    const joinRequest = await prisma.joinRequest.create({
       data: {
         participantId: participant.id,
         teamId: randomTeam.id,
         hackathonId: defaultHackathon.id,
         message: message,
-        status: joinRequestStatuses[Math.floor(Math.random() * joinRequestStatuses.length)]
+        status: status
       }
     })
+
+    createdJoinRequests.push({ joinRequest, participant, team: randomTeam, status })
+
+    // Track join request creation in journal
+    try {
+      await trackJoinRequestCreated(participant.id, joinRequest.id, randomTeam.name)
+      
+      // Track status changes if not pending
+      if (status === 'APPROVED') {
+        await trackJoinRequestApproved(participant.id, joinRequest.id, randomTeam.name)
+        // If approved, also add them to the team and track joining
+        await prisma.participant.update({
+          where: { id: participant.id },
+          data: { teamId: randomTeam.id }
+        })
+        await trackJoinedTeam(participant.id, randomTeam.id, randomTeam.name)
+      } else if (status === 'DECLINED') {
+        await trackJoinRequestRejected(participant.id, joinRequest.id, randomTeam.name)
+      }
+    } catch (error) {
+      console.log(`⚠️  Warning: Could not create join request journal entries for ${participant.name}`)
+    }
   }
 
-  console.log(`✅ Created mock join requests`)
+  console.log(`✅ Created ${createdJoinRequests.length} mock join requests with journal tracking`)
 
   // Create sample messages to test the messaging system
-  console.log('📧 Creating sample messages...')
+  console.log('📧 Creating enhanced sample messages...')
   
-  const messageSubjects = [
-    'Приглашение в команду',
-    'Заявка на вступление в команду',
-    'Обновление по проекту',
-    'Вопрос по технологиям',
-    'Планы на хакатон',
-    'Обсуждение архитектуры'
-  ]
+  const messageTypes = {
+    teamInvitation: {
+      subjects: [
+        '🎯 Приглашение в команду ${teamName}',
+        '🚀 Присоединяйтесь к нашей команде!',
+        '💫 Вакансия в команде ${teamName}',
+        '🔥 Ищем таланты для команды'
+      ],
+      templates: [
+        'Привет! Мы заметили ваш профиль и считаем, что вы отлично подойдете для нашей команды <strong>${teamName}</strong>. Ваш опыт в ${skill} именно то, что нам нужно! Присоединяйтесь к нам для создания крутого проекта.',
+        'Добро пожаловать! Команда <strong>${teamName}</strong> приглашает вас присоединиться к нашему проекту. Мы работаем с технологиями ${tech} и уверены, что вместе создадим что-то великолепное.',
+        'Здравствуйте! Ваши навыки в ${skill} произвели на нас впечатление. Команда <strong>${teamName}</strong> будет рада видеть вас в наших рядах для участия в хакатоне.'
+      ]
+    },
+    projectUpdate: {
+      subjects: [
+        '📊 Обновление по проекту',
+        '⚡ Прогресс команды ${teamName}',
+        '🎯 Статус разработки',
+        '📈 Отчет о проделанной работе'
+      ],
+      templates: [
+        'Команда! Хочу поделиться прогрессом по нашему проекту. Сегодня завершили модуль ${module}, осталось доработать ${remaining}. Все идет по плану!',
+        'Обновляю статус: архитектура готова на 80%, backend реализован, frontend в процессе. Завтра планируем интеграцию компонентов.',
+        'Отличные новости! Мы успешно реализовали ключевую функциональность. Сейчас занимаемся оптимизацией и подготовкой презентации.'
+      ]
+    },
+    technical: {
+      subjects: [
+        '🔧 Вопрос по технологиям',
+        '💻 Обсуждение архитектуры',
+        '⚙️ Техническое решение',
+        '🛠️ Выбор стека технологий'
+      ],
+      templates: [
+        'Привет! Хотел бы обсудить выбор базы данных для нашего проекта. Что думаешь насчет PostgreSQL vs MongoDB? Учитывая специфику задачи, какой вариант предпочтительнее?',
+        'Предлагаю использовать микросервисную архитектуру с Docker контейнерами. Это позволит нам лучше масштабироваться и разделить ответственность между компонентами.',
+        'Коллеги, давайте определимся с API. REST или GraphQL? У каждого подхода есть свои преимущества для нашей задачи.'
+      ]
+    },
+    collaboration: {
+      subjects: [
+        '🤝 Планы на хакатон',
+        '📅 Организация работы',
+        '🎯 Распределение задач',
+        '⏰ Временные рамки'
+      ],
+      templates: [
+        'Команда, давайте распределим задачи на завтра. Я беру на себя backend API, кто готов заняться фронтендом? Также нужен человек на DevOps.',
+        'Предлагаю встретиться в зуме сегодня в 20:00 для синхронизации. Обсудим архитектуру и следующие шаги.',
+        'Ребята, сделаем небольшой ретро: что получается хорошо, где есть блокеры? Давайте оптимизируем процесс работы.'
+      ]
+    },
+    mentorship: {
+      subjects: [
+        '🎓 Помощь новичку',
+        '📚 Обучение и развитие',
+        '💡 Советы по проекту',
+        '🌟 Менторство'
+      ],
+      templates: [
+        'Привет! Вижу, что ты новичок в команде. Если нужна помощь с настройкой окружения или вопросы по коду - обращайся, всегда готов помочь!',
+        'Отличная работа с компонентом! Небольшой совет: попробуй использовать React.memo для оптимизации рендеринга, это улучшит производительность.',
+        'Заметил, что у тебя вопросы по Git. Могу провести краткий воркшоп по лучшим практикам работы с ветками, если интересно.'
+      ]
+    }
+  }
 
-  const messageTemplates = [
-    'Добро пожаловать в нашу команду! Мы рады видеть вас среди участников.',
-    'Ваша заявка на вступление в команду была одобрена. Добро пожаловать!',
-    'Обновляю информацию по нашему проекту. Все идет по плану.',
-    'Хотел бы обсудить выбор технологий для нашего проекта.',
-    'Давайте обсудим наши планы на предстоящий хакатон.',
-    'Предлагаю рассмотреть следующую архитектуру для решения.'
-  ]
+  const skills = ['JavaScript', 'Python', 'React', 'DevOps', 'UI/UX', 'Machine Learning', 'Backend', 'Mobile']
+  const technologies = ['React/Node.js', 'Python/Django', 'Kubernetes', 'AWS', 'Docker', 'TypeScript']
+  const modules = ['аутентификации', 'API Gateway', 'dashboard', 'базы данных', 'файлового хранилища']
+  const remaining = ['тестирование', 'документация', 'оптимизация', 'деплой', 'UI полировка']
 
-  // Create messages between team members and between different participants
-  for (let i = 0; i < 20; i++) {
+  // Create diverse messages
+  let messageCount = 0
+  
+  // Messages between team members (more frequent)
+  for (const team of createdTeams) {
+    const teamMembersData = await prisma.participant.findMany({
+      where: { teamId: team.id }
+    })
+    
+    if (teamMembersData.length > 1) {
+      for (let i = 0; i < Math.min(3, teamMembersData.length); i++) {
+        const sender = teamMembersData[i]
+        const recipient = teamMembersData[(i + 1) % teamMembersData.length]
+        
+        const messageType = Object.keys(messageTypes)[Math.floor(Math.random() * Object.keys(messageTypes).length)]
+        const typeData = messageTypes[messageType as keyof typeof messageTypes]
+        
+        const subject = typeData.subjects[Math.floor(Math.random() * typeData.subjects.length)]
+          .replace('${teamName}', team.name)
+        
+        const body = typeData.templates[Math.floor(Math.random() * typeData.templates.length)]
+          .replace('${teamName}', team.name)
+          .replace('${skill}', skills[Math.floor(Math.random() * skills.length)])
+          .replace('${tech}', technologies[Math.floor(Math.random() * technologies.length)])
+          .replace('${module}', modules[Math.floor(Math.random() * modules.length)])
+          .replace('${remaining}', remaining[Math.floor(Math.random() * remaining.length)])
+        
+        const message = await prisma.message.create({
+          data: {
+            subject: subject,
+            body: `<p>${body}</p>`,
+            hackathonId: defaultHackathon.id,
+            senderId: sender.id,
+            recipientId: recipient.id,
+            status: Math.random() > 0.4 ? 'UNREAD' : 'READ',
+            teamId: team.id
+          }
+        })
+        
+        // Track message received in journal
+        try {
+          await trackMessageReceived(recipient.id, message.id, sender.name)
+        } catch (error) {
+          console.log(`⚠️  Warning: Could not track message in journal`)
+        }
+        
+        messageCount++
+      }
+    }
+  }
+
+  // Messages from organizers/system
+  const organizers = createdParticipants.filter(p => p.email.includes('alex.petrov') || p.email.includes('elena.smirnova'))
+  if (organizers.length > 0) {
+    const organizer = organizers[0]
+    const systemMessages = [
+      {
+        subject: '📢 Важное объявление для участников хакатона',
+        body: '<p>Уважаемые участники! Напоминаем, что завтра в 10:00 начинается питч-сессия. Подготовьте презентации ваших проектов. Удачи!</p>'
+      },
+      {
+        subject: '🏆 Критерии оценки проектов',
+        body: '<p>Жюри будет оценивать проекты по следующим критериям: техническая реализация (40%), инновационность (30%), полезность (20%), презентация (10%).</p>'
+      },
+      {
+        subject: '🍕 Обед и кофе-брейки',
+        body: '<p>Обед сегодня с 13:00 до 14:00 в главном зале. Кофе и снеки доступны весь день на 2 этаже. Приятного аппетита!</p>'
+      }
+    ]
+    
+    // Send to random participants
+    for (const sysMsg of systemMessages) {
+      const recipients = createdParticipants.sort(() => Math.random() - 0.5).slice(0, 8)
+      for (const recipient of recipients) {
+        if (recipient.id !== organizer.id) {
+          const message = await prisma.message.create({
+            data: {
+              subject: sysMsg.subject,
+              body: sysMsg.body,
+              hackathonId: defaultHackathon.id,
+              senderId: organizer.id,
+              recipientId: recipient.id,
+              status: Math.random() > 0.2 ? 'UNREAD' : 'READ'
+            }
+          })
+          
+          try {
+            await trackMessageReceived(recipient.id, message.id, 'Организатор')
+          } catch (error) {
+            console.log(`⚠️  Warning: Could not track system message in journal`)
+          }
+          
+          messageCount++
+        }
+      }
+    }
+  }
+
+  // Cross-team collaboration messages
+  for (let i = 0; i < 15; i++) {
     const sender = createdParticipants[Math.floor(Math.random() * createdParticipants.length)]
     const recipient = createdParticipants[Math.floor(Math.random() * createdParticipants.length)]
     
-    if (sender.id !== recipient.id) {
-      const subject = messageSubjects[Math.floor(Math.random() * messageSubjects.length)]
-      const body = messageTemplates[Math.floor(Math.random() * messageTemplates.length)]
+    if (sender.id !== recipient.id && sender.teamId !== recipient.teamId) {
+      const messageType = Math.random() > 0.5 ? 'technical' : 'mentorship'
+      const typeData = messageTypes[messageType]
       
-      await prisma.message.create({
+      const subject = typeData.subjects[Math.floor(Math.random() * typeData.subjects.length)]
+      const body = typeData.templates[Math.floor(Math.random() * typeData.templates.length)]
+        .replace('${skill}', skills[Math.floor(Math.random() * skills.length)])
+        .replace('${tech}', technologies[Math.floor(Math.random() * technologies.length)])
+      
+      const message = await prisma.message.create({
         data: {
           subject: subject,
           body: `<p>${body}</p>`,
           hackathonId: defaultHackathon.id,
           senderId: sender.id,
           recipientId: recipient.id,
-          status: Math.random() > 0.3 ? 'UNREAD' : 'READ', // Most messages unread
-          teamId: sender.teamId && recipient.teamId === sender.teamId ? sender.teamId : null
+          status: Math.random() > 0.3 ? 'UNREAD' : 'READ'
         }
       })
+      
+      try {
+        await trackMessageReceived(recipient.id, message.id, sender.name)
+      } catch (error) {
+        console.log(`⚠️  Warning: Could not track cross-team message in journal`)
+      }
+      
+      messageCount++
     }
   }
 
-  console.log(`✅ Created sample messages for testing messaging system`)
+  console.log(`✅ Created ${messageCount} enhanced messages with journal tracking`)
   console.log('🎉 Enhanced test data creation completed successfully!')
+  console.log(`📊 Summary:`)
+  console.log(`   • ${createdParticipants.length} participants with journal entries`)
+  console.log(`   • ${createdTeams.length} teams with creation tracking`)
+  console.log(`   • ${createdJoinRequests.length} join requests with status tracking`)
+  console.log(`   • ${messageCount} messages with notification tracking`)
+  console.log(`   • All activities logged in participant journals`)
 }
 
 async function main() {
