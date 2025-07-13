@@ -1,6 +1,12 @@
 'use server'
 
 import { db } from '@/lib/db'
+
+type TeamMember = {
+  id: string
+  name: string
+  email: string
+}
 import { revalidatePath } from 'next/cache'
 import { TeamStatus, BannerType } from '@prisma/client'
 import { getCurrentHackathon } from '@/lib/hackathon'
@@ -130,7 +136,7 @@ export async function leaveTeam(participantId: string, newLeaderId?: string | nu
 
             const currentTeam = participant.team;
             const isCurrentLeader = !!participant.ledTeam;
-            const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
+            const remainingMembers = currentTeam.members.filter((m: TeamMember) => m.id !== participantId);
 
             if (isCurrentLeader) {
                 if (remainingMembers.length === 0) {
@@ -144,7 +150,7 @@ export async function leaveTeam(participantId: string, newLeaderId?: string | nu
                         throw new Error('Вы должны выбрать нового лидера команды');
                     }
                     
-                    const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                    const newLeader = remainingMembers.find((m: TeamMember) => m.id === newLeaderId);
                     if (!newLeader) {
                         throw new Error('Выбранный лидер не является участником команды');
                     }
@@ -236,7 +242,7 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
             const currentTeam = participant.team;
             if (currentTeam) {
                 const isCurrentLeader = !!participant.ledTeam;
-                const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
+                const remainingMembers = currentTeam.members.filter((m: TeamMember) => m.id !== participantId);
 
                 if (isCurrentLeader) {
                     if (remainingMembers.length === 0) {
@@ -258,7 +264,7 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                             throw new Error('Вы должны выбрать нового лидера для текущей команды');
                         }
                         
-                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        const newLeader = remainingMembers.find((m: TeamMember) => m.id === newLeaderId);
                         if (!newLeader) {
                             throw new Error('Выбранный лидер не является участником команды');
                         }
@@ -321,7 +327,9 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
 
         // Track team creation outside transaction to avoid timeout issues
         try {
-            await trackTeamCreated(participantId, createdTeam.id, teamName);
+            if (createdTeam) {
+                await trackTeamCreated(participantId, createdTeam.id, createdTeam.name);
+            }
         } catch (journalError) {
             console.error('Ошибка при отслеживании создания команды в журнале:', journalError);
             // Don't fail the main operation if journal tracking fails
@@ -371,7 +379,7 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
             const currentTeam = participant.team;
             if (currentTeam) {
                 const isCurrentLeader = !!participant.ledTeam;
-                const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
+                const remainingMembers = currentTeam.members.filter((m: TeamMember) => m.id !== participantId);
 
                 if (isCurrentLeader) {
                     if (remainingMembers.length === 0) {
@@ -385,7 +393,7 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
                             throw new Error('Вы должны выбрать нового лидера для текущей команды');
                         }
                         
-                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        const newLeader = remainingMembers.find((m: TeamMember) => m.id === newLeaderId);
                         if (!newLeader) {
                             throw new Error('Выбранный лидер не является участником команды');
                         }
@@ -514,7 +522,7 @@ export async function changeTeam(formData: FormData) {
 
             // Handle leaving current team
             if (currentTeam) {
-                const remainingMembers = currentTeam.members.filter(m => m.id !== participantId);
+                const remainingMembers = currentTeam.members.filter((m: TeamMember) => m.id !== participantId);
                 
                 if (isCurrentLeader) {
                     // Leader is leaving
@@ -529,7 +537,7 @@ export async function changeTeam(formData: FormData) {
                             throw new Error('Вы должны выбрать нового лидера команды');
                         }
                         
-                        const newLeader = remainingMembers.find(m => m.id === newLeaderId);
+                        const newLeader = remainingMembers.find((m: TeamMember) => m.id === newLeaderId);
                         if (!newLeader) {
                             throw new Error('Выбранный лидер не является участником команды');
                         }
@@ -610,7 +618,7 @@ export async function changeTeam(formData: FormData) {
 
             // Update participant (only if leadership wasn't already transferred)
             const wasLeadershipTransferred = isCurrentLeader && currentTeam && 
-                currentTeam.members.filter(m => m.id !== participantId).length > 0 && 
+                currentTeam.members.filter((m: TeamMember) => m.id !== participantId).length > 0 && 
                 finalTeamId !== currentTeam.id;
             if (!wasLeadershipTransferred) {
                 await tx.participant.update({
@@ -966,7 +974,7 @@ export async function removeTeamMember(teamId: string, memberId: string, leaderI
         }
 
         // Check if member exists in the team
-        const member = team.members.find(m => m.id === memberId)
+        const member = team.members.find((m: TeamMember) => m.id === memberId)
         if (!member) {
             throw new Error('Участник не найден в команде')
         }
