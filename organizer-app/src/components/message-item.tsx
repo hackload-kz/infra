@@ -5,8 +5,9 @@ import { MessageWithRelations } from '@/lib/messages';
 import { Button } from './ui/button';
 import { MessageReply } from './message-reply';
 import { formatDistanceToNow } from 'date-fns';
-import { Mail, MailOpen, Reply, Users } from 'lucide-react';
+import { Mail, MailOpen, Reply, Users, ExternalLink } from 'lucide-react';
 import { markdownToHtml } from '@/lib/markdown';
+import Link from 'next/link';
 
 interface MessageItemProps {
   message: MessageWithRelations;
@@ -56,9 +57,12 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
             {message.team && (
               <Users className="h-4 w-4 text-purple-600" />
             )}
-            <h3 className={`font-semibold ${isUnread ? 'text-blue-900' : 'text-gray-900'}`}>
+            <Link 
+              href={`/space/messages/${message.id}`}
+              className={`font-semibold hover:underline ${isUnread ? 'text-blue-900 hover:text-blue-700' : 'text-gray-900 hover:text-gray-700'}`}
+            >
               {message.subject}
-            </h3>
+            </Link>
             {isUnread && (
               <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
                 Новое
@@ -150,6 +154,17 @@ export function MessageItem({ message, onUpdate, isAdmin = false }: MessageItemP
       </div>
 
       <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-200">
+        <Link href={`/space/messages/${message.id}`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Открыть
+          </Button>
+        </Link>
+        
         <Button
           variant="ghost"
           size="sm"
