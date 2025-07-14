@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { z } from 'zod'
 import { messageService } from '@/lib/messages'
 import { generateTeamInvitationMessage } from '@/lib/message-templates'
+import { urlBuilder } from '@/lib/urls'
 
 const teamInvitationSchema = z.object({
   teamId: z.string().min(1, 'Team ID is required'),
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate and send invitation message
-    const teamUrl = `https://hub.hackload.kz/space/teams/${team.id}`
+    const teamUrl = urlBuilder.space.teams(team.id)
     
     const messageTemplate = generateTeamInvitationMessage({
       team,

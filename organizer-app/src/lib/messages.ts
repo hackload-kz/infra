@@ -3,6 +3,7 @@ import { emailService } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { markdownToEmailHtml } from '@/lib/markdown-server';
 import { trackMessageReceived } from '@/lib/journal';
+import { urlBuilder } from '@/lib/urls';
 
 export interface CreateMessageInput {
   subject: string;
@@ -828,7 +829,7 @@ class MessageService {
           ${htmlContent}
         </div>
         <p style="text-align: center; margin-top: 25px;">
-          <a href="https://hub.hackload.kz/space/messages/${message.id}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          <a href="${urlBuilder.space.messages(message.id)}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
             📱 Открыть в панели управления
           </a>
         </p>

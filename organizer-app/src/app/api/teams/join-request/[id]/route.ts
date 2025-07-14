@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestResponseMessage } from '@/lib/message-templates'
 import { logger, LogAction } from '@/lib/logger'
+import { urlBuilder } from '@/lib/urls'
 
 const updateJoinRequestSchema = z.object({
   action: z.enum(['approve', 'decline'])
@@ -114,7 +115,7 @@ export async function PUT(
 
     // Send result message to participant
     try {
-      const joinRequestUrl = `https://hub.hackload.kz/space/teams`
+      const joinRequestUrl = urlBuilder.space.teams()
       
       const messageTemplate = generateJoinRequestResponseMessage({
         participant: joinRequest.participant,

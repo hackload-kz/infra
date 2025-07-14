@@ -13,6 +13,7 @@ import { getCurrentHackathon } from '@/lib/hackathon'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 import { dismissBanner } from '@/lib/banners'
+import { urlBuilder } from '@/lib/urls'
 import { 
     trackTeamCreated, 
     trackTeamUpdated,
@@ -754,8 +755,8 @@ export async function createJoinRequest(participantId: string, teamId: string, m
                     participant,
                     team,
                     joinRequest,
-                    joinRequestUrl: '/space/team', // URL to team management page
-                    participantProfileUrl: `/profile/${participant.id}` // URL to participant profile
+                    joinRequestUrl: urlBuilder.space.team(), // URL to team management page
+                    participantProfileUrl: urlBuilder.space.participants(participant.id) // URL to participant profile
                 })
 
                 // Send message to team leader

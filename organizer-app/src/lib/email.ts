@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { urlBuilder } from '@/lib/urls';
 
 interface EmailConfig {
   smtpServer: string;
@@ -109,7 +110,7 @@ class EmailService {
             <p>
             Команда <strong>Hackload</strong></p>
             <p>
-                <a href="https://hub.hackload.kz">hub.hackload.kz</a>
+                <a href="${urlBuilder.getBaseUrl()}">${urlBuilder.getDomain()}</a>
             </p>
         </div>
     </div>
@@ -212,7 +213,7 @@ class EmailService {
       </ul>
       <p>Перейдите в вашу панель управления, чтобы начать:</p>
       <p style="text-align: center; margin: 20px 0;">
-        <a href="https://hub.hackload.kz/space" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
+        <a href="${urlBuilder.buildUrl('/space')}" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
           🚀 Перейти в панель управления
         </a>
       </p>
@@ -236,7 +237,7 @@ class EmailService {
       <p><strong>${inviterName}</strong> приглашает вас присоединиться к команде <strong>"${teamName}"</strong> для участия в Hackload Hackathon 2025.</p>
       <p>Чтобы принять или отклонить это приглашение, перейдите в вашу панель управления:</p>
       <p style="text-align: center; margin: 20px 0;">
-        <a href="https://hub.hackload.kz/space/team" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
+        <a href="${urlBuilder.space.team()}" style="background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
           👀 Просмотреть приглашение
         </a>
       </p>

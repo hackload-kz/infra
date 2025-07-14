@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 import { logger, LogAction } from '@/lib/logger'
+import { urlBuilder } from '@/lib/urls'
 
 const createJoinRequestSchema = z.object({
   teamId: z.string().min(1, 'Team ID is required'),
@@ -121,8 +122,8 @@ export async function POST(request: NextRequest) {
       console.log('📧 Hackathon ID:', hackathon.id)
       console.log('📧 Participant ID:', participant.id)
       
-      const joinRequestUrl = `https://hub.hackload.kz/space/team`
-      const participantProfileUrl = `https://hub.hackload.kz/space/participants/${participant.id}`
+      const joinRequestUrl = urlBuilder.space.team()
+      const participantProfileUrl = urlBuilder.space.participants(participant.id)
       
       const messageTemplate = generateJoinRequestNotificationMessage({
         participant,
