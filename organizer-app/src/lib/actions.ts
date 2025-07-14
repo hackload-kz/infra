@@ -193,7 +193,7 @@ export async function leaveTeam(participantId: string, newLeaderId?: string | nu
     }
 }
 
-export async function createAndJoinTeam(participantId: string, teamName: string, teamNickname: string, newLeaderId?: string | null) {
+export async function createAndJoinTeam(participantId: string, teamName: string, teamNickname: string, teamLevel?: string | null, newLeaderId?: string | null) {
     if (!participantId || !teamName || !teamNickname) {
         throw new Error('Все поля обязательны для заполнения')
     }
@@ -304,6 +304,7 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 data: {
                     name: teamName,
                     nickname: teamNickname,
+                    level: teamLevel && teamLevel !== '' ? (teamLevel as 'BEGINNER' | 'ADVANCED') : null,
                     leaderId: participantId,
                     hackathonId: hackathon.id,
                 },
@@ -888,7 +889,7 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
     }
 }
 
-export async function updateTeamInfo(teamId: string, name: string, nickname: string, leaderId: string) {
+export async function updateTeamInfo(teamId: string, name: string, nickname: string, level: string | null, leaderId: string) {
     if (!teamId || !name || !nickname || !leaderId) {
         throw new Error('All parameters are required')
     }
@@ -930,7 +931,8 @@ export async function updateTeamInfo(teamId: string, name: string, nickname: str
             where: { id: teamId },
             data: {
                 name: name,
-                nickname: nickname
+                nickname: nickname,
+                level: level && level !== '' ? (level as 'BEGINNER' | 'ADVANCED') : null
             }
         })
 

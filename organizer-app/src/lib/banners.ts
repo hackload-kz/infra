@@ -17,11 +17,13 @@ export interface ParticipantData {
   team?: {
     id: string
     name: string
+    level?: string | null
     members: { id: string }[]
   } | null
   ledTeam?: {
     id: string
     name: string
+    level?: string | null
     members: { id: string }[]
   } | null
 }
@@ -77,6 +79,18 @@ export function calculateBanners(participant: ParticipantData): Banner[] {
       actionText: 'Найти участников',
       actionUrl: '/space/participants',
       variant: 'warning'
+    })
+  }
+
+  // Set Team Level Banner (for team leaders without level set)
+  if (participant.ledTeam && !participant.ledTeam.level) {
+    banners.push({
+      type: BannerType.SET_TEAM_LEVEL,
+      title: 'Укажите уровень команды',
+      message: 'Установите уровень сложности для вашей команды, чтобы получить доступ к соответствующим заданиям хакатона. Это важно для квалификации на участие.',
+      actionText: 'Установить уровень',
+      actionUrl: '/space/team',
+      variant: 'info'
     })
   }
 

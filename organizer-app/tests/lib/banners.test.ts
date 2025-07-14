@@ -233,6 +233,65 @@ describe('Banner Calculation Logic', () => {
       })
     })
 
+    describe('Set Team Level Banner', () => {
+      it('should show set team level banner for team leader without level', () => {
+        const participant = createMockParticipantForBanner({
+          telegram: '@leader',
+          githubUrl: 'https://github.com/leader',
+          team: null,
+          ledTeam: createMockTeam(3, { level: null }),
+        })
+
+        const banners = calculateBanners(participant)
+        const setLevelBanner = expectBannerType(banners, BannerType.SET_TEAM_LEVEL)
+
+        expect(setLevelBanner).toBeDefined()
+        expect(setLevelBanner?.title).toBe('Укажите уровень команды')
+        expect(setLevelBanner?.message).toBe('Установите уровень сложности для вашей команды, чтобы получить доступ к соответствующим заданиям хакатона. Это важно для квалификации на участие.')
+        expect(setLevelBanner?.variant).toBe('info')
+        expect(setLevelBanner?.actionUrl).toBe('/space/team')
+      })
+
+      it('should hide set team level banner for team leader with level set', () => {
+        const participant = createMockParticipantForBanner({
+          telegram: '@leader',
+          githubUrl: 'https://github.com/leader',
+          team: null,
+          ledTeam: createMockTeam(3, { level: 'BEGINNER' }),
+        })
+
+        const banners = calculateBanners(participant)
+        
+        expect(expectBannerNotPresent(banners, BannerType.SET_TEAM_LEVEL)).toBe(true)
+      })
+
+      it('should hide set team level banner for non-leader', () => {
+        const participant = createMockParticipantForBanner({
+          telegram: '@member',
+          githubUrl: 'https://github.com/member',
+          team: createMockTeam(3, { level: null }),
+          ledTeam: null,
+        })
+
+        const banners = calculateBanners(participant)
+        
+        expect(expectBannerNotPresent(banners, BannerType.SET_TEAM_LEVEL)).toBe(true)
+      })
+
+      it('should hide set team level banner for teamless participant', () => {
+        const participant = createMockParticipantForBanner({
+          telegram: '@user',
+          githubUrl: 'https://github.com/user',
+          team: null,
+          ledTeam: null,
+        })
+
+        const banners = calculateBanners(participant)
+        
+        expect(expectBannerNotPresent(banners, BannerType.SET_TEAM_LEVEL)).toBe(true)
+      })
+    })
+
     describe('Multiple Banner Scenarios', () => {
       it('should show all banners for new participant', () => {
         const participant = createMockParticipantForBanner({
@@ -260,10 +319,11 @@ describe('Banner Calculation Logic', () => {
 
         const banners = calculateBanners(participant)
 
-        expect(banners).toHaveLength(3)
+        expect(banners).toHaveLength(4)
         expect(expectBannerType(banners, BannerType.TELEGRAM_PROFILE)).toBeDefined()
         expect(expectBannerType(banners, BannerType.GITHUB_PROFILE)).toBeDefined()
         expect(expectBannerType(banners, BannerType.TEAM_NEEDS_MEMBERS)).toBeDefined()
+        expect(expectBannerType(banners, BannerType.SET_TEAM_LEVEL)).toBeDefined()
       })
 
       it('should show no banners for complete profile team member', () => {

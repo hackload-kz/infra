@@ -20,7 +20,9 @@ import {
   Info,
   AlertCircle,
   Clock,
-  XCircle
+  XCircle,
+  Trophy,
+  GraduationCap
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -156,6 +158,16 @@ export default async function ProfileTeamPage() {
     REJECTED: 'bg-red-500/20 text-red-300 border-red-500/30',
   }
 
+  const levelLabels = {
+    BEGINNER: 'Начинающий',
+    ADVANCED: 'Продвинутый'
+  }
+
+  const levelColors = {
+    BEGINNER: 'bg-green-500/20 text-green-300 border-green-500/30',
+    ADVANCED: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+  }
+
   return (
     <PersonalCabinetLayout user={user}>
       {/* Page Title */}
@@ -197,6 +209,15 @@ export default async function ProfileTeamPage() {
                   <p className="text-slate-400">@{participant.team.nickname}</p>
                 </div>
                 <div className="flex items-center space-x-2">
+                  {participant.team.level && (
+                    <div className="flex items-center space-x-2">
+                      {participant.team.level === 'BEGINNER' && <GraduationCap className="w-4 h-4 text-green-400" />}
+                      {participant.team.level === 'ADVANCED' && <Trophy className="w-4 h-4 text-orange-400" />}
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${levelColors[participant.team.level as keyof typeof levelColors]}`}>
+                        {levelLabels[participant.team.level as keyof typeof levelLabels]}
+                      </span>
+                    </div>
+                  )}
                   {participant.team.status === 'NEW' && <Clock className="w-4 h-4 text-blue-400" />}
                   {participant.team.status === 'INCOMPLETED' && <AlertCircle className="w-4 h-4 text-yellow-400" />}
                   {participant.team.status === 'FINISHED' && <CheckCircle className="w-4 h-4 text-green-400" />}
@@ -210,7 +231,7 @@ export default async function ProfileTeamPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-slate-700/30 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <Users className="w-6 h-6 text-amber-400" />
@@ -238,6 +259,19 @@ export default async function ProfileTeamPage() {
                       <p className="text-slate-400 text-sm">Лидер</p>
                       <p className="text-white font-semibold">
                         {participant.team.leader ? participant.team.leader.name : 'Не назначен'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-slate-700/30 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    {participant.team.level === 'BEGINNER' && <GraduationCap className="w-6 h-6 text-green-400" />}
+                    {participant.team.level === 'ADVANCED' && <Trophy className="w-6 h-6 text-orange-400" />}
+                    {!participant.team.level && <Info className="w-6 h-6 text-slate-400" />}
+                    <div>
+                      <p className="text-slate-400 text-sm">Уровень</p>
+                      <p className="text-white font-semibold">
+                        {participant.team.level ? levelLabels[participant.team.level as keyof typeof levelLabels] : 'Не указан'}
                       </p>
                     </div>
                   </div>
@@ -325,6 +359,7 @@ export default async function ProfileTeamPage() {
                   name: participant.team.name,
                   nickname: participant.team.nickname,
                   status: participant.team.status,
+                  level: participant.team.level,
                   members: participant.team.members.map(member => ({
                     id: member.id,
                     name: member.name,

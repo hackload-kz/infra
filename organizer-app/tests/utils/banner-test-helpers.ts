@@ -15,6 +15,7 @@ export const createMockParticipantForBanner = (overrides: Partial<ParticipantDat
 export const createMockTeam = (memberCount: number = 3, overrides = {}) => ({
   id: 'team-1',
   name: 'Test Team',
+  level: null,
   members: Array.from({ length: memberCount }, (_, i) => ({ id: `member-${i + 1}` })),
   ...overrides,
 })
@@ -52,6 +53,14 @@ export const createMockBanner = (type: BannerType, overrides: Partial<Banner> = 
       actionText: 'Найти участников',
       actionUrl: '/space/participants',
       variant: 'warning'
+    },
+    [BannerType.SET_TEAM_LEVEL]: {
+      type: BannerType.SET_TEAM_LEVEL,
+      title: 'Укажите уровень команды',
+      message: 'Установите уровень сложности для вашей команды, чтобы получить доступ к соответствующим заданиям хакатона. Это важно для квалификации на участие.',
+      actionText: 'Установить уровень',
+      actionUrl: '/space/team',
+      variant: 'info'
     }
   }
 
@@ -112,6 +121,22 @@ export const createIncompleteProfileTeamLeaderScenario = (): ParticipantData =>
     ledTeam: createMockTeam(2),
   })
 
+export const createTeamLeaderWithoutLevelScenario = (): ParticipantData => 
+  createMockParticipantForBanner({
+    telegram: '@leader',
+    githubUrl: 'https://github.com/leader',
+    team: null,
+    ledTeam: createMockTeam(3, { level: null }),
+  })
+
+export const createTeamLeaderWithLevelScenario = (): ParticipantData => 
+  createMockParticipantForBanner({
+    telegram: '@leader',
+    githubUrl: 'https://github.com/leader',
+    team: null,
+    ledTeam: createMockTeam(3, { level: 'BEGINNER' }),
+  })
+
 // Database Mock Helpers
 
 export const mockDismissedBannersQuery = (dismissedTypes: BannerType[] = []) => {
@@ -125,6 +150,7 @@ export const mockAllBannersDismissed = () => [
   { bannerType: BannerType.GITHUB_PROFILE },
   { bannerType: BannerType.FIND_TEAM },
   { bannerType: BannerType.TEAM_NEEDS_MEMBERS },
+  { bannerType: BannerType.SET_TEAM_LEVEL },
 ]
 
 // Test Assertion Helpers

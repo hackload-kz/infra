@@ -7,6 +7,187 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Hackathon {
+  id                String                   @id @default(cuid())
+  name              String
+  slug              String                   @unique
+  description       String?
+  theme             String?
+  startDate         DateTime
+  endDate           DateTime
+  registrationStart DateTime
+  registrationEnd   DateTime
+  maxTeamSize       Int                      @default(4)
+  minTeamSize       Int                      @default(1)
+  allowTeamChanges  Boolean                  @default(true)
+  isActive          Boolean                  @default(true)
+  isPublic          Boolean                  @default(true)
+  logoUrl           String?
+  bannerUrl         String?
+  primaryColor      String?
+  secondaryColor    String?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  dismissedBanners  DismissedBanner[]
+  participations    HackathonParticipation[]
+  joinRequests      JoinRequest[]
+  journalEntries    JournalEntry[]
+  messages          Message[]
+  teams             Team[]
+
+  @@map("hackathons")
+}
+
+model HackathonParticipation {
+  id            String      @id @default(cuid())
+  hackathonId   String
+  participantId String
+  registeredAt  DateTime    @default(now())
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  hackathon     Hackathon   @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@unique([hackathonId, participantId])
+  @@map("hackathon_participations")
+}
+
+model Team {
+  id           String        @id @default(cuid())
+  name         String
+  nickname     String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  leaderId     String?       @unique
+  comment      String?
+  hackathonId  String
+  level        TeamLevel?
+  status       TeamStatus    @default(NEW)
+  joinRequests JoinRequest[] @relation("TeamJoinRequests")
+  messages     Message[]
+  leader       Participant?  @relation("TeamLeader")
+  members      Participant[] @relation("TeamMembers")
+  hackathon    Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@map("teams")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  password    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  participant Participant?
+
+  @@map("users")
+}
+
+model Participant {
+  id                      String                   @id @default(cuid())
+  name                    String
+  email                   String                   @unique
+  city                    String?
+  company                 String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  userId                  String                   @unique
+  teamId                  String?
+  ledTeamId               String?                  @unique
+  cloudProviders          String?
+  cloudServices           String?
+  experienceLevel         String?
+  otherCloudProviders     String?
+  otherCloudServices      String?
+  otherTechnologies       String?
+  technologies            String?
+  telegram                String?
+  githubUrl               String?
+  linkedinUrl             String?
+  dismissedBanners        DismissedBanner[]
+  hackathonParticipations HackathonParticipation[]
+  joinRequests            JoinRequest[]            @relation("ParticipantJoinRequests")
+  journalEntries          JournalEntry[]
+  receivedMessages        Message[]                @relation("MessageRecipient")
+  sentMessages            Message[]                @relation("MessageSender")
+  ledTeam                 Team?                    @relation("TeamLeader", fields: [ledTeamId], references: [id])
+  team                    Team?                    @relation("TeamMembers", fields: [teamId], references: [id])
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("participants")
+}
+
+model JoinRequest {
+  id            String            @id @default(cuid())
+  status        JoinRequestStatus @default(PENDING)
+  message       String?
+  hackathonId   String
+  participantId String
+  teamId        String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  hackathon     Hackathon         @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant   Participant       @relation("ParticipantJoinRequests", fields: [participantId], references: [id], onDelete: Cascade)
+  team          Team              @relation("TeamJoinRequests", fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([participantId, teamId, hackathonId])
+  @@map("join_requests")
+}
+
+model Message {
+  id              String        @id @default(cuid())
+  subject         String
+  body            String
+  status          MessageStatus @default(UNREAD)
+  hackathonId     String
+  senderId        String?
+  recipientId     String
+  parentMessageId String?
+  teamId          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  hackathon       Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  parentMessage   Message?      @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: Cascade)
+  replies         Message[]     @relation("MessageReplies")
+  recipient       Participant   @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender          Participant?  @relation("MessageSender", fields: [senderId], references: [id])
+  team            Team?         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model DismissedBanner {
+  id            String      @id @default(cuid())
+  bannerType    BannerType
+  participantId String
+  hackathonId   String
+  dismissedAt   DateTime    @default(now())
+  hackathon     Hackathon   @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@unique([participantId, bannerType, hackathonId])
+  @@map("dismissed_banners")
+}
+
+model JournalEntry {
+  id            String           @id @default(cuid())
+  eventType     JournalEventType
+  title         String
+  description   String?
+  entityId      String?
+  entityType    String?
+  isRead        Boolean          @default(false)
+  participantId String
+  hackathonId   String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  hackathon     Hackathon        @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant   Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@map("journal_entries")
+}
+
 enum TeamStatus {
   NEW
   INCOMPLETED
@@ -38,6 +219,7 @@ enum BannerType {
   GITHUB_PROFILE
   FIND_TEAM
   TEAM_NEEDS_MEMBERS
+  SET_TEAM_LEVEL
 }
 
 enum JournalEventType {
@@ -56,226 +238,4 @@ enum JournalEventType {
   TEAM_STATUS_UPDATED
   ADMIN_TEAM_EDIT
   SYSTEM_EVENT
-}
-
-model Hackathon {
-  id          String @id @default(cuid())
-  name        String
-  slug        String @unique
-  description String?
-  theme       String? // e.g., "Building a ticket selling system"
-  
-  // Timing
-  startDate         DateTime
-  endDate           DateTime
-  registrationStart DateTime
-  registrationEnd   DateTime
-  
-  // Settings
-  maxTeamSize       Int @default(4)
-  minTeamSize       Int @default(1)
-  allowTeamChanges  Boolean @default(true)
-  isActive          Boolean @default(true)
-  isPublic          Boolean @default(true)
-  
-  // Branding
-  logoUrl          String?
-  bannerUrl        String?
-  primaryColor     String?
-  secondaryColor   String?
-  
-  // Relations
-  teams            Team[]
-  participations   HackathonParticipation[]
-  joinRequests     JoinRequest[]
-  messages         Message[]
-  dismissedBanners DismissedBanner[]
-  journalEntries   JournalEntry[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("hackathons")
-}
-
-model HackathonParticipation {
-  id            String @id @default(cuid())
-  
-  // Relations
-  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId   String
-  
-  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  participantId String
-  
-  // Participation details
-  registeredAt  DateTime @default(now())
-  isActive      Boolean @default(true)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@unique([hackathonId, participantId])
-  @@map("hackathon_participations")
-}
-
-model Team {
-  id        String        @id @default(cuid())
-  name      String
-  nickname  String        @unique
-  comment   String?
-  status    TeamStatus    @default(NEW)
-  level     TeamLevel?
-  
-  // Hackathon relation
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId String
-  
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  leaderId  String?       @unique
-  leader    Participant?  @relation("TeamLeader")
-  members   Participant[] @relation("TeamMembers")
-  joinRequests JoinRequest[] @relation("TeamJoinRequests")
-  messages  Message[]
-
-  @@map("teams")
-}
-
-model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  password    String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  participant Participant?
-
-  @@map("users")
-}
-
-model Participant {
-  id                  String   @id @default(cuid())
-  name                String
-  email               String   @unique
-  city                String?
-  company             String?
-  telegram            String?  // Telegram username or profile link
-  githubUrl           String?  // GitHub or GitLab profile URL
-  linkedinUrl         String?  // LinkedIn profile URL
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  userId              String   @unique
-  teamId              String?
-  ledTeamId           String?  @unique
-  cloudProviders      String?
-  cloudServices       String?
-  experienceLevel     String?
-  otherCloudProviders String?
-  otherCloudServices  String?
-  otherTechnologies   String?
-  technologies        String?
-  ledTeam             Team?    @relation("TeamLeader", fields: [ledTeamId], references: [id])
-  team                Team?    @relation("TeamMembers", fields: [teamId], references: [id])
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hackathonParticipations HackathonParticipation[]
-  joinRequests        JoinRequest[] @relation("ParticipantJoinRequests")
-  sentMessages        Message[] @relation("MessageSender")
-  receivedMessages    Message[] @relation("MessageRecipient")
-  dismissedBanners    DismissedBanner[]
-  journalEntries      JournalEntry[]
-
-  @@map("participants")
-}
-
-model JoinRequest {
-  id        String            @id @default(cuid())
-  status    JoinRequestStatus @default(PENDING)
-  message   String?           // Optional message from participant
-  
-  // Relations
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId String
-
-  participant   Participant @relation("ParticipantJoinRequests", fields: [participantId], references: [id], onDelete: Cascade)
-  participantId String
-
-  team   Team   @relation("TeamJoinRequests", fields: [teamId], references: [id], onDelete: Cascade)
-  teamId String
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Unique constraint to prevent duplicate requests within same hackathon
-  @@unique([participantId, teamId, hackathonId])
-  @@map("join_requests")
-}
-
-model Message {
-  id          String        @id @default(cuid())
-  subject     String
-  body        String        // HTML content
-  status      MessageStatus @default(UNREAD)
-  
-  // Relations
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId String
-  
-  sender      Participant? @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
-  senderId    String?
-  
-  recipient   Participant @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-  recipientId String
-  
-  // For threading replies
-  parentMessage   Message? @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: Cascade)
-  parentMessageId String?
-  replies         Message[] @relation("MessageReplies")
-  
-  // Team message (if sent to entire team)
-  team     Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  teamId   String?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("messages")
-}
-
-model DismissedBanner {
-  id            String     @id @default(cuid())
-  bannerType    BannerType
-  
-  // Relations
-  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  participantId String
-  
-  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId   String
-  
-  dismissedAt   DateTime @default(now())
-  
-  @@unique([participantId, bannerType, hackathonId])
-  @@map("dismissed_banners")
-}
-
-model JournalEntry {
-  id            String           @id @default(cuid())
-  eventType     JournalEventType
-  title         String           // Short description of the event
-  description   String?          // Optional longer description
-  entityId      String?          // ID of the related entity (team, message, etc.)
-  entityType    String?          // Type of entity (team, message, user, etc.)
-  isRead        Boolean          @default(false)
-  
-  // Relations
-  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  participantId String
-  
-  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  hackathonId   String
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@map("journal_entries")
 }

@@ -10,7 +10,9 @@ import {
   AlertCircle,
   Users,
   UserX,
-  Crown
+  Crown,
+  Trophy,
+  GraduationCap
 } from 'lucide-react'
 
 interface TeamMember {
@@ -26,6 +28,7 @@ interface Team {
   name: string
   nickname: string
   status: string
+  level?: string | null
   members: TeamMember[]
   leader?: {
     id: string
@@ -43,10 +46,16 @@ interface TeamEditFormProps {
 export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEditFormProps) {
   const [name, setName] = useState(team.name)
   const [nickname, setNickname] = useState(team.nickname)
+  const [level, setLevel] = useState(team.level || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [removingMember, setRemovingMember] = useState<string | null>(null)
   const router = useRouter()
+
+  const levelLabels = {
+    BEGINNER: 'Начинающий',
+    ADVANCED: 'Продвинутый'
+  }
 
   const canEdit = ['NEW', 'INCOMPLETED', 'FINISHED', 'IN_REVIEW'].includes(team.status)
   const isLeader = team.leader?.id === leaderId
@@ -57,7 +66,7 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
     setError(null)
 
     try {
-      await updateTeamInfo(team.id, name, nickname, leaderId)
+      await updateTeamInfo(team.id, name, nickname, level || null, leaderId)
       onToggleEdit()
       router.refresh()
     } catch (err) {
@@ -88,6 +97,7 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
   const handleCancel = () => {
     setName(team.name)
     setNickname(team.nickname)
+    setLevel(team.level || '')
     setError(null)
     onToggleEdit()
   }
@@ -165,6 +175,24 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
             </p>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Уровень команды
+            </label>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
+            >
+              <option value="">Не указан</option>
+              <option value="BEGINNER">{levelLabels.BEGINNER}</option>
+              <option value="ADVANCED">{levelLabels.ADVANCED}</option>
+            </select>
+            <p className="text-slate-500 text-xs mt-1">
+              Определяет сложность заданий для команды
+            </p>
+          </div>
+
           <div className="flex gap-4">
             <button
               type="submit"
@@ -186,7 +214,7 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
         </form>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-1">
                 Название команды
@@ -198,6 +226,18 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
                 Никнейм команды
               </label>
               <p className="text-white font-medium">@{team.nickname}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-1">
+                Уровень команды
+              </label>
+              <div className="flex items-center space-x-2">
+                {team.level === 'BEGINNER' && <GraduationCap className="w-4 h-4 text-green-400" />}
+                {team.level === 'ADVANCED' && <Trophy className="w-4 h-4 text-orange-400" />}
+                <p className="text-white font-medium">
+                  {team.level ? levelLabels[team.level as keyof typeof levelLabels] : 'Не указан'}
+                </p>
+              </div>
             </div>
           </div>
 

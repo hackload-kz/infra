@@ -20,6 +20,7 @@ export default async function TeamsPage() {
             name: true,
             nickname: true,
             status: true,
+            level: true,
             createdAt: true,
             updatedAt: true,
             _count: {

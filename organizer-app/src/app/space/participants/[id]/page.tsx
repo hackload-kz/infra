@@ -16,7 +16,8 @@ import {
   Code,
   Cloud,
   Calendar,
-  User
+  User,
+  Github
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -192,6 +193,19 @@ export default async function ParticipantProfilePage({ params }: Props) {
                         className="hover:text-amber-400 transition-colors"
                       >
                         {targetParticipant.telegram.startsWith('@') ? targetParticipant.telegram : `@${targetParticipant.telegram}`}
+                      </a>
+                    </div>
+                  )}
+                  {targetParticipant.githubUrl && (
+                    <div className="flex items-center space-x-2 text-slate-400">
+                      <Github className="w-4 h-4" />
+                      <a
+                        href={targetParticipant.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-amber-400 transition-colors"
+                      >
+                        GitHub
                       </a>
                     </div>
                   )}

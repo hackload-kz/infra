@@ -21,7 +21,9 @@ import {
   UserPlus,
   Code,
   Cloud,
-  Briefcase
+  Briefcase,
+  Trophy,
+  GraduationCap
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -130,6 +132,16 @@ export default async function TeamDetailPage({ params }: Props) {
     REJECTED: 'bg-red-500/20 text-red-300 border-red-500/30',
   }
 
+  const levelLabels = {
+    BEGINNER: 'Начинающий',
+    ADVANCED: 'Продвинутый'
+  }
+
+  const levelColors = {
+    BEGINNER: 'bg-green-500/20 text-green-300 border-green-500/30',
+    ADVANCED: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+  }
+
   const canJoin = !participant.teamId && 
                   team.members.length < 4 && 
                   ['NEW', 'INCOMPLETED'].includes(team.status) &&
@@ -169,6 +181,15 @@ export default async function TeamDetailPage({ params }: Props) {
           <div className="flex items-center space-x-3">
             <CopyTeamLink teamNickname={team.nickname} />
             <div className="flex items-center space-x-2">
+              {team.level && (
+                <div className="flex items-center space-x-2">
+                  {team.level === 'BEGINNER' && <GraduationCap className="w-4 h-4 text-green-400" />}
+                  {team.level === 'ADVANCED' && <Trophy className="w-4 h-4 text-orange-400" />}
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium border ${levelColors[team.level as keyof typeof levelColors]}`}>
+                    {levelLabels[team.level as keyof typeof levelLabels]}
+                  </span>
+                </div>
+              )}
               {team.status === 'NEW' && <Clock className="w-4 h-4 text-blue-400" />}
               {team.status === 'INCOMPLETED' && <AlertCircle className="w-4 h-4 text-yellow-400" />}
               {team.status === 'FINISHED' && <CheckCircle className="w-4 h-4 text-green-400" />}

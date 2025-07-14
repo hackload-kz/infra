@@ -11,7 +11,8 @@ import {
   Award,
   Code,
   Edit,
-  Send
+  Send,
+  Github
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -166,6 +167,24 @@ export default async function ProfileInfoPage() {
                       participant.telegram.replace('https://t.me/', '@') : 
                       participant.telegram.startsWith('@') ? participant.telegram : `@${participant.telegram}`
                     }
+                  </a>
+                </div>
+              </div>
+            )}
+            {participant.githubUrl && (
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-amber-400/20 rounded-lg flex items-center justify-center">
+                  <Github className="w-4 h-4 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-slate-400 text-sm">GitHub</p>
+                  <a
+                    href={participant.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 font-medium hover:text-amber-300 transition-colors"
+                  >
+                    GitHub Profile
                   </a>
                 </div>
               </div>

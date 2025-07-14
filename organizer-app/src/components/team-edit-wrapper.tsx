@@ -16,6 +16,7 @@ interface Team {
   name: string
   nickname: string
   status: string
+  level?: string | null
   members: TeamMember[]
   leader?: {
     id: string

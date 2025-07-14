@@ -170,11 +170,13 @@ export default async function PersonalCabinetPage() {
       team: participant.team ? {
         id: participant.team.id,
         name: participant.team.name,
+        level: participant.team.level,
         members: participant.team.members
       } : null,
       ledTeam: participant.ledTeam ? {
         id: participant.ledTeam.id,
         name: participant.ledTeam.name,
+        level: participant.ledTeam.level,
         members: participant.ledTeam.members
       } : null
     }

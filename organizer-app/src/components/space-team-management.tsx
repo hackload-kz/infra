@@ -70,6 +70,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
   const [selectedTeamId, setSelectedTeamId] = useState('')
   const [newTeamName, setNewTeamName] = useState('')
   const [newTeamNickname, setNewTeamNickname] = useState('')
+  const [newTeamLevel, setNewTeamLevel] = useState('')
   const [selectedNewLeader, setSelectedNewLeader] = useState('')
 
   const router = useRouter()
@@ -85,7 +86,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
     ['NEW', 'INCOMPLETED'].includes(team.status)
   )
 
-  const handleAction = async (action: string, data?: { teamId?: string; teamName?: string; teamNickname?: string; newLeaderId?: string | null }) => {
+  const handleAction = async (action: string, data?: { teamId?: string; teamName?: string; teamNickname?: string; teamLevel?: string; newLeaderId?: string | null }) => {
     setLoading(true)
     setError(null)
     
@@ -100,6 +101,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               participant.id,
               data.teamName,
               data.teamNickname,
+              data.teamLevel || null,
               data.newLeaderId || null
             )
           }
@@ -124,6 +126,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
     setSelectedTeamId('')
     setNewTeamName('')
     setNewTeamNickname('')
+    setNewTeamLevel('')
     setSelectedNewLeader('')
     setError(null)
   }
@@ -173,6 +176,11 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
       label: 'Отклонена',
       description: 'Команда не прошла отбор'
     }
+  }
+
+  const levelLabels = {
+    BEGINNER: 'Начинающий',
+    ADVANCED: 'Продвинутый'
   }
 
   if (activeAction === 'help') {
@@ -378,6 +386,37 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               Только буквы, цифры, дефисы и подчеркивания
             </p>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Уровень команды
+            </label>
+            <select
+              value={newTeamLevel}
+              onChange={(e) => setNewTeamLevel(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+            >
+              <option value="">Выберите уровень</option>
+              <option value="BEGINNER">
+                {levelLabels.BEGINNER}
+              </option>
+              <option value="ADVANCED">
+                {levelLabels.ADVANCED}
+              </option>
+            </select>
+            <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3 mt-3">
+              <div className="flex items-start space-x-2">
+                <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="text-blue-200 text-sm">
+                  <p className="mb-1">
+                    <strong>Примечание:</strong> Уровень команды можно изменить позже в настройках.
+                  </p>
+                  <p>
+                    Подробности о различиях между уровнями будут доступны после публикации заданий хакатона.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-4">
@@ -385,6 +424,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
             onClick={() => handleAction('create', {
               teamName: newTeamName,
               teamNickname: newTeamNickname,
+              teamLevel: newTeamLevel,
               newLeaderId: selectedNewLeader || null
             })}
             disabled={loading || !newTeamName || !newTeamNickname || 
