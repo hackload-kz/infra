@@ -4,8 +4,8 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { MessageNotifications } from '@/components/message-notifications'
-import { BannerList } from '@/components/banner-notification'
-import { getActiveBanners } from '@/lib/banners'
+import { CombinedBannerList } from '@/components/banner-notification'
+import { getActiveBanners, getActiveCustomBanners } from '@/lib/banners'
 import Link from 'next/link'
 import { 
   Trophy,
@@ -182,6 +182,12 @@ export default async function PersonalCabinetPage() {
     }
   ) : []
 
+  // Get active custom banners for participant
+  const activeCustomBanners = hackathon ? await getActiveCustomBanners(
+    participant.id,
+    hackathon.id
+  ) : []
+
   return (
     <PersonalCabinetLayout user={user}>
       {/* Page Title */}
@@ -192,10 +198,11 @@ export default async function PersonalCabinetPage() {
         <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full"></div>
       </div>
 
-      {/* Banner Notifications */}
+      {/* All Banner Notifications */}
       {hackathon && (
-        <BannerList 
-          banners={activeBanners}
+        <CombinedBannerList 
+          customBanners={activeCustomBanners}
+          systemBanners={activeBanners}
           participantId={participant.id}
           hackathonId={hackathon.id}
         />

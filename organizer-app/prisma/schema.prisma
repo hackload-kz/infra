@@ -28,6 +28,8 @@ model Hackathon {
   secondaryColor    String?
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
+  customBanners     CustomBanner[]
+  customBannerDismissals CustomBannerDismissal[]
   dismissedBanners  DismissedBanner[]
   participations    HackathonParticipation[]
   joinRequests      JoinRequest[]
@@ -105,6 +107,7 @@ model Participant {
   telegram                String?
   githubUrl               String?
   linkedinUrl             String?
+  customBannerDismissals  CustomBannerDismissal[]
   dismissedBanners        DismissedBanner[]
   hackathonParticipations HackathonParticipation[]
   joinRequests            JoinRequest[]            @relation("ParticipantJoinRequests")
@@ -155,6 +158,40 @@ model Message {
   team            Team?         @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model CustomBanner {
+  id           String              @id @default(cuid())
+  title        String
+  description  String
+  type         CustomBannerType
+  displayStart DateTime
+  displayEnd   DateTime
+  allowDismiss Boolean             @default(true)
+  actionText   String?
+  actionUrl    String?
+  hackathonId  String
+  isActive     Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  hackathon    Hackathon           @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  dismissals   CustomBannerDismissal[]
+
+  @@map("custom_banners")
+}
+
+model CustomBannerDismissal {
+  id               String        @id @default(cuid())
+  customBannerId   String
+  participantId    String
+  hackathonId      String
+  dismissedAt      DateTime      @default(now())
+  customBanner     CustomBanner  @relation(fields: [customBannerId], references: [id], onDelete: Cascade)
+  participant      Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  hackathon        Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@unique([customBannerId, participantId, hackathonId])
+  @@map("custom_banner_dismissals")
 }
 
 model DismissedBanner {
@@ -220,6 +257,11 @@ enum BannerType {
   FIND_TEAM
   TEAM_NEEDS_MEMBERS
   SET_TEAM_LEVEL
+}
+
+enum CustomBannerType {
+  INFO
+  WARN
 }
 
 enum JournalEventType {

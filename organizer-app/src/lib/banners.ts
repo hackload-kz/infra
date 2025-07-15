@@ -1,4 +1,4 @@
-import { BannerType } from '@prisma/client'
+import { BannerType, CustomBannerType } from '@prisma/client'
 import { db } from '@/lib/db'
 
 export interface Banner {
@@ -8,6 +8,17 @@ export interface Banner {
   actionText: string
   actionUrl: string
   variant: 'warning' | 'info' | 'error'
+}
+
+export interface CustomBanner {
+  id: string
+  title: string
+  description: string
+  type: CustomBannerType
+  variant: 'warning' | 'info' | 'error'
+  allowDismiss: boolean
+  actionText?: string | null
+  actionUrl?: string | null
 }
 
 export interface ParticipantData {
@@ -95,6 +106,56 @@ export function calculateBanners(participant: ParticipantData): Banner[] {
   }
 
   return banners
+}
+
+/**
+ * Get active custom banners for a participant (excluding dismissed ones)
+ */
+export async function getActiveCustomBanners(
+  participantId: string,
+  hackathonId: string
+): Promise<CustomBanner[]> {
+  const now = new Date()
+  
+  // Get all active custom banners for this hackathon
+  const customBanners = await db.customBanner.findMany({
+    where: {
+      hackathonId,
+      isActive: true,
+      displayStart: { lte: now },
+      displayEnd: { gte: now }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+
+  // Get dismissed custom banners
+  const dismissedCustomBanners = await db.customBannerDismissal.findMany({
+    where: {
+      participantId,
+      hackathonId
+    },
+    select: {
+      customBannerId: true
+    }
+  })
+
+  const dismissedCustomIds = new Set(dismissedCustomBanners.map(b => b.customBannerId))
+  
+  // Filter out dismissed custom banners
+  const activeCustomBanners = customBanners.filter(banner => 
+    !dismissedCustomIds.has(banner.id)
+  )
+
+  return activeCustomBanners.map(banner => ({
+    id: banner.id,
+    title: banner.title,
+    description: banner.description,
+    type: banner.type,
+    variant: banner.type === CustomBannerType.WARN ? 'warning' : 'info',
+    allowDismiss: banner.allowDismiss,
+    actionText: banner.actionText,
+    actionUrl: banner.actionUrl
+  }))
 }
 
 /**

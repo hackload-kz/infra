@@ -1018,3 +1018,52 @@ export async function dismissBannerAction(
         throw error
     }
 }
+
+export async function dismissCustomBannerAction(
+    participantId: string,
+    hackathonId: string,
+    customBannerId: string
+) {
+    if (!participantId || !hackathonId || !customBannerId) {
+        throw new Error('All parameters are required')
+    }
+
+    try {
+        // Check if banner exists and is dismissible
+        const banner = await db.customBanner.findUnique({
+            where: { id: customBannerId }
+        })
+
+        if (!banner) {
+            throw new Error('Banner not found')
+        }
+
+        if (!banner.allowDismiss) {
+            throw new Error('Banner cannot be dismissed')
+        }
+
+        // Create or update dismissal record
+        await db.customBannerDismissal.upsert({
+            where: {
+                customBannerId_participantId_hackathonId: {
+                    customBannerId,
+                    participantId,
+                    hackathonId
+                }
+            },
+            update: {
+                dismissedAt: new Date()
+            },
+            create: {
+                customBannerId,
+                participantId,
+                hackathonId
+            }
+        })
+
+        revalidatePath('/space')
+    } catch (error) {
+        console.error('Error dismissing custom banner:', error)
+        throw error
+    }
+}
