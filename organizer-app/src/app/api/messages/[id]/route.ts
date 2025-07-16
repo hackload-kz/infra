@@ -86,8 +86,10 @@ export async function PUT(
     // Update message status
     if (action === 'read') {
       await messageService.markAsRead(messageId, session.user.email);
+      console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as read`);
     } else {
       await messageService.markAsUnread(messageId, session.user.email);
+      console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as unread`);
     }
 
     return NextResponse.json({ success: true });

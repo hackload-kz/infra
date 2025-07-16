@@ -119,6 +119,9 @@ export async function PUT(
         teamId: joinRequest.teamId,
         teamName: joinRequest.team.name
       });
+      console.info(`✅ Join request approved: ${session.user.email} approved ${joinRequest.participant.name} to join team ${joinRequest.team.name}`);
+    } else {
+      console.info(`❌ Join request declined: ${session.user.email} declined ${joinRequest.participant.name} from team ${joinRequest.team.name}`);
     }
 
     // Send result message to participant

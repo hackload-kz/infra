@@ -44,12 +44,15 @@ export default {
               },
               include: { participant: true },
             });
+            console.info(`🔑 New user registered via OAuth: ${user.email} using ${account?.provider}`);
           } else {
             // Check if user has a participant profile and if it's active
             if (dbUser.participant && !dbUser.participant.isActive) {
               // Block inactive participants from logging in
+              console.info(`🚫 Blocked inactive user login attempt: ${user.email}`);
               return false;
             }
+            console.info(`🔑 User authenticated: ${user.email} using ${account?.provider}`);
           }
         } catch (error) {
           console.error("Error creating OAuth user:", error);

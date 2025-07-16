@@ -104,6 +104,9 @@ export default async function ParticipantProfilePage({ params }: Props) {
     notFound()
   }
 
+  // Log profile viewing
+  console.info(`👁️ Profile viewed: ${session.user.email} viewed participant ${targetParticipant.name} (${targetParticipant.email}) in personal cabinet`)
+
   // Check if participant is inactive
   const isInactive = !targetParticipant.isActive
 

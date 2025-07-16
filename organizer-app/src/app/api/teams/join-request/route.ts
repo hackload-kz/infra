@@ -119,6 +119,8 @@ export async function POST(request: NextRequest) {
       hackathonId: hackathon.id
     });
 
+    console.info(`📩 Join request sent: ${session.user.email} sent join request to team ${joinRequest.team.name} (@${joinRequest.team.nickname})`);
+
     // Send notification message to team
     try {
       console.log('📧 Starting join request notification process...')

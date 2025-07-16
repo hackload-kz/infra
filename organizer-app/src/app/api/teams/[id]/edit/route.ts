@@ -70,6 +70,8 @@ export async function PUT(
             })
         })
 
+        console.info(`✏️ Team edited: ${session.user.email} updated team ${updatedTeam.name} (@${updatedTeam.nickname})`)
+
         return NextResponse.json(updatedTeam)
     } catch (error) {
         console.error('Error updating team:', error)

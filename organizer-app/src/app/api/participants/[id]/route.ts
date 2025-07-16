@@ -101,6 +101,8 @@ export async function PUT(
             },
         })
 
+        console.info(`✏️ Profile edited: Admin ${session.user.email} updated profile for ${updatedParticipant.name} (${updatedParticipant.email})`)
+
         // Send notification to team leader if participant was removed from team
         if (isBeingDeactivated && teamLeaderId && teamLeaderId !== participant.id) {
             await createJournalEntry({

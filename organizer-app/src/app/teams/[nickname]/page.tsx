@@ -75,6 +75,9 @@ export default async function PublicTeamPage({ params }: Props) {
     notFound()
   }
 
+  // Log team viewing
+  console.info(`🏆 Team viewed: ${session?.user?.email || 'Anonymous'} viewed team ${team.name} (@${team.nickname})`)
+
   const statusLabels = {
     NEW: 'Новая',
     INCOMPLETED: 'Не завершена',
