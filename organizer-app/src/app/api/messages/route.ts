@@ -51,9 +51,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ messages });
   } catch (error) {
-    await logger.error(LogAction.READ, 'Message', `Error fetching messages: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
-    const session = await auth();
-    await logger.logError('Message', error as Error, session?.user?.email || undefined);
+    const errorSession = await auth();
+    await logger.error(LogAction.READ, 'Message', `Error fetching messages: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
+    await logger.logError('Message', error as Error, errorSession?.user?.email || undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -110,9 +110,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message });
   } catch (error) {
-    await logger.error(LogAction.CREATE, 'Message', `Error creating message: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
-    const session = await auth();
-    await logger.logApiError('POST', '/api/messages', error as Error, session?.user?.email || undefined);
+    const errorSession = await auth();
+    await logger.error(LogAction.CREATE, 'Message', `Error creating message: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
+    await logger.logApiError('POST', '/api/messages', error as Error, errorSession?.user?.email || undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

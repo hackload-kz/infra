@@ -71,7 +71,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     await logger.logApiSuccess('POST', `/api/calendar/${id}/dismiss`, session.user.email, id)
     return NextResponse.json(dismissal)
   } catch (error) {
-    await logger.logApiError('POST', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    const { id } = params
+    await logger.logApiError('POST', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -124,7 +126,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await logger.logApiSuccess('DELETE', `/api/calendar/${id}/dismiss`, session.user.email, id)
     return NextResponse.json({ message: 'Dismissal removed successfully' })
   } catch (error) {
-    await logger.logApiError('DELETE', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    const { id } = params
+    await logger.logApiError('DELETE', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -314,9 +314,9 @@ export async function dismissCalendarEvent(
 ): Promise<void> {
   await db.calendarEventDismissal.upsert({
     where: {
-      participantId_eventId_hackathonId: {
-        participantId,
+      eventId_participantId_hackathonId: {
         eventId,
+        participantId,
         hackathonId
       }
     },

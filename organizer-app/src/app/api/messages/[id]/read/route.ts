@@ -42,10 +42,10 @@ export async function PUT(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    await logger.error(LogAction.UPDATE, 'Message', `Error marking message as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
-    const session = await auth();
+    const errorSession = await auth();
     const { id: messageId } = await params;
-    await logger.logApiError('PUT', `/api/messages/${messageId}/read`, error as Error, session?.user?.email || undefined);
+    await logger.error(LogAction.UPDATE, 'Message', `Error marking message as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
+    await logger.logApiError('PUT', `/api/messages/${messageId}/read`, error as Error, errorSession?.user?.email || undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

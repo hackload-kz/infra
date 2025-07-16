@@ -140,7 +140,8 @@ export async function PUT(
 
         return NextResponse.json(updatedParticipant)
     } catch (error) {
-        await logger.error(LogAction.UPDATE, 'Participant', `Error updating participant: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
+        const errorSession = await auth()
+        await logger.error(LogAction.UPDATE, 'Participant', `Error updating participant: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

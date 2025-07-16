@@ -40,7 +40,8 @@ export async function GET(
 
     return NextResponse.json({ message });
   } catch (error) {
-    await logger.error(LogAction.READ, 'Message', `Error fetching message: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
+    const errorSession = await auth()
+    await logger.error(LogAction.READ, 'Message', `Error fetching message: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -163,11 +163,11 @@ export async function PUT(
 
     return NextResponse.json(updatedJoinRequest)
   } catch (error) {
-    await logger.error(LogAction.UPDATE, 'JoinRequest', `Error updating join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, entityId: resolvedParams.id, metadata: { error: error instanceof Error ? error.stack : error } });
+    const errorSession = await auth()
+    const errorParams = await params
+    await logger.error(LogAction.UPDATE, 'JoinRequest', `Error updating join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, entityId: errorParams.id, metadata: { error: error instanceof Error ? error.stack : error } });
     
-    const session = await auth();
-    const resolvedParams = await params;
-    await logger.logApiError('PUT', `/api/teams/join-request/${resolvedParams.id}`, error as Error, session?.user?.email || undefined);
+    await logger.logApiError('PUT', `/api/teams/join-request/${errorParams.id}`, error as Error, errorSession?.user?.email || undefined);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 })

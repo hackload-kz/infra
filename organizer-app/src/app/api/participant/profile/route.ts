@@ -213,10 +213,10 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        await logger.error(LogAction.CREATE, 'Participant', `Profile creation error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
+        const errorSession = await auth();
+        await logger.error(LogAction.CREATE, 'Participant', `Profile creation error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
         
-        const session = await auth();
-        await logger.logApiError('POST', '/api/participant/profile', error as Error, session?.user?.email || undefined);
+        await logger.logApiError('POST', '/api/participant/profile', error as Error, errorSession?.user?.email || undefined);
 
         if (error instanceof Error) {
             return NextResponse.json(
@@ -412,10 +412,10 @@ export async function PUT(request: NextRequest) {
         });
 
     } catch (error) {
-        await logger.error(LogAction.UPDATE, 'Participant', `Profile update error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
+        const errorSession = await auth();
+        await logger.error(LogAction.UPDATE, 'Participant', `Profile update error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
         
-        const session = await auth();
-        await logger.logApiError('PUT', '/api/participant/profile', error as Error, session?.user?.email || undefined);
+        await logger.logApiError('PUT', '/api/participant/profile', error as Error, errorSession?.user?.email || undefined);
 
         if (error instanceof Error) {
             return NextResponse.json(

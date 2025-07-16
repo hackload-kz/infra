@@ -75,7 +75,8 @@ export async function PUT(
 
         return NextResponse.json(updatedTeam)
     } catch (error) {
-        await logger.error(LogAction.UPDATE, 'Team', `Error updating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
+        const errorSession = await auth()
+        await logger.error(LogAction.UPDATE, 'Team', `Error updating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
         return NextResponse.json({ error: 'Failed to update team' }, { status: 500 })
     }
 }

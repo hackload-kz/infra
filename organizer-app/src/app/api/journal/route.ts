@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ entries })
   } catch (error) {
-    await logger.error(LogAction.READ, 'Journal', `Error fetching journal entries: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } })
+    const errorSession = await auth()
+    await logger.error(LogAction.READ, 'Journal', `Error fetching journal entries: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -61,7 +62,8 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    await logger.error(LogAction.UPDATE, 'Journal', `Error marking journal entries as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } })
+    const errorSession = await auth()
+    await logger.error(LogAction.UPDATE, 'Journal', `Error marking journal entries as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: errorSession?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

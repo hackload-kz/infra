@@ -92,7 +92,8 @@ export async function GET(request: NextRequest) {
     await logger.logApiSuccess('GET', '/api/calendar', session.user.email)
     return NextResponse.json(eventsWithDismissal)
   } catch (error) {
-    await logger.logApiError('GET', '/api/calendar', error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    await logger.logApiError('GET', '/api/calendar', error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -165,7 +166,8 @@ export async function POST(request: NextRequest) {
     await logger.logApiSuccess('POST', '/api/calendar', session.user.email, event.id)
     return NextResponse.json(event)
   } catch (error) {
-    await logger.logApiError('POST', '/api/calendar', error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    await logger.logApiError('POST', '/api/calendar', error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

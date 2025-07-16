@@ -49,7 +49,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     await logger.logApiSuccess('GET', `/api/calendar/${id}`, session.user.email, id)
     return NextResponse.json(eventWithDismissal)
   } catch (error) {
-    await logger.logApiError('GET', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    const { id } = params
+    await logger.logApiError('GET', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -122,7 +124,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     await logger.logApiSuccess('PUT', `/api/calendar/${id}`, session.user.email, id)
     return NextResponse.json(event)
   } catch (error) {
-    await logger.logApiError('PUT', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    const { id } = params
+    await logger.logApiError('PUT', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -161,7 +165,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await logger.logApiSuccess('DELETE', `/api/calendar/${id}`, session.user.email, id)
     return NextResponse.json({ message: 'Event deleted successfully' })
   } catch (error) {
-    await logger.logApiError('DELETE', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), session?.user?.email || undefined)
+    const errorSession = await auth()
+    const { id } = params
+    await logger.logApiError('DELETE', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
