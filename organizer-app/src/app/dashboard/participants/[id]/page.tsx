@@ -66,7 +66,16 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                         <User className="w-8 h-8 text-gray-600" />
                     </div>
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold text-gray-900">{participant.name}</h1>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-3xl font-bold text-gray-900">{participant.name}</h1>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                participant.isActive 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                            }`}>
+                                {participant.isActive ? 'Активен' : 'Заблокирован'}
+                            </span>
+                        </div>
                         <div className="flex flex-wrap items-center gap-4 mt-2 text-gray-600">
                             <div className="flex items-center">
                                 <Mail className="w-4 h-4 mr-1" />

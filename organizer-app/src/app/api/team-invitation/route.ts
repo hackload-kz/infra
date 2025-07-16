@@ -66,6 +66,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Target participant not found' }, { status: 404 })
     }
 
+    // Check if target participant is active
+    if (!targetParticipant.isActive) {
+      return NextResponse.json({ error: 'Cannot invite inactive participant' }, { status: 403 })
+    }
+
     // Check if target participant is already in a team
     if (targetParticipant.teamId) {
       return NextResponse.json({ error: 'Participant is already in a team' }, { status: 400 })

@@ -11,7 +11,7 @@ RUN npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-retry-mintimeout 10000 && \
     npm config set fetch-retry-maxtimeout 60000 && \
     npm config set progress false && \
-    npm config set loglevel error
+    npm config set loglevel info
 
 # Этап установки production зависимостей
 FROM base AS deps

@@ -76,12 +76,20 @@ export async function PUT(
         return NextResponse.json({ error: 'Team is full' }, { status: 400 })
       }
 
-      // Check if participant is still available (not in another team)
+      // Check if participant is still available (not in another team) and is active
       const currentParticipant = await db.participant.findUnique({
         where: { id: joinRequest.participantId }
       })
 
-      if (currentParticipant?.teamId) {
+      if (!currentParticipant) {
+        return NextResponse.json({ error: 'Participant not found' }, { status: 404 })
+      }
+
+      if (!currentParticipant.isActive) {
+        return NextResponse.json({ error: 'Cannot approve join request - participant account is inactive' }, { status: 403 })
+      }
+
+      if (currentParticipant.teamId) {
         return NextResponse.json({ error: 'Participant has already joined another team' }, { status: 400 })
       }
 
@@ -111,6 +119,9 @@ export async function PUT(
         teamId: joinRequest.teamId,
         teamName: joinRequest.team.name
       });
+      console.info(`✅ Join request approved: ${session.user.email} approved ${joinRequest.participant.name} to join team ${joinRequest.team.name}`);
+    } else {
+      console.info(`❌ Join request declined: ${session.user.email} declined ${joinRequest.participant.name} from team ${joinRequest.team.name}`);
     }
 
     // Send result message to participant

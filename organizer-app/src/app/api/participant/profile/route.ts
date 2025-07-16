@@ -178,6 +178,8 @@ export async function POST(request: NextRequest) {
             isLeader: result.isLeader
         });
 
+        console.info(`👤 User registered: ${session.user.email} created profile for ${result.participant.name}`);
+
         // Track participant creation in journal
         await trackParticipantCreated(result.participant.id);
 
@@ -186,6 +188,8 @@ export async function POST(request: NextRequest) {
                 teamName: result.team.name,
                 teamNickname: result.team.nickname
             });
+
+            console.info(`🏆 Team created: ${result.team.name} (@${result.team.nickname}) by ${session.user.email}`);
 
             // Track team creation in journal
             await trackTeamCreated(result.participant.id, result.team.id, result.team.name);
@@ -346,6 +350,8 @@ export async function PUT(request: NextRequest) {
             
             await logger.logCreate('Participant', result.id, session.user.email, 'First-time participant profile created');
             
+            console.info(`👤 User registered: ${session.user.email} created profile for ${result.name}`);
+            
             // Track participant creation in journal
             await trackParticipantCreated(result.id);
         } else {
@@ -371,6 +377,8 @@ export async function PUT(request: NextRequest) {
             });
             
             await logger.logUpdate('Participant', user.participant.id, session.user.email, 'Participant profile updated');
+            
+            console.info(`✏️ Profile edited: ${session.user.email} updated profile for ${updatedParticipant.name}`);
             
             // Track profile update in journal
             await trackProfileUpdated(user.participant.id);

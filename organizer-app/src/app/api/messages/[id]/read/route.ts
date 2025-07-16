@@ -37,6 +37,8 @@ export async function PUT(
     await messageService.markAsRead(messageId, session.user.email);
 
     await logger.logStatusChange('Message', messageId, session.user.email, 'UNREAD', 'READ');
+    
+    console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as read`);
 
     return NextResponse.json({ success: true });
   } catch (error) {

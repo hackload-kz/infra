@@ -69,6 +69,9 @@ export default async function PublicParticipantPage({ params }: Props) {
     notFound()
   }
 
+  // Log profile viewing
+  console.info(`👁️ Profile viewed: ${session?.user?.email || 'Anonymous'} viewed participant ${participant.name} (${participant.email})`)
+
   const parseTechnologies = (techString: string | null) => {
     if (!techString) return []
     try {
