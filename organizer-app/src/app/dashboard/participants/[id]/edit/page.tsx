@@ -29,16 +29,6 @@ export default async function EditParticipantPage({ params }: EditParticipantPag
             },
         }),
         db.team.findMany({
-            select: {
-                id: true,
-                name: true,
-                nickname: true,
-                _count: {
-                    select: {
-                        members: true
-                    }
-                }
-            },
             orderBy: {
                 name: 'asc'
             }
