@@ -155,8 +155,12 @@ export function CalendarView({
     )
   }
 
-  const allEvents = [...upcomingEvents, ...pastEvents].sort((a, b) => 
+  // Sort events: upcoming first (chronological), then past events (reverse chronological)
+  const sortedUpcomingEvents = upcomingEvents.sort((a, b) => 
     new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+  )
+  const sortedPastEvents = pastEvents.sort((a, b) => 
+    new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()
   )
 
   return (
@@ -166,53 +170,94 @@ export function CalendarView({
         <h2 className="text-lg font-semibold text-white">Календарь событий</h2>
       </div>
 
-      {nextEvent && (
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <Clock className="h-4 w-4 text-amber-400" />
-            <span className="text-sm font-medium text-amber-300">Ближайшее событие</span>
-          </div>
-          <CalendarEventItem
-            event={nextEvent}
-            isUpcoming={true}
-            canDismiss={canDismiss}
-            onDismiss={handleDismiss}
-          />
-        </div>
-      )}
-
-      {allEvents.length === 0 && (
+      {(sortedUpcomingEvents.length === 0 && sortedPastEvents.length === 0) && (
         <div className="text-center py-12">
           <Calendar className="h-12 w-12 mx-auto mb-4 text-slate-400" />
           <p className="text-slate-300">События будут опубликованы позже</p>
         </div>
       )}
 
-      {allEvents.length > 0 && (
+      {(sortedUpcomingEvents.length > 0 || sortedPastEvents.length > 0) && (
         <div className="relative">
+          {/* Past Events Toggle Button at Top */}
+          {sortedPastEvents.length > 0 && (
+            <div className="mb-6 text-center">
+              <button
+                onClick={() => setShowPastEvents(!showPastEvents)}
+                className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 rounded-lg transition-colors"
+              >
+                <span>{showPastEvents ? 'Скрыть прошедшие' : 'Показать прошедшие'} ({sortedPastEvents.length})</span>
+                {showPastEvents ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+            </div>
+          )}
+
           {/* Vertical Timeline Line */}
           <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400/50 via-slate-600/50 to-slate-700/30"></div>
           
           <div className="space-y-6">
-            {allEvents.map((event, index) => {
+            {/* Past Events Section - Collapsed by Default */}
+            {showPastEvents && sortedPastEvents.map((event, index) => {
               const eventDate = new Date(event.eventDate)
-              const isPast = eventDate < now
+              
+              return (
+                <div key={event.id} className="relative flex items-start space-x-4">
+                  {/* Timeline Node */}
+                  <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 bg-slate-700 border-slate-600">
+                    <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                  </div>
+                  
+                  {/* Event Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Date Header */}
+                    <div className="mb-2">
+                      <div className="text-sm font-medium text-slate-400">
+                        {eventDate.toLocaleDateString('ru-RU', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {eventDate.toLocaleTimeString('ru-RU', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Event Item */}
+                    <div className="opacity-60">
+                      <CalendarEventItem
+                        event={event}
+                        isUpcoming={false}
+                        canDismiss={false}
+                        onDismiss={handleDismiss}
+                        isPast={true}
+                        isCollapsed={false}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Upcoming Events Section */}
+            {sortedUpcomingEvents.map((event, index) => {
+              const eventDate = new Date(event.eventDate)
               const isToday = eventDate.toDateString() === now.toDateString()
               
               return (
                 <div key={event.id} className="relative flex items-start space-x-4">
                   {/* Timeline Node */}
                   <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${
-                    isPast 
-                      ? 'bg-slate-700 border-slate-600' 
-                      : isToday 
+                    isToday 
                       ? 'bg-amber-400 border-amber-300 animate-pulse' 
                       : 'bg-slate-800 border-amber-400/50'
                   }`}>
                     <div className={`w-2 h-2 rounded-full ${
-                      isPast 
-                        ? 'bg-slate-500' 
-                        : isToday 
+                      isToday 
                         ? 'bg-slate-800' 
                         : 'bg-amber-400'
                     }`}></div>
@@ -223,9 +268,7 @@ export function CalendarView({
                     {/* Date Header */}
                     <div className="mb-2">
                       <div className={`text-sm font-medium ${
-                        isPast 
-                          ? 'text-slate-400' 
-                          : isToday 
+                        isToday 
                           ? 'text-amber-300' 
                           : 'text-slate-200'
                       }`}>
@@ -237,9 +280,7 @@ export function CalendarView({
                         })}
                       </div>
                       <div className={`text-xs ${
-                        isPast 
-                          ? 'text-slate-500' 
-                          : isToday 
+                        isToday 
                           ? 'text-amber-400' 
                           : 'text-slate-400'
                       }`}>
@@ -251,38 +292,19 @@ export function CalendarView({
                     </div>
                     
                     {/* Event Item */}
-                    <div className={`${
-                      isPast 
-                        ? 'opacity-60' 
-                        : ''
-                    }`}>
-                      <CalendarEventItem
-                        event={event}
-                        isUpcoming={!isPast}
-                        canDismiss={canDismiss && !isPast}
-                        onDismiss={handleDismiss}
-                        isPast={isPast}
-                        isCollapsed={isPast && !showPastEvents}
-                      />
-                    </div>
+                    <CalendarEventItem
+                      event={event}
+                      isUpcoming={true}
+                      canDismiss={canDismiss}
+                      onDismiss={handleDismiss}
+                      isPast={false}
+                      isCollapsed={false}
+                    />
                   </div>
                 </div>
               )
             })}
           </div>
-          
-          {/* Past Events Toggle */}
-          {pastEvents.length > 0 && (
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setShowPastEvents(!showPastEvents)}
-                className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 rounded-lg transition-colors"
-              >
-                <span>{showPastEvents ? 'Скрыть прошедшие' : 'Показать прошедшие'} ({pastEvents.length})</span>
-                {showPastEvents ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

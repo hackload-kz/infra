@@ -21,6 +21,24 @@ export interface CustomBanner {
   actionUrl?: string | null
 }
 
+export interface CalendarEventBanner {
+  id: string
+  title: string
+  description: string
+  eventDate: Date
+  eventEndDate: Date | null
+  eventType: 'INFO' | 'WARNING' | 'DEADLINE'
+  variant: 'warning' | 'info' | 'error'
+  allowDismiss: boolean
+  actionText: string
+  actionUrl: string
+  team?: {
+    id: string
+    name: string
+    nickname: string
+  } | null
+}
+
 export interface ParticipantData {
   id: string
   telegram?: string | null
@@ -106,6 +124,81 @@ export function calculateBanners(participant: ParticipantData): Banner[] {
   }
 
   return banners
+}
+
+/**
+ * Get upcoming calendar events as banners
+ */
+export async function getUpcomingCalendarEvents(
+  participantId: string,
+  hackathonId: string,
+  teamId?: string
+): Promise<CalendarEventBanner[]> {
+  const now = new Date()
+  const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  
+  // Get upcoming events for the next 24 hours
+  const upcomingEvents = await db.calendarEvent.findMany({
+    where: {
+      hackathonId,
+      isActive: true,
+      eventDate: {
+        gte: now,
+        lte: next24Hours
+      },
+      OR: [
+        { teamId: null }, // Global events
+        ...(teamId ? [{ teamId }] : []) // Team-specific events if participant has a team
+      ]
+    },
+    include: {
+      team: {
+        select: {
+          id: true,
+          name: true,
+          nickname: true
+        }
+      }
+    },
+    orderBy: {
+      eventDate: 'asc'
+    },
+    take: 3 // Show only the next 3 events
+  })
+
+  // Get dismissed events
+  const dismissedEvents = await db.calendarEventDismissal.findMany({
+    where: {
+      participantId,
+      hackathonId,
+      eventId: {
+        in: upcomingEvents.map(e => e.id)
+      }
+    },
+    select: {
+      eventId: true
+    }
+  })
+
+  const dismissedEventIds = new Set(dismissedEvents.map(d => d.eventId))
+
+  // Filter out dismissed events and convert to banner format
+  return upcomingEvents
+    .filter(event => !dismissedEventIds.has(event.id))
+    .map(event => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      eventDate: event.eventDate,
+      eventEndDate: event.eventEndDate,
+      eventType: event.eventType,
+      variant: event.eventType === 'DEADLINE' ? 'error' as const : 
+               event.eventType === 'WARNING' ? 'warning' as const : 'info' as const,
+      allowDismiss: true,
+      actionText: 'Открыть календарь',
+      actionUrl: '/space/calendar',
+      team: event.team
+    }))
 }
 
 /**
@@ -207,6 +300,33 @@ export async function dismissBanner(
       participantId,
       hackathonId,
       bannerType
+    }
+  })
+}
+
+/**
+ * Dismiss a calendar event for a participant
+ */
+export async function dismissCalendarEvent(
+  participantId: string,
+  hackathonId: string,
+  eventId: string
+): Promise<void> {
+  await db.calendarEventDismissal.upsert({
+    where: {
+      participantId_eventId_hackathonId: {
+        participantId,
+        eventId,
+        hackathonId
+      }
+    },
+    update: {
+      dismissedAt: new Date()
+    },
+    create: {
+      participantId,
+      hackathonId,
+      eventId
     }
   })
 }

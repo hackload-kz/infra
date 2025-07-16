@@ -659,12 +659,158 @@ async function createTestData() {
   }
 
   console.log(`✅ Created ${messageCount} enhanced messages with journal tracking`)
+
+  // Create calendar events
+  console.log('📅 Creating calendar events...')
+
+  const calendarEventTemplates = [
+    {
+      title: 'Открытие хакатона HackLoad 2025',
+      description: '<p>Торжественное открытие хакатона! Добро пожаловать всех участников. Будет представлена программа, задания и критерии оценки.</p><p><strong>Программа:</strong><br>• Приветственное слово<br>• Представление жюри<br>• Обзор заданий<br>• Нетворкинг</p>',
+      eventType: 'INFO',
+      teamId: null,
+      link: 'https://zoom.us/j/hackload2025',
+      hoursFromNow: -48 // 2 days ago
+    },
+    {
+      title: 'Deadline: Регистрация команд',
+      description: '<p><strong>Крайний срок для регистрации команд!</strong></p><p>Все команды должны быть зарегистрированы до этого времени. После дедлайна новые команды не принимаются.</p><p>Требования:<br>• Минимум 3 участника<br>• Максимум 4 участника<br>• Заполненная информация о команде</p>',
+      eventType: 'DEADLINE',
+      teamId: null,
+      link: '/space/team',
+      hoursFromNow: -24 // 1 day ago
+    },
+    {
+      title: 'Техническая консультация',
+      description: '<p>Консультация по техническим вопросам с экспертами. Можно задать вопросы по архитектуре, выбору технологий и лучшим практикам.</p><p><strong>Темы:</strong><br>• Архитектура приложений<br>• Выбор технологий<br>• Облачные сервисы<br>• DevOps практики</p>',
+      eventType: 'INFO',
+      teamId: null,
+      link: 'https://zoom.us/j/tech-consultation',
+      hoursFromNow: -6 // 6 hours ago
+    },
+    {
+      title: 'Checkpoint: Проверка прогресса',
+      description: '<p><strong>Промежуточная проверка команд</strong></p><p>Время показать текущий прогресс и получить обратную связь от менторов. Рекомендуется продемонстрировать:</p><ul><li>Текущее состояние проекта</li><li>Архитектурные решения</li><li>Планы на оставшееся время</li></ul>',
+      eventType: 'WARNING',
+      teamId: null,
+      link: null,
+      hoursFromNow: 2 // 2 hours from now
+    },
+    {
+      title: 'Мастер-класс: Презентация проектов',
+      description: '<p>Мастер-класс по эффективной презентации проектов. Узнайте, как лучше представить свой проект жюри.</p><p><strong>Что узнаете:</strong><br>• Структура питча<br>• Визуализация данных<br>• Демонстрация функциональности<br>• Ответы на вопросы жюри</p>',
+      eventType: 'INFO',
+      teamId: null,
+      link: 'https://zoom.us/j/pitch-masterclass',
+      hoursFromNow: 6 // 6 hours from now
+    },
+    {
+      title: 'Deadline: Сдача проектов',
+      description: '<p><strong>КРАЙНИЙ СРОК СДАЧИ ПРОЕКТОВ!</strong></p><p>До этого времени все команды должны загрузить:</p><ul><li>Исходный код в GitHub</li><li>Демо-версию проекта</li><li>Презентацию (PDF)</li><li>Техническое описание</li></ul><p><strong>Внимание:</strong> Проекты, поданные после дедлайна, не будут рассмотрены жюри.</p>',
+      eventType: 'DEADLINE',
+      teamId: null,
+      link: '/space/team',
+      hoursFromNow: 18 // 18 hours from now
+    },
+    {
+      title: 'Питч-сессия: Презентация проектов',
+      description: '<p>Финальная презентация проектов перед жюри. Каждая команда получает 5 минут на презентацию + 3 минуты на вопросы.</p><p><strong>Формат:</strong><br>• 5 минут презентация<br>• 3 минуты вопросы жюри<br>• Демонстрация работающего проекта</p>',
+      eventType: 'INFO',
+      teamId: null,
+      link: 'https://zoom.us/j/final-pitch',
+      hoursFromNow: 24 // 24 hours from now
+    },
+    {
+      title: 'Объявление результатов и награждение',
+      description: '<p>Торжественное объявление результатов хакатона и награждение победителей!</p><p><strong>Программа:</strong><br>• Объявление результатов<br>• Награждение призеров<br>• Обратная связь от жюри<br>• Фотосессия<br>• Нетворкинг</p>',
+      eventType: 'INFO',
+      teamId: null,
+      link: 'https://zoom.us/j/awards-ceremony',
+      hoursFromNow: 30 // 30 hours from now
+    }
+  ]
+
+  const now = new Date()
+  let calendarEventCount = 0
+
+  // Create global events
+  for (const template of calendarEventTemplates) {
+    const eventDate = new Date(now.getTime() + template.hoursFromNow * 60 * 60 * 1000)
+    const eventEndDate = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000) // 2 hours duration
+
+    const event = await prisma.calendarEvent.create({
+      data: {
+        title: template.title,
+        description: template.description,
+        eventDate: eventDate,
+        eventEndDate: eventEndDate,
+        eventType: template.eventType as 'INFO' | 'WARNING' | 'DEADLINE',
+        link: template.link,
+        isActive: true,
+        hackathonId: defaultHackathon.id,
+        teamId: template.teamId
+      }
+    })
+
+    calendarEventCount++
+  }
+
+  // Create team-specific events
+  const teamSpecificEvents = [
+    {
+      title: 'Встреча команды: Планирование спринта',
+      description: '<p>Внутренняя встреча команды для планирования текущего спринта и распределения задач.</p><p><strong>Повестка:</strong><br>• Ретроспектива<br>• Планирование задач<br>• Определение приоритетов<br>• Техническое обсуждение</p>',
+      eventType: 'INFO',
+      hoursFromNow: 4
+    },
+    {
+      title: 'Code Review: Архитектура проекта',
+      description: '<p>Совместный разбор архитектуры проекта и code review ключевых компонентов.</p><p><strong>Фокус:</strong><br>• Архитектурные решения<br>• Качество кода<br>• Производительность<br>• Безопасность</p>',
+      eventType: 'INFO',
+      hoursFromNow: 8
+    },
+    {
+      title: 'Внутренний дедлайн: MVP готов',
+      description: '<p><strong>Внутренний дедлайн команды</strong></p><p>К этому времени должен быть готов минимально жизнеспособный продукт (MVP) для тестирования.</p><p>Требования:<br>• Основной функционал работает<br>• Базовый UI готов<br>• Можно провести демонстрацию</p>',
+      eventType: 'DEADLINE',
+      hoursFromNow: 12
+    }
+  ]
+
+  // Add team-specific events to some teams
+  const teamsWithEvents = createdTeams.slice(0, 3) // First 3 teams get specific events
+  
+  for (const team of teamsWithEvents) {
+    for (const template of teamSpecificEvents) {
+      const eventDate = new Date(now.getTime() + template.hoursFromNow * 60 * 60 * 1000)
+      const eventEndDate = new Date(eventDate.getTime() + 1.5 * 60 * 60 * 1000) // 1.5 hours duration
+
+      const event = await prisma.calendarEvent.create({
+        data: {
+          title: `${team.name}: ${template.title}`,
+          description: template.description,
+          eventDate: eventDate,
+          eventEndDate: eventEndDate,
+          eventType: template.eventType as 'INFO' | 'WARNING' | 'DEADLINE',
+          link: null,
+          isActive: true,
+          hackathonId: defaultHackathon.id,
+          teamId: team.id
+        }
+      })
+
+      calendarEventCount++
+    }
+  }
+
+  console.log(`✅ Created ${calendarEventCount} calendar events (${calendarEventTemplates.length} global, ${teamsWithEvents.length * teamSpecificEvents.length} team-specific)`)
   console.log('🎉 Enhanced test data creation completed successfully!')
   console.log(`📊 Summary:`)
   console.log(`   • ${createdParticipants.length} participants with journal entries`)
   console.log(`   • ${createdTeams.length} teams with creation tracking`)
   console.log(`   • ${createdJoinRequests.length} join requests with status tracking`)
   console.log(`   • ${messageCount} messages with notification tracking`)
+  console.log(`   • ${calendarEventCount} calendar events (global and team-specific)`)
   console.log(`   • All activities logged in participant journals`)
 }
 

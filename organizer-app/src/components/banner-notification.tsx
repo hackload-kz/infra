@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { X, AlertTriangle, Info, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { Banner, CustomBanner } from '@/lib/banners'
+import { X, AlertTriangle, Info, AlertCircle, ChevronDown, ChevronUp, Calendar, Clock, Users } from 'lucide-react'
+import { Banner, CustomBanner, CalendarEventBanner } from '@/lib/banners'
 import { dismissBannerAction, dismissCustomBannerAction } from '@/lib/actions'
 import { markdownToHtml } from '@/lib/markdown'
 
@@ -79,6 +79,151 @@ export function BannerNotification({ banner, participantId, hackathonId }: Banne
               className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${styles.button}`}
             >
               {banner.actionText}
+            </Link>
+          </div>
+        </div>
+
+        <button
+          onClick={handleDismiss}
+          disabled={isDismissing}
+          className="flex-shrink-0 text-slate-400 hover:text-white transition-colors disabled:opacity-50"
+          aria-label="Закрыть уведомление"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+interface CalendarEventBannerProps {
+  event: CalendarEventBanner
+  participantId: string
+  hackathonId: string
+}
+
+export function CalendarEventBannerComponent({ event, participantId, hackathonId }: CalendarEventBannerProps) {
+  const [isVisible, setIsVisible] = useState(true)
+  const [isDismissing, setIsDismissing] = useState(false)
+
+  const handleDismiss = async () => {
+    setIsDismissing(true)
+    try {
+      // We'll need to create a new action for dismissing calendar events
+      const response = await fetch(`/api/calendar/${event.id}/dismiss`, {
+        method: 'POST'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to dismiss event')
+      }
+      
+      setIsVisible(false)
+    } catch (error) {
+      console.error('Failed to dismiss calendar event:', error)
+      setIsDismissing(false)
+    }
+  }
+
+  if (!isVisible) {
+    return null
+  }
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const formatEndDate = (startDate: Date, endDate: Date) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    const isSameDay = start.toDateString() === end.toDateString()
+    
+    if (isSameDay) {
+      return end.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } else {
+      return formatDate(end)
+    }
+  }
+
+  const getVariantStyles = () => {
+    switch (event.variant) {
+      case 'error':
+        return {
+          container: 'bg-red-900/30 border-red-500/50 text-red-100',
+          icon: 'text-red-400',
+          button: 'bg-red-600 hover:bg-red-700 text-white',
+          IconComponent: AlertCircle
+        }
+      case 'warning':
+        return {
+          container: 'bg-amber-900/30 border-amber-500/50 text-amber-100',
+          icon: 'text-amber-400',
+          button: 'bg-amber-600 hover:bg-amber-700 text-white',
+          IconComponent: AlertTriangle
+        }
+      case 'info':
+      default:
+        return {
+          container: 'bg-blue-900/30 border-blue-500/50 text-blue-100',
+          icon: 'text-blue-400',
+          button: 'bg-blue-600 hover:bg-blue-700 text-white',
+          IconComponent: Info
+        }
+    }
+  }
+
+  const styles = getVariantStyles()
+  const { IconComponent } = styles
+
+  return (
+    <div className={`relative rounded-lg border p-4 ${styles.container} mb-4`}>
+      <div className="flex items-start space-x-3">
+        <div className={`flex-shrink-0 ${styles.icon}`}>
+          <IconComponent className="h-5 w-5" />
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold mb-1">{event.title}</h3>
+          
+          <div className="flex items-center space-x-4 text-sm opacity-90 mb-2">
+            <div className="flex items-center space-x-1">
+              <Calendar className="h-4 w-4" />
+              <span>{formatDate(event.eventDate)}</span>
+            </div>
+            {event.eventEndDate && (
+              <div className="flex items-center space-x-1">
+                <Clock className="h-4 w-4" />
+                <span>до {formatEndDate(event.eventDate, event.eventEndDate)}</span>
+              </div>
+            )}
+            {event.team && (
+              <div className="flex items-center space-x-1">
+                <Users className="h-4 w-4" />
+                <span>{event.team.name}</span>
+              </div>
+            )}
+          </div>
+          
+          <div 
+            className="text-sm opacity-90 mb-3"
+            dangerouslySetInnerHTML={{ __html: event.description }}
+          />
+          
+          <div className="flex items-center space-x-3">
+            <Link
+              href={event.actionUrl}
+              className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${styles.button}`}
+            >
+              {event.actionText}
             </Link>
           </div>
         </div>
