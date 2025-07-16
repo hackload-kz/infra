@@ -8,8 +8,10 @@ const nextConfig: NextConfig = {
   
   // Оптимизации компилятора
   compiler: {
-    // Удаляем console.log в production
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Удаляем только console.log в production, оставляем console.info, console.warn, console.error
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['info', 'warn', 'error']
+    } : false,
   },
   
   // Экспериментальные оптимизации

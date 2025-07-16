@@ -43,7 +43,25 @@ class Logger {
     try {
       // In a production environment, you might want to store logs in a dedicated table
       // For now, we'll use console and could extend to external logging services
-      console.log(this.formatMessage(entry));
+      const message = this.formatMessage(entry);
+      
+      // Use appropriate console method based on log level
+      switch (entry.level) {
+        case LogLevel.ERROR:
+          console.error(message);
+          break;
+        case LogLevel.WARN:
+          console.warn(message);
+          break;
+        case LogLevel.INFO:
+          console.info(message);
+          break;
+        case LogLevel.DEBUG:
+          console.info(message); // Use console.info for DEBUG as well
+          break;
+        default:
+          console.info(message);
+      }
       
       // Optional: Store in database (create a Log model in Prisma schema if needed)
       // await db.log.create({ data: entry });

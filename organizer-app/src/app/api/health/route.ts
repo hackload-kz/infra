@@ -22,6 +22,9 @@ export async function GET() {
       metadata: { status: 'healthy' }
     });
     
+    // Test console.info logging
+    console.info('❤️ Health check: Health endpoint accessed successfully');
+    
     return NextResponse.json(healthStatus, { status: 200 });
   } catch (error) {
     const healthStatus = {
