@@ -60,40 +60,40 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {participants.map((participant) => (
                                 <tr key={participant.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700">
                                         {participant.userId}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
                                         {participant.name}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.email}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.team ? (
                                             <Link 
                                                 href={`/dashboard/teams/${participant.team.nickname}`}
-                                                className="text-blue-600 hover:text-blue-900"
+                                                className="text-blue-600 hover:text-blue-800"
                                             >
                                                 {participant.team.name}
                                             </Link>
                                         ) : (
-                                            <span className="text-gray-400">Не назначена</span>
+                                            <span className="text-gray-500">Не назначена</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.city || '-'}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.company || '-'}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.githubUrl ? (
                                             <a 
                                                 href={participant.githubUrl} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
-                                                className="text-blue-600 hover:text-blue-900"
+                                                className="text-blue-600 hover:text-blue-800"
                                             >
                                                 Профиль
                                             </a>
@@ -101,13 +101,13 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                             '-'
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {participant.linkedinUrl ? (
                                             <a 
                                                 href={participant.linkedinUrl} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
-                                                className="text-blue-600 hover:text-blue-900"
+                                                className="text-blue-600 hover:text-blue-800"
                                             >
                                                 Профиль
                                             </a>
@@ -115,7 +115,7 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                             '-'
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         <div className="flex space-x-2">
                                             <Link href={`/dashboard/participants/${participant.id}`}>
                                                 <Button variant="outline" size="sm" title="View Profile">

@@ -48,6 +48,7 @@ export function CalendarManagement() {
   const [filterTeam, setFilterTeam] = useState<string>('')
   const [filterType, setFilterType] = useState<string>('')
   const [showInactive, setShowInactive] = useState(false)
+  const [preSelectedTeam, setPreSelectedTeam] = useState<string | null>(null)
 
   const fetchEvents = async () => {
     try {
@@ -83,6 +84,14 @@ export function CalendarManagement() {
     setMounted(true)
     fetchEvents()
     fetchTeams()
+    
+    // Check for team parameter in URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const teamParam = urlParams.get('team')
+    if (teamParam) {
+      setPreSelectedTeam(teamParam)
+      setShowCreateForm(true)
+    }
   }, [])
 
   if (!mounted) {
@@ -192,7 +201,7 @@ export function CalendarManagement() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-semibold text-gray-900">
             {editingEvent ? 'Редактировать событие' : 'Создать новое событие'}
           </h2>
         </div>
@@ -205,8 +214,10 @@ export function CalendarManagement() {
             onCancel={() => {
               setShowCreateForm(false)
               setEditingEvent(null)
+              setPreSelectedTeam(null)
             }}
             isSubmitting={isSubmitting}
+            teamId={preSelectedTeam || undefined}
           />
         </div>
       </div>
@@ -229,7 +240,7 @@ export function CalendarManagement() {
 
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h2 className="text-xl font-semibold">События календаря</h2>
+          <h2 className="text-xl font-semibold text-gray-900">События календаря</h2>
           <button
             onClick={() => setShowCreateForm(true)}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700"
@@ -357,10 +368,10 @@ export function CalendarManagement() {
           )}
 
           {filteredEvents.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <div className="text-center py-12 text-gray-700">
+              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p>События не найдены</p>
-              <p className="text-sm mt-2">Попробуйте изменить фильтры или создать новое событие</p>
+              <p className="text-sm mt-2 text-gray-600">Попробуйте изменить фильтры или создать новое событие</p>
             </div>
           )}
         </div>

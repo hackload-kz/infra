@@ -96,6 +96,29 @@ export function CalendarEventItem({
     })
   }
 
+  const formatEndDate = (startDate: Date, endDate: Date) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    // Check if the end date is on the same day as start date
+    const isSameDay = start.toDateString() === end.toDateString()
+    
+    if (isSameDay) {
+      // Same day - show only time
+      return formatTime(end)
+    } else {
+      // Different day - show full date and time
+      const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      if (daysDiff === 1) {
+        // Next day - show "завтра" + time
+        return `завтра в ${formatTime(end)}`
+      } else {
+        // Multiple days - show full date and time
+        return formatDate(end)
+      }
+    }
+  }
+
   if (isPast && isCollapsed && !isExpanded) {
     return (
       <div className="border-l-4 border-gray-300 bg-gray-50 p-4 rounded-lg opacity-70">
@@ -104,12 +127,12 @@ export function CalendarEventItem({
           onClick={() => setIsExpanded(true)}
         >
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-700">
               {formatDate(event.eventDate)}
             </span>
-            <span className="text-sm font-medium text-gray-700">{event.title}</span>
+            <span className="text-sm font-medium text-gray-800">{event.title}</span>
             {event.team && (
-              <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
+              <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
                 {event.team.name}
               </span>
             )}
@@ -154,7 +177,7 @@ export function CalendarEventItem({
             )}
           </div>
 
-          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+          <div className="flex items-center space-x-4 text-sm text-gray-700 mb-3">
             <div className="flex items-center space-x-1">
               <Calendar className="h-4 w-4" />
               <span>{formatDate(event.eventDate)}</span>
@@ -162,13 +185,20 @@ export function CalendarEventItem({
             {event.eventEndDate && (
               <div className="flex items-center space-x-1">
                 <Clock className="h-4 w-4" />
-                <span>до {formatTime(event.eventEndDate)}</span>
+                <span>до {formatEndDate(event.eventDate, event.eventEndDate)}</span>
               </div>
             )}
           </div>
+          
+          {event.eventEndDate && new Date(event.eventDate).toDateString() !== new Date(event.eventEndDate).toDateString() && (
+            <div className="text-xs text-gray-600 mb-2 flex items-center space-x-1">
+              <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+              <span>Многодневное событие</span>
+            </div>
+          )}
 
           <div 
-            className="prose prose-sm max-w-none text-gray-700 mb-3"
+            className="prose prose-sm max-w-none text-gray-800 mb-3"
             dangerouslySetInnerHTML={{ __html: event.description }}
           />
 

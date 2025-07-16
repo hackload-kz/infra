@@ -79,7 +79,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                         <div className="flex flex-wrap items-center gap-4 mt-2 text-gray-600">
                             <div className="flex items-center">
                                 <Mail className="w-4 h-4 mr-1" />
-                                <a href={`mailto:${participant.email}`} className="hover:text-blue-600">
+                                <a href={`mailto:${participant.email}`} className="text-blue-600 hover:text-blue-800">
                                     {participant.email}
                                 </a>
                             </div>
@@ -102,7 +102,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                         href={participant.telegram.startsWith('http') ? participant.telegram : `https://t.me/${participant.telegram.replace('@', '')}`}
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="hover:text-blue-600"
+                                        className="text-blue-600 hover:text-blue-800"
                                     >
                                         Telegram
                                     </a>
@@ -115,7 +115,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                         href={participant.githubUrl} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="hover:text-blue-600"
+                                        className="text-blue-600 hover:text-blue-800"
                                     >
                                         GitHub
                                     </a>
@@ -128,7 +128,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                         href={participant.linkedinUrl} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="hover:text-blue-600"
+                                        className="text-blue-600 hover:text-blue-800"
                                     >
                                         LinkedIn
                                     </a>
@@ -148,7 +148,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                         {participant.experienceLevel && (
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Уровень опыта</label>
-                                <p className="text-gray-900 flex items-center mt-1">
+                                <p className="text-gray-700 flex items-center mt-1">
                                     <Award className="w-4 h-4 mr-2 text-amber-500" />
                                     {participant.experienceLevel}
                                 </p>
@@ -172,7 +172,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                                 </div>
                                             );
                                         } catch {
-                                            return <p className="text-gray-900">{participant.technologies}</p>;
+                                            return <p className="text-gray-700">{participant.technologies}</p>;
                                         }
                                     })()}
                                 </div>
@@ -196,7 +196,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                                 </div>
                                             );
                                         } catch {
-                                            return <p className="text-gray-900">{participant.cloudServices}</p>;
+                                            return <p className="text-gray-700">{participant.cloudServices}</p>;
                                         }
                                     })()}
                                 </div>
@@ -220,7 +220,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                                 </div>
                                             );
                                         } catch {
-                                            return <p className="text-gray-900">{participant.cloudProviders}</p>;
+                                            return <p className="text-gray-700">{participant.cloudProviders}</p>;
                                         }
                                     })()}
                                 </div>
@@ -234,20 +234,20 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                                 <div className="mt-2 space-y-2">
                                     {participant.otherTechnologies && (
                                         <div>
-                                            <span className="text-xs font-medium text-gray-400">Другие технологии:</span>
-                                            <p className="text-gray-900 text-sm">{participant.otherTechnologies}</p>
+                                            <span className="text-xs font-medium text-gray-500">Другие технологии:</span>
+                                            <p className="text-gray-700 text-sm">{participant.otherTechnologies}</p>
                                         </div>
                                     )}
                                     {participant.otherCloudServices && (
                                         <div>
-                                            <span className="text-xs font-medium text-gray-400">Другие облачные сервисы:</span>
-                                            <p className="text-gray-900 text-sm">{participant.otherCloudServices}</p>
+                                            <span className="text-xs font-medium text-gray-500">Другие облачные сервисы:</span>
+                                            <p className="text-gray-700 text-sm">{participant.otherCloudServices}</p>
                                         </div>
                                     )}
                                     {participant.otherCloudProviders && (
                                         <div>
-                                            <span className="text-xs font-medium text-gray-400">Другие облачные провайдеры:</span>
-                                            <p className="text-gray-900 text-sm">{participant.otherCloudProviders}</p>
+                                            <span className="text-xs font-medium text-gray-500">Другие облачные провайдеры:</span>
+                                            <p className="text-gray-700 text-sm">{participant.otherCloudProviders}</p>
                                         </div>
                                     )}
                                 </div>
@@ -321,7 +321,7 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                         {participant.team?.comment && (
                             <div>
                                 <label className="text-sm font-medium text-gray-500">Описание проекта</label>
-                                <p className="text-gray-900 mt-1 text-sm bg-gray-50 p-3 rounded-md">
+                                <p className="text-gray-700 mt-1 text-sm bg-gray-50 p-3 rounded-md">
                                     {participant.team.comment}
                                 </p>
                             </div>

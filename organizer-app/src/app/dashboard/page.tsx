@@ -60,7 +60,7 @@ export default async function DashboardPage() {
                             <Users className="h-6 w-6 text-blue-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Всего команд</p>
+                            <p className="text-sm font-medium text-gray-600">Всего команд</p>
                             <p className="text-2xl font-bold text-gray-900">{totalTeams}</p>
                         </div>
                     </div>
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
                             <UserCheck className="h-6 w-6 text-indigo-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Всего участников</p>
+                            <p className="text-sm font-medium text-gray-600">Всего участников</p>
                             <p className="text-2xl font-bold text-gray-900">{totalParticipants}</p>
                         </div>
                     </div>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
                             <TrendingUp className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Команд за неделю</p>
+                            <p className="text-sm font-medium text-gray-600">Команд за неделю</p>
                             <p className="text-2xl font-bold text-gray-900">{teamsThisWeek}</p>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ export default async function DashboardPage() {
                             <Calendar className="h-6 w-6 text-orange-600" />
                         </div>
                         <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-800">Дней до хакатона</p>
+                            <p className="text-sm font-medium text-gray-600">Дней до хакатона</p>
                             <p className="text-2xl font-bold text-gray-900">30</p>
                         </div>
                     </div>
@@ -119,9 +119,9 @@ export default async function DashboardPage() {
                                 <div key={team.id} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg">
                                     <div>
                                         <h3 className="font-medium text-gray-900">{team.name}</h3>
-                                        <p className="text-sm text-gray-700">@{team.nickname}</p>
+                                        <p className="text-sm text-gray-600">@{team.nickname}</p>
                                     </div>
-                                    <div className="text-sm text-gray-700">
+                                    <div className="text-sm text-gray-600">
                                         {new Date(team.createdAt).toLocaleDateString('ru-RU')}
                                     </div>
                                 </div>
@@ -146,7 +146,7 @@ export default async function DashboardPage() {
                                 <Users className="h-5 w-5 text-blue-600 mr-3" />
                                 <div>
                                     <h3 className="font-medium text-gray-900">Управление командами</h3>
-                                    <p className="text-sm text-gray-700">Просмотр, создание и редактирование команд</p>
+                                    <p className="text-sm text-gray-600">Просмотр, создание и редактирование команд</p>
                                 </div>
                             </div>
                         </Link>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
                                 <UserCheck className="h-5 w-5 text-indigo-600 mr-3" />
                                 <div>
                                     <h3 className="font-medium text-gray-900">Управление участниками</h3>
-                                    <p className="text-sm text-gray-700">Просмотр и редактирование участников</p>
+                                    <p className="text-sm text-gray-600">Просмотр и редактирование участников</p>
                                 </div>
                             </div>
                         </Link>

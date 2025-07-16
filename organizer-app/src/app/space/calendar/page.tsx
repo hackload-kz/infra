@@ -65,7 +65,6 @@ export default async function SpaceCalendarPage() {
           <CalendarView 
             teamId={participant?.team?.id}
             canDismiss={true}
-            className="[&_h2]:text-white [&_h3]:text-white [&_p]:text-slate-300 [&_.text-gray-500]:text-slate-400 [&_.text-gray-600]:text-slate-300 [&_.text-gray-700]:text-slate-200 [&_.text-gray-900]:text-white [&_.bg-gray-100]:bg-slate-700/30 [&_.bg-gray-50]:bg-slate-700/20 [&_.border-gray-300]:border-slate-600/30"
           />
         </div>
       </div>

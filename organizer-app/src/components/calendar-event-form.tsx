@@ -65,7 +65,7 @@ export function CalendarEventForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.title.trim() || !formData.description.trim() || !formData.eventDate) {
+    if (!isFormValid()) {
       return
     }
 
@@ -95,12 +95,20 @@ export function CalendarEventForm({
     }
   }
 
+  const isFormValid = () => {
+    const titleValid = formData.title.trim().length > 0
+    const descriptionValid = formData.description.trim().length > 0
+    const dateValid = formData.eventDate.trim().length > 0
+    
+    return titleValid && descriptionValid && dateValid
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-500 mb-2">
               Заголовок события *
             </label>
             <input
@@ -110,13 +118,13 @@ export function CalendarEventForm({
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               placeholder="Введите заголовок события"
             />
           </div>
 
           <div>
-            <label htmlFor="eventType" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="eventType" className="block text-sm font-medium text-gray-500 mb-2">
               Тип события
             </label>
             <select
@@ -124,7 +132,7 @@ export function CalendarEventForm({
               name="eventType"
               value={formData.eventType}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             >
               <option value="INFO">Информация</option>
               <option value="WARNING">Предупреждение</option>
@@ -133,7 +141,7 @@ export function CalendarEventForm({
           </div>
 
           <div>
-            <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="eventDate" className="block text-sm font-medium text-gray-500 mb-2">
               Дата и время события *
             </label>
             <div className="flex items-center space-x-2">
@@ -145,13 +153,13 @@ export function CalendarEventForm({
                 value={formData.eventDate}
                 onChange={handleChange}
                 required
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="eventEndDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="eventEndDate" className="block text-sm font-medium text-gray-500 mb-2">
               Дата и время окончания (опционально)
             </label>
             <div className="flex items-center space-x-2">
@@ -162,13 +170,13 @@ export function CalendarEventForm({
                 name="eventEndDate"
                 value={formData.eventEndDate}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="link" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="link" className="block text-sm font-medium text-gray-500 mb-2">
               Ссылка (опционально)
             </label>
             <div className="flex items-center space-x-2">
@@ -179,7 +187,7 @@ export function CalendarEventForm({
                 name="link"
                 value={formData.link}
                 onChange={handleChange}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 placeholder="https://example.com"
               />
             </div>
@@ -187,7 +195,7 @@ export function CalendarEventForm({
 
           {teams.length > 0 && (
             <div>
-              <label htmlFor="teamId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="teamId" className="block text-sm font-medium text-gray-500 mb-2">
                 Команда (опционально)
               </label>
               <div className="flex items-center space-x-2">
@@ -197,7 +205,7 @@ export function CalendarEventForm({
                   name="teamId"
                   value={formData.teamId}
                   onChange={handleChange}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 >
                   <option value="">Глобальное событие</option>
                   {teams.map(team => (
@@ -219,15 +227,23 @@ export function CalendarEventForm({
               onChange={handleChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="isActive" className="text-sm text-gray-700">
+            <label htmlFor="isActive" className="text-sm text-gray-600">
               Активное событие
             </label>
+          </div>
+          
+          {/* Debug info - remove in production */}
+          <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+            Debug: Title: {formData.title.trim() ? '✓' : '✗'}, 
+            Description: {formData.description.trim() ? '✓' : '✗'}, 
+            Date: {formData.eventDate.trim() ? '✓' : '✗'}, 
+            Valid: {isFormValid() ? '✓' : '✗'}
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-500 mb-2">
               Описание события (Markdown) *
             </label>
             <textarea
@@ -237,7 +253,7 @@ export function CalendarEventForm({
               onChange={handleChange}
               required
               rows={10}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-900"
               placeholder="Введите описание события в формате Markdown..."
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -286,7 +302,7 @@ export function CalendarEventForm({
         </button>
         <button
           type="submit"
-          disabled={isSubmitting || !formData.title.trim() || !formData.description.trim() || !formData.eventDate}
+          disabled={isSubmitting || !isFormValid()}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Save className="h-4 w-4 mr-2 inline" />

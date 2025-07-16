@@ -77,12 +77,12 @@ export function CalendarView({
     return (
       <div className={`space-y-4 ${className}`}>
         <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold">Календарь событий</h2>
+          <Calendar className="h-5 w-5 text-amber-400" />
+          <h2 className="text-lg font-semibold text-white">Календарь событий</h2>
         </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-16 bg-gray-100 rounded-lg"></div>
+            <div key={i} className="h-16 bg-slate-700/30 rounded-lg"></div>
           ))}
         </div>
       </div>
@@ -129,12 +129,12 @@ export function CalendarView({
     return (
       <div className={`space-y-4 ${className}`}>
         <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold">Календарь событий</h2>
+          <Calendar className="h-5 w-5 text-amber-400" />
+          <h2 className="text-lg font-semibold text-white">Календарь событий</h2>
         </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-16 bg-gray-100 rounded-lg"></div>
+            <div key={i} className="h-16 bg-slate-700/30 rounded-lg"></div>
           ))}
         </div>
       </div>
@@ -145,28 +145,32 @@ export function CalendarView({
     return (
       <div className={`space-y-4 ${className}`}>
         <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-gray-600" />
-          <h2 className="text-lg font-semibold">Календарь событий</h2>
+          <Calendar className="h-5 w-5 text-amber-400" />
+          <h2 className="text-lg font-semibold text-white">Календарь событий</h2>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700">Ошибка загрузки событий: {error}</p>
+        <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+          <p className="text-red-300">Ошибка загрузки событий: {error}</p>
         </div>
       </div>
     )
   }
 
+  const allEvents = [...upcomingEvents, ...pastEvents].sort((a, b) => 
+    new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
+  )
+
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       <div className="flex items-center space-x-2">
-        <Calendar className="h-5 w-5 text-gray-600" />
-        <h2 className="text-lg font-semibold">Календарь событий</h2>
+        <Calendar className="h-5 w-5 text-amber-400" />
+        <h2 className="text-lg font-semibold text-white">Календарь событий</h2>
       </div>
 
       {nextEvent && (
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-lg p-4">
           <div className="flex items-center space-x-2 mb-2">
-            <Clock className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800">Ближайшее событие</span>
+            <Clock className="h-4 w-4 text-amber-400" />
+            <span className="text-sm font-medium text-amber-300">Ближайшее событие</span>
           </div>
           <CalendarEventItem
             event={nextEvent}
@@ -177,53 +181,106 @@ export function CalendarView({
         </div>
       )}
 
-      {upcomingEvents.length === 0 && pastEvents.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <p>События будут опубликованы позже</p>
+      {allEvents.length === 0 && (
+        <div className="text-center py-12">
+          <Calendar className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+          <p className="text-slate-300">События будут опубликованы позже</p>
         </div>
       )}
 
-      {upcomingEvents.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="font-medium text-gray-900">Предстоящие события</h3>
-          {upcomingEvents.map(event => (
-            <CalendarEventItem
-              key={event.id}
-              event={event}
-              isUpcoming={true}
-              canDismiss={canDismiss}
-              onDismiss={handleDismiss}
-            />
-          ))}
-        </div>
-      )}
-
-      {pastEvents.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-gray-900">Прошедшие события</h3>
-            <button
-              onClick={() => setShowPastEvents(!showPastEvents)}
-              className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-800"
-            >
-              <span>{showPastEvents ? 'Скрыть' : 'Показать'} ({pastEvents.length})</span>
-              {showPastEvents ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </button>
+      {allEvents.length > 0 && (
+        <div className="relative">
+          {/* Vertical Timeline Line */}
+          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400/50 via-slate-600/50 to-slate-700/30"></div>
+          
+          <div className="space-y-6">
+            {allEvents.map((event, index) => {
+              const eventDate = new Date(event.eventDate)
+              const isPast = eventDate < now
+              const isToday = eventDate.toDateString() === now.toDateString()
+              
+              return (
+                <div key={event.id} className="relative flex items-start space-x-4">
+                  {/* Timeline Node */}
+                  <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+                    isPast 
+                      ? 'bg-slate-700 border-slate-600' 
+                      : isToday 
+                      ? 'bg-amber-400 border-amber-300 animate-pulse' 
+                      : 'bg-slate-800 border-amber-400/50'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${
+                      isPast 
+                        ? 'bg-slate-500' 
+                        : isToday 
+                        ? 'bg-slate-800' 
+                        : 'bg-amber-400'
+                    }`}></div>
+                  </div>
+                  
+                  {/* Event Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Date Header */}
+                    <div className="mb-2">
+                      <div className={`text-sm font-medium ${
+                        isPast 
+                          ? 'text-slate-400' 
+                          : isToday 
+                          ? 'text-amber-300' 
+                          : 'text-slate-200'
+                      }`}>
+                        {eventDate.toLocaleDateString('ru-RU', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                      <div className={`text-xs ${
+                        isPast 
+                          ? 'text-slate-500' 
+                          : isToday 
+                          ? 'text-amber-400' 
+                          : 'text-slate-400'
+                      }`}>
+                        {eventDate.toLocaleTimeString('ru-RU', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Event Item */}
+                    <div className={`${
+                      isPast 
+                        ? 'opacity-60' 
+                        : ''
+                    }`}>
+                      <CalendarEventItem
+                        event={event}
+                        isUpcoming={!isPast}
+                        canDismiss={canDismiss && !isPast}
+                        onDismiss={handleDismiss}
+                        isPast={isPast}
+                        isCollapsed={isPast && !showPastEvents}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
           
-          {showPastEvents && (
-            <div className="space-y-2">
-              {pastEvents.map(event => (
-                <CalendarEventItem
-                  key={event.id}
-                  event={event}
-                  isUpcoming={false}
-                  canDismiss={false}
-                  isPast={true}
-                  isCollapsed={true}
-                />
-              ))}
+          {/* Past Events Toggle */}
+          {pastEvents.length > 0 && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setShowPastEvents(!showPastEvents)}
+                className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 rounded-lg transition-colors"
+              >
+                <span>{showPastEvents ? 'Скрыть прошедшие' : 'Показать прошедшие'} ({pastEvents.length})</span>
+                {showPastEvents ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
             </div>
           )}
         </div>

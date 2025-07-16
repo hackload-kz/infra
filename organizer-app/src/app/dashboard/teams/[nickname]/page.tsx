@@ -4,7 +4,7 @@ import { auth } from '@/auth'
 import { isOrganizer } from '@/lib/admin'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Edit, Users } from 'lucide-react'
+import { ArrowLeft, Edit, Users, Calendar } from 'lucide-react'
 import { TeamStatus, TeamLevel } from '@prisma/client'
 import { TeamPageClient } from '@/components/team-page-client'
 
@@ -83,6 +83,12 @@ export default async function TeamPage({ params }: TeamPageProps) {
                             teamName={team.name}
                             hackathonId={team.hackathon.id}
                         />
+                        <Link href={`/dashboard/calendar?team=${team.id}`}>
+                            <Button variant="outline">
+                                <Calendar className="w-4 h-4 mr-2" />
+                                Создать событие
+                            </Button>
+                        </Link>
                         <Link href={`/dashboard/teams/${team.nickname}/edit`}>
                             <Button>
                                 <Edit className="w-4 h-4 mr-2" />
@@ -119,7 +125,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     <h2 className="text-xl font-semibold mb-4 text-gray-900">Информация о команде</h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium text-gray-500">Создана</label>
+                            <label className="text-sm font-medium text-gray-600">Создана</label>
                             <p className="text-gray-900">
                                 {team.createdAt.toLocaleDateString('ru-RU', {
                                     year: 'numeric',
@@ -131,7 +137,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">Последнее обновление</label>
+                            <label className="text-sm font-medium text-gray-600">Последнее обновление</label>
                             <p className="text-gray-900">
                                 {team.updatedAt.toLocaleDateString('ru-RU', {
                                     year: 'numeric',
@@ -143,7 +149,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
                             </p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500">Количество участников</label>
+                            <label className="text-sm font-medium text-gray-600">Количество участников</label>
                             <p className="text-gray-900 flex items-center">
                                 <Users className="w-4 h-4 mr-2" />
                                 {team.members.length} / 4
@@ -151,13 +157,13 @@ export default async function TeamPage({ params }: TeamPageProps) {
                         </div>
                         {team.level && (
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Уровень команды</label>
+                                <label className="text-sm font-medium text-gray-600">Уровень команды</label>
                                 <p className="text-gray-900">{levelLabels[team.level]}</p>
                             </div>
                         )}
                         {isAdmin && team.comment && (
                             <div>
-                                <label className="text-sm font-medium text-gray-500">Комментарий (только для админов)</label>
+                                <label className="text-sm font-medium text-gray-600">Комментарий (только для админов)</label>
                                 <p className="text-gray-900 bg-yellow-50 p-3 rounded border">{team.comment}</p>
                             </div>
                         )}
@@ -175,16 +181,16 @@ export default async function TeamPage({ params }: TeamPageProps) {
                             >
                                 {team.leader.name}
                             </Link>
-                            <p className="text-sm text-gray-600">{team.leader.email}</p>
+                            <p className="text-sm text-gray-700">{team.leader.email}</p>
                             {team.leader.company && (
-                                <p className="text-sm text-gray-600">{team.leader.company}</p>
+                                <p className="text-sm text-gray-700">{team.leader.company}</p>
                             )}
                             {team.leader.city && (
-                                <p className="text-sm text-gray-600">{team.leader.city}</p>
+                                <p className="text-sm text-gray-700">{team.leader.city}</p>
                             )}
                         </div>
                     ) : (
-                        <p className="text-gray-500">Лидер не назначен</p>
+                        <p className="text-gray-700">Лидер не назначен</p>
                     )}
                 </div>
             </div>
@@ -202,21 +208,21 @@ export default async function TeamPage({ params }: TeamPageProps) {
                                 >
                                     {member.name}
                                 </Link>
-                                <p className="text-sm text-gray-600">{member.email}</p>
+                                <p className="text-sm text-gray-700">{member.email}</p>
                                 {member.company && (
-                                    <p className="text-sm text-gray-600">{member.company}</p>
+                                    <p className="text-sm text-gray-700">{member.company}</p>
                                 )}
                                 {member.city && (
-                                    <p className="text-sm text-gray-600">{member.city}</p>
+                                    <p className="text-sm text-gray-700">{member.city}</p>
                                 )}
                                 {member.experienceLevel && (
-                                    <p className="text-xs text-gray-500 mt-1">Опыт: {member.experienceLevel}</p>
+                                    <p className="text-xs text-gray-600 mt-1">Опыт: {member.experienceLevel}</p>
                                 )}
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500">В команде пока нет участников</p>
+                    <p className="text-gray-700">В команде пока нет участников</p>
                 )}
             </div>
         </div>

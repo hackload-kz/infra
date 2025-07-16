@@ -293,7 +293,7 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                                 <div key={member.id} className="flex items-center justify-between p-3 border border-gray-200 rounded">
                                     <div>
                                         <p className="font-medium">{member.name}</p>
-                                        <p className="text-sm text-gray-600">{member.email}</p>
+                                        <p className="text-sm text-gray-700">{member.email}</p>
                                         {member.id === team.leaderId && (
                                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Лидер</span>
                                         )}
@@ -310,7 +310,7 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-500">В команде пока нет участников</p>
+                        <p className="text-gray-700">В команде пока нет участников</p>
                     )}
                 </div>
 
@@ -324,9 +324,9 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                                 <div key={participant.id} className="flex items-center justify-between p-3 border border-gray-200 rounded">
                                     <div>
                                         <p className="font-medium">{participant.name}</p>
-                                        <p className="text-sm text-gray-600">{participant.email}</p>
+                                        <p className="text-sm text-gray-700">{participant.email}</p>
                                         {participant.company && (
-                                            <p className="text-xs text-gray-500">{participant.company}</p>
+                                            <p className="text-xs text-gray-600">{participant.company}</p>
                                         )}
                                     </div>
                                     <Button

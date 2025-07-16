@@ -177,7 +177,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                        <label className="block text-sm font-medium text-gray-500 mb-2">Search</label>
                         <Input
                             type="text"
                             placeholder="Search teams..."
@@ -187,7 +187,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <label className="block text-sm font-medium text-gray-500 mb-2">Status</label>
                         <select 
                             value={statusFilter} 
                             onChange={(e) => setStatusFilter(e.target.value as TeamStatus | 'ALL')}
@@ -201,7 +201,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Level</label>
+                        <label className="block text-sm font-medium text-gray-500 mb-2">Level</label>
                         <select 
                             value={levelFilter} 
                             onChange={(e) => setLevelFilter(e.target.value as TeamLevel | 'ALL')}
@@ -215,7 +215,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Team Size</label>
+                        <label className="block text-sm font-medium text-gray-500 mb-2">Team Size</label>
                         <select 
                             value={memberFilter} 
                             onChange={(e) => setMemberFilter(e.target.value as 'ALL' | 'FULL' | 'PARTIAL')}
@@ -239,7 +239,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                             <input type="hidden" name="id" value={editingTeam.id} />
                         )}
                         <div>
-                            <label className="block text-sm font-medium text-gray-800 mb-1">
+                            <label className="block text-sm font-medium text-gray-500 mb-1">
                                 Name
                             </label>
                             <Input
@@ -251,7 +251,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-800 mb-1">
+                            <label className="block text-sm font-medium text-gray-500 mb-1">
                                 Nickname (for URL)
                             </label>
                             <Input
@@ -287,7 +287,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                 </div>
                 
                 {filteredTeams.length === 0 ? (
-                    <div className="p-8 text-center text-gray-700">
+                    <div className="p-8 text-center text-gray-500">
                         {teams.length === 0 ? 'No teams found. Create your first team.' : 'No teams match the current filters.'}
                     </div>
                 ) : (
@@ -295,25 +295,25 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                         <table className="w-full">
                             <thead className="bg-gray-100">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Name
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Nickname
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Level
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Members
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Created
                                     </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
