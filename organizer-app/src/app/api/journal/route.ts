@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { getJournalEntries, markJournalEntriesAsRead } from '@/lib/journal'
+import { logger, LogAction } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ entries })
   } catch (error) {
-    console.error('Ошибка при получении записей журнала:', error)
+    await logger.error(LogAction.READ, 'Journal', `Error fetching journal entries: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Ошибка при отметке записей журнала как прочитанных:', error)
+    await logger.error(LogAction.UPDATE, 'Journal', `Error marking journal entries as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

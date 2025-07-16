@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { emailService } from '@/lib/email';
-import { logger } from '@/lib/logger';
+import { logger, LogAction } from '@/lib/logger';
 import { markdownToEmailHtml } from '@/lib/markdown-server';
 import { trackMessageReceived } from '@/lib/journal';
 import { urlBuilder } from '@/lib/urls';
@@ -720,13 +720,7 @@ class MessageService {
   }
 
   async sendToTeam(teamId: string, subject: string, body: string, senderId?: string, hackathonId?: string): Promise<MessageWithRelations[]> {
-    console.log('📧 MessageService.sendToTeam called with:', {
-      teamId,
-      subject,
-      senderId,
-      hackathonId,
-      bodyLength: body.length
-    });
+    await logger.logApiCall('sendToTeam', 'MessageService', senderId, undefined);
 
     const team = await db.team.findUnique({
       where: { id: teamId },
@@ -738,20 +732,14 @@ class MessageService {
     });
 
     if (!team) {
-      console.error('❌ Team not found:', teamId);
+      await logger.error(LogAction.READ, 'Team', `Team not found: ${teamId}`, { entityId: teamId });
       throw new Error('Team not found');
     }
 
-    console.log('📧 Team found:', {
-      name: team.name,
-      membersCount: team.members.length,
-      leader: team.leader ? { id: team.leader.id, name: team.leader.name, email: team.leader.email } : null,
-      hackathonId: team.hackathonId,
-      members: team.members.map(m => ({ id: m.id, name: m.name, email: m.email }))
-    });
+    await logger.info(LogAction.READ, 'Team', `Team found: ${team.name}`, { entityId: team.id, metadata: { membersCount: team.members.length, leaderId: team.leader?.id } });
 
     const finalHackathonId = hackathonId || team.hackathonId;
-    console.log('📧 Using hackathon ID:', finalHackathonId);
+    await logger.debug(LogAction.READ, 'Hackathon', `Using hackathon ID: ${finalHackathonId}`, { entityId: finalHackathonId });
 
     // Build recipient list: include leader and all members (avoid duplicates)
     const recipients: Array<{ id: string; name: string; email: string }> = [];
@@ -776,20 +764,16 @@ class MessageService {
       }
     });
 
-    console.log('📧 Final recipients:', recipients);
+    await logger.debug(LogAction.READ, 'Message', `Final recipients count: ${recipients.length}`, { metadata: { recipients: recipients.map(r => r.email) } });
 
     if (recipients.length === 0) {
-      console.warn('⚠️ No recipients found for team:', teamId);
+      await logger.warn(LogAction.READ, 'Team', `No recipients found for team: ${teamId}`, { entityId: teamId });
       return [];
     }
 
     const messages = await Promise.all(
       recipients.map(async (recipient, index) => {
-        console.log(`📧 Creating message ${index + 1}/${recipients.length} for recipient:`, {
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email
-        });
+        await logger.debug(LogAction.CREATE, 'Message', `Creating message ${index + 1}/${recipients.length} for recipient: ${recipient.name}`, { entityId: recipient.id, metadata: { email: recipient.email } });
         
         try {
           const message = await this.createMessage({
@@ -801,16 +785,16 @@ class MessageService {
             teamId,
           });
           
-          console.log(`✅ Message created successfully for ${recipient.name}:`, message.id);
+          await logger.logCreate('Message', message.id, senderId || 'system', `Message created successfully for ${recipient.name}`);
           return message;
         } catch (error) {
-          console.error(`❌ Failed to create message for ${recipient.name}:`, error);
+          await logger.error(LogAction.CREATE, 'Message', `Failed to create message for ${recipient.name}: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
           throw error;
         }
       })
     );
 
-    console.log('📧 All team messages created successfully:', messages.length);
+    await logger.info(LogAction.CREATE, 'Message', `All team messages created successfully: ${messages.length}`, { metadata: { teamId, messagesCount: messages.length } });
     return messages;
   }
 
@@ -840,7 +824,7 @@ class MessageService {
 
       await emailService.sendHtmlEmail(message.recipient.email, subject, emailBody);
     } catch (error) {
-      console.error('Failed to send email notification:', error);
+      await logger.error(LogAction.UPDATE, 'Email', `Failed to send email notification: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
       // Don't throw error - message creation should succeed even if email fails
     }
   }

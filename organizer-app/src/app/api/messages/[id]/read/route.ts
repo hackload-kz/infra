@@ -38,11 +38,11 @@ export async function PUT(
 
     await logger.logStatusChange('Message', messageId, session.user.email, 'UNREAD', 'READ');
     
-    console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as read`);
+    await logger.info(LogAction.UPDATE, 'Message', `Message state changed: ${session.user.email} marked message ${messageId} as read`, { userEmail: session.user.email, entityId: messageId });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error marking message as read:', error);
+    await logger.error(LogAction.UPDATE, 'Message', `Error marking message as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
     const session = await auth();
     const { id: messageId } = await params;
     await logger.logApiError('PUT', `/api/messages/${messageId}/read`, error as Error, session?.user?.email || undefined);

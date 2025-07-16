@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, X } from 'lucide-react'
+import { logger, LogAction } from '@/lib/logger'
 
 interface Participant {
     id: string
@@ -82,7 +83,7 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
                 setError(errorData.error || 'Ошибка при обновлении профиля')
             }
         } catch (error) {
-            console.error('Profile update error:', error)
+            logger.error(LogAction.UPDATE, 'Participant', `Profile update error: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } }).catch(() => {})
             setError('Ошибка при обновлении профиля')
         } finally {
             setLoading(false)

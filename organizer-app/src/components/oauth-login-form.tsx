@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
+import { logger, LogAction } from '@/lib/logger'
 
 export function OAuthLoginForm() {
     const [loadingGoogle, setLoadingGoogle] = useState(false)
@@ -26,7 +27,7 @@ export function OAuthLoginForm() {
                 callbackUrl,
             })
         } catch (err) {
-            console.error('Google sign in error:', err)
+            logger.error(LogAction.LOGIN, 'Auth', `Google sign in error: ${err instanceof Error ? err.message : 'Unknown error'}`, { metadata: { error: err instanceof Error ? err.stack : err } }).catch(() => {})
             setError('Произошла ошибка при входе через Google')
             setLoadingGoogle(false)
         }
@@ -41,7 +42,7 @@ export function OAuthLoginForm() {
                 callbackUrl,
             })
         } catch (err) {
-            console.error('GitHub sign in error:', err)
+            logger.error(LogAction.LOGIN, 'Auth', `GitHub sign in error: ${err instanceof Error ? err.message : 'Unknown error'}`, { metadata: { error: err instanceof Error ? err.stack : err } }).catch(() => {})
             setError('Произошла ошибка при входе через GitHub')
             setLoadingGitHub(false)
         }

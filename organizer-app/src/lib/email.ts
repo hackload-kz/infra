@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { urlBuilder } from '@/lib/urls';
+import { logger, LogAction } from '@/lib/logger';
 
 interface EmailConfig {
   smtpServer: string;
@@ -39,7 +40,7 @@ class EmailService {
         }
       });
     } else {
-      console.warn('Email service not configured: SENDER_EMAIL and SENDER_PASSWORD environment variables are missing');
+      logger.warn(LogAction.READ, 'Email', 'Email service not configured: SENDER_EMAIL and SENDER_PASSWORD environment variables are missing', {}).catch(() => {});
     }
   }
 
@@ -120,7 +121,7 @@ class EmailService {
 
   async sendEmail(recipient: string, subject: string, body: string): Promise<boolean> {
     if (!this.isConfigured || !this.transporter) {
-      console.warn('Email service not configured, skipping email send');
+      logger.warn(LogAction.CREATE, 'Email', 'Email service not configured, skipping email send', {}).catch(() => {});
       return false;
     }
 
@@ -147,18 +148,18 @@ class EmailService {
       await this.transporter.sendMail(mailOptions);
       
       // Log email sent with both original and actual recipient
-      console.log(`[EMAIL SENT] ${new Date().toISOString()} | Original: ${recipient} | Actual: ${actualRecipient} | Subject: ${actualSubject}`);
+      logger.info(LogAction.CREATE, 'Email', `Email sent successfully`, { userEmail: recipient, metadata: { originalRecipient: recipient, actualRecipient, subject: actualSubject } }).catch(() => {});
       
       return true;
     } catch (error) {
-      console.error('Email sending failed:', error);
+      logger.error(LogAction.CREATE, 'Email', `Email sending failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: recipient, metadata: { error: error instanceof Error ? error.stack : error } }).catch(() => {});
       return false;
     }
   }
 
   async sendHtmlEmail(recipient: string, subject: string, htmlBody: string): Promise<boolean> {
     if (!this.isConfigured || !this.transporter) {
-      console.warn('Email service not configured, skipping HTML email send');
+      logger.warn(LogAction.CREATE, 'Email', 'Email service not configured, skipping HTML email send', {}).catch(() => {});
       return false;
     }
 
@@ -185,18 +186,18 @@ class EmailService {
       await this.transporter.sendMail(mailOptions);
       
       // Log email sent with both original and actual recipient
-      console.log(`[EMAIL SENT HTML] ${new Date().toISOString()} | Original: ${recipient} | Actual: ${actualRecipient} | Subject: ${actualSubject}`);
+      logger.info(LogAction.CREATE, 'Email', `HTML email sent successfully`, { userEmail: recipient, metadata: { originalRecipient: recipient, actualRecipient, subject: actualSubject } }).catch(() => {});
       
       return true;
     } catch (error) {
-      console.error('HTML email sending failed:', error);
+      logger.error(LogAction.CREATE, 'Email', `HTML email sending failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: recipient, metadata: { error: error instanceof Error ? error.stack : error } }).catch(() => {});
       return false;
     }
   }
 
   async sendWelcomeEmail(recipient: string, participantName: string): Promise<boolean> {
     if (!this.isConfigured) {
-      console.warn('Email service not configured, skipping welcome email');
+      logger.warn(LogAction.CREATE, 'Email', 'Email service not configured, skipping welcome email', { userEmail: recipient }).catch(() => {});
       return false;
     }
 
@@ -227,7 +228,7 @@ class EmailService {
 
   async sendTeamInvitation(recipient: string, teamName: string, inviterName: string): Promise<boolean> {
     if (!this.isConfigured) {
-      console.warn('Email service not configured, skipping team invitation email');
+      logger.warn(LogAction.CREATE, 'Email', 'Email service not configured, skipping team invitation email', { userEmail: recipient }).catch(() => {});
       return false;
     }
 

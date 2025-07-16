@@ -119,9 +119,9 @@ export async function PUT(
         teamId: joinRequest.teamId,
         teamName: joinRequest.team.name
       });
-      console.info(`✅ Join request approved: ${session.user.email} approved ${joinRequest.participant.name} to join team ${joinRequest.team.name}`);
+      await logger.info(LogAction.UPDATE, 'JoinRequest', `Join request approved: ${session.user.email} approved ${joinRequest.participant.name} to join team ${joinRequest.team.name}`, { userEmail: session.user.email, entityId: resolvedParams.id });
     } else {
-      console.info(`❌ Join request declined: ${session.user.email} declined ${joinRequest.participant.name} from team ${joinRequest.team.name}`);
+      await logger.info(LogAction.UPDATE, 'JoinRequest', `Join request declined: ${session.user.email} declined ${joinRequest.participant.name} from team ${joinRequest.team.name}`, { userEmail: session.user.email, entityId: resolvedParams.id });
     }
 
     // Send result message to participant
@@ -148,7 +148,7 @@ export async function PUT(
         hackathonId: joinRequest.hackathonId
       })
     } catch (error) {
-      console.error('Failed to send join request response notification:', error)
+      await logger.error(LogAction.CREATE, 'Message', `Failed to send join request response notification: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session.user.email, entityId: resolvedParams.id, metadata: { error: error instanceof Error ? error.stack : error } });
       // Don't fail the request update if notification fails
     }
 
@@ -163,7 +163,7 @@ export async function PUT(
 
     return NextResponse.json(updatedJoinRequest)
   } catch (error) {
-    console.error('Error updating join request:', error)
+    await logger.error(LogAction.UPDATE, 'JoinRequest', `Error updating join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, entityId: resolvedParams.id, metadata: { error: error instanceof Error ? error.stack : error } });
     
     const session = await auth();
     const resolvedParams = await params;

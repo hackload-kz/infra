@@ -3,6 +3,7 @@
 import { db } from '@/lib/db'
 import { JournalEventType } from '@prisma/client'
 import { getCurrentHackathon } from '@/lib/hackathon'
+import { logger, LogAction } from '@/lib/logger'
 
 export interface JournalEventData {
   participantId: string
@@ -17,7 +18,7 @@ export async function createJournalEntry(data: JournalEventData) {
   try {
     const hackathon = await getCurrentHackathon()
     if (!hackathon) {
-      console.error('Активный хакатон не найден для записи в журнал')
+      await logger.error(LogAction.CREATE, 'Journal', 'Active hackathon not found for journal entry', {})
       return
     }
 
@@ -28,7 +29,7 @@ export async function createJournalEntry(data: JournalEventData) {
       },
     })
   } catch (error) {
-    console.error('Ошибка при создании записи в журнале:', error)
+    await logger.error(LogAction.CREATE, 'Journal', `Error creating journal entry: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
   }
 }
 
@@ -50,7 +51,7 @@ export async function markJournalEntriesAsRead(participantId: string) {
       },
     })
   } catch (error) {
-    console.error('Ошибка при отметке записей журнала как прочитанных:', error)
+    await logger.error(LogAction.UPDATE, 'Journal', `Error marking journal entries as read: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
     throw error
   }
 }
@@ -76,7 +77,7 @@ export async function getJournalEntries(participantId: string, page = 1, limit =
 
     return entries
   } catch (error) {
-    console.error('Ошибка при получении записей журнала:', error)
+    await logger.error(LogAction.READ, 'Journal', `Error fetching journal entries: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
     throw error
   }
 }
@@ -98,7 +99,7 @@ export async function getUnreadJournalCount(participantId: string): Promise<numb
 
     return count
   } catch (error) {
-    console.error('Ошибка при получении количества непрочитанных записей журнала:', error)
+    await logger.error(LogAction.READ, 'Journal', `Error getting unread journal count: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
     return 0
   }
 }

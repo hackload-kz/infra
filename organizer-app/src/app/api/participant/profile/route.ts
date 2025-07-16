@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
             isLeader: result.isLeader
         });
 
-        console.info(`👤 User registered: ${session.user.email} created profile for ${result.participant.name}`);
+        await logger.info(LogAction.CREATE, 'Participant', `User registered: ${session.user.email} created profile for ${result.participant.name}`, { userEmail: session.user.email, entityId: result.participant.id });
 
         // Track participant creation in journal
         await trackParticipantCreated(result.participant.id);
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
                 teamNickname: result.team.nickname
             });
 
-            console.info(`🏆 Team created: ${result.team.name} (@${result.team.nickname}) by ${session.user.email}`);
+            await logger.info(LogAction.CREATE, 'Team', `Team created: ${result.team.name} (@${result.team.nickname}) by ${session.user.email}`, { userEmail: session.user.email, entityId: result.team.id });
 
             // Track team creation in journal
             await trackTeamCreated(result.participant.id, result.team.id, result.team.name);
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Profile creation error:', error);
+        await logger.error(LogAction.CREATE, 'Participant', `Profile creation error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
         
         const session = await auth();
         await logger.logApiError('POST', '/api/participant/profile', error as Error, session?.user?.email || undefined);
@@ -350,7 +350,7 @@ export async function PUT(request: NextRequest) {
             
             await logger.logCreate('Participant', result.id, session.user.email, 'First-time participant profile created');
             
-            console.info(`👤 User registered: ${session.user.email} created profile for ${result.name}`);
+            await logger.info(LogAction.CREATE, 'Participant', `User registered: ${session.user.email} created profile for ${result.name}`, { userEmail: session.user.email, entityId: result.id });
             
             // Track participant creation in journal
             await trackParticipantCreated(result.id);
@@ -378,7 +378,7 @@ export async function PUT(request: NextRequest) {
             
             await logger.logUpdate('Participant', user.participant.id, session.user.email, 'Participant profile updated');
             
-            console.info(`✏️ Profile edited: ${session.user.email} updated profile for ${updatedParticipant.name}`);
+            await logger.info(LogAction.UPDATE, 'Participant', `Profile edited: ${session.user.email} updated profile for ${updatedParticipant.name}`, { userEmail: session.user.email, entityId: updatedParticipant.id });
             
             // Track profile update in journal
             await trackProfileUpdated(user.participant.id);
@@ -412,7 +412,7 @@ export async function PUT(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Profile update error:', error);
+        await logger.error(LogAction.UPDATE, 'Participant', `Profile update error: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
         
         const session = await auth();
         await logger.logApiError('PUT', '/api/participant/profile', error as Error, session?.user?.email || undefined);

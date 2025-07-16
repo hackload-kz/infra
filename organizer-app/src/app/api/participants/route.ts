@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
 import { isOrganizer } from '@/lib/admin';
+import { logger, LogAction } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -54,7 +55,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ participants });
   } catch (error) {
-    console.error('Error fetching participants:', error);
+    const session = await auth();
+    await logger.error(LogAction.READ, 'Participant', `Error fetching participants: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

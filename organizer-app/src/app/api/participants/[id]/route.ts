@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import { createJournalEntry } from '@/lib/journal'
 import { JournalEventType } from '@prisma/client'
+import { logger, LogAction } from '@/lib/logger'
 
 export async function PUT(
     request: NextRequest,
@@ -101,7 +102,7 @@ export async function PUT(
             },
         })
 
-        console.info(`✏️ Profile edited: Admin ${session.user.email} updated profile for ${updatedParticipant.name} (${updatedParticipant.email})`)
+        await logger.info(LogAction.UPDATE, 'Participant', `Profile edited: Admin ${session.user.email} updated profile for ${updatedParticipant.name} (${updatedParticipant.email})`, { userEmail: session.user.email, entityId: updatedParticipant.id });
 
         // Send notification to team leader if participant was removed from team
         if (isBeingDeactivated && teamLeaderId && teamLeaderId !== participant.id) {
@@ -139,7 +140,7 @@ export async function PUT(
 
         return NextResponse.json(updatedParticipant)
     } catch (error) {
-        console.error('Error updating participant:', error)
+        await logger.error(LogAction.UPDATE, 'Participant', `Error updating participant: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

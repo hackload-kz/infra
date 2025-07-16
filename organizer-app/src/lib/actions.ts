@@ -1,6 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
+import { logger, LogAction } from '@/lib/logger'
 
 type TeamMember = {
   id: string
@@ -48,7 +49,7 @@ export async function createTeam(formData: FormData) {
 
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error creating team:', error)
+        await logger.error(LogAction.CREATE, 'Team', `Error creating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw new Error('Failed to create team')
     }
 }
@@ -73,7 +74,7 @@ export async function updateTeam(formData: FormData) {
 
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error updating team:', error)
+        await logger.error(LogAction.UPDATE, 'Team', `Error updating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw new Error('Failed to update team')
     }
 }
@@ -107,7 +108,7 @@ export async function deleteTeam(formData: FormData) {
 
         revalidatePath('/dashboard/teams');
     } catch (error) {
-        console.error('Error deleting team:', error)
+        await logger.error(LogAction.DELETE, 'Team', `Error deleting team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw new Error('Failed to delete team')
     }
 }
@@ -189,7 +190,7 @@ export async function leaveTeam(participantId: string, newLeaderId?: string | nu
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
     } catch (error) {
-        console.error('Error leaving team:', error);
+        await logger.error(LogAction.UPDATE, 'Team', `Error leaving team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
         throw error;
     }
 }
@@ -333,14 +334,14 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
                 await trackTeamCreated(participantId, createdTeam.id, createdTeam.name);
             }
         } catch (journalError) {
-            console.error('Ошибка при отслеживании создания команды в журнале:', journalError);
+            await logger.error(LogAction.CREATE, 'Team', `Error tracking team creation in journal: ${journalError instanceof Error ? journalError.message : 'Unknown error'}`, { metadata: { error: journalError instanceof Error ? journalError.stack : journalError } });
             // Don't fail the main operation if journal tracking fails
         }
 
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
     } catch (error) {
-        console.error('Error creating team:', error);
+        await logger.error(LogAction.CREATE, 'Team', `Error creating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
         throw error;
     }
 }
@@ -441,14 +442,14 @@ export async function joinTeam(participantId: string, teamId: string, newLeaderI
                 await trackJoinedTeam(participantId, teamId, targetTeam.name);
             }
         } catch (journalError) {
-            console.error('Ошибка при отслеживании присоединения к команде в журнале:', journalError);
+            await logger.error(LogAction.UPDATE, 'Team', `Error tracking team join in journal: ${journalError instanceof Error ? journalError.message : 'Unknown error'}`, { metadata: { error: journalError instanceof Error ? journalError.stack : journalError } });
             // Don't fail the main operation if journal tracking fails
         }
 
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
     } catch (error) {
-        console.error('Error joining team:', error);
+        await logger.error(LogAction.UPDATE, 'Team', `Error joining team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
         throw error;
     }
 }
@@ -466,7 +467,7 @@ export async function updateTeamStatusById(teamId: string, status: TeamStatus) {
 
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error updating team status:', error)
+        await logger.error(LogAction.UPDATE, 'Team', `Error updating team status: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw new Error('Failed to update team status')
     }
 }
@@ -652,7 +653,7 @@ export async function changeTeam(formData: FormData) {
         revalidatePath('/profile');
         revalidatePath('/dashboard/teams');
     } catch (error) {
-        console.error('Error changing team:', error);
+        await logger.error(LogAction.UPDATE, 'Team', `Error changing team: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } });
         throw error;
     }
 }
@@ -743,7 +744,7 @@ export async function createJoinRequest(participantId: string, teamId: string, m
         try {
             await trackJoinRequestCreated(participantId, joinRequest.id, team.name);
         } catch (journalError) {
-            console.error('Ошибка при отслеживании создания заявки на вступление в журнале:', journalError);
+            await logger.error(LogAction.CREATE, 'JoinRequest', `Error tracking join request creation in journal: ${journalError instanceof Error ? journalError.message : 'Unknown error'}`, { metadata: { error: journalError instanceof Error ? journalError.stack : journalError } });
             // Don't fail the main operation if journal tracking fails
         }
 
@@ -769,13 +770,13 @@ export async function createJoinRequest(participantId: string, teamId: string, m
                 })
             } catch (messageError) {
                 // Log the error but don't fail the join request creation
-                console.error('Error sending join request notification:', messageError)
+                await logger.error(LogAction.CREATE, 'Message', `Error sending join request notification: ${messageError instanceof Error ? messageError.message : 'Unknown error'}`, { metadata: { error: messageError instanceof Error ? messageError.stack : messageError } })
             }
         }
 
         revalidatePath('/space/team')
     } catch (error) {
-        console.error('Error creating join request:', error)
+        await logger.error(LogAction.CREATE, 'JoinRequest', `Error creating join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }
@@ -878,14 +879,14 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
                 await trackJoinRequestRejected(requestData.participantId, requestData.joinRequestId, requestData.teamName);
             }
         } catch (journalError) {
-            console.error('Ошибка при отслеживании ответа на заявку в журнале:', journalError);
+            await logger.error(LogAction.UPDATE, 'JoinRequest', `Error tracking join request response in journal: ${journalError instanceof Error ? journalError.message : 'Unknown error'}`, { metadata: { error: journalError instanceof Error ? journalError.stack : journalError } });
             // Don't fail the main operation if journal tracking fails
         }
 
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error responding to join request:', error)
+        await logger.error(LogAction.UPDATE, 'JoinRequest', `Error responding to join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }
@@ -941,14 +942,14 @@ export async function updateTeamInfo(teamId: string, name: string, nickname: str
         try {
             await trackTeamUpdated(leaderId, teamId, name);
         } catch (journalError) {
-            console.error('Ошибка при отслеживании обновления команды в журнале:', journalError);
+            await logger.error(LogAction.UPDATE, 'Team', `Error tracking team update in journal: ${journalError instanceof Error ? journalError.message : 'Unknown error'}`, { metadata: { error: journalError instanceof Error ? journalError.stack : journalError } });
             // Don't fail the main operation if journal tracking fails
         }
 
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error updating team info:', error)
+        await logger.error(LogAction.UPDATE, 'Team', `Error updating team info: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }
@@ -996,7 +997,7 @@ export async function removeTeamMember(teamId: string, memberId: string, leaderI
         revalidatePath('/space/team')
         revalidatePath('/dashboard/teams')
     } catch (error) {
-        console.error('Error removing team member:', error)
+        await logger.error(LogAction.UPDATE, 'Team', `Error removing team member: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }
@@ -1014,7 +1015,7 @@ export async function dismissBannerAction(
         await dismissBanner(participantId, hackathonId, bannerType)
         revalidatePath('/space')
     } catch (error) {
-        console.error('Error dismissing banner:', error)
+        await logger.error(LogAction.UPDATE, 'Banner', `Error dismissing banner: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }
@@ -1063,7 +1064,7 @@ export async function dismissCustomBannerAction(
 
         revalidatePath('/space')
     } catch (error) {
-        console.error('Error dismissing custom banner:', error)
+        await logger.error(LogAction.UPDATE, 'Banner', `Error dismissing custom banner: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { error: error instanceof Error ? error.stack : error } })
         throw error
     }
 }

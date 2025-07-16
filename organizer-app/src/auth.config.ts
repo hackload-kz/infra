@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { db } from "@/lib/db";
 import { isOrganizer } from "@/lib/admin";
+import { logger, LogAction } from "@/lib/logger";
 
 export default {
   providers: [
@@ -44,18 +45,18 @@ export default {
               },
               include: { participant: true },
             });
-            console.info(`🔑 New user registered via OAuth: ${user.email} using ${account?.provider}`);
+            await logger.info(LogAction.LOGIN, 'User', `New user registered via OAuth: ${user.email} using ${account?.provider}`, { userEmail: user.email, metadata: { provider: account?.provider } });
           } else {
             // Check if user has a participant profile and if it's active
             if (dbUser.participant && !dbUser.participant.isActive) {
               // Block inactive participants from logging in
-              console.info(`🚫 Blocked inactive user login attempt: ${user.email}`);
+              await logger.warn(LogAction.LOGIN, 'User', `Blocked inactive user login attempt: ${user.email}`, { userEmail: user.email });
               return false;
             }
-            console.info(`🔑 User authenticated: ${user.email} using ${account?.provider}`);
+            await logger.info(LogAction.LOGIN, 'User', `User authenticated: ${user.email} using ${account?.provider}`, { userEmail: user.email, metadata: { provider: account?.provider } });
           }
         } catch (error) {
-          console.error("Error creating OAuth user:", error);
+          await logger.error(LogAction.LOGIN, 'User', `Error creating OAuth user: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: user.email, metadata: { error: error instanceof Error ? error.stack : error } });
           return false;
         }
       }

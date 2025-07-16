@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { messageService } from '@/lib/messages';
 import { db } from '@/lib/db';
 import { isOrganizer } from '@/lib/admin';
-import { logger } from '@/lib/logger';
+import { logger, LogAction } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -40,7 +40,7 @@ export async function GET(
 
     return NextResponse.json({ message });
   } catch (error) {
-    console.error('Error fetching message:', error);
+    await logger.error(LogAction.READ, 'Message', `Error fetching message: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -86,10 +86,10 @@ export async function PUT(
     // Update message status
     if (action === 'read') {
       await messageService.markAsRead(messageId, session.user.email);
-      console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as read`);
+      await logger.info(LogAction.UPDATE, 'Message', `Message state changed: ${session.user.email} marked message ${messageId} as read`, { userEmail: session.user.email, entityId: messageId });
     } else {
       await messageService.markAsUnread(messageId, session.user.email);
-      console.info(`📧 Message state changed: ${session.user.email} marked message ${messageId} as unread`);
+      await logger.info(LogAction.UPDATE, 'Message', `Message state changed: ${session.user.email} marked message ${messageId} as unread`, { userEmail: session.user.email, entityId: messageId });
     }
 
     return NextResponse.json({ success: true });

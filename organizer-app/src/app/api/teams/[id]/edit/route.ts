@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { isOrganizer } from '@/lib/admin'
 import { db } from '@/lib/db'
 import { TeamStatus, TeamLevel } from '@prisma/client'
+import { logger, LogAction } from '@/lib/logger'
 
 export async function PUT(
     request: NextRequest,
@@ -70,11 +71,11 @@ export async function PUT(
             })
         })
 
-        console.info(`✏️ Team edited: ${session.user.email} updated team ${updatedTeam.name} (@${updatedTeam.nickname})`)
+        await logger.info(LogAction.UPDATE, 'Team', `Team edited: ${session.user.email} updated team ${updatedTeam.name} (@${updatedTeam.nickname})`, { userEmail: session.user.email, entityId: updatedTeam.id });
 
         return NextResponse.json(updatedTeam)
     } catch (error) {
-        console.error('Error updating team:', error)
+        await logger.error(LogAction.UPDATE, 'Team', `Error updating team: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email, metadata: { error: error instanceof Error ? error.stack : error } });
         return NextResponse.json({ error: 'Failed to update team' }, { status: 500 })
     }
 }

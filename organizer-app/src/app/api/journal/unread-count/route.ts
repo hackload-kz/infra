@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { getUnreadJournalCount } from '@/lib/journal'
+import { logger, LogAction } from '@/lib/logger'
 
 export async function GET() {
   try {
@@ -24,7 +25,8 @@ export async function GET() {
     
     return NextResponse.json({ count })
   } catch (error) {
-    console.error('Ошибка при получении количества непрочитанных записей журнала:', error)
+    const session = await auth();
+    await logger.error(LogAction.READ, 'Journal', `Error getting unread journal count: ${error instanceof Error ? error.message : 'Unknown error'}`, { userEmail: session?.user?.email || undefined, metadata: { error: error instanceof Error ? error.stack : error } });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
