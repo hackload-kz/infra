@@ -102,7 +102,7 @@ interface CalendarEventBannerProps {
   hackathonId: string
 }
 
-export function CalendarEventBannerComponent({ event, participantId, hackathonId }: CalendarEventBannerProps) {
+export function CalendarEventBannerComponent({ event }: CalendarEventBannerProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [isDismissing, setIsDismissing] = useState(false)
 

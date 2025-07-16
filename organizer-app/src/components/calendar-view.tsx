@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Calendar, ChevronDown, ChevronUp, Clock } from 'lucide-react'
+import { Calendar, ChevronDown, ChevronUp } from 'lucide-react'
 // Define the CalendarEvent type locally since it's not available in the client
 type CalendarEvent = {
   id: string
@@ -118,12 +118,12 @@ export function CalendarView({
     new Date(event.eventDate) < now
   )
 
-  const getNextEvent = () => {
-    const upcoming = upcomingEvents.filter(event => event.isActive)
-    return upcoming.length > 0 ? upcoming[0] : null
-  }
+  // const getNextEvent = () => {
+  //   const upcoming = upcomingEvents.filter(event => event.isActive)
+  //   return upcoming.length > 0 ? upcoming[0] : null
+  // }
 
-  const nextEvent = getNextEvent()
+  // const nextEvent = getNextEvent()
 
   if (loading) {
     return (
@@ -197,7 +197,7 @@ export function CalendarView({
           
           <div className="space-y-6">
             {/* Past Events Section - Collapsed by Default */}
-            {showPastEvents && sortedPastEvents.map((event, index) => {
+            {showPastEvents && sortedPastEvents.map((event) => {
               const eventDate = new Date(event.eventDate)
               
               return (
@@ -244,7 +244,7 @@ export function CalendarView({
             })}
 
             {/* Upcoming Events Section */}
-            {sortedUpcomingEvents.map((event, index) => {
+            {sortedUpcomingEvents.map((event) => {
               const eventDate = new Date(event.eventDate)
               const isToday = eventDate.toDateString() === now.toDateString()
               
