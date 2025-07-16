@@ -93,6 +93,11 @@ export default async function Home() {
                             <span>Управление командами</span>
                           </div>
                         </Link>
+                        <Link href="/space">
+                          <div className="bg-slate-700 hover:bg-slate-600 text-white px-8 py-4 rounded-lg font-semibold transition-colors duration-150 border border-slate-600">
+                            <span>Кабинет участника</span>
+                          </div>
+                        </Link>
                       </>
                     ) : (
                       // Participant interface

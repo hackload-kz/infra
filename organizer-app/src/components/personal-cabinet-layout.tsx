@@ -116,7 +116,6 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
               const Icon = item.icon
               const isActive = pathname === item.href
               const isDisabled = item.href === '/space/notifications' ||
-                               item.href === '/space/calendar' ||
                                item.href === '/space/tasks'
               
               if (isDisabled) {

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Users, Home, UserCheck, Calendar, MessageSquare, AlertCircle } from 'lucide-react'
+import { Users, Home, UserCheck, Calendar, MessageSquare, AlertCircle, CalendarDays, User } from 'lucide-react'
 import { LogoutButton } from './logout-button'
 
 const navigation = [
@@ -13,6 +13,8 @@ const navigation = [
     { name: 'Участники', href: '/dashboard/participants', icon: UserCheck },
     { name: 'Сообщения', href: '/dashboard/messages', icon: MessageSquare },
     { name: 'Баннеры', href: '/dashboard/banners', icon: AlertCircle },
+    { name: 'Календарь', href: '/dashboard/calendar', icon: CalendarDays },
+    { name: 'Кабинет участника', href: '/space', icon: User },
 ]
 
 export function Sidebar() {

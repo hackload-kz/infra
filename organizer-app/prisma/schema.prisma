@@ -36,6 +36,8 @@ model Hackathon {
   journalEntries    JournalEntry[]
   messages          Message[]
   teams             Team[]
+  calendarEvents    CalendarEvent[]
+  calendarEventDismissals CalendarEventDismissal[]
 
   @@map("hackathons")
 }
@@ -71,6 +73,7 @@ model Team {
   leader       Participant?  @relation("TeamLeader")
   members      Participant[] @relation("TeamMembers")
   hackathon    Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  calendarEvents CalendarEvent[]
 
   @@map("teams")
 }
@@ -115,6 +118,7 @@ model Participant {
   journalEntries          JournalEntry[]
   receivedMessages        Message[]                @relation("MessageRecipient")
   sentMessages            Message[]                @relation("MessageSender")
+  calendarEventDismissals CalendarEventDismissal[]
   ledTeam                 Team?                    @relation("TeamLeader", fields: [ledTeamId], references: [id])
   team                    Team?                    @relation("TeamMembers", fields: [teamId], references: [id])
   user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -226,6 +230,40 @@ model JournalEntry {
   @@map("journal_entries")
 }
 
+model CalendarEvent {
+  id             String                    @id @default(cuid())
+  title          String
+  description    String                    // HTML formatted description
+  eventDate      DateTime                  // Event start date and time
+  eventEndDate   DateTime?                 // Optional event end date and time
+  link           String?                   // Optional link
+  eventType      CalendarEventType         @default(INFO)
+  isActive       Boolean                   @default(true)
+  hackathonId    String
+  teamId         String?                   // Optional team relation
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  hackathon      Hackathon                 @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  team           Team?                     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  dismissals     CalendarEventDismissal[]
+
+  @@map("calendar_events")
+}
+
+model CalendarEventDismissal {
+  id              String        @id @default(cuid())
+  eventId         String
+  participantId   String
+  hackathonId     String
+  dismissedAt     DateTime      @default(now())
+  event           CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  participant     Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  hackathon       Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, participantId, hackathonId])
+  @@map("calendar_event_dismissals")
+}
+
 enum TeamStatus {
   NEW
   INCOMPLETED
@@ -281,4 +319,10 @@ enum JournalEventType {
   TEAM_STATUS_UPDATED
   ADMIN_TEAM_EDIT
   SYSTEM_EVENT
+}
+
+enum CalendarEventType {
+  INFO
+  WARNING
+  DEADLINE
 }
