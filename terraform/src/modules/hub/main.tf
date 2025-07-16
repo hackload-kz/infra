@@ -159,6 +159,7 @@ resource "kubernetes_deployment" "hub" {
   lifecycle {
     ignore_changes = [
       spec[0].template[0].spec[0].container[0].image,
+      spec[0].template[0].spec[0].container[0].env,
       spec[0].replicas,
     ]
   }

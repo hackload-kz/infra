@@ -48,6 +48,23 @@ module "traefik" {
   depends_on = [module.cert_manager]
 }
 
+module "k6_operator" {
+  source = "../../modules/k6-operator"
+
+  namespace               = "k6-system"
+  release_name            = "k6-operator"
+  chart_version           = "3.14.1"
+  create_test_service_account = true
+  
+  helm_values = {
+    "namespace.create"                  = false
+    "manager.resources.limits.cpu"      = "500m"
+    "manager.resources.limits.memory"   = "512Mi"
+    "manager.resources.requests.cpu"    = "100m"
+    "manager.resources.requests.memory" = "128Mi"
+  }
+}
+
 module "hub" {
   source = "../../modules/hub"
 
