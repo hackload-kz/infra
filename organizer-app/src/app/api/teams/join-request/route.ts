@@ -38,6 +38,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Participant not found' }, { status: 404 })
     }
 
+    // Check if participant is active
+    if (!participant.isActive) {
+      return NextResponse.json({ error: 'Your account is inactive and cannot join teams' }, { status: 403 })
+    }
+
     // Check if participant is already in a team
     if (participant.teamId) {
       return NextResponse.json({ error: 'You are already in a team' }, { status: 400 })

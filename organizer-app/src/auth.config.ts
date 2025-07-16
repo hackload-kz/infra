@@ -32,6 +32,7 @@ export default {
         try {
           let dbUser = await db.user.findUnique({
             where: { email: user.email },
+            include: { participant: true },
           });
 
           if (!dbUser) {
@@ -41,7 +42,14 @@ export default {
                 email: user.email,
                 // No password field for OAuth users
               },
+              include: { participant: true },
             });
+          } else {
+            // Check if user has a participant profile and if it's active
+            if (dbUser.participant && !dbUser.participant.isActive) {
+              // Block inactive participants from logging in
+              return false;
+            }
           }
         } catch (error) {
           console.error("Error creating OAuth user:", error);

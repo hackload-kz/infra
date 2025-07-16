@@ -76,12 +76,20 @@ export async function PUT(
         return NextResponse.json({ error: 'Team is full' }, { status: 400 })
       }
 
-      // Check if participant is still available (not in another team)
+      // Check if participant is still available (not in another team) and is active
       const currentParticipant = await db.participant.findUnique({
         where: { id: joinRequest.participantId }
       })
 
-      if (currentParticipant?.teamId) {
+      if (!currentParticipant) {
+        return NextResponse.json({ error: 'Participant not found' }, { status: 404 })
+      }
+
+      if (!currentParticipant.isActive) {
+        return NextResponse.json({ error: 'Cannot approve join request - participant account is inactive' }, { status: 403 })
+      }
+
+      if (currentParticipant.teamId) {
         return NextResponse.json({ error: 'Participant has already joined another team' }, { status: 400 })
       }
 

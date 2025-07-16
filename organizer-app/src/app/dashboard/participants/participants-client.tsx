@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { User, Participant, Team } from '@prisma/client'
 import { Button } from '@/components/ui/button'
-import { Edit } from 'lucide-react'
+import { Edit, Eye } from 'lucide-react'
 
 type ParticipantWithRelations = Participant & {
     user: User
@@ -118,7 +118,13 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <div className="flex space-x-2">
                                             <Link href={`/dashboard/participants/${participant.id}`}>
-                                                <Button variant="outline" size="sm">
+                                                <Button variant="outline" size="sm" title="View Profile">
+                                                    <Eye className="w-4 h-4 mr-1" />
+                                                    Просмотр
+                                                </Button>
+                                            </Link>
+                                            <Link href={`/dashboard/participants/${participant.id}/edit`}>
+                                                <Button variant="outline" size="sm" title="Edit Profile">
                                                     <Edit className="w-4 h-4 mr-1" />
                                                     Редактировать
                                                 </Button>

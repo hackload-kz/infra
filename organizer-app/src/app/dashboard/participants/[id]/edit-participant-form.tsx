@@ -31,6 +31,7 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
         otherCloudServices: participant.otherCloudServices || '',
         otherCloudProviders: participant.otherCloudProviders || '',
         teamId: participant.teamId || '',
+        isActive: participant.isActive,
     });
 
     const [loading, setLoading] = useState(false);
@@ -189,6 +190,40 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
                             </option>
                         ))}
                     </select>
+                </div>
+            </div>
+
+            {/* Account Status */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Статус аккаунта</h3>
+                
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <label className="flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={formData.isActive}
+                            onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                            className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <div>
+                            <span className="text-sm font-medium text-gray-900">
+                                Активный аккаунт
+                            </span>
+                            <p className="text-sm text-gray-600">
+                                Неактивные пользователи не смогут войти в систему и присоединиться к командам
+                            </p>
+                        </div>
+                    </label>
+                    
+                    <div className="mt-2 flex items-center">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            formData.isActive 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                        }`}>
+                            {formData.isActive ? 'Активен' : 'Заблокирован'}
+                        </span>
+                    </div>
                 </div>
             </div>
 

@@ -50,7 +50,8 @@ export default async function SpaceParticipantsPage() {
       where: {
         AND: [
           { team: null }, // Not in any team
-          { user: { email: { not: session.user.email } } } // Not the current user
+          { user: { email: { not: session.user.email } } }, // Not the current user
+          { isActive: true } // Only active participants
         ]
       },
       include: {

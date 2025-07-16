@@ -104,6 +104,9 @@ export default async function ParticipantProfilePage({ params }: Props) {
     notFound()
   }
 
+  // Check if participant is inactive
+  const isInactive = !targetParticipant.isActive
+
   const user = {
     name: currentParticipant.name,
     email: currentParticipant.email,
@@ -152,6 +155,21 @@ export default async function ParticipantProfilePage({ params }: Props) {
         </h1>
         <div className="w-16 h-1 bg-amber-400 rounded-full"></div>
       </div>
+
+      {/* Inactive Status Banner */}
+      {isInactive && (
+        <div className="bg-red-500/20 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+          <div className="flex items-center space-x-2">
+            <User className="w-5 h-5 text-red-400" />
+            <div>
+              <h3 className="text-red-400 font-semibold">Аккаунт деактивирован</h3>
+              <p className="text-red-300 text-sm">
+                Этот участник был деактивирован и больше не может участвовать в хакатоне
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Profile Info */}
@@ -231,7 +249,7 @@ export default async function ParticipantProfilePage({ params }: Props) {
             )}
 
             {/* Contact Actions */}
-            {currentTeam && isCurrentUserLeader && teamHasSpace && !targetParticipant.team && (
+            {currentTeam && isCurrentUserLeader && teamHasSpace && !targetParticipant.team && !isInactive && (
               <div className="border-t border-slate-700/30 pt-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Пригласить в команду</h3>
                 <div className="flex flex-wrap gap-3">
@@ -438,9 +456,20 @@ export default async function ParticipantProfilePage({ params }: Props) {
                 <User className="w-5 h-5 text-slate-400" />
                 <h3 className="text-lg font-semibold text-white">Статус</h3>
               </div>
-              <p className="text-slate-400 text-sm">
-                Не состоит в команде и ищет возможности для участия в хакатоне
-              </p>
+              {isInactive ? (
+                <div className="space-y-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    Заблокирован
+                  </span>
+                  <p className="text-slate-400 text-sm">
+                    Участник был деактивирован и не может присоединиться к команде
+                  </p>
+                </div>
+              ) : (
+                <p className="text-slate-400 text-sm">
+                  Не состоит в команде и ищет возможности для участия в хакатоне
+                </p>
+              )}
             </div>
           )}
 

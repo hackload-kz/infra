@@ -92,6 +92,7 @@ model Participant {
   email                   String                   @unique
   city                    String?
   company                 String?
+  isActive                Boolean                  @default(true)
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
   userId                  String                   @unique
