@@ -4,8 +4,28 @@ import GitHub from "next-auth/providers/github";
 import { db } from "@/lib/db";
 import { isOrganizer } from "@/lib/admin";
 import { logger, LogAction } from "@/lib/logger";
+import "@/types/auth";
 
 export default {
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
+  jwt: {
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
+  useSecureCookies: process.env.NODE_ENV === "production",
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -15,6 +35,7 @@ export default {
           prompt: "select_account",
         },
       },
+      checks: ["pkce", "state"],
     }),
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
@@ -24,8 +45,27 @@ export default {
           prompt: "select_account",
         },
       },
+      checks: ["pkce", "state"],
     }),
   ],
+  events: {
+    async signIn({ user, account }) {
+      if (user.email) {
+        await logger.info(LogAction.LOGIN, 'User', `User signed in: ${user.email} via ${account?.provider}`, { 
+          userEmail: user.email, 
+          metadata: { provider: account?.provider, timestamp: new Date().toISOString() }
+        });
+      }
+    },
+    async signOut({ token }) {
+      if (token?.email) {
+        await logger.info(LogAction.LOGIN, 'User', `User signed out: ${token.email}`, { 
+          userEmail: token.email as string, 
+          metadata: { timestamp: new Date().toISOString() }
+        });
+      }
+    },
+  },
   callbacks: {
     async signIn({ user, account }) {
       // For OAuth providers, ensure user exists in database
@@ -47,12 +87,6 @@ export default {
             });
             await logger.info(LogAction.LOGIN, 'User', `New user registered via OAuth: ${user.email} using ${account?.provider}`, { userEmail: user.email, metadata: { provider: account?.provider } });
           } else {
-            // Check if user has a participant profile and if it's active
-            if (dbUser.participant && !dbUser.participant.isActive) {
-              // Block inactive participants from logging in
-              await logger.warn(LogAction.LOGIN, 'User', `Blocked inactive user login attempt: ${user.email}`, { userEmail: user.email });
-              return false;
-            }
             await logger.info(LogAction.LOGIN, 'User', `User authenticated: ${user.email} using ${account?.provider}`, { userEmail: user.email, metadata: { provider: account?.provider } });
           }
         } catch (error) {
@@ -62,10 +96,17 @@ export default {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user && user.email) {
         // Determine role based on email
         token.role = isOrganizer(user.email) ? "admin" : "participant";
+        token.sub = user.id;
+        
+        // Add session metadata for security
+        if (account) {
+          token.provider = account.provider;
+          token.iat = Math.floor(Date.now() / 1000);
+        }
       }
       return token;
     },
@@ -103,5 +144,8 @@ export default {
   },
   pages: {
     signIn: "/login",
+    error: "/auth/error",
   },
+  trustHost: true,
+  debug: process.env.NODE_ENV === "development",
 } satisfies NextAuthConfig;

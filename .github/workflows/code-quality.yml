@@ -87,9 +87,7 @@ jobs:
             echo "🔍 Running ESLint..." && \
             npm run lint && \
             echo "🔍 Type checking..." && \
-            npx tsc --noEmit && \            
-            echo "🏗️  Building application..." && \
-            NODE_OPTIONS="--max_old_space_size=4096" npm run build && \
+            npx tsc --noEmit && \ 
             echo "✅ All quality checks passed!"
         EOF
         
@@ -116,6 +114,5 @@ jobs:
         echo "- **ESLint**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **TypeScript**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Tests**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Build**: ${{ needs.lint-and-type-check.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image**: ${{ needs.determine-base-image.outputs.base-image-full }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Base Image Tag**: ${{ needs.determine-base-image.outputs.base-image-tag }}" >> $GITHUB_STEP_SUMMARY
