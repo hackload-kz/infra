@@ -57,13 +57,12 @@ export default {
         });
       }
     },
-    async signOut({ session }) {
-      if (session?.user?.email) {
-        await logger.info(LogAction.LOGIN, 'User', `User signed out: ${session.user.email}`, { 
-          userEmail: session.user.email, 
-          metadata: { timestamp: new Date().toISOString() }
-        });
-      }
+    async signOut() {
+      // Note: SignOut event logging temporarily disabled due to type issues
+      // The signOut event parameter structure varies in NextAuth v5
+      await logger.info(LogAction.LOGIN, 'User', 'User signed out', { 
+        metadata: { timestamp: new Date().toISOString() }
+      });
     },
   },
   callbacks: {
