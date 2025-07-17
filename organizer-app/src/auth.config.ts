@@ -57,10 +57,10 @@ export default {
         });
       }
     },
-    async signOut({ token }) {
-      if (token?.email) {
-        await logger.info(LogAction.LOGIN, 'User', `User signed out: ${token.email}`, { 
-          userEmail: token.email as string, 
+    async signOut({ session }) {
+      if (session?.user?.email) {
+        await logger.info(LogAction.LOGIN, 'User', `User signed out: ${session.user.email}`, { 
+          userEmail: session.user.email, 
           metadata: { timestamp: new Date().toISOString() }
         });
       }
