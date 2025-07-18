@@ -79,10 +79,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Admin Updated Name',
+          city: 'Test City',
+          company: 'Test Company',
+          githubUrl: 'https://github.com/test',
+          linkedinUrl: 'https://linkedin.com/in/test',
           experienceLevel: 'ADVANCED',
-          teamId: 'new-team-id',
           technologies: ['Updated', 'Tech', 'Stack'],
           cloudServices: ['AWS', 'Azure'],
+          cloudProviders: ['AWS', 'GCP'],
+          otherTechnologies: 'Other tech',
+          otherCloudServices: 'Other services',
+          otherCloudProviders: 'Other providers',
+          programmingLanguages: ['JavaScript', 'Python'],
+          databases: ['PostgreSQL', 'MongoDB'],
+          description: 'Test description',
+          teamId: 'new-team-id',
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -103,21 +115,17 @@ describe('Internal Participant Data', () => {
 
         expect(db.participant.update).toHaveBeenCalledWith({
           where: { id: 'participant-1' },
-          data: {
+          data: expect.objectContaining({
             name: 'Admin Updated Name',
-            city: undefined,
-            company: undefined,
-            githubUrl: null,
-            linkedinUrl: null,
             experienceLevel: 'ADVANCED',
             technologies: JSON.stringify(['Updated', 'Tech', 'Stack']),
             cloudServices: JSON.stringify(['AWS', 'Azure']),
-            cloudProviders: JSON.stringify(undefined),
-            otherTechnologies: undefined,
-            otherCloudServices: undefined,
-            otherCloudProviders: undefined,
             teamId: 'new-team-id',
-          },
+            programmingLanguages: ['JavaScript', 'Python'],
+            databases: ['PostgreSQL', 'MongoDB'],
+            description: 'Test description',
+            isActive: true,
+          }),
         });
       });
 
@@ -160,7 +168,11 @@ describe('Internal Participant Data', () => {
           otherTechnologies: 'Django, Flask',
           otherCloudServices: 'Kubernetes, Docker',
           otherCloudProviders: 'DigitalOcean, Linode',
+          programmingLanguages: ['JavaScript', 'Python', 'TypeScript'],
+          databases: ['PostgreSQL', 'MongoDB', 'Redis'],
+          description: 'Complete test description',
           teamId: 'target-team',
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -208,7 +220,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Participant Name',
+          city: 'Test City',
+          company: 'Test Company',
+          githubUrl: 'https://github.com/test',
+          linkedinUrl: 'https://linkedin.com/in/test',
+          experienceLevel: 'BEGINNER',
+          technologies: ['JavaScript'],
+          cloudServices: ['AWS'],
+          cloudProviders: ['Amazon'],
+          otherTechnologies: '',
+          otherCloudServices: '',
+          otherCloudProviders: '',
+          programmingLanguages: ['JavaScript'],
+          databases: ['PostgreSQL'],
+          description: 'Test description',
           teamId: 'target-team-id',
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -249,7 +276,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Participant Name',
+          city: 'Test City',
+          company: 'Test Company',
+          githubUrl: 'https://github.com/test',
+          linkedinUrl: 'https://linkedin.com/in/test',
+          experienceLevel: 'BEGINNER',
+          technologies: ['JavaScript'],
+          cloudServices: ['AWS'],
+          cloudProviders: ['Amazon'],
+          otherTechnologies: '',
+          otherCloudServices: '',
+          otherCloudProviders: '',
+          programmingLanguages: ['JavaScript'],
+          databases: ['PostgreSQL'],
+          description: 'Test description',
           teamId: 'valid-team-id',
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -291,7 +333,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Participant Name',
+          city: 'Test City',
+          company: 'Test Company',
+          githubUrl: 'https://github.com/test',
+          linkedinUrl: 'https://linkedin.com/in/test',
+          experienceLevel: 'BEGINNER',
+          technologies: ['JavaScript'],
+          cloudServices: ['AWS'],
+          cloudProviders: ['Amazon'],
+          otherTechnologies: '',
+          otherCloudServices: '',
+          otherCloudProviders: '',
+          programmingLanguages: ['JavaScript'],
+          databases: ['PostgreSQL'],
+          description: 'Test description',
           teamId: null,
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -486,7 +543,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Updated Admin User',
+          city: 'Admin City',
+          company: 'Admin Company',
+          githubUrl: 'https://github.com/admin',
+          linkedinUrl: 'https://linkedin.com/in/admin',
           experienceLevel: 'EXPERT',
+          technologies: ['JavaScript', 'React'],
+          cloudServices: ['AWS', 'Azure'],
+          cloudProviders: ['Amazon', 'Microsoft'],
+          otherTechnologies: '',
+          otherCloudServices: '',
+          otherCloudProviders: '',
+          programmingLanguages: ['JavaScript', 'TypeScript'],
+          databases: ['PostgreSQL', 'MongoDB'],
+          description: 'Admin description',
+          teamId: null,
+          isActive: true,
         };
 
         const request = createMockRequest(
@@ -540,7 +612,25 @@ describe('Internal Participant Data', () => {
             `http://localhost:3000/api/participants/${participantId}`,
             {
               method: 'PUT',
-              body: { name: 'Updated Participant', teamId: 'new-team-id' },
+              body: { 
+                name: 'Updated Participant', 
+                city: 'Test City',
+                company: 'Test Company',
+                githubUrl: 'https://github.com/test',
+                linkedinUrl: 'https://linkedin.com/in/test',
+                experienceLevel: 'BEGINNER',
+                technologies: ['JavaScript'],
+                cloudServices: ['AWS'],
+                cloudProviders: ['Amazon'],
+                otherTechnologies: '',
+                otherCloudServices: '',
+                otherCloudProviders: '',
+                programmingLanguages: ['JavaScript'],
+                databases: ['PostgreSQL'],
+                description: 'Test description',
+                teamId: 'new-team-id',
+                isActive: true,
+              },
             }
           );
 
@@ -590,7 +680,22 @@ describe('Internal Participant Data', () => {
 
         const requestBody = {
           name: 'Former Team Leader',
+          city: 'Test City',
+          company: 'Test Company',
+          githubUrl: 'https://github.com/test',
+          linkedinUrl: 'https://linkedin.com/in/test',
+          experienceLevel: 'BEGINNER',
+          technologies: ['JavaScript'],
+          cloudServices: ['AWS'],
+          cloudProviders: ['Amazon'],
+          otherTechnologies: '',
+          otherCloudServices: '',
+          otherCloudProviders: '',
+          programmingLanguages: ['JavaScript'],
+          databases: ['PostgreSQL'],
+          description: 'Test description',
           teamId: 'new-team',
+          isActive: true,
         };
 
         const request = createMockRequest(

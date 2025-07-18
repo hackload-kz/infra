@@ -35,6 +35,17 @@ export interface MockParticipant {
   otherTechnologies?: string | null;
   otherCloudServices?: string | null;
   otherCloudProviders?: string | null;
+  isActive?: boolean;
+  programmingLanguages?: string[] | null;
+  databases?: string[] | null;
+  description?: string | null;
+  hackathonParticipations?: Array<{
+    hackathon: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+  }>;
   userId: string;
   teamId?: string | null;
   ledTeamId?: string | null;
@@ -112,9 +123,20 @@ export const createMockParticipant = (overrides: Partial<MockParticipant> = {}):
   technologies: null,
   cloudServices: null,
   cloudProviders: null,
+  hackathonParticipations: [{
+    hackathon: {
+      id: 'hackathon-1',
+      name: 'Test Hackathon',
+      slug: 'test-hackathon'
+    }
+  }],
   otherTechnologies: null,
   otherCloudServices: null,
   otherCloudProviders: null,
+  isActive: true,
+  programmingLanguages: null,
+  databases: null,
+  description: null,
   team: null,
   ledTeam: null,
   ...overrides,

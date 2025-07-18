@@ -3,6 +3,8 @@ import { redirect, notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { JoinRequestForm } from '@/components/join-request-form'
+import { TeamJoinErrorBanner } from '@/components/team-join-error'
+import { getJoinBlockReason } from '@/lib/team-join-errors'
 import Link from 'next/link'
 import { 
   ArrowLeft,
@@ -29,7 +31,7 @@ export default async function JoinTeamPage({ params }: Props) {
     redirect('/login')
   }
 
-  const [participant, team] = await Promise.all([
+  const [participant, team, hackathon] = await Promise.all([
     db.participant.findFirst({
       where: { 
         user: { email: session.user.email } 
@@ -69,6 +71,9 @@ export default async function JoinTeamPage({ params }: Props) {
           }
         }
       }
+    }),
+    db.hackathon.findFirst({
+      where: { slug: 'hackload-2025' }
     })
   ])
 
@@ -86,15 +91,11 @@ export default async function JoinTeamPage({ params }: Props) {
     image: session.user?.image || undefined
   }
 
-  // Check if user can join
-  const canJoin = !participant.teamId && 
-                  team.members.length < 4 && 
-                  ['NEW', 'INCOMPLETED'].includes(team.status) &&
-                  participant.joinRequests.length === 0
-
-  if (!canJoin) {
-    redirect(`/space/teams/${resolvedParams.id}`)
-  }
+  // Check if user can join and get specific error reason
+  const existingRequest = participant.joinRequests.length > 0 ? participant.joinRequests[0] : null
+  const blockReason = getJoinBlockReason(participant, team, hackathon, existingRequest)
+  
+  const canJoin = !blockReason
 
   const statusLabels = {
     NEW: 'Новая',
@@ -191,11 +192,29 @@ export default async function JoinTeamPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Join Request Form */}
-      <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
-        <h3 className="text-xl font-semibold text-white mb-6">Заявка на вступление</h3>
-        <JoinRequestForm teamId={resolvedParams.id} participantId={participant.id} />
-      </div>
+      {/* Join Request Form or Error */}
+      {canJoin ? (
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+          <h3 className="text-xl font-semibold text-white mb-6">Заявка на вступление</h3>
+          <JoinRequestForm teamId={resolvedParams.id} participantId={participant.id} />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {blockReason && (
+            <TeamJoinErrorBanner 
+              error={blockReason}
+              actionButton={
+                <Link
+                  href={`/space/teams/${resolvedParams.id}`}
+                  className="inline-flex items-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                >
+                  Вернуться к команде
+                </Link>
+              }
+            />
+          )}
+        </div>
+      )}
     </PersonalCabinetLayout>
   )
 }

@@ -1074,3 +1074,29 @@ export async function dismissCustomBannerAction(
         throw error
     }
 }
+
+export async function withdrawJoinRequest(joinRequestId: string) {
+    if (!joinRequestId) {
+        throw new Error('Join request ID is required')
+    }
+
+    try {
+        const response = await fetch(`/api/teams/join-request/${joinRequestId}/withdraw`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to withdraw join request')
+        }
+
+        const result = await response.json()
+        return result
+    } catch (error) {
+        await logger.error(LogAction.DELETE, 'JoinRequest', `Error withdrawing join request: ${error instanceof Error ? error.message : 'Unknown error'}`, { metadata: { joinRequestId } })
+        throw error
+    }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { X, AlertTriangle, Info, AlertCircle, ChevronDown, ChevronUp, Calendar, Clock, Users } from 'lucide-react'
 import { Banner, CustomBanner, CalendarEventBanner } from '@/lib/banners'
@@ -16,17 +16,28 @@ interface BannerNotificationProps {
 export function BannerNotification({ banner, participantId, hackathonId }: BannerNotificationProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [isDismissing, setIsDismissing] = useState(false)
+  const isMountedRef = useRef(true)
+  
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
-  const handleDismiss = async () => {
+  const handleDismiss = useCallback(async () => {
     setIsDismissing(true)
     try {
       await dismissBannerAction(participantId, hackathonId, banner.type)
-      setIsVisible(false)
+      if (isMountedRef.current) {
+        setIsVisible(false)
+      }
     } catch (error) {
       console.error('Failed to dismiss banner:', error)
-      setIsDismissing(false)
+      if (isMountedRef.current) {
+        setIsDismissing(false)
+      }
     }
-  }
+  }, [participantId, hackathonId, banner.type])
 
   if (!isVisible) {
     return null
@@ -106,7 +117,7 @@ export function CalendarEventBannerComponent({ event }: CalendarEventBannerProps
   const [isVisible, setIsVisible] = useState(true)
   const [isDismissing, setIsDismissing] = useState(false)
 
-  const handleDismiss = async () => {
+  const handleDismiss = useCallback(async () => {
     setIsDismissing(true)
     try {
       // We'll need to create a new action for dismissing calendar events
@@ -123,7 +134,7 @@ export function CalendarEventBannerComponent({ event }: CalendarEventBannerProps
       console.error('Failed to dismiss calendar event:', error)
       setIsDismissing(false)
     }
-  }
+  }, [event.id])
 
   if (!isVisible) {
     return null
@@ -305,7 +316,7 @@ export function CustomBannerNotification({ banner, participantId, hackathonId }:
   const [isVisible, setIsVisible] = useState(true)
   const [isDismissing, setIsDismissing] = useState(false)
 
-  const handleDismiss = async () => {
+  const handleDismiss = useCallback(async () => {
     if (!banner.allowDismiss) return
     
     setIsDismissing(true)
@@ -316,7 +327,7 @@ export function CustomBannerNotification({ banner, participantId, hackathonId }:
       console.error('Failed to dismiss custom banner:', error)
       setIsDismissing(false)
     }
-  }
+  }, [banner.allowDismiss, banner.id, participantId, hackathonId])
 
   if (!isVisible) {
     return null

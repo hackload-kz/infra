@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createJoinRequest } from '@/lib/actions'
-import { UserPlus, AlertCircle } from 'lucide-react'
+import { getTeamJoinError } from '@/lib/team-join-errors'
+import { TeamJoinErrorDisplay } from '@/components/team-join-error'
+import { UserPlus } from 'lucide-react'
 
 interface JoinRequestFormProps {
   teamId: string
@@ -26,7 +28,8 @@ export function JoinRequestForm({ teamId, participantId }: JoinRequestFormProps)
       router.push(`/space/teams/${teamId}`)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка при отправке заявки')
+      const errorMessage = err instanceof Error ? err.message : 'Произошла ошибка при отправке заявки'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -35,12 +38,10 @@ export function JoinRequestForm({ teamId, participantId }: JoinRequestFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
-          <div className="flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <p className="text-red-300 text-sm">{error}</p>
-          </div>
-        </div>
+        <TeamJoinErrorDisplay 
+          error={getTeamJoinError(error)}
+          onClose={() => setError(null)}
+        />
       )}
 
       <div>

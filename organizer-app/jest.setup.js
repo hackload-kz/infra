@@ -57,6 +57,14 @@ jest.mock('react-dom/test-utils', () => {
   }
 })
 
+// Mock marked package
+jest.mock('marked', () => ({
+  marked: {
+    parse: jest.fn((markdown) => `<p>${markdown}</p>`),
+    setOptions: jest.fn(),
+  },
+}));
+
 // Polyfill Web APIs for Node.js test environment
 const { TextEncoder, TextDecoder } = require('util')
 

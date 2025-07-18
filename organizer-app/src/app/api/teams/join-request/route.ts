@@ -6,6 +6,7 @@ import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 import { logger, LogAction } from '@/lib/logger'
 import { urlBuilder } from '@/lib/urls'
+import { cleanupOldRequestsForParticipant } from '@/lib/team-join-cleanup'
 
 const createJoinRequestSchema = z.object({
   teamId: z.string().min(1, 'Team ID is required'),
@@ -93,6 +94,14 @@ export async function POST(request: NextRequest) {
 
     if (existingRequest) {
       return NextResponse.json({ error: 'You already have a pending request for this team' }, { status: 400 })
+    }
+
+    // Clean up old declined requests for this participant (background task)
+    try {
+      await cleanupOldRequestsForParticipant(participant.id)
+    } catch (cleanupError) {
+      // Don't fail the request creation if cleanup fails
+      console.warn('Failed to clean up old requests:', cleanupError)
     }
 
     // Create the join request

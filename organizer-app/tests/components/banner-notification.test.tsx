@@ -268,7 +268,10 @@ describe('BannerList Component', () => {
 
       expect(screen.getByText('Telegram Banner')).toBeInTheDocument()
       expect(screen.getByText('GitHub Banner')).toBeInTheDocument()
-      expect(screen.getByText('Team Banner')).toBeInTheDocument()
+      
+      // The third banner should be hidden by default but expand button should be visible
+      expect(screen.queryByText('Team Banner')).not.toBeInTheDocument()
+      expect(screen.getByText('Показать ещё 1 уведомлений')).toBeInTheDocument()
     })
 
     it('should render banners in order', () => {
@@ -277,7 +280,8 @@ describe('BannerList Component', () => {
       const bannerTitles = screen.getAllByRole('heading', { level: 3 })
       expect(bannerTitles[0]).toHaveTextContent('Telegram Banner')
       expect(bannerTitles[1]).toHaveTextContent('GitHub Banner')
-      expect(bannerTitles[2]).toHaveTextContent('Team Banner')
+      // Only first 2 banners should be visible by default
+      expect(bannerTitles).toHaveLength(2)
     })
 
     it('should render nothing for empty banner list', () => {
@@ -311,18 +315,22 @@ describe('BannerList Component', () => {
         expect(screen.queryByText('Telegram Banner')).not.toBeInTheDocument()
       })
 
-      // Other banners should still be visible
+      // Other banner should still be visible
       expect(screen.getByText('GitHub Banner')).toBeInTheDocument()
-      expect(screen.getByText('Team Banner')).toBeInTheDocument()
+      // Third banner should still be hidden since the component doesn't automatically show it
+      expect(screen.queryByText('Team Banner')).not.toBeInTheDocument()
+      // Expand button should still be visible
+      expect(screen.getByText('Показать ещё 1 уведомлений')).toBeInTheDocument()
     })
 
     it('should pass correct props to each banner component', () => {
       render(<BannerList {...defaultProps} />)
 
-      // Check that each banner type is rendered with correct props
+      // Check that first 2 banner types are rendered with correct props
       expect(screen.getByText('Add Telegram')).toBeInTheDocument()
       expect(screen.getByText('Add GitHub')).toBeInTheDocument()
-      expect(screen.getByText('Find Team')).toBeInTheDocument()
+      // Third banner should not be visible by default
+      expect(screen.queryByText('Find Team')).not.toBeInTheDocument()
     })
   })
 
@@ -360,10 +368,11 @@ describe('BannerList Component', () => {
         expect(consoleSpy).toHaveBeenCalled()
       })
 
-      // All banners should still be visible
+      // All visible banners should still be visible
       expect(screen.getByText('Telegram Banner')).toBeInTheDocument()
       expect(screen.getByText('GitHub Banner')).toBeInTheDocument()
-      expect(screen.getByText('Team Banner')).toBeInTheDocument()
+      // Third banner should still be hidden by default
+      expect(screen.queryByText('Team Banner')).not.toBeInTheDocument()
 
       consoleSpy.mockRestore()
     })
@@ -387,7 +396,8 @@ describe('BannerList Component', () => {
 
       render(<BannerList {...defaultProps} banners={manyBanners} />)
 
-      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(10)
+      // Only first 2 banners should be visible by default
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(2)
     })
   })
 })
