@@ -42,12 +42,23 @@ export default async function TeamsPage() {
         orderBy: { createdAt: 'desc' },
     });
 
+    // Helper function to determine if a team is completed
+    const isTeamCompleted = (team: typeof teams[0]) => {
+        const memberCount = team._count?.members || 0;
+        return memberCount >= 3;
+    };
+
     // Calculate statistics
+    const completedTeams = teams.filter(isTeamCompleted);
+    const notCompletedTeams = teams.filter(t => !isTeamCompleted(t));
+
     const stats = {
         totalTeams: teams.length,
         beginnerTeams: teams.filter(t => t.level === 'BEGINNER').length,
         advancedTeams: teams.filter(t => t.level === 'ADVANCED').length,
         fullTeams: teams.filter(t => (t._count?.members || 0) >= 4).length,
+        completedTeams: completedTeams.length,
+        notCompletedTeams: notCompletedTeams.length,
         statusBreakdown: {
             NEW: teams.filter(t => t.status === 'NEW').length,
             INCOMPLETED: teams.filter(t => t.status === 'INCOMPLETED').length,

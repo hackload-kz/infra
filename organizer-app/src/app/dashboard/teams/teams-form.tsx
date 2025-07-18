@@ -65,6 +65,8 @@ interface TeamStats {
     beginnerTeams: number
     advancedTeams: number
     fullTeams: number
+    completedTeams: number
+    notCompletedTeams: number
     statusBreakdown: Record<TeamStatus, number>
 }
 
@@ -79,6 +81,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
     const [statusFilter, setStatusFilter] = useState<TeamStatus | 'ALL'>('ALL')
     const [levelFilter, setLevelFilter] = useState<TeamLevel | 'ALL'>('ALL')
     const [memberFilter, setMemberFilter] = useState<'ALL' | 'FULL' | 'PARTIAL'>('ALL')
+    const [completionFilter, setCompletionFilter] = useState<'ALL' | 'COMPLETED' | 'NOT_COMPLETED'>('ALL')
     const [searchTerm, setSearchTerm] = useState('')
 
     // Keep for future use if needed
@@ -92,6 +95,12 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
         setEditingTeam(null)
     }
 
+    // Helper function to determine if a team is completed
+    const isTeamCompleted = (team: Team) => {
+        const memberCount = team._count?.members || 0;
+        return memberCount >= 3;
+    };
+
     // Filter teams based on current filters
     const filteredTeams = teams.filter(team => {
         const matchesStatus = statusFilter === 'ALL' || team.status === statusFilter
@@ -99,11 +108,14 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
         const matchesMembers = memberFilter === 'ALL' || 
             (memberFilter === 'FULL' && (team._count?.members || 0) >= 4) ||
             (memberFilter === 'PARTIAL' && (team._count?.members || 0) < 4)
+        const matchesCompletion = completionFilter === 'ALL' ||
+            (completionFilter === 'COMPLETED' && isTeamCompleted(team)) ||
+            (completionFilter === 'NOT_COMPLETED' && !isTeamCompleted(team))
         const matchesSearch = searchTerm === '' || 
             team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             team.nickname.toLowerCase().includes(searchTerm.toLowerCase())
         
-        return matchesStatus && matchesLevel && matchesMembers && matchesSearch
+        return matchesStatus && matchesLevel && matchesMembers && matchesCompletion && matchesSearch
     })
 
 
@@ -118,7 +130,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
             </div>
 
             {/* Statistics Dashboard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <div className="flex items-center">
                         <div className="p-2 bg-blue-100 rounded-lg">
@@ -134,7 +146,31 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <div className="flex items-center">
                         <div className="p-2 bg-green-100 rounded-lg">
-                            <Trophy className="w-6 h-6 text-green-600" />
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div className="ml-4">
+                            <p className="text-sm font-medium text-gray-600">Completed Teams (3+ members)</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.completedTeams}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center">
+                        <div className="p-2 bg-red-100 rounded-lg">
+                            <Users className="w-6 h-6 text-red-600" />
+                        </div>
+                        <div className="ml-4">
+                            <p className="text-sm font-medium text-gray-600">Incomplete Teams (&lt; 3 members)</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats.notCompletedTeams}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center">
+                        <div className="p-2 bg-emerald-100 rounded-lg">
+                            <Trophy className="w-6 h-6 text-emerald-600" />
                         </div>
                         <div className="ml-4">
                             <p className="text-sm font-medium text-gray-600">Beginner Teams</p>
@@ -175,7 +211,7 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                     <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-500 mb-2">Search</label>
                         <Input
@@ -184,6 +220,19 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-2">Completion Status</label>
+                        <select 
+                            value={completionFilter} 
+                            onChange={(e) => setCompletionFilter(e.target.value as 'ALL' | 'COMPLETED' | 'NOT_COMPLETED')}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="ALL">All Teams</option>
+                            <option value="COMPLETED">Completed (3+ members)</option>
+                            <option value="NOT_COMPLETED">Incomplete (&lt; 3 members)</option>
+                        </select>
                     </div>
                     
                     <div>
@@ -311,6 +360,9 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                                         Members
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Completion
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Created
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -345,6 +397,19 @@ function TeamsForm({ teams, stats }: TeamsFormProps) {
                                             <span className={`${(team._count?.members || 0) >= 4 ? 'text-green-600 font-semibold' : 'text-gray-900'}`}>
                                                 {team._count?.members || team.members?.length || 0} / 4
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            {isTeamCompleted(team) ? (
+                                                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                                    Completed
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                                                    <Users className="w-3 h-3 mr-1" />
+                                                    Incomplete
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {new Date(team.createdAt).toLocaleDateString()}
