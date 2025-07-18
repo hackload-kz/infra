@@ -21,6 +21,9 @@ interface Participant {
     otherTechnologies?: string | null
     otherCloudServices?: string | null
     otherCloudProviders?: string | null
+    programmingLanguages?: string[] | null
+    databases?: string[] | null
+    description?: string | null
 }
 
 interface SpaceEditProfileFormProps {
@@ -43,13 +46,16 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
         otherTechnologies: participant.otherTechnologies || '',
         otherCloudServices: participant.otherCloudServices || '',
         otherCloudProviders: participant.otherCloudProviders || '',
+        programmingLanguages: participant.programmingLanguages || [],
+        databases: participant.databases || [],
+        description: participant.description || '',
     })
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
-    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders', value: string) => {
+    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders' | 'programmingLanguages' | 'databases', value: string) => {
         setFormData(prev => ({
             ...prev,
             [field]: prev[field].includes(value)
@@ -357,6 +363,69 @@ export function SpaceEditProfileForm({ participant, userEmail }: SpaceEditProfil
                                 />
                             </div>
                         )}
+                    </div>
+                </div>
+
+                {/* Technology Skills */}
+                <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+                    <h3 className="text-xl font-semibold text-white mb-6">Технические навыки</h3>
+                    
+                    {/* Programming Languages */}
+                    <div className="mb-8">
+                        <label className="block text-sm font-medium text-slate-300 mb-4">
+                            Языки программирования (выбор нескольких вариантов)
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'C#', 'Go', 'Rust', 'PHP', 'Swift'].map(lang => (
+                                <label key={lang} className="flex items-center p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.programmingLanguages?.includes(lang) || false}
+                                        onChange={() => handleCheckboxChange('programmingLanguages', lang)}
+                                        className="mr-3 text-amber-400 focus:ring-amber-400/50"
+                                    />
+                                    <span className="text-slate-300 text-sm">{lang}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Databases */}
+                    <div className="mb-8">
+                        <label className="block text-sm font-medium text-slate-300 mb-4">
+                            Базы данных (выбор нескольких вариантов)
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle', 'SQL Server', 'CouchDB', 'Firebase', 'Cassandra'].map(db => (
+                                <label key={db} className="flex items-center p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.databases?.includes(db) || false}
+                                        onChange={() => handleCheckboxChange('databases', db)}
+                                        className="mr-3 text-amber-400 focus:ring-amber-400/50"
+                                    />
+                                    <span className="text-slate-300 text-sm">{db}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
+                            Описание профиля
+                        </label>
+                        <textarea
+                            id="description"
+                            value={formData.description || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="Расскажите о себе, своих интересах и целях участия в хакатоне..."
+                            rows={4}
+                            className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50 resize-none"
+                        />
+                        <p className="text-slate-500 text-xs mt-1">
+                            Дополнительная информация о ваших навыках и интересах
+                        </p>
                     </div>
                 </div>
 

@@ -24,6 +24,9 @@ interface FormParticipant {
   otherTechnologies?: string | null
   otherCloudServices?: string | null
   otherCloudProviders?: string | null
+  programmingLanguages?: string[] | null
+  databases?: string[] | null
+  description?: string | null
 }
 
 interface SpaceEditProfilePageProps {
@@ -90,6 +93,9 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
       otherTechnologies: null,
       otherCloudServices: null,
       otherCloudProviders: null,
+      programmingLanguages: null,
+      databases: null,
+      description: null,
     };
   } else {
     // Map existing participant data to form format
@@ -109,6 +115,9 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
       otherTechnologies: user.participant.otherTechnologies,
       otherCloudServices: user.participant.otherCloudServices,
       otherCloudProviders: user.participant.otherCloudProviders,
+      programmingLanguages: user.participant.programmingLanguages,
+      databases: user.participant.databases,
+      description: user.participant.description,
     };
   }
 

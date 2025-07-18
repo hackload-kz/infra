@@ -120,7 +120,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
             </div>
 
             {/* Team Information */}
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <h2 className="text-xl font-semibold mb-4 text-gray-900">Информация о команде</h2>
                     <div className="space-y-4">
@@ -169,6 +169,49 @@ export default async function TeamPage({ params }: TeamPageProps) {
                         )}
                     </div>
                 </div>
+
+                {/* Team Technology */}
+                {(team.acceptedLanguages?.length || team.techStack?.length || team.description) && (
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-900">Технологии команды</h2>
+                        <div className="space-y-4">
+                            {team.acceptedLanguages && team.acceptedLanguages.length > 0 && (
+                                <div>
+                                    <label className="text-sm font-medium text-gray-600">Принимаемые языки программирования</label>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {team.acceptedLanguages.map((lang) => (
+                                            <span key={lang} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
+                                                {lang}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {team.techStack && team.techStack.length > 0 && (
+                                <div>
+                                    <label className="text-sm font-medium text-gray-600">Технический стек</label>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {team.techStack.map((tech) => (
+                                            <span key={tech} className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {team.description && (
+                                <div>
+                                    <label className="text-sm font-medium text-gray-600">Описание команды</label>
+                                    <p className="text-gray-900 mt-2 bg-gray-50 p-3 rounded border">
+                                        {team.description}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Team Leader */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">

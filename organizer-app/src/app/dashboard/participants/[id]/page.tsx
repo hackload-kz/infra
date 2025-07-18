@@ -227,6 +227,44 @@ export default async function ParticipantPage({ params }: ParticipantPageProps) 
                             </div>
                         )}
 
+                        {/* Programming Languages */}
+                        {participant.programmingLanguages && participant.programmingLanguages.length > 0 && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Языки программирования</label>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    {participant.programmingLanguages.map((lang, index) => (
+                                        <span key={index} className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md text-sm">
+                                            {lang}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Databases */}
+                        {participant.databases && participant.databases.length > 0 && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Базы данных</label>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    {participant.databases.map((db, index) => (
+                                        <span key={index} className="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-md text-sm">
+                                            {db}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Description */}
+                        {participant.description && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-500">Описание профиля</label>
+                                <p className="text-gray-700 mt-2 bg-gray-50 p-3 rounded-md text-sm">
+                                    {participant.description}
+                                </p>
+                            </div>
+                        )}
+
                         {/* Additional Technologies */}
                         {(participant.otherTechnologies || participant.otherCloudServices || participant.otherCloudProviders) && (
                             <div className="border-t pt-4">

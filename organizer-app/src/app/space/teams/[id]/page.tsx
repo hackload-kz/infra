@@ -290,6 +290,52 @@ export default async function TeamDetailPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Team Technology Information */}
+      {(team.acceptedLanguages?.length || team.techStack?.length || team.description) && (
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mb-8">
+          <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+            <Code className="w-5 h-5 text-amber-400 mr-2" />
+            Технологии команды
+          </h2>
+          <div className="space-y-4">
+            {team.acceptedLanguages && team.acceptedLanguages.length > 0 && (
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Принимаемые языки программирования:</p>
+                <div className="flex flex-wrap gap-2">
+                  {team.acceptedLanguages.map((lang: string) => (
+                    <span key={lang} className="bg-amber-400/20 text-amber-300 px-3 py-1 rounded-full text-sm">
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {team.techStack && team.techStack.length > 0 && (
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Технический стек:</p>
+                <div className="flex flex-wrap gap-2">
+                  {team.techStack.map((tech: string) => (
+                    <span key={tech} className="bg-blue-400/20 text-blue-300 px-3 py-1 rounded-full text-sm">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {team.description && (
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Описание команды:</p>
+                <p className="text-slate-300 bg-slate-700/30 p-4 rounded-lg">
+                  {team.description}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Team Members */}
       <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
         <h2 className="text-xl font-semibold text-white mb-6 flex items-center">

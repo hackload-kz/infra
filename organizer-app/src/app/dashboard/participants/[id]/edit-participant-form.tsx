@@ -30,6 +30,9 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
         otherTechnologies: participant.otherTechnologies || '',
         otherCloudServices: participant.otherCloudServices || '',
         otherCloudProviders: participant.otherCloudProviders || '',
+        programmingLanguages: participant.programmingLanguages || [],
+        databases: participant.databases || [],
+        description: participant.description || '',
         teamId: participant.teamId || '',
         isActive: participant.isActive,
     });
@@ -38,7 +41,7 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders', value: string) => {
+    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders' | 'programmingLanguages' | 'databases', value: string) => {
         setFormData(prev => ({
             ...prev,
             [field]: prev[field].includes(value)
@@ -301,6 +304,63 @@ export function EditParticipantForm({ participant, teams }: EditParticipantFormP
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* Technical Skills */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Технические навыки</h3>
+                
+                <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">
+                        Языки программирования
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'C#', 'Go', 'Rust', 'PHP', 'Swift'].map(lang => (
+                            <label key={lang} className="flex items-center font-medium text-gray-800">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.programmingLanguages.includes(lang)}
+                                    onChange={() => handleCheckboxChange('programmingLanguages', lang)}
+                                    className="mr-2"
+                                />
+                                {lang}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">
+                        Базы данных
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle', 'SQL Server', 'CouchDB', 'Firebase', 'Cassandra'].map(db => (
+                            <label key={db} className="flex items-center font-medium text-gray-800">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.databases.includes(db)}
+                                    onChange={() => handleCheckboxChange('databases', db)}
+                                    className="mr-2"
+                                />
+                                {db}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <label htmlFor="description" className="block text-sm font-semibold text-gray-800 mb-1">
+                        Описание профиля
+                    </label>
+                    <textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Расскажите о себе, своих интересах и целях участия в хакатоне..."
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
                 </div>
             </div>
 

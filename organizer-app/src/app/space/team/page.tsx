@@ -66,6 +66,9 @@ export default async function ProfileTeamPage() {
                     otherTechnologies: true,
                     otherCloudServices: true,
                     otherCloudProviders: true,
+                    programmingLanguages: true,
+                    databases: true,
+                    description: true,
                   }
                 }
               },
@@ -278,6 +281,52 @@ export default async function ProfileTeamPage() {
                 </div>
               </div>
             </div>
+
+            {/* Team Technology Information */}
+            {(participant.team.acceptedLanguages?.length || participant.team.techStack?.length || participant.team.description) && (
+              <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+                <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
+                  <Info className="w-5 h-5 text-amber-400 mr-2" />
+                  Технологии команды
+                </h3>
+                <div className="space-y-4">
+                  {participant.team.acceptedLanguages && participant.team.acceptedLanguages.length > 0 && (
+                    <div>
+                      <p className="text-slate-400 text-sm mb-2">Принимаемые языки программирования:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {participant.team.acceptedLanguages.map((lang) => (
+                          <span key={lang} className="bg-amber-400/20 text-amber-300 px-3 py-1 rounded-full text-sm">
+                            {lang}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {participant.team.techStack && participant.team.techStack.length > 0 && (
+                    <div>
+                      <p className="text-slate-400 text-sm mb-2">Технический стек:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {participant.team.techStack.map((tech) => (
+                          <span key={tech} className="bg-blue-400/20 text-blue-300 px-3 py-1 rounded-full text-sm">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {participant.team.description && (
+                    <div>
+                      <p className="text-slate-400 text-sm mb-2">Описание команды:</p>
+                      <p className="text-slate-300 bg-slate-700/30 p-4 rounded-lg">
+                        {participant.team.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Team Members */}
             <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">

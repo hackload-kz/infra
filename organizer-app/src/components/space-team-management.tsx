@@ -72,6 +72,9 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
   const [newTeamNickname, setNewTeamNickname] = useState('')
   const [newTeamLevel, setNewTeamLevel] = useState('')
   const [selectedNewLeader, setSelectedNewLeader] = useState('')
+  const [acceptedLanguages, setAcceptedLanguages] = useState<string[]>([])
+  const [techStack, setTechStack] = useState<string[]>([])
+  const [teamDescription, setTeamDescription] = useState('')
 
   const router = useRouter()
   const isLeader = !!participant.ledTeam
@@ -86,7 +89,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
     ['NEW', 'INCOMPLETED'].includes(team.status)
   )
 
-  const handleAction = async (action: string, data?: { teamId?: string; teamName?: string; teamNickname?: string; teamLevel?: string; newLeaderId?: string | null }) => {
+  const handleAction = async (action: string, data?: { teamId?: string; teamName?: string; teamNickname?: string; teamLevel?: string; newLeaderId?: string | null; acceptedLanguages?: string[]; techStack?: string[]; description?: string }) => {
     setLoading(true)
     setError(null)
     
@@ -102,7 +105,10 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               data.teamName,
               data.teamNickname,
               data.teamLevel || null,
-              data.newLeaderId || null
+              data.newLeaderId || null,
+              data.acceptedLanguages || [],
+              data.techStack || [],
+              data.description || ''
             )
           }
           break
@@ -128,6 +134,9 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
     setNewTeamNickname('')
     setNewTeamLevel('')
     setSelectedNewLeader('')
+    setAcceptedLanguages([])
+    setTechStack([])
+    setTeamDescription('')
     setError(null)
   }
 
@@ -417,6 +426,66 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               </div>
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Принимаемые языки программирования
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'C#', 'Go', 'Rust', 'PHP', 'Swift'].map(lang => (
+                <label key={lang} className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={acceptedLanguages.includes(lang)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAcceptedLanguages([...acceptedLanguages, lang])
+                      } else {
+                        setAcceptedLanguages(acceptedLanguages.filter(l => l !== lang))
+                      }
+                    }}
+                    className="rounded border-slate-600 bg-slate-700/50 text-amber-400 focus:ring-amber-400/50"
+                  />
+                  <span className="text-slate-300">{lang}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Технический стек
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {['React', 'Vue.js', 'Angular', 'Node.js', 'Django', 'Flask', 'Spring', 'Laravel', 'Docker', 'Kubernetes'].map(tech => (
+                <label key={tech} className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={techStack.includes(tech)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setTechStack([...techStack, tech])
+                      } else {
+                        setTechStack(techStack.filter(t => t !== tech))
+                      }
+                    }}
+                    className="rounded border-slate-600 bg-slate-700/50 text-amber-400 focus:ring-amber-400/50"
+                  />
+                  <span className="text-slate-300">{tech}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Описание команды
+            </label>
+            <textarea
+              value={teamDescription}
+              onChange={(e) => setTeamDescription(e.target.value)}
+              placeholder="Расскажите о целях команды, опыте участников..."
+              rows={3}
+              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 resize-none"
+            />
+          </div>
         </div>
 
         <div className="flex gap-4">
@@ -425,7 +494,10 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               teamName: newTeamName,
               teamNickname: newTeamNickname,
               teamLevel: newTeamLevel,
-              newLeaderId: selectedNewLeader || null
+              newLeaderId: selectedNewLeader || null,
+              acceptedLanguages: acceptedLanguages,
+              techStack: techStack,
+              description: teamDescription
             })}
             disabled={loading || !newTeamName || !newTeamNickname || 
                       Boolean(currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}

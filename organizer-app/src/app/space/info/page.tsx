@@ -287,6 +287,52 @@ export default async function ProfileInfoPage() {
         </div>
       </div>
 
+          {/* Technical Skills */}
+          {(participant.programmingLanguages?.length || participant.databases?.length || participant.description) && (
+            <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30 mt-8">
+              <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+                <Code className="w-5 h-5 text-amber-400 mr-2" />
+                Технические навыки
+              </h2>
+              <div className="space-y-6">
+                {participant.programmingLanguages && participant.programmingLanguages.length > 0 && (
+                  <div>
+                    <p className="text-slate-400 text-sm mb-2">Языки программирования</p>
+                    <div className="flex flex-wrap gap-2">
+                      {participant.programmingLanguages.map((lang: string, index: number) => (
+                        <span key={index} className="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-sm">
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {participant.databases && participant.databases.length > 0 && (
+                  <div>
+                    <p className="text-slate-400 text-sm mb-2">Базы данных</p>
+                    <div className="flex flex-wrap gap-2">
+                      {participant.databases.map((db: string, index: number) => (
+                        <span key={index} className="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">
+                          {db}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {participant.description && (
+                  <div>
+                    <p className="text-slate-400 text-sm mb-2">Описание профиля</p>
+                    <p className="text-slate-300 bg-slate-700/30 p-4 rounded-lg">
+                      {participant.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="mt-8">
             <Link

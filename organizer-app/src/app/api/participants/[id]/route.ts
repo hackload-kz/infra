@@ -37,6 +37,9 @@ export async function PUT(
             otherTechnologies, 
             otherCloudServices, 
             otherCloudProviders,
+            programmingLanguages,
+            databases,
+            description,
             teamId,
             isActive
         } = data
@@ -94,6 +97,9 @@ export async function PUT(
                 otherTechnologies,
                 otherCloudServices,
                 otherCloudProviders,
+                programmingLanguages: programmingLanguages || [],
+                databases: databases || [],
+                description: description || null,
                 isActive: isActive,
                 // Remove from team if being deactivated, otherwise use the provided teamId
                 teamId: isBeingDeactivated ? null : (teamId || null),

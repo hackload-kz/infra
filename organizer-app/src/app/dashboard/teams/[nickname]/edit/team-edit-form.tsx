@@ -34,6 +34,9 @@ interface Team {
     leaderId: string | null
     leader: Participant | null
     members: Participant[]
+    acceptedLanguages: string[]
+    techStack: string[]
+    description: string | null
 }
 
 interface TeamEditFormProps {
@@ -65,6 +68,9 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
         level: team.level || '',
         comment: team.comment || '',
         leaderId: team.leaderId || '',
+        acceptedLanguages: team.acceptedLanguages || [],
+        techStack: team.techStack || [],
+        description: team.description || '',
     })
     const [submitting, setSubmitting] = useState(false)
 
@@ -254,6 +260,85 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                    </div>
+                    
+                    {/* Technology Fields */}
+                    <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Технологии команды</h3>
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Принимаемые языки программирования
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'C#', 'Go', 'Rust', 'PHP', 'Swift'].map(lang => (
+                                        <label key={lang} className="flex items-center space-x-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.acceptedLanguages.includes(lang)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setFormData({
+                                                            ...formData,
+                                                            acceptedLanguages: [...formData.acceptedLanguages, lang]
+                                                        })
+                                                    } else {
+                                                        setFormData({
+                                                            ...formData,
+                                                            acceptedLanguages: formData.acceptedLanguages.filter(l => l !== lang)
+                                                        })
+                                                    }
+                                                }}
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-gray-700">{lang}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Технический стек
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['React', 'Vue.js', 'Angular', 'Node.js', 'Django', 'Flask', 'Spring', 'Laravel', 'Docker', 'Kubernetes'].map(tech => (
+                                        <label key={tech} className="flex items-center space-x-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.techStack.includes(tech)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setFormData({
+                                                            ...formData,
+                                                            techStack: [...formData.techStack, tech]
+                                                        })
+                                                    } else {
+                                                        setFormData({
+                                                            ...formData,
+                                                            techStack: formData.techStack.filter(t => t !== tech)
+                                                        })
+                                                    }
+                                                }}
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-gray-700">{tech}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Описание команды
+                            </label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                rows={3}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Расскажите о целях команды, опыте участников..."
+                            />
                         </div>
                     </div>
                     

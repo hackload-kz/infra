@@ -58,10 +58,9 @@ export default async function SpaceTeamsPage() {
             company: true,
             telegram: true,
             experienceLevel: true,
-            // Don't load large JSON fields in team browsing
-            technologies: false,
-            cloudServices: false,
-            cloudProviders: false,
+            technologies: true,
+            cloudServices: true,
+            cloudProviders: true,
           },
           take: 5, // Limit members shown per team
         },

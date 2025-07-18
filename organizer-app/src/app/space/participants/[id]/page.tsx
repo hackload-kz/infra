@@ -137,6 +137,11 @@ export default async function ParticipantProfilePage({ params }: Props) {
   const otherTechnologies = parseJsonField(targetParticipant.otherTechnologies)
   const otherCloudServices = parseJsonField(targetParticipant.otherCloudServices)
   const otherCloudProviders = parseJsonField(targetParticipant.otherCloudProviders)
+  
+  // New fields - these are already arrays in the database
+  const programmingLanguages = targetParticipant.programmingLanguages || []
+  const databases = targetParticipant.databases || []
+  const description = targetParticipant.description
 
   return (
     <PersonalCabinetLayout user={user}>
@@ -299,6 +304,53 @@ export default async function ParticipantProfilePage({ params }: Props) {
               </div>
             )}
           </div>
+
+          {/* Programming Languages & Databases */}
+          {(programmingLanguages.length > 0 || databases.length > 0) && (
+            <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+              <div className="flex items-center space-x-2 mb-4">
+                <Code className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-semibold text-white">Технические навыки</h3>
+              </div>
+              
+              {programmingLanguages.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-slate-400 text-sm mb-2">Языки программирования:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {programmingLanguages.map((lang: string, index: number) => (
+                      <span key={index} className="bg-orange-400/20 text-orange-300 px-3 py-2 rounded-lg text-sm">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {databases.length > 0 && (
+                <div>
+                  <p className="text-slate-400 text-sm mb-2">Базы данных:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {databases.map((db: string, index: number) => (
+                      <span key={index} className="bg-cyan-400/20 text-cyan-300 px-3 py-2 rounded-lg text-sm">
+                        {db}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Description */}
+          {description && (
+            <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+              <div className="flex items-center space-x-2 mb-4">
+                <User className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-semibold text-white">О себе</h3>
+              </div>
+              <p className="text-slate-300 leading-relaxed">{description}</p>
+            </div>
+          )}
 
           {/* Technologies */}
           {technologies.length > 0 && (
