@@ -164,7 +164,7 @@ export function getJoinBlockReason(
     return teamJoinErrors[JoinErrorCode.TEAM_FULL]
   }
 
-  if (!['NEW', 'INCOMPLETED'].includes(team.status)) {
+  if (!team.status || !['NEW', 'INCOMPLETED'].includes(team.status)) {
     return teamJoinErrors[JoinErrorCode.TEAM_NOT_ACCEPTING]
   }
 

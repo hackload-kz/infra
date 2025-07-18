@@ -62,6 +62,7 @@ export interface MockTeam {
   level?: string | null;
   hackathonId: string;
   leaderId?: string | null;
+  members?: MockParticipant[];
 }
 
 export interface MockHackathon {
@@ -151,6 +152,7 @@ export const createMockTeam = (overrides: Partial<MockTeam> = {}): MockTeam => (
   level: 'BEGINNER',
   hackathonId: 'hackathon-1',
   leaderId: null,
+  members: [],
   ...overrides,
 });
 
