@@ -14,6 +14,7 @@ import {
   Search,
   UserPlus
 } from 'lucide-react'
+import WithdrawRequestButton from '@/components/withdraw-request-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -185,7 +186,10 @@ export default async function SpaceTeamsPage() {
                     <p className="text-white font-medium">{request.team.name}</p>
                     <p className="text-slate-400 text-sm">@{request.team.nickname}</p>
                   </div>
-                  <span className="text-yellow-300 text-sm">Ожидает ответа</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-yellow-300 text-sm">Ожидает ответа</span>
+                    <WithdrawRequestButton requestId={request.id} />
+                  </div>
                 </div>
                 {request.message && (
                   <p className="text-slate-300 text-sm mt-2 italic">&quot;{request.message}&quot;</p>

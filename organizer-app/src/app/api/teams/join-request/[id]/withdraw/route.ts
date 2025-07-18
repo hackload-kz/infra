@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { logger, LogAction } from '@/lib/logger'
+import { trackJoinRequestWithdrawn } from '@/lib/journal'
+import { messageService } from '@/lib/messages'
+import { getCurrentHackathon } from '@/lib/hackathon'
 
 interface Props {
   params: Promise<{
@@ -41,7 +44,8 @@ export async function DELETE(_request: NextRequest, { params }: Props) {
           select: {
             id: true,
             name: true,
-            nickname: true
+            nickname: true,
+            leaderId: true
           }
         }
       }
@@ -78,6 +82,47 @@ export async function DELETE(_request: NextRequest, { params }: Props) {
     })
 
     await logger.logDelete('JoinRequest', resolvedParams.id, session.user.email, 'Join request withdrawn by participant')
+
+    // Add journal entry for the participant
+    await trackJoinRequestWithdrawn(participant.id, resolvedParams.id, joinRequest.team.name)
+
+    // Get current hackathon for messaging
+    const hackathon = await getCurrentHackathon()
+    if (!hackathon) {
+      await logger.warn(LogAction.READ, 'Hackathon', 'Active hackathon not found for withdrawal notification', {})
+    }
+
+    try {
+      // Send notification to participant (requestor)
+      await messageService.createMessage({
+        subject: 'Заявка на вступление отозвана',
+        body: `Вы отозвали заявку на вступление в команду **${joinRequest.team.name}** (@${joinRequest.team.nickname}).\n\nЕсли вы передумаете, вы можете подать новую заявку в любое время.`,
+        recipientId: participant.id,
+        hackathonId: hackathon?.id || '',
+        teamId: joinRequest.team.id
+      })
+
+      // Send notification to team leader if exists
+      if (joinRequest.team.leaderId) {
+        await messageService.createMessage({
+          subject: 'Заявка на вступление отозвана',
+          body: `Участник **${participant.name}** отозвал заявку на вступление в команду **${joinRequest.team.name}** (@${joinRequest.team.nickname}).\n\nЗаявка была удалена из списка ожидающих рассмотрения.`,
+          recipientId: joinRequest.team.leaderId,
+          hackathonId: hackathon?.id || '',
+          teamId: joinRequest.team.id
+        })
+      }
+    } catch (messageError) {
+      await logger.error(LogAction.CREATE, 'Message', `Failed to send withdrawal notification: ${messageError instanceof Error ? messageError.message : 'Unknown error'}`, {
+        metadata: { 
+          joinRequestId: resolvedParams.id,
+          teamId: joinRequest.team.id,
+          participantId: participant.id,
+          error: messageError instanceof Error ? messageError.stack : messageError
+        }
+      })
+      // Don't fail the withdrawal if messaging fails
+    }
 
     console.info(`🔄 Join request withdrawn: ${session.user.email} withdrew request to join team ${joinRequest.team.name} (@${joinRequest.team.nickname})`)
 

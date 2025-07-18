@@ -257,6 +257,17 @@ export async function trackAdminTeamEdit(participantId: string, teamId: string, 
   })
 }
 
+export async function trackJoinRequestWithdrawn(participantId: string, requestId: string, teamName: string) {
+  await createJournalEntry({
+    participantId,
+    eventType: 'JOIN_REQUEST_REJECTED',
+    title: 'Заявка на вступление отозвана',
+    description: `Вы отозвали заявку на вступление в команду "${teamName}"`,
+    entityId: requestId,
+    entityType: 'join_request',
+  })
+}
+
 export async function trackSystemEvent(participantId: string, title: string, description?: string) {
   await createJournalEntry({
     participantId,
