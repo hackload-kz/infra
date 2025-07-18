@@ -68,6 +68,9 @@ model Team {
   hackathonId  String
   level        TeamLevel?
   status       TeamStatus    @default(NEW)
+  acceptedLanguages String[]  @default([])
+  techStack    String[]      @default([])
+  description  String?
   joinRequests JoinRequest[] @relation("TeamJoinRequests")
   messages     Message[]
   leader       Participant?  @relation("TeamLeader")
@@ -111,6 +114,9 @@ model Participant {
   telegram                String?
   githubUrl               String?
   linkedinUrl             String?
+  programmingLanguages    String[]                 @default([])
+  databases               String[]                 @default([])
+  description             String?
   customBannerDismissals  CustomBannerDismissal[]
   dismissedBanners        DismissedBanner[]
   hackathonParticipations HackathonParticipation[]

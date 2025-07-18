@@ -224,6 +224,59 @@ export default async function SpaceParticipantsPage() {
                     </div>
                   )}
 
+                  {/* Programming Languages */}
+                  {availableParticipant.programmingLanguages && availableParticipant.programmingLanguages.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Code className="w-4 h-4 text-amber-400" />
+                        <span className="text-white font-medium">Языки программирования:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {availableParticipant.programmingLanguages.slice(0, 6).map((lang, index) => (
+                          <span key={index} className="bg-amber-400/20 text-amber-300 px-2 py-1 rounded text-xs">
+                            {lang}
+                          </span>
+                        ))}
+                        {availableParticipant.programmingLanguages.length > 6 && (
+                          <span className="text-slate-400 text-xs">+{availableParticipant.programmingLanguages.length - 6} ещё</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Databases */}
+                  {availableParticipant.databases && availableParticipant.databases.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Cloud className="w-4 h-4 text-blue-400" />
+                        <span className="text-white font-medium">Базы данных:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {availableParticipant.databases.slice(0, 4).map((db, index) => (
+                          <span key={index} className="bg-blue-400/20 text-blue-300 px-2 py-1 rounded text-xs">
+                            {db}
+                          </span>
+                        ))}
+                        {availableParticipant.databases.length > 4 && (
+                          <span className="text-slate-400 text-xs">+{availableParticipant.databases.length - 4} ещё</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {availableParticipant.description && (
+                    <div className="mb-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Award className="w-4 h-4 text-green-400" />
+                        <span className="text-white font-medium">О себе:</span>
+                      </div>
+                      <p className="text-slate-300 text-sm bg-slate-700/30 p-3 rounded-lg">
+                        {availableParticipant.description}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Technologies */}
                   {availableParticipant.technologies && (() => {
                     try {

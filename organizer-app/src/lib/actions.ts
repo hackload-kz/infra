@@ -891,7 +891,7 @@ export async function respondToJoinRequest(joinRequestId: string, action: 'appro
     }
 }
 
-export async function updateTeamInfo(teamId: string, name: string, nickname: string, level: string | null, leaderId: string) {
+export async function updateTeamInfo(teamId: string, name: string, nickname: string, level: string | null, leaderId: string, acceptedLanguages?: string[], techStack?: string[], description?: string) {
     if (!teamId || !name || !nickname || !leaderId) {
         throw new Error('All parameters are required')
     }
@@ -934,7 +934,10 @@ export async function updateTeamInfo(teamId: string, name: string, nickname: str
             data: {
                 name: name,
                 nickname: nickname,
-                level: level && level !== '' ? (level as 'BEGINNER' | 'ADVANCED') : null
+                level: level && level !== '' ? (level as 'BEGINNER' | 'ADVANCED') : null,
+                acceptedLanguages: acceptedLanguages || [],
+                techStack: techStack || [],
+                description: description || null
             }
         })
 

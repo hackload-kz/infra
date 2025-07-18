@@ -42,6 +42,10 @@ export async function POST(request: NextRequest) {
             otherTechnologies,
             otherCloudServices,
             otherCloudProviders,
+            // New profile fields
+            programmingLanguages,
+            databases,
+            description,
         } = body;
 
         // Validate required fields
@@ -155,6 +159,10 @@ export async function POST(request: NextRequest) {
                     otherTechnologies: otherTechnologies || null,
                     otherCloudServices: otherCloudServices || null,
                     otherCloudProviders: otherCloudProviders || null,
+                    // New profile fields
+                    programmingLanguages: programmingLanguages || [],
+                    databases: databases || [],
+                    description: description || null,
                 },
             });
 
@@ -265,6 +273,10 @@ export async function PUT(request: NextRequest) {
             otherTechnologies,
             otherCloudServices,
             otherCloudProviders,
+            // New profile fields
+            programmingLanguages,
+            databases,
+            description,
         } = body;
 
         // Validate required fields
@@ -332,6 +344,10 @@ export async function PUT(request: NextRequest) {
                         otherTechnologies: otherTechnologies || null,
                         otherCloudServices: otherCloudServices || null,
                         otherCloudProviders: otherCloudProviders || null,
+                        // New profile fields
+                        programmingLanguages: programmingLanguages || [],
+                        databases: databases || [],
+                        description: description || null,
                     },
                 });
 
@@ -373,6 +389,10 @@ export async function PUT(request: NextRequest) {
                     otherTechnologies: otherTechnologies || null,
                     otherCloudServices: otherCloudServices || null,
                     otherCloudProviders: otherCloudProviders || null,
+                    // New profile fields
+                    programmingLanguages: programmingLanguages || [],
+                    databases: databases || [],
+                    description: description || null,
                 },
             });
             

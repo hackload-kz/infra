@@ -29,6 +29,9 @@ interface Team {
   nickname: string
   status: string
   level?: string | null
+  acceptedLanguages?: string[]
+  techStack?: string[]
+  description?: string | null
   members: TeamMember[]
   leader?: {
     id: string
@@ -47,6 +50,9 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
   const [name, setName] = useState(team.name)
   const [nickname, setNickname] = useState(team.nickname)
   const [level, setLevel] = useState(team.level || '')
+  const [acceptedLanguages, setAcceptedLanguages] = useState(team.acceptedLanguages || [])
+  const [techStack, setTechStack] = useState(team.techStack || [])
+  const [description, setDescription] = useState(team.description || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [removingMember, setRemovingMember] = useState<string | null>(null)
@@ -55,6 +61,31 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
   const levelLabels = {
     BEGINNER: 'Начинающий',
     ADVANCED: 'Продвинутый'
+  }
+
+  const programmingLanguages = [
+    'JavaScript', 'TypeScript', 'Python', 'Java', 'C#', 'C++', 'Go', 'Rust', 'PHP', 'Ruby'
+  ]
+
+  const techOptions = [
+    'React', 'Vue.js', 'Angular', 'Node.js', 'Express', 'Django', 'Flask', 'Spring', 'ASP.NET', 'Ruby on Rails',
+    'PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP', 'GraphQL'
+  ]
+
+  const handleLanguageChange = (language: string) => {
+    setAcceptedLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    )
+  }
+
+  const handleTechStackChange = (tech: string) => {
+    setTechStack(prev => 
+      prev.includes(tech) 
+        ? prev.filter(t => t !== tech)
+        : [...prev, tech]
+    )
   }
 
   const canEdit = ['NEW', 'INCOMPLETED', 'FINISHED', 'IN_REVIEW'].includes(team.status)
@@ -66,7 +97,7 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
     setError(null)
 
     try {
-      await updateTeamInfo(team.id, name, nickname, level || null, leaderId)
+      await updateTeamInfo(team.id, name, nickname, level || null, leaderId, acceptedLanguages, techStack, description)
       onToggleEdit()
       router.refresh()
     } catch (err) {
@@ -98,6 +129,9 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
     setName(team.name)
     setNickname(team.nickname)
     setLevel(team.level || '')
+    setAcceptedLanguages(team.acceptedLanguages || [])
+    setTechStack(team.techStack || [])
+    setDescription(team.description || '')
     setError(null)
     onToggleEdit()
   }
@@ -193,6 +227,66 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
             </p>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Принимаемые языки программирования
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {programmingLanguages.map(lang => (
+                <label key={lang} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={acceptedLanguages.includes(lang)}
+                    onChange={() => handleLanguageChange(lang)}
+                    className="rounded border-slate-600 text-amber-400 focus:ring-amber-400/50"
+                  />
+                  <span className="text-slate-300 text-sm">{lang}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-slate-500 text-xs mt-1">
+              Выберите языки, которые команда готова использовать
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Технологический стек
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {techOptions.map(tech => (
+                <label key={tech} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={techStack.includes(tech)}
+                    onChange={() => handleTechStackChange(tech)}
+                    className="rounded border-slate-600 text-amber-400 focus:ring-amber-400/50"
+                  />
+                  <span className="text-slate-300 text-sm">{tech}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-slate-500 text-xs mt-1">
+              Выберите технологии, которые команда планирует использовать
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Описание команды
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={4}
+              placeholder="Расскажите о команде, её целях и подходе к решению задач..."
+              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400/50"
+            />
+            <p className="text-slate-500 text-xs mt-1">
+              Опишите команду для потенциальных участников
+            </p>
+          </div>
+
           <div className="flex gap-4">
             <button
               type="submit"
@@ -236,6 +330,54 @@ export function TeamEditForm({ team, leaderId, isEditing, onToggleEdit }: TeamEd
                 {team.level === 'ADVANCED' && <Trophy className="w-4 h-4 text-orange-400" />}
                 <p className="text-white font-medium">
                   {team.level ? levelLabels[team.level as keyof typeof levelLabels] : 'Не указан'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* New Fields Display */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                Принимаемые языки программирования
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(team.acceptedLanguages && team.acceptedLanguages.length > 0) ? (
+                  team.acceptedLanguages.map(lang => (
+                    <span key={lang} className="bg-amber-400/20 text-amber-300 px-2 py-1 rounded-md text-sm">
+                      {lang}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-slate-500 text-sm">Не указаны</span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                Технологический стек
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(team.techStack && team.techStack.length > 0) ? (
+                  team.techStack.map(tech => (
+                    <span key={tech} className="bg-blue-400/20 text-blue-300 px-2 py-1 rounded-md text-sm">
+                      {tech}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-slate-500 text-sm">Не указаны</span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2">
+                Описание команды
+              </label>
+              <div className="bg-slate-700/30 p-3 rounded-lg">
+                <p className="text-slate-300 text-sm">
+                  {team.description || 'Описание не указано'}
                 </p>
               </div>
             </div>

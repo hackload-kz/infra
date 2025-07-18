@@ -25,6 +25,9 @@ export async function ParticipantsServer() {
                     level: true,
                     hackathonId: true,
                     leaderId: true,
+                    acceptedLanguages: true,
+                    techStack: true,
+                    description: true,
                 }
             },
         },

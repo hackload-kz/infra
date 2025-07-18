@@ -39,6 +39,10 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
         otherTechnologies: '',
         otherCloudServices: '',
         otherCloudProviders: '',
+        // New profile fields
+        programmingLanguages: [] as string[],
+        databases: [] as string[],
+        description: '',
     });
 
     const [teams, setTeams] = useState<Team[]>([]);
@@ -69,7 +73,7 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
         }
     };
 
-    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders', value: string) => {
+    const handleCheckboxChange = (field: 'technologies' | 'cloudServices' | 'cloudProviders' | 'programmingLanguages' | 'databases', value: string) => {
         setFormData(prev => ({
             ...prev,
             [field]: prev[field].includes(value)
@@ -422,6 +426,92 @@ export function ParticipantProfileForm({ userEmail, preselectedTeam }: Participa
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
+
+            {/* Programming Languages */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Языки программирования</h3>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">
+                        Какие языки программирования вы знаете? (выбор нескольких вариантов)
+                    </label>
+                    <div className="space-y-2">
+                        {[
+                            'JavaScript',
+                            'TypeScript',
+                            'Python',
+                            'Java',
+                            'C#',
+                            'C++',
+                            'Go',
+                            'Rust',
+                            'PHP',
+                            'Ruby'
+                        ].map(lang => (
+                            <label key={lang} className="flex items-center font-medium text-gray-800">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.programmingLanguages.includes(lang)}
+                                    onChange={() => handleCheckboxChange('programmingLanguages', lang)}
+                                    className="mr-2"
+                                />
+                                {lang}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Databases */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Базы данных</h3>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">
+                        С какими базами данных вы работали? (выбор нескольких вариантов)
+                    </label>
+                    <div className="space-y-2">
+                        {[
+                            'PostgreSQL',
+                            'MySQL',
+                            'MongoDB',
+                            'Redis',
+                            'SQLite',
+                            'Oracle',
+                            'SQL Server',
+                            'Cassandra',
+                            'Elasticsearch',
+                            'Neo4j'
+                        ].map(db => (
+                            <label key={db} className="flex items-center font-medium text-gray-800">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.databases.includes(db)}
+                                    onChange={() => handleCheckboxChange('databases', db)}
+                                    className="mr-2"
+                                />
+                                {db}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">О себе</h3>
+                <div>
+                    <label htmlFor="description" className="block text-sm font-semibold text-gray-800 mb-1">
+                        Расскажите о себе и ваших технологиях
+                    </label>
+                    <textarea
+                        id="description"
+                        rows={4}
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Расскажите о своем опыте, интересах и технологиях, с которыми вы работаете..."
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    />
                 </div>
             </div>
 

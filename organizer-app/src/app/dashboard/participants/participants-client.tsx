@@ -53,6 +53,12 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                     LinkedIn
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Языки программирования
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Базы данных
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Действия
                                 </th>
                             </tr>
@@ -114,6 +120,38 @@ export function ParticipantsList({ participants }: ParticipantsListProps) {
                                         ) : (
                                             '-'
                                         )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        <div className="flex flex-wrap gap-1">
+                                            {participant.programmingLanguages && participant.programmingLanguages.length > 0 ? (
+                                                participant.programmingLanguages.slice(0, 3).map((lang, index) => (
+                                                    <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                                        {lang}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-500">-</span>
+                                            )}
+                                            {participant.programmingLanguages && participant.programmingLanguages.length > 3 && (
+                                                <span className="text-gray-500 text-xs">+{participant.programmingLanguages.length - 3}</span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        <div className="flex flex-wrap gap-1">
+                                            {participant.databases && participant.databases.length > 0 ? (
+                                                participant.databases.slice(0, 3).map((db, index) => (
+                                                    <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                                        {db}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-500">-</span>
+                                            )}
+                                            {participant.databases && participant.databases.length > 3 && (
+                                                <span className="text-gray-500 text-xs">+{participant.databases.length - 3}</span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         <div className="flex space-x-2">

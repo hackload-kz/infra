@@ -306,6 +306,50 @@ export default async function SpaceTeamsPage() {
                     </div>
                   )}
 
+                  {/* Team Tech Info */}
+                  <div className="space-y-3 mb-6">
+                    {team.acceptedLanguages && team.acceptedLanguages.length > 0 && (
+                      <div>
+                        <p className="text-slate-400 text-sm mb-2">Принимаемые языки:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {team.acceptedLanguages.slice(0, 4).map((lang) => (
+                            <span key={lang} className="bg-amber-400/20 text-amber-300 px-2 py-1 rounded text-xs">
+                              {lang}
+                            </span>
+                          ))}
+                          {team.acceptedLanguages.length > 4 && (
+                            <span className="text-slate-400 text-xs">+{team.acceptedLanguages.length - 4} ещё</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {team.techStack && team.techStack.length > 0 && (
+                      <div>
+                        <p className="text-slate-400 text-sm mb-2">Технологии:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {team.techStack.slice(0, 4).map((tech) => (
+                            <span key={tech} className="bg-blue-400/20 text-blue-300 px-2 py-1 rounded text-xs">
+                              {tech}
+                            </span>
+                          ))}
+                          {team.techStack.length > 4 && (
+                            <span className="text-slate-400 text-xs">+{team.techStack.length - 4} ещё</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {team.description && (
+                      <div>
+                        <p className="text-slate-400 text-sm mb-2">Описание команды:</p>
+                        <p className="text-slate-300 text-sm bg-slate-700/30 p-3 rounded-lg">
+                          {team.description}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="flex gap-3">
                     <Link
