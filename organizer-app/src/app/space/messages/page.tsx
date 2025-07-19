@@ -58,8 +58,10 @@ export default async function SpaceMessagesPage() {
     image: session.user?.image || undefined
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">

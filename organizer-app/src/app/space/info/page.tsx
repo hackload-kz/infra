@@ -68,8 +68,10 @@ export default async function ProfileInfoPage() {
     image: session.user?.image || undefined
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={userForLayout}>
+    <PersonalCabinetLayout user={userForLayout} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
@@ -93,9 +95,6 @@ export default async function ProfileInfoPage() {
           <div className="flex gap-4 justify-center">
             <Link href="/space/info/edit?first=true" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
               Создать профиль участника
-            </Link>
-            <Link href="/dashboard" className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-150">
-              Панель управления
             </Link>
           </div>
         </div>

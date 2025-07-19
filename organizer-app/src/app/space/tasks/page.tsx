@@ -7,8 +7,12 @@ import {
   CheckSquare, 
   Square, 
   Flag,
-  Circle
+  Circle,
+  Settings,
+  AlertCircle
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +32,11 @@ export default async function SpaceTasksPage() {
     },
     include: {
       user: true,
-      team: true,
+      team: {
+        include: {
+          environmentData: true
+        }
+      },
       ledTeam: true,
     },
   })
@@ -103,15 +111,67 @@ export default async function SpaceTasksPage() {
 
   const completedTasks = tasks.filter(t => t.status === 'completed').length
   const totalTasks = tasks.length
+  
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+  const environmentDataCount = participant?.team?.environmentData?.length || 0
 
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
           <span className="text-amber-400">Задание</span>
         </h1>
         <div className="w-16 h-1 bg-amber-400 rounded-full"></div>
+      </div>
+
+      {/* Environment Data Quick Access */}
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-amber-400/20 rounded-lg flex items-center justify-center">
+              <Settings className="w-6 h-6 text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Окружение команды</h3>
+              <p className="text-slate-400 text-sm">
+                Данные для разработки и развертывания проекта
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            {hasTeam ? (
+              <div className="space-y-2">
+                <div className="text-sm text-slate-300">
+                  Команда: <span className="font-medium text-white">{participant.team?.name}</span>
+                </div>
+                <div className="text-sm text-slate-300">
+                  Параметров: <span className="text-amber-400 font-medium">{environmentDataCount}</span>
+                </div>
+                <Button asChild size="sm">
+                  <Link href="/space/tasks/environment">
+                    Перейти к данным
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-amber-500">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">Нет команды</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/space/teams">Найти</Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link href="/space/team">Создать</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="text-center py-16">

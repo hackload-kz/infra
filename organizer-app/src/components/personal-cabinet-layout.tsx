@@ -12,7 +12,6 @@ import {
   Menu,
   X,
   ChevronRight,
-  Bell,
   FileText,
   MessageSquare,
   HelpCircle,
@@ -28,6 +27,7 @@ interface PersonalCabinetLayoutProps {
     email: string
     image?: string
   }
+  hasTeam?: boolean
 }
 
 interface SidebarItem {
@@ -46,11 +46,10 @@ const sidebarItems: SidebarItem[] = [
   { icon: FileText, label: 'Задание', href: '/space/tasks' },
   { icon: Trophy, label: 'Журнал', href: '/space/journal' },
   { icon: MessageSquare, label: 'Сообщения', href: '/space/messages' },
-  { icon: Bell, label: 'Уведомления', href: '/space/notifications' },
   { icon: HelpCircle, label: 'FAQ', href: '/space/faq' },
 ]
 
-export default function PersonalCabinetLayout({ children, user }: PersonalCabinetLayoutProps) {
+export default function PersonalCabinetLayout({ children, user, hasTeam = false }: PersonalCabinetLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
 
@@ -115,14 +114,14 @@ export default function PersonalCabinetLayout({ children, user }: PersonalCabine
             {sidebarItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
-              const isDisabled = item.href === '/space/notifications' ||
-                               item.href === '/space/tasks'
+              const isTasksDisabled = item.href === '/space/tasks' && !hasTeam
               
-              if (isDisabled) {
+              if (isTasksDisabled) {
                 return (
                   <div
                     key={item.href}
                     className="flex items-center justify-between px-4 py-3 rounded-lg cursor-not-allowed opacity-50"
+                    title="Доступно только участникам команд"
                   >
                     <div className="flex items-center space-x-3">
                       <Icon className="w-5 h-5 text-slate-500" />

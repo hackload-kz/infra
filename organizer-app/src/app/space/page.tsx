@@ -77,7 +77,7 @@ export default async function PersonalCabinetPage() {
   // If user is an organizer without participant data, show organizer view
   if (userIsOrganizer && !participant) {
     return (
-      <PersonalCabinetLayout user={user}>
+      <PersonalCabinetLayout user={user} hasTeam={false}>
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">
@@ -100,10 +100,7 @@ export default async function PersonalCabinetPage() {
               Вы авторизованы как организатор. У вас есть доступ к панели управления и всем функциям участников.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link href="/dashboard" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
-                Панель управления
-              </Link>
-              <Link href="/space/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-150">
+              <Link href="/space/teams" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150">
                 Просмотреть команды
               </Link>
             </div>
@@ -120,14 +117,7 @@ export default async function PersonalCabinetPage() {
         {/* Organizer Quick Actions */}
         <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
           <h3 className="text-xl font-semibold text-white mb-6">Быстрые действия</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="/dashboard" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
-              <div className="bg-amber-400/20 p-3 rounded-lg">
-                <Edit className="w-6 h-6 text-amber-400" />
-              </div>
-              <span className="text-white text-center font-medium">Панель управления</span>
-            </Link>
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link href="/space/teams" className="flex flex-col items-center space-y-3 p-6 bg-slate-700/30 hover:bg-slate-700/50 rounded-lg transition-all duration-150 border border-slate-600/30 hover:border-amber-400/30">
               <div className="bg-amber-400/20 p-3 rounded-lg">
                 <Users className="w-6 h-6 text-amber-400" />
@@ -188,8 +178,10 @@ export default async function PersonalCabinetPage() {
     hackathon.id
   ) : []
 
+  const hasTeam = !!(participant.team || participant.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="text-center mb-12">
         <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">

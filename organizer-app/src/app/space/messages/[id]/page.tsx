@@ -78,8 +78,10 @@ export default async function MessagePage({ params }: MessagePageProps) {
     image: session.user?.image || undefined
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       <div className="max-w-4xl mx-auto">
         <MessageDetail 
           message={message}

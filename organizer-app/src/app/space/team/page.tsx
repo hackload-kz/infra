@@ -171,8 +171,10 @@ export default async function ProfileTeamPage() {
     ADVANCED: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
@@ -191,9 +193,6 @@ export default async function ProfileTeamPage() {
             <div className="flex gap-4 justify-center">
               <Link href="/space/info/edit" className="bg-amber-400 hover:bg-amber-500 text-slate-900 px-4 py-2 rounded-lg font-medium transition-colors duration-150">
                 Зарегистрироваться как участник
-              </Link>
-              <Link href="/dashboard/teams" className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-150">
-                Управление командами в дашборде
               </Link>
             </div>
           </div>

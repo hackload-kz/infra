@@ -277,3 +277,82 @@ export async function trackSystemEvent(participantId: string, title: string, des
     entityType: 'system',
   })
 }
+
+export async function trackTeamEnvironmentUpdated(
+  participantId: string, 
+  teamId: string, 
+  teamName: string, 
+  changedKeys: string[]
+) {
+  await createJournalEntry({
+    participantId,
+    eventType: 'TEAM_ENVIRONMENT_UPDATED',
+    title: 'Данные окружения обновлены',
+    description: `Обновлены параметры окружения команды "${teamName}": ${changedKeys.join(', ')}`,
+    entityId: teamId,
+    entityType: 'team',
+  })
+}
+
+export async function trackTeamEnvironmentDeleted(
+  participantId: string, 
+  teamId: string, 
+  teamName: string, 
+  deletedKeys: string[]
+) {
+  await createJournalEntry({
+    participantId,
+    eventType: 'TEAM_ENVIRONMENT_DELETED',
+    title: 'Данные окружения удалены',
+    description: `Удалены параметры окружения команды "${teamName}": ${deletedKeys.join(', ')}`,
+    entityId: teamId,
+    entityType: 'team',
+  })
+}
+
+// Notify all team members when environment data changes
+export async function notifyTeamEnvironmentUpdate(
+  teamId: string, 
+  changedKeys: string[]
+) {
+  const team = await db.team.findUnique({
+    where: { id: teamId },
+    include: { members: true, leader: true }
+  })
+  
+  const allMembers = [...(team?.members || []), team?.leader].filter(Boolean)
+  
+  for (const member of allMembers) {
+    if (member?.id) {
+      await trackTeamEnvironmentUpdated(
+        member.id, 
+        teamId, 
+        team?.name || '', 
+        changedKeys
+      )
+    }
+  }
+}
+
+export async function notifyTeamEnvironmentDelete(
+  teamId: string, 
+  deletedKeys: string[]
+) {
+  const team = await db.team.findUnique({
+    where: { id: teamId },
+    include: { members: true, leader: true }
+  })
+  
+  const allMembers = [...(team?.members || []), team?.leader].filter(Boolean)
+  
+  for (const member of allMembers) {
+    if (member?.id) {
+      await trackTeamEnvironmentDeleted(
+        member.id, 
+        teamId, 
+        team?.name || '', 
+        deletedKeys
+      )
+    }
+  }
+}

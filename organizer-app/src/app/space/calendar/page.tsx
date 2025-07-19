@@ -50,8 +50,10 @@ export default async function SpaceCalendarPage() {
     image: session.user?.image || undefined
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">

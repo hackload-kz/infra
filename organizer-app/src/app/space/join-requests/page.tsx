@@ -18,6 +18,8 @@ export default async function JoinRequestsPage() {
       user: { email: session.user.email } 
     },
     include: {
+      team: true,
+      ledTeam: true,
       joinRequests: {
         include: {
           team: {
@@ -45,8 +47,10 @@ export default async function JoinRequestsPage() {
     image: session.user?.image || undefined
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       <JoinRequestsPageClient initialRequests={participant.joinRequests} />
     </PersonalCabinetLayout>
   )

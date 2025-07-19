@@ -102,8 +102,10 @@ export default async function JoinTeamPage({ params }: Props) {
     INCOMPLETED: 'Не завершена',
   }
 
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Back Navigation */}
       <div className="mb-6">
         <Link

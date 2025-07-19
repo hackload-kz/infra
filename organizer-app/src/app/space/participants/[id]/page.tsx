@@ -143,8 +143,10 @@ export default async function ParticipantProfilePage({ params }: Props) {
   const databases = targetParticipant.databases || []
   const description = targetParticipant.description
 
+  const hasTeam = !!(currentParticipant?.team || currentParticipant?.ledTeam)
+
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Navigation */}
       <div className="mb-6">
         <Link

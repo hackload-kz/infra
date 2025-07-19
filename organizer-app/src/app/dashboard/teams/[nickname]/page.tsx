@@ -4,7 +4,7 @@ import { auth } from '@/auth'
 import { isOrganizer } from '@/lib/admin'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Edit, Users, Calendar } from 'lucide-react'
+import { ArrowLeft, Edit, Users, Calendar, Settings } from 'lucide-react'
 import { TeamStatus, TeamLevel } from '@prisma/client'
 import { TeamPageClient } from '@/components/team-page-client'
 
@@ -57,6 +57,12 @@ export default async function TeamPage({ params }: TeamPageProps) {
             leader: true,
             members: true,
             hackathon: true,
+            environmentData: {
+                orderBy: [
+                    { category: 'asc' },
+                    { key: 'asc' }
+                ]
+            },
         },
     });
 
@@ -266,6 +272,68 @@ export default async function TeamPage({ params }: TeamPageProps) {
                     </div>
                 ) : (
                     <p className="text-gray-700">В команде пока нет участников</p>
+                )}
+            </div>
+
+            {/* Environment Data Management */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900">Данные окружения</h2>
+                    <Link href={`/dashboard/teams/${team.nickname}/environment`}>
+                        <Button>
+                            <Settings className="w-4 h-4 mr-2" />
+                            Управление окружением
+                        </Button>
+                    </Link>
+                </div>
+                
+                {team.environmentData && team.environmentData.length > 0 ? (
+                    <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {team.environmentData.slice(0, 6).map((envData) => (
+                                <div key={envData.id} className="p-4 border border-gray-200 rounded-lg">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h4 className="font-medium text-gray-900">{envData.key}</h4>
+                                        {envData.isSecure && (
+                                            <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                                                Конфиденциально
+                                            </span>
+                                        )}
+                                    </div>
+                                    {envData.category && (
+                                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full mb-2 inline-block">
+                                            {envData.category}
+                                        </span>
+                                    )}
+                                    <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded font-mono">
+                                        {envData.isSecure ? '***' : envData.value.length > 50 ? envData.value.substring(0, 50) + '...' : envData.value}
+                                    </p>
+                                    {envData.description && (
+                                        <p className="text-xs text-gray-500 mt-2">{envData.description}</p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        {team.environmentData.length > 6 && (
+                            <p className="text-sm text-gray-600 text-center">
+                                и ещё {team.environmentData.length - 6} параметров...
+                            </p>
+                        )}
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <Settings className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Нет данных окружения</h3>
+                        <p className="text-gray-600 mb-4">
+                            Добавьте данные окружения для команды: API ключи, URL репозиториев, IP адреса и другие параметры.
+                        </p>
+                        <Link href={`/dashboard/teams/${team.nickname}/environment`}>
+                            <Button>
+                                <Settings className="w-4 h-4 mr-2" />
+                                Добавить данные окружения
+                            </Button>
+                        </Link>
+                    </div>
                 )}
             </div>
         </div>

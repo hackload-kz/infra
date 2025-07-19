@@ -13,7 +13,7 @@ class URLBuilder {
   constructor() {
     this.config = {
       baseUrl: process.env.NEXTAUTH_URL || 'http://localhost:3000',
-      domain: process.env.APP_DOMAIN || 'localhost:3000'
+      domain: process.env.NEXTAUTH_URL || 'localhost:3000'
     };
   }
 

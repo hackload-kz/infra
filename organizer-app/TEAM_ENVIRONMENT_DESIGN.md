@@ -7,12 +7,15 @@ This document outlines the design for a comprehensive team environment informati
 ## Requirements Analysis
 
 ### Functional Requirements
+
 1. **Data Storage**: Store key-value environment metadata tied to teams
 2. **Access Control**: Read-only access for team members, full CRUD for organizers
 3. **UI Integration**: Sub-menu under "Tasks" in space mode sidebar
-4. **API Access**: Service account API for external automation
+4. **API Access**: Service account API for external automation with multiple API keys
 5. **Journal Integration**: Automatic notifications when data is updated
 6. **Team Membership**: Empty page with guidance for non-team members
+7. **Service Key Management**: Dashboard interface for managing multiple API keys
+8. **Security Dashboard**: Dedicated "Security" tab in admin dashboard
 
 ### Non-Functional Requirements
 - Secure handling of sensitive credentials
@@ -25,6 +28,7 @@ This document outlines the design for a comprehensive team environment informati
 ### Database Schema Design
 
 #### New Model: TeamEnvironmentData
+
 ```prisma
 model TeamEnvironmentData {
   id          String    @id @default(cuid())
@@ -43,6 +47,49 @@ model TeamEnvironmentData {
   
   @@unique([teamId, key]) // Ensure unique keys per team
   @@map("team_environment_data")
+}
+```
+
+#### New Model: ServiceApiKey
+
+```prisma
+model ServiceApiKey {
+  id          String    @id @default(cuid())
+  name        String    // Human-readable name for the key
+  keyHash     String    @unique // Hashed version of the API key
+  keyPrefix   String    // First 8 characters for identification
+  description String?   // Optional description
+  permissions String[]  @default(["environment:write"]) // Scoped permissions
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime? // Track when key was last used
+  expiresAt   DateTime? // Optional expiration date
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String?   // Participant ID who created this key
+  
+  usageLogs   ServiceApiKeyUsage[]
+  
+  @@map("service_api_keys")
+}
+```
+
+#### New Model: ServiceApiKeyUsage
+
+```prisma
+model ServiceApiKeyUsage {
+  id        String        @id @default(cuid())
+  keyId     String
+  endpoint  String        // Which API endpoint was called
+  method    String        // HTTP method (GET, POST, PUT, DELETE)
+  userAgent String?       // Client user agent
+  ipAddress String?       // Client IP address
+  teamId    String?       // Team affected (if applicable)
+  success   Boolean       // Whether the request was successful
+  createdAt DateTime      @default(now())
+  
+  apiKey    ServiceApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  
+  @@map("service_api_key_usage")
 }
 ```
 

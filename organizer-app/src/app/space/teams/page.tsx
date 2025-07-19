@@ -133,9 +133,10 @@ export default async function SpaceTeamsPage() {
 
   // Get pending join requests for this participant
   const pendingRequests = participant?.joinRequests || []
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">

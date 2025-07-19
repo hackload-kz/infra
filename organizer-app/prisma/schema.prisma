@@ -77,6 +77,7 @@ model Team {
   members      Participant[] @relation("TeamMembers")
   hackathon    Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   calendarEvents CalendarEvent[]
+  environmentData TeamEnvironmentData[]
 
   @@map("teams")
 }
@@ -325,10 +326,66 @@ enum JournalEventType {
   TEAM_STATUS_UPDATED
   ADMIN_TEAM_EDIT
   SYSTEM_EVENT
+  TEAM_ENVIRONMENT_UPDATED
+  TEAM_ENVIRONMENT_DELETED
 }
 
 enum CalendarEventType {
   INFO
   WARNING
   DEADLINE
+}
+
+model TeamEnvironmentData {
+  id          String    @id @default(cuid())
+  teamId      String
+  key         String    // e.g., "github_repo_url", "server_ip", "aws_access_key"
+  value       String    // The actual value
+  description String?   // Optional description for the key
+  category    String?   // Optional grouping (e.g., "git", "infrastructure", "credentials")
+  isSecure    Boolean   @default(false) // Mark sensitive data for display handling
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String?   // Participant ID who created this entry
+  updatedBy   String?   // Participant ID who last updated this entry
+  
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, key]) // Ensure unique keys per team
+  @@map("team_environment_data")
+}
+
+model ServiceApiKey {
+  id          String    @id @default(cuid())
+  name        String    // Human-readable name for the key
+  keyHash     String    @unique // Hashed version of the API key
+  keyPrefix   String    // First 8 characters for identification
+  description String?   // Optional description
+  permissions String[]  @default(["environment:write"]) // Scoped permissions
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime? // Track when key was last used
+  expiresAt   DateTime? // Optional expiration date
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String?   // Participant ID who created this key
+  
+  usageLogs   ServiceApiKeyUsage[]
+  
+  @@map("service_api_keys")
+}
+
+model ServiceApiKeyUsage {
+  id        String        @id @default(cuid())
+  keyId     String
+  endpoint  String        // Which API endpoint was called
+  method    String        // HTTP method (GET, POST, PUT, DELETE)
+  userAgent String?       // Client user agent
+  ipAddress String?       // Client IP address
+  teamId    String?       // Team affected (if applicable)
+  success   Boolean       // Whether the request was successful
+  createdAt DateTime      @default(now())
+  
+  apiKey    ServiceApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  
+  @@map("service_api_key_usage")
 }

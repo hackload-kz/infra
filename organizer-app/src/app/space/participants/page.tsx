@@ -88,9 +88,10 @@ export default async function SpaceParticipantsPage() {
   const currentTeam = participant?.team
   const isLeader = !!participant?.ledTeam
   const teamHasSpace = currentTeam && currentTeam.members.length < 4
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">

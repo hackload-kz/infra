@@ -128,9 +128,10 @@ export default async function SpaceEditProfilePage({ searchParams }: SpaceEditPr
   }
 
   const isFirstTime = !user.participant && first === 'true';
+  const hasTeam = !!(user.participant?.team || user.participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={userForLayout}>
+    <PersonalCabinetLayout user={userForLayout} hasTeam={hasTeam}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">
