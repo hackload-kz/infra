@@ -71,13 +71,27 @@ export default function SpaceJournalPage() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [hasTeam, setHasTeam] = useState(false)
 
   useEffect(() => {
     if (session?.user?.email) {
       fetchEntries()
       markEntriesAsRead()
+      fetchParticipantData()
     }
   }, [session])
+
+  const fetchParticipantData = async () => {
+    try {
+      const response = await fetch('/api/participant/profile')
+      if (response.ok) {
+        const data = await response.json()
+        setHasTeam(!!(data.participant?.team || data.participant?.ledTeam))
+      }
+    } catch (error) {
+      console.error('Error fetching participant data:', error)
+    }
+  }
 
   const fetchEntries = async (pageNum = 1) => {
     try {
@@ -144,7 +158,7 @@ export default function SpaceJournalPage() {
 
   if (loading) {
     return (
-      <PersonalCabinetLayout user={user}>
+      <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
         </div>
@@ -153,7 +167,7 @@ export default function SpaceJournalPage() {
   }
 
   return (
-    <PersonalCabinetLayout user={user}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Bell className="h-8 w-8 text-amber-400" />

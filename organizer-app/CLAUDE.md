@@ -310,6 +310,152 @@ it('should create participant successfully', async () => {
 - **Standardize mock data expectations** across test files
 - **Add performance benchmarking** for critical API endpoints
 
+## UI Color Schema Reference
+
+### Overview
+The HackLoad organizer application uses a comprehensive dark theme color schema built on Tailwind CSS. This reference provides standardized color usage patterns for consistency across the dashboard and space interfaces.
+
+### Primary Color Palette
+
+#### **Amber (Primary/Accent Color)**
+- **Primary Brand**: `text-amber-400`, `bg-amber-400`
+- **Accent Elements**: Page titles, active states, highlights
+- **Gradients**: `from-amber-400 to-amber-500`
+- **Interactive**: `bg-amber-400/20` (20% opacity for backgrounds)
+- **Hover States**: `hover:bg-amber-500`, `hover:text-amber-300`
+
+#### **Slate (Main UI Framework)**
+- **Dark Backgrounds**: 
+  - `bg-slate-900` - Main app background
+  - `bg-slate-800` - Secondary panels/cards
+  - `bg-slate-800/50` - Semi-transparent overlays with backdrop blur
+  - `bg-slate-700` - Interactive elements background
+  - `bg-slate-700/30` - Subtle card sections
+- **Text Colors**:
+  - `text-white` - Primary headings and important text
+  - `text-slate-300` - Secondary text and navigation
+  - `text-slate-400` - Muted text, descriptions, placeholders
+  - `text-slate-500` - Very subtle text, timestamps
+- **Borders**: 
+  - `border-slate-700/30` - Standard borders with opacity
+  - `border-slate-800/50` - Subtle dividers
+
+### State-Specific Colors
+
+#### **Success States (Green)**
+- **Success Actions**: `text-green-400`, `bg-green-400`
+- **Team Status**: `bg-green-500/20 text-green-300 border-green-500/30`
+- **Completed Tasks**: `text-green-400`
+- **Success Messages**: `bg-green-100 text-green-800` (light theme contexts)
+- **Interactive**: `bg-green-500 hover:bg-green-600` (buttons)
+
+#### **Error/Danger States (Red)**
+- **High Priority**: `text-red-400`
+- **Destructive Actions**: `bg-red-600 hover:bg-red-700`
+- **Error Messages**: `bg-red-100 text-red-800` (light theme contexts)
+- **Borders**: `border-red-300 text-red-600 hover:bg-red-50`
+
+#### **Warning States (Yellow/Amber)**
+- **Medium Priority**: `text-yellow-400`
+- **Warning Messages**: `bg-yellow-100 text-yellow-800` (light theme contexts)
+- **Alert Icons**: `text-amber-500`
+- **Warning Banners**: `bg-amber-900/30 border-amber-500/50 text-amber-100`
+
+#### **Info States (Blue)**
+- **Info Messages**: `text-blue-400`, `bg-blue-500/20 text-blue-300`
+- **Default Buttons**: `bg-blue-600 hover:bg-blue-700`
+- **In Progress Status**: `text-blue-400`
+- **Focus Rings**: `focus:ring-blue-500`
+
+#### **Neutral States (Purple/Gray)**
+- **Admin Actions**: `bg-purple-100 text-purple-800`
+- **Review Status**: `bg-purple-500/20 text-purple-300`
+- **Disabled/Inactive**: `text-slate-500`, `opacity-50`
+
+### Interactive Element Colors
+
+#### **Navigation (PersonalCabinetLayout)**
+- **Active Page**: `bg-amber-400/20 text-amber-400 border border-amber-400/30`
+- **Inactive Links**: `text-slate-300 hover:bg-slate-800/50 hover:text-white`
+- **Disabled Items**: `text-slate-500` with `opacity-50`
+- **Icons**: `text-slate-400 group-hover:text-white`
+
+#### **Buttons (UI Components)**
+- **Primary**: `bg-blue-600 text-white hover:bg-blue-700`
+- **Destructive**: `bg-red-600 text-white hover:bg-red-700`
+- **Outline**: `border border-gray-300 bg-white text-gray-700 hover:bg-gray-50`
+- **Secondary**: `bg-gray-100 text-gray-900 hover:bg-gray-200`
+- **Ghost**: `text-gray-700 hover:bg-gray-100`
+- **Success**: `bg-green-500 hover:bg-green-600 text-white`
+
+#### **Form Elements**
+- **Input Fields**: `border-gray-300 focus:ring-blue-500 text-gray-900`
+- **Checkboxes**: `text-blue-600 focus:ring-blue-500`
+- **Focus States**: `focus:ring-2 focus:ring-offset-2`
+
+#### **Cards and Containers**
+- **Main Cards**: `bg-slate-800/50 backdrop-blur-sm border border-slate-700/30`
+- **Hover States**: `hover:bg-slate-800/70`
+- **Special Highlights**: `border-amber-400/30 bg-amber-400/5` (unread items)
+
+### Team Status Colors
+
+#### **Team Workflow States**
+- **NEW**: `bg-blue-500/20 text-blue-300 border-blue-500/30`
+- **INCOMPLETED**: `bg-yellow-500/20 text-yellow-300 border-yellow-500/30`
+- **FINISHED**: `bg-green-500/20 text-green-300 border-green-500/30`
+- **IN_REVIEW**: `bg-purple-500/20 text-purple-300 border-purple-500/30`
+- **APPROVED**: `bg-green-500/20 text-green-300 border-green-500/30`
+- **CANCELED**: `bg-gray-500/20 text-gray-300 border-gray-500/30`
+
+### Priority Colors
+
+#### **Task Priority System**
+- **High Priority**: `text-red-400`
+- **Medium Priority**: `text-yellow-400`
+- **Low Priority**: `text-green-400`
+
+### Gradient Patterns
+
+#### **Brand Gradients**
+- **Primary**: `bg-gradient-to-r from-amber-400 to-amber-500`
+- **User Avatar**: `bg-gradient-to-r from-amber-400 to-amber-500`
+- **CTA Sections**: `from-amber-400/20 to-amber-500/20 border-amber-400/30`
+
+### Accessibility Considerations
+
+#### **Contrast Ratios**
+- **High Contrast**: White text on dark backgrounds for readability
+- **Interactive Elements**: Clear visual feedback with hover states
+- **Focus Indicators**: Prominent focus rings for keyboard navigation
+- **Color + Text**: Status information uses both color and text labels
+
+#### **Dark Theme Optimization**
+- **Backdrop Blur**: `backdrop-blur-sm` used with semi-transparent backgrounds
+- **Opacity Layers**: Strategic use of opacity (`/50`, `/30`, `/20`) for depth
+- **Border Contrast**: Subtle borders with opacity for visual separation
+
+### Usage Guidelines
+
+#### **Do's**
+- Use amber for primary brand elements and active states
+- Maintain slate as the foundation color system
+- Apply consistent opacity patterns for layering
+- Use semantic colors (green=success, red=error, etc.)
+
+#### **Don'ts**
+- Mix different opacity levels of the same color randomly
+- Use pure black backgrounds (prefer slate-900)
+- Override focus ring colors without accessibility testing
+- Use color alone to convey important information
+
+#### **Special Cases**
+- **Admin Interface**: Uses light theme colors (`gray-100`, `gray-900`) in some components
+- **Message System**: Has dedicated read/unread color states
+- **Loading States**: Uses amber spinner with `border-amber-400`
+
+This color schema ensures visual consistency, accessibility compliance, and maintainability across the entire HackLoad organizer application.
+
 ## Architecture Overview
 
 [... rest of the existing content remains unchanged ...]
