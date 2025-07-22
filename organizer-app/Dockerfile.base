@@ -1,11 +1,14 @@
 # Base image with pre-installed dependencies for organizer-app
 FROM node:20-alpine AS base
 
-# Install system dependencies
+# Install system dependencies including build tools for native modules
 RUN apk add --no-cache \
     libc6-compat \
     netcat-openbsd \
     wget \
+    python3 \
+    make \
+    g++ \
     && rm -rf /var/cache/apk/*
 
 WORKDIR /app
