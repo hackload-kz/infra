@@ -205,8 +205,15 @@ variable "load_nextauth_secret" {
   default     = ""
 }
 
-variable "load_admin_users" {
-  description = "Comma-separated list of admin users who can access the load testing app"
+variable "load_username" {
+  description = "Username for load testing app authentication"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "load_password" {
+  description = "Password for load testing app authentication"
   type        = string
   sensitive   = true
   default     = ""

@@ -1,32 +1,39 @@
 import { NextAuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
-import GitHubProvider from 'next-auth/providers/github'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' }
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          return null
+        }
+
+        const validUsername = process.env.LOAD_USERNAME
+        const validPassword = process.env.LOAD_PASSWORD
+
+        if (credentials.username === validUsername && credentials.password === validPassword) {
+          return {
+            id: '1',
+            name: 'Load Testing User',
+            email: 'loadtester@hackload.kz',
+          }
+        }
+
+        return null
+      }
+    })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
-      const adminUsers = process.env.ADMIN_USERS?.split(',') || []
-      
-      if (!user.email || !adminUsers.includes(user.email)) {
-        return false
-      }
-      
-      return true
-    },
     async session({ session, token }) {
       return session
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       return token
     },
   },
@@ -34,4 +41,7 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
     error: '/login',
   },
+  session: {
+    strategy: 'jwt'
+  }
 }

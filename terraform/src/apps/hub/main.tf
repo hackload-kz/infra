@@ -167,14 +167,11 @@ module "load" {
   enable_tls       = true
   cert_issuer_name = module.cert_manager.cluster_issuer_name
 
-  # OAuth configuration (reuse hub OAuth apps)
-  nextauth_url         = "https://${var.hub_host}/load"
-  nextauth_secret      = var.load_nextauth_secret
-  google_client_id     = var.hub_google_client_id
-  google_client_secret = var.hub_google_client_secret
-  github_client_id     = var.hub_github_client_id
-  github_client_secret = var.hub_github_client_secret
-  admin_users          = var.load_admin_users
+  # Authentication configuration
+  nextauth_url    = "https://${var.hub_host}/load"
+  nextauth_secret = var.load_nextauth_secret
+  load_username   = var.load_username
+  load_password   = var.load_password
 
   # k6 configuration
   k6_namespace = "k6-system"

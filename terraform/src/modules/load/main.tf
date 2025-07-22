@@ -147,28 +147,13 @@ resource "kubernetes_deployment" "load" {
           }
 
           env {
-            name  = "GOOGLE_CLIENT_ID"
-            value = var.google_client_id
+            name  = "LOAD_USERNAME"
+            value = var.load_username
           }
 
           env {
-            name  = "GOOGLE_CLIENT_SECRET"
-            value = var.google_client_secret
-          }
-
-          env {
-            name  = "GITHUB_CLIENT_ID"
-            value = var.github_client_id
-          }
-
-          env {
-            name  = "GITHUB_CLIENT_SECRET"
-            value = var.github_client_secret
-          }
-
-          env {
-            name  = "ADMIN_USERS"
-            value = var.admin_users
+            name  = "LOAD_PASSWORD"
+            value = var.load_password
           }
 
           env {
@@ -255,11 +240,11 @@ resource "kubernetes_manifest" "load_ingressroute" {
               port = var.service_port
             }
           ]
-          middlewares = var.path_prefix != "/" ? [
-            {
-              name = kubernetes_manifest.load_stripprefix[0].manifest.metadata.name
-            }
-          ] : []
+          # middlewares = var.path_prefix != "/" ? [
+          #   {
+          #     name = kubernetes_manifest.load_stripprefix[0].manifest.metadata.name
+          #   }
+          # ] : []
         }
       ]
       tls = {
@@ -270,23 +255,23 @@ resource "kubernetes_manifest" "load_ingressroute" {
 }
 
 # StripPrefix middleware if using a path prefix
-resource "kubernetes_manifest" "load_stripprefix" {
-  count = var.enable_tls && var.path_prefix != "/" ? 1 : 0
+# resource "kubernetes_manifest" "load_stripprefix" {
+#   count = var.enable_tls && var.path_prefix != "/" ? 1 : 0
 
-  manifest = {
-    apiVersion = "traefik.containo.us/v1alpha1"
-    kind       = "Middleware"
-    metadata = {
-      name      = "load-stripprefix"
-      namespace = kubernetes_namespace.load.metadata[0].name
-    }
-    spec = {
-      stripPrefix = {
-        prefixes = [var.path_prefix]
-      }
-    }
-  }
-}
+#   manifest = {
+#     apiVersion = "traefik.containo.us/v1alpha1"
+#     kind       = "Middleware"
+#     metadata = {
+#       name      = "load-stripprefix"
+#       namespace = kubernetes_namespace.load.metadata[0].name
+#     }
+#     spec = {
+#       stripPrefix = {
+#         prefixes = [var.path_prefix]
+#       }
+#     }
+#   }
+# }
 
 # HTTP to HTTPS redirect
 resource "kubernetes_manifest" "load_redirect" {

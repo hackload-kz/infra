@@ -31,8 +31,9 @@ module "hub" {
   telemetry_grafana_storage_size       = "20Gi"
 
   # Load testing application configuration
-  load_enabled        = true
-  load_image_tag      = "latest"
+  load_enabled         = true
+  load_image_tag       = "latest"
   load_nextauth_secret = var.load_nextauth_secret
-  load_admin_users    = var.load_admin_users
+  load_username        = var.load_username
+  load_password        = var.load_password
 }
