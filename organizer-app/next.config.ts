@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
     ],
     // Кэширование сборки
     webpackBuildWorker: true,
+    // External packages for server components
+    serverComponentsExternalPackages: ['@kubernetes/client-node'],
   },
   
   // Оптимизации Webpack

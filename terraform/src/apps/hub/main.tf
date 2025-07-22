@@ -153,53 +153,6 @@ module "telemetry" {
   depends_on = [module.traefik, module.cert_manager]
 }
 
-module "load" {
-  count  = var.load_enabled ? 1 : 0
-  source = "../../modules/load"
-
-  namespace    = "load"
-  image        = "ghcr.io/hackload-kz/load-app"
-  tag          = var.load_image_tag
-  host         = var.hub_host
-  path_prefix  = "/load"
-  replicas     = var.load_replicas
-
-  enable_tls       = true
-  cert_issuer_name = module.cert_manager.cluster_issuer_name
-
-  # Authentication configuration
-  nextauth_url    = "https://${var.hub_host}/load"
-  nextauth_secret = var.load_nextauth_secret
-  load_username   = var.load_username
-  load_password   = var.load_password
-
-  # k6 configuration
-  k6_namespace = "k6-system"
-
-  # Container registry (reuse hub registry)
-  registry_credentials = {
-    server   = "ghcr.io"
-    username = var.ghcr_username
-    password = var.ghcr_token
-    email    = var.ghcr_email
-  }
-
-  container_port = 8080
-  service_port   = 80
-
-  resources = {
-    limits = {
-      cpu    = "200m"
-      memory = "256Mi"
-    }
-    requests = {
-      cpu    = "100m"
-      memory = "128Mi"
-    }
-  }
-
-  depends_on = [module.traefik, module.cert_manager]
-}
 
 module "hub" {
   source = "../../modules/hub"

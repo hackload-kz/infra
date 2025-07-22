@@ -1,5 +1,4 @@
 import * as k8s from '@kubernetes/client-node'
-import * as yaml from 'js-yaml'
 
 const kc = new k8s.KubeConfig()
 
@@ -48,7 +47,7 @@ export default function() {
     kind: 'K6',
     metadata: {
       name: testId,
-      namespace: process.env.K6_NAMESPACE || 'k6-system'
+      namespace: 'k6-system'
     },
     spec: {
       parallelism: 1,
@@ -68,7 +67,7 @@ export default function() {
     kind: 'ConfigMap',
     metadata: {
       name: `${testId}-script`,
-      namespace: process.env.K6_NAMESPACE || 'k6-system'
+      namespace: 'k6-system'
     },
     data: {
       'test.js': k6Script
@@ -80,7 +79,7 @@ export default function() {
     await customObjectsApi.createNamespacedCustomObject(
       '',
       'v1',
-      process.env.K6_NAMESPACE || 'k6-system',
+      'k6-system',
       'configmaps',
       configMapResource
     )
@@ -89,7 +88,7 @@ export default function() {
     await customObjectsApi.createNamespacedCustomObject(
       'k6.io',
       'v1alpha1',
-      process.env.K6_NAMESPACE || 'k6-system',
+      'k6-system',
       'k6s',
       k6TestResource
     )
@@ -106,7 +105,7 @@ export async function getK6TestStatus(testId: string) {
     const response = await customObjectsApi.getNamespacedCustomObject(
       'k6.io',
       'v1alpha1',
-      process.env.K6_NAMESPACE || 'k6-system',
+      'k6-system',
       'k6s',
       testId
     )

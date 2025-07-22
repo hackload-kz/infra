@@ -30,10 +30,4 @@ module "hub" {
   telemetry_alertmanager_storage_size  = "5Gi"
   telemetry_grafana_storage_size       = "20Gi"
 
-  # Load testing application configuration
-  load_enabled         = true
-  load_image_tag       = "latest"
-  load_nextauth_secret = var.load_nextauth_secret
-  load_username        = var.load_username
-  load_password        = var.load_password
 }

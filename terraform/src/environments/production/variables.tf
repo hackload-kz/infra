@@ -65,22 +65,3 @@ variable "telemetry_grafana_admin_password" {
   sensitive   = true
   default     = "admin123"
 }
-
-variable "load_nextauth_secret" {
-  description = "NextAuth secret for JWT signing in load app"
-  type        = string
-  sensitive   = true
-}
-
-variable "load_username" {
-  description = "Username for load testing app authentication"
-  type        = string
-  sensitive   = true
-}
-
-variable "load_password" {
-  description = "Password for load testing app authentication"
-  type        = string
-  sensitive   = true
-}
-

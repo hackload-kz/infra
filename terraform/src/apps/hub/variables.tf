@@ -179,45 +179,6 @@ variable "telemetry_grafana_storage_size" {
   default     = "10Gi"
 }
 
-# Load testing application variables
-variable "load_enabled" {
-  description = "Enable load testing application"
-  type        = bool
-  default     = true
-}
-
-variable "load_image_tag" {
-  description = "Docker image tag for the load application"
-  type        = string
-  default     = "latest"
-}
-
-variable "load_replicas" {
-  description = "Number of replicas for the load deployment"
-  type        = number
-  default     = 1
-}
-
-variable "load_nextauth_secret" {
-  description = "NextAuth secret for JWT signing in load app"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-variable "load_username" {
-  description = "Username for load testing app authentication"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-variable "load_password" {
-  description = "Password for load testing app authentication"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
 
 # variable "openstack_auth_url" {
 #   description = "OpenStack authentication URL"
