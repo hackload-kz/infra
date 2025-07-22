@@ -26,9 +26,12 @@ RUN npm config set registry https://registry.npmjs.org/ && \
 # Copy package files
 COPY package.json package-lock.json* ./
 
+# Debug: Check if files exist and show versions
+RUN ls -la package* && node --version && npm --version
+
 # Install ALL dependencies (both production and development)
 # This will be our "fat" base image with everything pre-installed
-RUN npm ci --include=dev --silent --no-audit --no-fund
+RUN npm ci --include=dev --no-audit --no-fund
 
 # Pre-generate any global tools that might be needed
 RUN npm list -g --depth=0
