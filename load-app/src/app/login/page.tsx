@@ -16,7 +16,8 @@ function LoginContent() {
     const checkSession = async () => {
       const session = await getSession()
       if (session) {
-        router.push('/')
+        // Redirect to load app home page if already logged in
+        window.location.href = '/load'
       }
     }
     checkSession()
@@ -44,12 +45,14 @@ function LoginContent() {
         username,
         password,
         redirect: false,
+        callbackUrl: '/load'
       })
 
       if (result?.error) {
         setError('Invalid username or password.')
       } else if (result?.ok) {
-        router.push('/')
+        // Redirect to the load app home page
+        window.location.href = '/load'
       }
     } catch (err) {
       setError('An error occurred. Please try again.')

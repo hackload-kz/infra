@@ -30,10 +30,22 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async session({ session, token }) {
+    async redirect({ url, baseUrl }) {
+      // Always redirect to the /load path after authentication
+      if (url.startsWith('/')) {
+        return `${baseUrl}/load${url}`
+      }
+      // If it's already a full URL and contains our domain, ensure it includes /load
+      if (url.includes(baseUrl) && !url.includes('/load')) {
+        return url.replace(baseUrl, `${baseUrl}/load`)
+      }
+      // Default fallback to load app home page
+      return `${baseUrl}/load`
+    },
+    async session({ session }) {
       return session
     },
-    async jwt({ token, user }) {
+    async jwt({ token }) {
       return token
     },
   },

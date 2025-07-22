@@ -14,7 +14,8 @@ export default function HomePage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/login')
+      // Redirect to login with current path context
+      window.location.href = '/load/login'
     }
   }, [status, router])
 
