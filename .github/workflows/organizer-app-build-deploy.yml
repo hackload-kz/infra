@@ -3,8 +3,14 @@ name: Build and Deploy Docker Image
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'organizer-app/**'
+      - '.github/workflows/organizer-app-build-deploy.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'organizer-app/**'
+      - '.github/workflows/organizer-app-build-deploy.yml'
   workflow_dispatch:
     inputs:
       image_tag:

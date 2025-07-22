@@ -14,13 +14,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Create public directory if it doesn't exist
+RUN mkdir -p public
+
 RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -39,7 +42,7 @@ USER nextjs
 
 EXPOSE 8080
 
-ENV PORT 8080
+ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
 
 # Health check
