@@ -22,4 +22,17 @@ module "hub" {
   ghcr_username = var.ghcr_username
   ghcr_token    = var.ghcr_token
   ghcr_email    = var.ghcr_email
+
+  # Telemetry configuration
+  telemetry_enabled                    = true
+  telemetry_grafana_admin_password     = var.telemetry_grafana_admin_password
+  telemetry_prometheus_storage_size    = "200Gi"
+  telemetry_alertmanager_storage_size  = "5Gi"
+  telemetry_grafana_storage_size       = "20Gi"
+
+  # Load testing application configuration
+  load_enabled        = true
+  load_image_tag      = "latest"
+  load_nextauth_secret = var.load_nextauth_secret
+  load_admin_users    = var.load_admin_users
 }

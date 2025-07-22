@@ -1,0 +1,184 @@
+name: Build and Deploy Load App
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'load-app/**'
+      - '.github/workflows/load-app-build-deploy.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'load-app/**'
+      - '.github/workflows/load-app-build-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: ''
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: hackload-kz/load-app
+
+jobs:
+  build-and-push:
+    runs-on: [self-hosted]
+    permissions:
+      contents: read
+      packages: write
+      actions: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver-opts: |
+          network=host
+          env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
+          env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
+        buildkitd-config-inline: |
+          [worker.oci]
+            max-parallelism = 4
+          [worker.containerd]
+            max-parallelism = 4
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix=sha-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: load-app
+        file: load-app/Dockerfile
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Generate deployment artifact
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+      run: |
+        echo "IMAGE_TAG=sha-${GITHUB_SHA::7}" >> deployment.env
+        echo "IMAGE_URL=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${GITHUB_SHA::7}" >> deployment.env
+
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: load-deployment-info
+        path: deployment.env
+
+    - name: Build Summary
+      run: |
+        echo "### 🚀 Load App Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Application Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "- **Context**: load-app/" >> $GITHUB_STEP_SUMMARY
+        echo "- **Platforms**: linux/amd64" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    runs-on: [self-hosted]
+    needs: [build-and-push]
+    if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download deployment artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: load-deployment-info
+
+    - name: Load deployment info
+      run: |
+        source deployment.env
+        echo "IMAGE_TAG_FROM_BUILD=$IMAGE_TAG" >> $GITHUB_ENV
+
+    - name: Determine image tag
+      id: image_tag
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.image_tag }}" ]]; then
+          echo "tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=$IMAGE_TAG_FROM_BUILD" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
+
+    - name: Verify kubectl connection
+      run: |
+        kubectl cluster-info
+        kubectl get nodes
+
+    - name: Update deployment image
+      run: |
+        kubectl set image deployment/load \
+          load=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }} \
+          -n load
+        
+        echo "Updated deployment with image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }}"
+
+    - name: Wait for rollout
+      run: |
+        kubectl rollout status deployment/load -n load --timeout=300s
+
+    - name: Verify deployment
+      run: |
+        kubectl get pods -n load -l app=load
+        kubectl get deployment load -n load -o wide
+        echo "Load app deployment successful!"
+
+    - name: Get deployment info
+      run: |
+        echo "### Load App Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Namespace**: load" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployment**: load" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status**: $(kubectl get deployment load -n load -o jsonpath='{.status.conditions[?(@.type=="Available")].status}')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Ready Replicas**: $(kubectl get deployment load -n load -o jsonpath='{.status.readyReplicas}')/$(kubectl get deployment load -n load -o jsonpath='{.spec.replicas}')" >> $GITHUB_STEP_SUMMARY
+
+  notify-failure:
+    runs-on: [self-hosted]
+    if: failure()
+    needs: [build-and-push, deploy]
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "### ❌ Load App Build and Deploy Workflow Failed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,68 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Kubernetes Pods Monitoring",
+    "tags": ["kubernetes", "pods"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Pod CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(container_cpu_usage_seconds_total{container!=\"POD\",container!=\"\"}[5m])) by (pod, namespace)"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "CPU Usage",
+            "unit": "cores"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Pod Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(container_memory_usage_bytes{container!=\"POD\",container!=\"\"}) by (pod, namespace)"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Memory Usage",
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Pod Restarts",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "increase(kube_pod_container_status_restarts_total[1h])"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Pod Status",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "kube_pod_status_phase"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

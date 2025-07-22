@@ -58,3 +58,23 @@ variable "hub_admin_users" {
   type        = string
   sensitive   = true
 }
+
+variable "telemetry_grafana_admin_password" {
+  description = "Admin password for Grafana"
+  type        = string
+  sensitive   = true
+  default     = "admin123"
+}
+
+variable "load_nextauth_secret" {
+  description = "NextAuth secret for JWT signing in load app"
+  type        = string
+  sensitive   = true
+}
+
+variable "load_admin_users" {
+  description = "Comma-separated list of admin users who can access the load testing app"
+  type        = string
+  sensitive   = true
+}
+

@@ -129,6 +129,89 @@ variable "hub_admin_users" {
   sensitive   = true
 }
 
+# Telemetry variables
+variable "telemetry_enabled" {
+  description = "Enable telemetry with Prometheus and Grafana"
+  type        = bool
+  default     = true
+}
+
+variable "telemetry_prometheus_host" {
+  description = "Hostname for Prometheus UI"
+  type        = string
+  default     = "prometheus.hackload.kz"
+}
+
+variable "telemetry_grafana_host" {
+  description = "Hostname for Grafana UI"
+  type        = string
+  default     = "grafana.hackload.kz"
+}
+
+variable "telemetry_alertmanager_host" {
+  description = "Hostname for Alertmanager UI"
+  type        = string
+  default     = "alertmanager.hackload.kz"
+}
+
+variable "telemetry_grafana_admin_password" {
+  description = "Admin password for Grafana"
+  type        = string
+  sensitive   = true
+  default     = "admin123"
+}
+
+variable "telemetry_prometheus_storage_size" {
+  description = "Storage size for Prometheus data"
+  type        = string
+  default     = "10Gi"
+}
+
+variable "telemetry_alertmanager_storage_size" {
+  description = "Storage size for Alertmanager data"
+  type        = string
+  default     = "2Gi"
+}
+
+variable "telemetry_grafana_storage_size" {
+  description = "Storage size for Grafana data"
+  type        = string
+  default     = "10Gi"
+}
+
+# Load testing application variables
+variable "load_enabled" {
+  description = "Enable load testing application"
+  type        = bool
+  default     = true
+}
+
+variable "load_image_tag" {
+  description = "Docker image tag for the load application"
+  type        = string
+  default     = "latest"
+}
+
+variable "load_replicas" {
+  description = "Number of replicas for the load deployment"
+  type        = number
+  default     = 1
+}
+
+variable "load_nextauth_secret" {
+  description = "NextAuth secret for JWT signing in load app"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "load_admin_users" {
+  description = "Comma-separated list of admin users who can access the load testing app"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # variable "openstack_auth_url" {
 #   description = "OpenStack authentication URL"
 #   type        = string

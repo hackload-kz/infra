@@ -65,6 +65,145 @@ module "k6_operator" {
   }
 }
 
+module "telemetry" {
+  count  = var.telemetry_enabled ? 1 : 0
+  source = "../../modules/telemetry"
+
+  namespace         = "telemetry"
+  cert_issuer_name  = module.cert_manager.cluster_issuer_name
+  storage_class     = var.storage_class
+
+  # Prometheus configuration
+  enable_prometheus        = true
+  prometheus_host          = var.hub_host
+  prometheus_path          = "/prometheus"
+  prometheus_storage_size  = var.telemetry_prometheus_storage_size
+
+  # Grafana configuration
+  enable_grafana           = true
+  grafana_host             = var.hub_host
+  grafana_path             = "/grafana"
+  grafana_admin_password   = var.telemetry_grafana_admin_password
+  grafana_storage_size     = var.telemetry_grafana_storage_size
+
+  # Alertmanager configuration
+  enable_alertmanager       = true
+  alertmanager_host         = var.hub_host
+  alertmanager_storage_size = var.telemetry_alertmanager_storage_size
+
+  prometheus_helm_values = {
+    prometheus = {
+      prometheusSpec = {
+        retention = "30d"
+        externalUrl = "https://${var.hub_host}/prometheus"
+        routePrefix = "/prometheus"
+        storageSpec = {
+          volumeClaimTemplate = {
+            spec = {
+              storageClassName = var.storage_class
+              accessModes      = ["ReadWriteOnce"]
+              resources = {
+                requests = {
+                  storage = var.telemetry_prometheus_storage_size
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    alertmanager = {
+      alertmanagerSpec = {
+        storage = {
+          volumeClaimTemplate = {
+            spec = {
+              storageClassName = var.storage_class
+              accessModes      = ["ReadWriteOnce"]
+              resources = {
+                requests = {
+                  storage = var.telemetry_alertmanager_storage_size
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    grafana = {
+      enabled = true
+      adminPassword = var.telemetry_grafana_admin_password
+      persistence = {
+        enabled = true
+        storageClassName = var.storage_class
+        size = var.telemetry_grafana_storage_size
+      }
+      "grafana.ini" = {
+        server = {
+          root_url = "https://${var.hub_host}/grafana"
+          serve_from_sub_path = true
+        }
+      }
+    }
+    kubeStateMetrics = {
+      enabled = false
+    }
+  }
+
+
+  depends_on = [module.traefik, module.cert_manager]
+}
+
+module "load" {
+  count  = var.load_enabled ? 1 : 0
+  source = "../../modules/load"
+
+  namespace    = "load"
+  image        = "ghcr.io/hackload-kz/load-app"
+  tag          = var.load_image_tag
+  host         = var.hub_host
+  path_prefix  = "/load"
+  replicas     = var.load_replicas
+
+  enable_tls       = true
+  cert_issuer_name = module.cert_manager.cluster_issuer_name
+
+  # OAuth configuration (reuse hub OAuth apps)
+  nextauth_url         = "https://${var.hub_host}/load"
+  nextauth_secret      = var.load_nextauth_secret
+  google_client_id     = var.hub_google_client_id
+  google_client_secret = var.hub_google_client_secret
+  github_client_id     = var.hub_github_client_id
+  github_client_secret = var.hub_github_client_secret
+  admin_users          = var.load_admin_users
+
+  # k6 configuration
+  k6_namespace = "k6-system"
+
+  # Container registry (reuse hub registry)
+  registry_credentials = {
+    server   = "ghcr.io"
+    username = var.ghcr_username
+    password = var.ghcr_token
+    email    = var.ghcr_email
+  }
+
+  container_port = 8080
+  service_port   = 80
+
+  resources = {
+    limits = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+    requests = {
+      cpu    = "100m"
+      memory = "128Mi"
+    }
+  }
+
+  depends_on = [module.traefik, module.cert_manager]
+}
+
 module "hub" {
   source = "../../modules/hub"
 
