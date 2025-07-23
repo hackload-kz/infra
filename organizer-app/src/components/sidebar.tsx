@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Users, Home, UserCheck, Calendar, MessageSquare, AlertCircle, CalendarDays, User, Shield, Zap } from 'lucide-react'
+import { Users, Home, UserCheck, Calendar, MessageSquare, AlertCircle, CalendarDays, User, Shield, Zap, TestTube } from 'lucide-react'
 import { LogoutButton } from './logout-button'
 
 const navigation = [
@@ -15,6 +15,7 @@ const navigation = [
     { name: 'Баннеры', href: '/dashboard/banners', icon: AlertCircle },
     { name: 'Календарь', href: '/dashboard/calendar', icon: CalendarDays },
     { name: 'Нагрузочное тестирование', href: '/dashboard/load-testing', icon: Zap },
+    { name: 'Сценарии тестирования', href: '/dashboard/test-scenarios', icon: TestTube },
     { name: 'Безопасность', href: '/dashboard/security', icon: Shield },
     { name: 'Кабинет участника', href: '/space', icon: User },
 ]

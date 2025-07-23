@@ -389,3 +389,41 @@ model ServiceApiKeyUsage {
   
   @@map("service_api_key_usage")
 }
+
+model TestScenario {
+  id          String             @id @default(cuid())
+  name        String             // Название сценария
+  identifier  String             @unique // Идентификатор сценария
+  description String?            // Описание сценария
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  createdBy   String?            // Participant ID who created this scenario
+  
+  steps       TestScenarioStep[]
+  
+  @@map("test_scenarios")
+}
+
+model TestScenarioStep {
+  id          String           @id @default(cuid())
+  scenarioId  String
+  name        String           // Название шага
+  description String?          // Описание шага
+  stepType    TestStepType     // k6_script или http_request
+  stepOrder   Int              // Порядок выполнения шага
+  config      Json             // Конфигурация шага (k6 скрипт или curl команда)
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  scenario    TestScenario     @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  
+  @@unique([scenarioId, stepOrder]) // Уникальный порядок для каждого сценария
+  @@map("test_scenario_steps")
+}
+
+enum TestStepType {
+  k6_script
+  http_request
+}
