@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,6 @@ import {
   ArrowDown,
   Code,
   Globe,
-  Play,
   AlertCircle
 } from 'lucide-react'
 import TestStepForm from '@/components/test-step-form'
@@ -39,7 +38,7 @@ interface TestScenarioStep {
   description?: string
   stepType: 'k6_script' | 'http_request'
   stepOrder: number
-  config: any
+  config: Record<string, unknown>
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -58,19 +57,7 @@ export default function TestStepsManager({ scenario, onClose }: TestStepsManager
   const [showForm, setShowForm] = useState(false)
   const [editingStep, setEditingStep] = useState<TestScenarioStep | null>(null)
 
-  useEffect(() => {
-    fetchSteps()
-  }, [scenario.id])
-
-  useEffect(() => {
-    const filtered = steps.filter(step =>
-      step.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (step.description && step.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-    setFilteredSteps(filtered)
-  }, [steps, searchTerm])
-
-  const fetchSteps = async () => {
+  const fetchSteps = useCallback(async () => {
     try {
       const response = await fetch(`/api/dashboard/test-scenarios/${scenario.id}/steps`)
       if (response.ok) {
@@ -82,7 +69,19 @@ export default function TestStepsManager({ scenario, onClose }: TestStepsManager
     } finally {
       setLoading(false)
     }
-  }
+  }, [scenario.id])
+
+  useEffect(() => {
+    fetchSteps()
+  }, [fetchSteps])
+
+  useEffect(() => {
+    const filtered = steps.filter(step =>
+      step.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (step.description && step.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    setFilteredSteps(filtered)
+  }, [steps, searchTerm])
 
   const handleCreateStep = () => {
     setEditingStep(null)
@@ -118,7 +117,7 @@ export default function TestStepsManager({ scenario, onClose }: TestStepsManager
   }
 
   const handleMoveStep = async (step: TestScenarioStep, direction: 'up' | 'down') => {
-    const currentIndex = steps.findIndex(s => s.id === step.id)
+    // const currentIndex = steps.findIndex(s => s.id === step.id)
     const newOrder = direction === 'up' ? step.stepOrder - 1 : step.stepOrder + 1
     
     if (newOrder < 1 || newOrder > steps.length) {
@@ -176,11 +175,11 @@ export default function TestStepsManager({ scenario, onClose }: TestStepsManager
     }
   }
 
-  const formatConfig = (config: any, stepType: string) => {
-    if (stepType === 'http_request' && config.curl) {
+  const formatConfig = (config: Record<string, unknown>, stepType: string) => {
+    if (stepType === 'http_request' && config.curl && typeof config.curl === 'string') {
       return config.curl.length > 50 ? config.curl.substring(0, 50) + '...' : config.curl
     }
-    if (stepType === 'k6_script' && config.script) {
+    if (stepType === 'k6_script' && config.script && typeof config.script === 'string') {
       const lines = config.script.split('\n').length
       return `${lines} строк кода`
     }
@@ -254,7 +253,7 @@ export default function TestStepsManager({ scenario, onClose }: TestStepsManager
         </Card>
       ) : (
         <div className="space-y-3">
-          {filteredSteps.map((step, index) => (
+          {filteredSteps.map((step) => (
             <Card key={step.id} className="bg-slate-800/50 backdrop-blur-sm border-slate-700/30 p-4">
               <div className="flex items-start gap-4">
                 {/* Order Controls */}

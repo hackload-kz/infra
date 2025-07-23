@@ -9,9 +9,7 @@ import {
   Search, 
   Settings, 
   Trash2, 
-  Eye, 
   Edit,
-  Play,
   AlertCircle,
   CheckCircle,
   Clock
@@ -40,7 +38,7 @@ interface TestScenarioStep {
   description?: string
   stepType: 'k6_script' | 'http_request'
   stepOrder: number
-  config: any
+  config: Record<string, unknown>
   isActive: boolean
   createdAt: string
   updatedAt: string

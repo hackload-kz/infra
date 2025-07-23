@@ -13,7 +13,6 @@ import {
   X, 
   Code, 
   Globe, 
-  HelpCircle,
   Copy,
   Check
 } from 'lucide-react'
@@ -38,7 +37,7 @@ interface TestScenarioStep {
   description?: string
   stepType: 'k6_script' | 'http_request'
   stepOrder: number
-  config: any
+  config: Record<string, unknown>
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -81,8 +80,8 @@ export default function TestStepForm({
         stepOrder: step.stepOrder || 1,
         isActive: step.isActive,
         config: {
-          curl: step.config?.curl || '',
-          script: step.config?.script || ''
+          curl: (step.config?.curl as string) || '',
+          script: (step.config?.script as string) || ''
         }
       })
     }
