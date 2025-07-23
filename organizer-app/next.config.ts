@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     '/api/**/*': ['./node_modules/@prisma/client/**/*'],
   },
   
+  // External packages for server components
+  serverExternalPackages: ['@kubernetes/client-node'],
+  
   // Оптимизации компилятора
   compiler: {
     // Удаляем только console.log в production, оставляем console.info, console.warn, console.error
@@ -27,8 +30,6 @@ const nextConfig: NextConfig = {
     ],
     // Кэширование сборки
     webpackBuildWorker: true,
-    // External packages for server components
-    serverComponentsExternalPackages: ['@kubernetes/client-node'],
   },
   
   // Оптимизации Webpack
