@@ -76,22 +76,22 @@ export default function() {
 
   try {
     // Create ConfigMap first
-    await customObjectsApi.createNamespacedCustomObject(
-      '',
-      'v1',
-      'k6-system',
-      'configmaps',
-      configMapResource
-    )
+    await customObjectsApi.createNamespacedCustomObject({
+      group: '',
+      version: 'v1',
+      namespace: 'k6-system',
+      plural: 'configmaps',
+      body: configMapResource
+    })
 
     // Create K6 test resource
-    await customObjectsApi.createNamespacedCustomObject(
-      'k6.io',
-      'v1alpha1',
-      'k6-system',
-      'k6s',
-      k6TestResource
-    )
+    await customObjectsApi.createNamespacedCustomObject({
+      group: 'k6.io',
+      version: 'v1alpha1',
+      namespace: 'k6-system',
+      plural: 'k6s',
+      body: k6TestResource
+    })
 
     return testId
   } catch (error) {
@@ -102,13 +102,13 @@ export default function() {
 
 export async function getK6TestStatus(testId: string) {
   try {
-    const response = await customObjectsApi.getNamespacedCustomObject(
-      'k6.io',
-      'v1alpha1',
-      'k6-system',
-      'k6s',
-      testId
-    )
+    const response = await customObjectsApi.getNamespacedCustomObject({
+      group: 'k6.io',
+      version: 'v1alpha1',
+      namespace: 'k6-system',
+      plural: 'k6s',
+      name: testId
+    })
     
     return response.body
   } catch (error) {

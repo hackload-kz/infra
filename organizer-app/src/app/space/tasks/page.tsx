@@ -4,10 +4,6 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { 
-  CheckSquare, 
-  Square, 
-  Flag,
-  Circle,
   Settings,
   AlertCircle
 } from 'lucide-react'
@@ -57,60 +53,7 @@ export default async function SpaceTasksPage() {
     image: session.user?.image || undefined
   }
 
-  // Mock tasks data
-  const tasks = [
-    {
-      id: 1,
-      title: 'Завершить регистрацию команды',
-      description: 'Убедиться, что все участники команды зарегистрированы',
-      status: 'completed',
-      priority: 'high',
-      dueDate: '2025-02-01',
-      assignee: 'Вы'
-    },
-    {
-      id: 2,
-      title: 'Подготовить техническое задание',
-      description: 'Создать подробный план проекта для хакатона',
-      status: 'in_progress',
-      priority: 'high',
-      dueDate: '2025-02-10',
-      assignee: participant?.ledTeam ? 'Вы' : 'Лидер команды'
-    },
-    {
-      id: 3,
-      title: 'Изучить API документацию',
-      description: 'Ознакомиться с доступными API для проекта',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: '2025-02-15',
-      assignee: 'Команда'
-    },
-    {
-      id: 4,
-      title: 'Настроить среду разработки',
-      description: 'Подготовить все необходимые инструменты',
-      status: 'todo',
-      priority: 'low',
-      dueDate: '2025-03-01',
-      assignee: 'Каждый участник'
-    }
-  ]
 
-  const statusLabels = {
-    todo: 'К выполнению',
-    in_progress: 'В работе',
-    completed: 'Завершено'
-  }
-
-  const priorityColors = {
-    high: 'text-red-400',
-    medium: 'text-yellow-400',
-    low: 'text-green-400'
-  }
-
-  const completedTasks = tasks.filter(t => t.status === 'completed').length
-  const totalTasks = tasks.length
   
   const hasTeam = !!(participant?.team || participant?.ledTeam)
   const environmentDataCount = participant?.team?.environmentData?.length || 0

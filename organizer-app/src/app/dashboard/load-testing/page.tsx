@@ -74,7 +74,7 @@ export default function LoadTestingPage() {
         setMessage(result.error || 'Failed to start load test')
         setMessageType('error')
       }
-    } catch (error) {
+    } catch {
       setMessage('Failed to start load test. Please try again.')
       setMessageType('error')
     } finally {
