@@ -18,6 +18,9 @@ import {
   UserPlus
 } from 'lucide-react'
 import { leaveTeam, createAndJoinTeam, joinTeam } from '@/lib/actions'
+import { isRegistrationEnded } from '@/lib/hackathon'
+import { RegistrationStatusNotification } from '@/components/registration-ended-notification'
+import type { Hackathon } from '@prisma/client'
 
 interface Participant {
   id: string
@@ -58,9 +61,10 @@ interface AvailableTeam {
 interface SpaceTeamManagementProps {
   participant: Participant
   availableTeams: AvailableTeam[]
+  hackathon: Hackathon | null
 }
 
-export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamManagementProps) {
+export function SpaceTeamManagement({ participant, availableTeams, hackathon }: SpaceTeamManagementProps) {
   const [activeAction, setActiveAction] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -81,6 +85,7 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
   const currentTeam = participant.team
   const teamMembers = currentTeam?.members || []
   const otherMembers = teamMembers.filter(m => m.id !== participant.id)
+  const registrationEnded = hackathon ? isRegistrationEnded(hackathon) : false
   
   // Filter available teams that have space and are not user's current team
   const joinableTeams = availableTeams.filter(team => 
@@ -323,6 +328,29 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
   }
 
   if (activeAction === 'create') {
+    // If registration has ended, show notification and return to main view
+    if (registrationEnded) {
+      return (
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+          <h3 className="text-xl font-semibold text-white mb-4">Создание команды недоступно</h3>
+          {hackathon && (
+            <RegistrationStatusNotification
+              hackathonName={hackathon.name}
+              registrationStartDate={hackathon.registrationStart}
+              registrationEndDate={hackathon.registrationEnd}
+              className="mb-6"
+            />
+          )}
+          <button
+            onClick={resetForm}
+            className="w-full bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-150"
+          >
+            Вернуться
+          </button>
+        </div>
+      )
+    }
+
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
         <h3 className="text-xl font-semibold text-white mb-4">
@@ -500,10 +528,11 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               description: teamDescription
             })}
             disabled={loading || !newTeamName || !newTeamNickname || 
-                      Boolean(currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader)}
+                      Boolean(currentTeam && isLeader && otherMembers.length > 0 && !selectedNewLeader) ||
+                      registrationEnded}
             className="flex-1 bg-amber-400 hover:bg-amber-500 disabled:bg-amber-400/50 text-slate-900 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
           >
-            {loading ? 'Создание...' : 'Создать команду'}
+            {loading ? 'Создание...' : registrationEnded ? 'Регистрация завершена' : 'Создать команду'}
           </button>
           <button
             onClick={resetForm}
@@ -667,6 +696,14 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
   // Default team actions view
   return (
     <div className="space-y-6">
+      {/* Registration Status Notification */}
+      {hackathon && (
+        <RegistrationStatusNotification
+          hackathonName={hackathon.name}
+          registrationStartDate={hackathon.registrationStart}
+          registrationEndDate={hackathon.registrationEnd}
+        />
+      )}
       {/* Help Section */}
       <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
         <div className="flex items-center justify-between mb-4">
@@ -716,11 +753,18 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
           {!currentTeam ? (
             <>
               <button
-                onClick={() => setActiveAction('create')}
-                className="flex items-center space-x-3 p-4 bg-amber-400/20 hover:bg-amber-400/30 rounded-lg transition-all duration-150 border border-amber-400/30"
+                onClick={() => !registrationEnded && setActiveAction('create')}
+                disabled={registrationEnded}
+                className={`flex items-center space-x-3 p-4 rounded-lg transition-all duration-150 border ${
+                  registrationEnded 
+                    ? 'bg-gray-500/20 border-gray-500/30 cursor-not-allowed opacity-50' 
+                    : 'bg-amber-400/20 hover:bg-amber-400/30 border-amber-400/30'
+                }`}
               >
-                <Plus className="w-5 h-5 text-amber-400" />
-                <span className="text-white font-medium">Создать команду</span>
+                <Plus className={`w-5 h-5 ${registrationEnded ? 'text-gray-400' : 'text-amber-400'}`} />
+                <span className={`font-medium ${registrationEnded ? 'text-gray-400' : 'text-white'}`}>
+                  {registrationEnded ? 'Регистрация завершена' : 'Создать команду'}
+                </span>
               </button>
               
               <Link
@@ -742,11 +786,18 @@ export function SpaceTeamManagement({ participant, availableTeams }: SpaceTeamMa
               </button>
 
               <button
-                onClick={() => setActiveAction('create')}
-                className="flex items-center space-x-3 p-4 bg-amber-400/20 hover:bg-amber-400/30 rounded-lg transition-all duration-150 border border-amber-400/30"
+                onClick={() => !registrationEnded && setActiveAction('create')}
+                disabled={registrationEnded}
+                className={`flex items-center space-x-3 p-4 rounded-lg transition-all duration-150 border ${
+                  registrationEnded 
+                    ? 'bg-gray-500/20 border-gray-500/30 cursor-not-allowed opacity-50' 
+                    : 'bg-amber-400/20 hover:bg-amber-400/30 border-amber-400/30'
+                }`}
               >
-                <Plus className="w-5 h-5 text-amber-400" />
-                <span className="text-white font-medium">Создать новую</span>
+                <Plus className={`w-5 h-5 ${registrationEnded ? 'text-gray-400' : 'text-amber-400'}`} />
+                <span className={`font-medium ${registrationEnded ? 'text-gray-400' : 'text-white'}`}>
+                  {registrationEnded ? 'Регистрация завершена' : 'Создать новую'}
+                </span>
               </button>
 
               <Link
