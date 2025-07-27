@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { db } from '@/lib/db'
+import { getCurrentHackathon } from '@/lib/hackathon'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { CopyTeamLink } from '@/components/copy-team-link'
 import Link from 'next/link'
@@ -42,7 +43,7 @@ export default async function TeamDetailPage({ params }: Props) {
     redirect('/login')
   }
 
-  const [participant, team] = await Promise.all([
+  const [participant, team, hackathon] = await Promise.all([
     db.participant.findFirst({
       where: { 
         user: { email: session.user.email } 
@@ -95,7 +96,8 @@ export default async function TeamDetailPage({ params }: Props) {
           }
         }
       }
-    })
+    }),
+    getCurrentHackathon()
   ])
 
   if (!participant) {
@@ -142,10 +144,14 @@ export default async function TeamDetailPage({ params }: Props) {
     ADVANCED: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   }
 
+  // Check if registration has ended
+  const registrationEnded = hackathon?.registrationEnd ? new Date() > hackathon.registrationEnd : false
+
   const canJoin = !participant.teamId && 
                   team.members.length < 4 && 
                   ['NEW', 'INCOMPLETED'].includes(team.status) &&
-                  participant.joinRequests.length === 0
+                  participant.joinRequests.length === 0 &&
+                  !(registrationEnded && team.status === 'NEW')
 
   const hasPendingRequest = participant.joinRequests.length > 0
 
@@ -285,7 +291,12 @@ export default async function TeamDetailPage({ params }: Props) {
           ) : (
             <div className="bg-slate-700/30 rounded-lg p-4">
               <p className="text-slate-400">
-                {team.members.length >= 4 ? 'Команда заполнена' : 'Команда не принимает новых участников'}
+                {team.members.length >= 4 
+                  ? 'Команда заполнена' 
+                  : registrationEnded && team.status === 'NEW'
+                  ? 'Регистрация завершена. Команды со статусом "новая" не принимают участников'
+                  : 'Команда не принимает новых участников'
+                }
               </p>
             </div>
           )}
