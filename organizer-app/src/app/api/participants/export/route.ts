@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { auth } from '@/auth';
 import { isOrganizer } from '@/lib/admin';
-import { getParticipantsFromLargeTeams, getParticipantsFromLargeTeamsRaw } from '../../../../../query-participants-large-teams';
+import { getParticipantsFromLargeTeams, getParticipantsFromLargeTeamsRaw } from '@/lib/query-participants-large-teams';
 
 type ParticipantExportData = {
   id: string;
