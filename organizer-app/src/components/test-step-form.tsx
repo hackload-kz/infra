@@ -221,7 +221,7 @@ export default function () {
           <h1 className="text-3xl font-bold text-white">
             {step ? 'Редактировать шаг' : 'Создать шаг'}
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-500 mt-1">
             {scenario.name} • {step ? `Шаг ${step.stepOrder}` : 'Новый шаг'}
           </p>
         </div>

@@ -175,7 +175,7 @@ export default function TestScenariosClient() {
             placeholder="Поиск сценариев..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-slate-700/70 border-slate-600/50 text-white placeholder-slate-400"
           />
         </div>
         <Button onClick={handleCreateScenario}>
@@ -187,15 +187,15 @@ export default function TestScenariosClient() {
       {/* Scenarios Grid */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="text-slate-400">Загрузка сценариев...</div>
+          <div className="text-slate-200">Загрузка сценариев...</div>
         </div>
       ) : filteredScenarios.length === 0 ? (
-        <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/30 p-8 text-center">
-          <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">
             {searchTerm ? 'Сценарии не найдены' : 'Нет сценариев'}
           </h3>
-          <p className="text-slate-400 mb-4">
+          <p className="text-slate-200 mb-4">
             {searchTerm 
               ? 'Попробуйте изменить условия поиска'
               : 'Создайте первый тестовый сценарий для начала работы'
@@ -211,7 +211,7 @@ export default function TestScenariosClient() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredScenarios.map((scenario) => (
-            <Card key={scenario.id} className="bg-slate-800/50 backdrop-blur-sm border-slate-700/30 p-6">
+            <Card key={scenario.id} className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(scenario)}
@@ -256,18 +256,18 @@ export default function TestScenariosClient() {
               <div className="space-y-3">
                 <div>
                   <h3 className="font-semibold text-white text-lg">{scenario.name}</h3>
-                  <p className="text-sm text-slate-400 font-mono bg-slate-900/50 px-2 py-1 rounded mt-1">
+                  <p className="text-sm text-slate-300 font-mono bg-slate-900/60 px-2 py-1 rounded mt-1">
                     {scenario.identifier}
                   </p>
                 </div>
 
                 {scenario.description && (
-                  <p className="text-sm text-slate-300 line-clamp-2">
+                  <p className="text-sm text-slate-200 line-clamp-2">
                     {scenario.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between text-sm text-slate-400">
+                <div className="flex items-center justify-between text-sm text-slate-300">
                   <span>{scenario._count.steps} шагов</span>
                   <span>
                     {new Date(scenario.updatedAt).toLocaleDateString('ru-RU')}

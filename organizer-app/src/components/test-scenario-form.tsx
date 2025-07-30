@@ -153,7 +153,7 @@ export default function TestScenarioForm({
           <h1 className="text-3xl font-bold text-white">
             {scenario ? 'Редактировать сценарий' : 'Создать сценарий'}
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-500 mt-1">
             {scenario ? 'Изменить параметры тестового сценария' : 'Добавить новый тестовый сценарий'}
           </p>
         </div>

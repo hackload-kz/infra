@@ -97,6 +97,13 @@ module "telemetry" {
         retention = "30d"
         externalUrl = "https://${var.hub_host}/prometheus"
         routePrefix = "/prometheus"
+        enableRemoteWriteReceiver = true
+        additionalArgs = [
+          {
+            name  = "enable-feature"
+            value = "native-histograms"
+          }
+        ]
         storageSpec = {
           volumeClaimTemplate = {
             spec = {
@@ -149,7 +156,6 @@ module "telemetry" {
     }
   }
 
-
   depends_on = [module.traefik, module.cert_manager]
 }
 
@@ -197,4 +203,11 @@ module "hub" {
   }
 
   depends_on = [module.traefik, module.cert_manager]
+}
+
+module "kafka" {
+  source = "../../modules/kafka"
+
+  namespace     = "kafka"
+  storage_class = var.storage_class
 }

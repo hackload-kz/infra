@@ -78,6 +78,7 @@ model Team {
   hackathon    Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   calendarEvents CalendarEvent[]
   environmentData TeamEnvironmentData[]
+  testRuns     TestRun[]
 
   @@map("teams")
 }
@@ -401,6 +402,7 @@ model TestScenario {
   createdBy   String?            // Participant ID who created this scenario
   
   steps       TestScenarioStep[]
+  testRuns    TestRun[]
   
   @@map("test_scenarios")
 }
@@ -426,4 +428,31 @@ model TestScenarioStep {
 enum TestStepType {
   k6_script
   http_request
+}
+
+model TestRun {
+  id          String       @id @default(cuid())
+  scenarioId  String
+  teamId      String
+  comment     String?
+  status      TestRunStatus @default(PENDING)
+  startedAt   DateTime?
+  completedAt DateTime?
+  results     Json?        // Результаты тестирования
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   String?      // Participant ID who created this run
+  
+  scenario    TestScenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@map("test_runs")
+}
+
+enum TestRunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
 }

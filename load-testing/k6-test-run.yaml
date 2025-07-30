@@ -1,0 +1,205 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-nginx-script
+  # IMPORTANT: This should be in the namespace where the k6 operator is running
+  namespace: k6-runs
+data:
+  test.js: |
+    import http from 'k6/http';
+    import { sleep, check } from 'k6';
+    import { Counter, Gauge, Rate, Trend } from 'k6/metrics';
+
+    // === CUSTOM METRICS DEFINITIONS ===
+    
+    // 1. COUNTERS - Track total occurrences
+    const totalRequests = new Counter('business_requests_total');
+    const searchRequests = new Counter('search_operations_total');
+    const cacheHits = new Counter('cache_hits_total');
+    const databaseQueries = new Counter('database_queries_total');
+    
+    // 2. GAUGES - Track current values
+    const activeConnections = new Gauge('active_connections_current');
+    const queueDepth = new Gauge('processing_queue_depth');
+    const systemLoad = new Gauge('system_load_percentage');
+    
+    // 3. RATES - Track success/failure percentages
+    const searchSuccessRate = new Rate('search_success_rate');
+    const authenticationRate = new Rate('authentication_success_rate');
+    const cacheHitRate = new Rate('cache_hit_rate');
+    
+    // 4. TRENDS - Track distributions and percentiles
+    const searchLatency = new Trend('search_latency_ms');
+    const dbQueryTime = new Trend('database_query_duration_ms');
+    const payloadSize = new Trend('response_payload_bytes');
+
+    export const options = {
+      // Define custom tags that will be applied to all metrics
+      tags: {
+        scnr: 'tickets',
+        tm: 'drim',
+        environment: 'load_test',
+        version: 'v2.1.0'
+      },
+      stages: [
+        // Ramp-up to 50 virtual users over 30 seconds
+        { duration: '30s', target:1000 },
+        // Stay at 50 virtual users for 14 minutes
+        { duration: '9m', target: 1000 },
+        // Ramp-down to 0 virtual users over 30 seconds
+        { duration: '30s', target: 0 },
+      ],
+      
+      // Set performance thresholds using custom metrics
+      thresholds: {
+        'search_success_rate': ['rate>0.99'], // 99% search success
+        'search_latency_ms': ['p(95)<200', 'p(99)<500'], // 95th percentile under 200ms
+        'authentication_success_rate': ['rate>0.95'], // 95% auth success
+        'cache_hit_rate': ['rate>0.80'], // 80% cache hit rate
+        'database_queries_total': ['count<1000'], // Less than 1000 DB queries total
+      },
+    };
+
+    export default function () {
+      // === SIMULATE REALISTIC USER BEHAVIOR ===
+      
+      // 1. Update system gauges (simulated monitoring)
+      activeConnections.add(__VU); // Current virtual user as active connection
+      queueDepth.add(Math.floor(Math.random() * 50)); // Random queue depth 0-49
+      systemLoad.add(Math.random() * 100); // Random CPU load 0-100%
+      
+      // 2. Simulate user authentication
+      const authStart = Date.now();
+      const isAuthenticated = Math.random() > 0.05; // 95% success rate
+      authenticationRate.add(isAuthenticated ? 1 : 0);
+      
+      if (!isAuthenticated) {
+        console.log('Authentication failed for VU', __VU);
+        return; // Skip rest if auth fails
+      }
+      
+      // 3. Main application request with timing
+      const requestStart = Date.now();
+      
+      const response = http.get('http://nginx-service.default.svc.cluster.local', {
+        tags: { 
+          operation: 'main_page',
+          user_type: Math.random() > 0.7 ? 'premium' : 'standard',
+          region: 'us-west'
+        }
+      });
+      
+      const requestDuration = Date.now() - requestStart;
+      
+      // Record basic request metrics
+      totalRequests.add(1);
+      
+      // Check response and record success/failure
+      const requestSuccess = check(response, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 1000ms': (r) => r.timings.duration < 1000,
+      });
+      
+      // 4. Simulate search functionality (70% of users search)
+      if (Math.random() > 0.3) {
+        const searchStart = Date.now();
+        
+        // Simulate cache check
+        const cacheHit = Math.random() > 0.2; // 80% cache hit rate
+        cacheHitRate.add(cacheHit ? 1 : 0);
+        
+        if (cacheHit) {
+          cacheHits.add(1);
+          searchLatency.add(Math.random() * 50 + 10); // Fast cache response 10-60ms
+        } else {
+          // Cache miss - need database query
+          databaseQueries.add(1);
+          const dbStart = Date.now();
+          
+          // Simulate DB query time
+          sleep(Math.random() * 0.1); // 0-100ms DB query
+          const dbDuration = Date.now() - dbStart;
+          dbQueryTime.add(dbDuration);
+          
+          searchLatency.add(dbDuration + Math.random() * 100); // DB + processing time
+        }
+        
+        searchRequests.add(1);
+        
+        // Simulate search success rate (98% success)
+        const searchSuccess = Math.random() > 0.02;
+        searchSuccessRate.add(searchSuccess ? 1 : 0);
+        
+        // Record payload size (simulated)
+        const responseSize = Math.random() * 50000 + 1000; // 1KB to 51KB
+        payloadSize.add(responseSize);
+      }
+      
+      // 5. Simulate different user behaviors with custom tags
+      const userBehavior = Math.random();
+      
+      if (userBehavior > 0.8) {
+        // 20% power users - make additional requests
+        totalRequests.add(2, { user_segment: 'power_user' });
+        searchRequests.add(1, { search_type: 'advanced' });
+      } else if (userBehavior > 0.6) {
+        // 20% mobile users - different performance characteristics
+        totalRequests.add(1, { device: 'mobile' });
+        searchLatency.add(requestDuration * 1.2, { device: 'mobile' }); // 20% slower on mobile
+      }
+      
+      // 6. Business-specific metrics
+      if (Math.random() > 0.9) {
+        // 10% chance of premium feature usage
+        totalRequests.add(1, { feature: 'premium', billing: 'charged' });
+      }
+      
+      sleep(1);
+    }
+
+    // Setup function - runs once before test starts
+    export function setup() {
+      console.log('🚀 Starting load test with custom metrics');
+      console.log('📊 Metrics to watch:');
+      console.log('  - search_success_rate (target: >99%)');
+      console.log('  - search_latency_ms p95 (target: <200ms)');
+      console.log('  - cache_hit_rate (target: >80%)');
+      console.log('  - authentication_success_rate (target: >95%)');
+      
+      return { 
+        startTime: Date.now(),
+        testVersion: 'v2.1.0',
+        environment: 'load_test'
+      };
+    }
+
+    // Teardown function - runs once after test completes
+    export function teardown(data) {
+      const duration = (Date.now() - data.startTime) / 1000;
+      console.log(`✅ Test completed in ${duration}s`);
+      console.log(`📈 Check Prometheus for metrics with labels:`);
+      console.log(`   scnr=tickets, tm=drim, environment=${data.environment}`);
+    }
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-nginx-test
+  # IMPORTANT: This should be in the namespace where the k6 operator is running
+  namespace: k6-runs
+spec:
+  parallelism: 4
+  script:
+    configMap:
+      name: k6-nginx-script
+      file: test.js
+  arguments: --out experimental-prometheus-rw --tag team=drim-dev --tag test_scenario=tickets-search --tag testid=drim-dev-tickets-search-2
+  runner:
+    image: grafana/k6:latest
+    env:
+      - name: K6_PROMETHEUS_RW_SERVER_URL
+        value: "http://prometheus-kube-prometheus-prometheus.telemetry.svc.cluster.local:9090/prometheus/api/v1/write"
+      - name: K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM
+        value: "true"
+      - name: K6_PROMETHEUS_RW_PUSH_INTERVAL
+        value: "5s"
