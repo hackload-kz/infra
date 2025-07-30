@@ -16,6 +16,7 @@ export enum JoinErrorCode {
   EXISTING_REQUEST = 'EXISTING_REQUEST',
   NO_ACTIVE_HACKATHON = 'NO_ACTIVE_HACKATHON',
   WRONG_HACKATHON = 'WRONG_HACKATHON',
+  REGISTRATION_ENDED = 'REGISTRATION_ENDED',
   UNAUTHORIZED = 'UNAUTHORIZED',
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR'
@@ -85,6 +86,13 @@ export const teamJoinErrors: Record<JoinErrorCode, TeamJoinError> = {
     suggestion: 'Найдите команду в рамках текущего хакатона',
     severity: 'error'
   },
+  [JoinErrorCode.REGISTRATION_ENDED]: {
+    code: 'REGISTRATION_ENDED',
+    message: 'Регистрация на хакатон завершена',
+    description: 'Период регистрации участников и формирования команд завершен. Новые команды со статусом "новая" не могут принимать участников',
+    suggestion: 'Обратитесь к организаторам или дождитесь следующего хакатона',
+    severity: 'warning'
+  },
   [JoinErrorCode.UNAUTHORIZED]: {
     code: 'UNAUTHORIZED',
     message: 'Необходима авторизация',
@@ -126,6 +134,8 @@ export function getTeamJoinError(errorMessage: string): TeamJoinError {
     'У вас уже есть заявка на вступление в эту команду': JoinErrorCode.EXISTING_REQUEST,
     'No active hackathon found': JoinErrorCode.NO_ACTIVE_HACKATHON,
     'Команда принадлежит другому хакатону': JoinErrorCode.WRONG_HACKATHON,
+    'Registration has ended': JoinErrorCode.REGISTRATION_ENDED,
+    'Регистрация завершена': JoinErrorCode.REGISTRATION_ENDED,
     'Unauthorized': JoinErrorCode.UNAUTHORIZED,
     'Invalid request data': JoinErrorCode.VALIDATION_ERROR
   }
@@ -141,7 +151,7 @@ export function getTeamJoinError(errorMessage: string): TeamJoinError {
 export function getJoinBlockReason(
   participant: { id?: string; isActive?: boolean; teamId?: string | null } | null,
   team: { id?: string; members?: unknown[]; status?: string; hackathonId?: string } | null,
-  hackathon: { id?: string } | null,
+  hackathon: { id?: string; registrationEnd?: Date } | null,
   existingRequest?: { id?: string; status?: string } | null
 ): TeamJoinError | null {
   if (!participant) {
@@ -178,6 +188,14 @@ export function getJoinBlockReason(
 
   if (team.hackathonId && hackathon.id && team.hackathonId !== hackathon.id) {
     return teamJoinErrors[JoinErrorCode.WRONG_HACKATHON]
+  }
+
+  // Check if registration has ended and team status is NEW
+  if (hackathon.registrationEnd && team.status === 'NEW') {
+    const now = new Date()
+    if (now > hackathon.registrationEnd) {
+      return teamJoinErrors[JoinErrorCode.REGISTRATION_ENDED]
+    }
   }
 
   return null

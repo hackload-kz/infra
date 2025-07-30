@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
+import { getCurrentHackathon } from '@/lib/hackathon'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import Link from 'next/link'
 import { 
@@ -28,7 +29,7 @@ export default async function SpaceTeamsPage() {
   // Check if user is an organizer
   const userIsOrganizer = isOrganizer(session.user.email)
 
-  const [participant, teams] = await Promise.all([
+  const [participant, teams, hackathon] = await Promise.all([
     db.participant.findFirst({
       where: { 
         user: { email: session.user.email } 
@@ -85,7 +86,8 @@ export default async function SpaceTeamsPage() {
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    }),
+    getCurrentHackathon()
   ])
 
   // If no participant found and user is not an organizer, redirect to login
@@ -124,12 +126,24 @@ export default async function SpaceTeamsPage() {
     REJECTED: 'bg-red-500/20 text-red-300 border-red-500/30',
   }
 
+  // Check if registration has ended
+  const registrationEnded = hackathon?.registrationEnd ? new Date() > hackathon.registrationEnd : false
+
   // Filter teams that user can join (not their own team, has space, accepting members)
-  const joinableTeams = teams.filter(team => 
-    team.id !== participant?.teamId && 
-    team.members.length < 4 &&
-    ['NEW', 'INCOMPLETED'].includes(team.status)
-  )
+  const joinableTeams = teams.filter(team => {
+    // Basic checks
+    if (team.id === participant?.teamId || team.members.length >= 4) {
+      return false
+    }
+    
+    // If registration ended, exclude NEW teams but allow INCOMPLETED teams
+    if (registrationEnded && team.status === 'NEW') {
+      return false
+    }
+    
+    // Allow teams with acceptable status
+    return ['NEW', 'INCOMPLETED'].includes(team.status)
+  })
 
   // Get pending join requests for this participant
   const pendingRequests = participant?.joinRequests || []

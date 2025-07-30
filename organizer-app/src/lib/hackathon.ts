@@ -50,6 +50,18 @@ export async function isParticipantRegistered(
   return !!participation?.isActive
 }
 
+// Check if hackathon registration has ended
+export function isRegistrationEnded(hackathon: Hackathon): boolean {
+  const now = new Date()
+  return now > hackathon.registrationEnd
+}
+
+// Check if hackathon registration is active (between start and end)
+export function isRegistrationActive(hackathon: Hackathon): boolean {
+  const now = new Date()
+  return now >= hackathon.registrationStart && now <= hackathon.registrationEnd
+}
+
 // Register participant for hackathon
 export async function registerParticipantForHackathon(
   participantId: string,

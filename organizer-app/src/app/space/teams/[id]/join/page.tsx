@@ -5,6 +5,7 @@ import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { JoinRequestForm } from '@/components/join-request-form'
 import { TeamJoinErrorBanner } from '@/components/team-join-error'
 import { getJoinBlockReason } from '@/lib/team-join-errors'
+import { getCurrentHackathon } from '@/lib/hackathon'
 import Link from 'next/link'
 import { 
   ArrowLeft,
@@ -72,9 +73,7 @@ export default async function JoinTeamPage({ params }: Props) {
         }
       }
     }),
-    db.hackathon.findFirst({
-      where: { slug: 'hackload-2025' }
-    })
+    getCurrentHackathon()
   ])
 
   if (!participant) {

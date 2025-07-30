@@ -124,6 +124,34 @@ describe('Team Join Error Handling', () => {
       expect(reason?.code).toBe(JoinErrorCode.WRONG_HACKATHON)
     })
 
+    it('should detect registration ended for NEW teams', () => {
+      const participant = createMockParticipant({ teamId: null })
+      const team = createMockTeam({
+        members: [createMockParticipant()],
+        status: 'NEW',
+      })
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1) // Yesterday
+      const hackathon = createMockHackathon({ registrationEnd: pastDate })
+
+      const reason = getJoinBlockReason(participant, team, hackathon)
+      expect(reason?.code).toBe(JoinErrorCode.REGISTRATION_ENDED)
+    })
+
+    it('should allow joining INCOMPLETED teams even after registration ends', () => {
+      const participant = createMockParticipant({ teamId: null })
+      const team = createMockTeam({
+        members: [createMockParticipant()],
+        status: 'INCOMPLETED',
+      })
+      const pastDate = new Date()
+      pastDate.setDate(pastDate.getDate() - 1) // Yesterday
+      const hackathon = createMockHackathon({ registrationEnd: pastDate })
+
+      const reason = getJoinBlockReason(participant, team, hackathon)
+      expect(reason).toBeNull() // Should be allowed
+    })
+
     it('should check conditions in correct priority order', () => {
       // Multiple issues - should return the first one encountered
       const participant = createMockParticipant({ teamId: null, isActive: false })
@@ -163,6 +191,7 @@ describe('Team Join Error Handling', () => {
       expect(teamJoinErrors[JoinErrorCode.TEAM_FULL].severity).toBe('warning')
       expect(teamJoinErrors[JoinErrorCode.TEAM_NOT_ACCEPTING].severity).toBe('warning')
       expect(teamJoinErrors[JoinErrorCode.EXISTING_REQUEST].severity).toBe('info')
+      expect(teamJoinErrors[JoinErrorCode.REGISTRATION_ENDED].severity).toBe('warning')
       expect(teamJoinErrors[JoinErrorCode.UNAUTHORIZED].severity).toBe('error')
     })
 

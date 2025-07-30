@@ -10,7 +10,7 @@ type TeamMember = {
 }
 import { revalidatePath } from 'next/cache'
 import { TeamStatus, BannerType } from '@prisma/client'
-import { getCurrentHackathon } from '@/lib/hackathon'
+import { getCurrentHackathon, isRegistrationEnded } from '@/lib/hackathon'
 import { messageService } from '@/lib/messages'
 import { generateJoinRequestNotificationMessage } from '@/lib/message-templates'
 import { dismissBanner } from '@/lib/banners'
@@ -37,6 +37,11 @@ export async function createTeam(formData: FormData) {
         const hackathon = await getCurrentHackathon()
         if (!hackathon) {
             throw new Error('No active hackathon found')
+        }
+
+        // Check if registration has ended
+        if (isRegistrationEnded(hackathon)) {
+            throw new Error('Team registration has ended for this hackathon')
         }
 
         await db.team.create({
@@ -211,6 +216,11 @@ export async function createAndJoinTeam(participantId: string, teamName: string,
         const hackathon = await getCurrentHackathon()
         if (!hackathon) {
             throw new Error('No active hackathon found')
+        }
+
+        // Check if registration has ended
+        if (isRegistrationEnded(hackathon)) {
+            throw new Error('Регистрация команд для этого хакатона завершена')
         }
 
         // Use a more focused transaction with timeout configuration

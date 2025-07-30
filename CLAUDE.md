@@ -204,6 +204,31 @@ The application receives configuration through Kubernetes environment variables 
 
 This suggests recent changes to infrastructure configuration that may need to be applied.
 
+## Critical Development Patterns
+
+### Monorepo Structure
+This is a **monorepo** with two main components. Always work in the correct directory:
+- **Application development**: `cd organizer-app` 
+- **Infrastructure changes**: `cd terraform/src/environments/production`
+
+### OAuth-Only Authentication
+- **No password authentication** - only Google/GitHub OAuth supported
+- **Admin control**: Set via `ADMIN_USERS` environment variable (comma-separated emails)
+- **Local development**: OAuth must be configured with `localhost:3000` callbacks
+
+### Multi-Hackathon Architecture
+- **Current state**: Single active hackathon in production
+- **Database design**: All entities are hackathon-scoped for future multi-tenancy
+- **Team membership**: Participants can only join teams within their hackathon
+
+### Production Deployment Flow
+1. **Code push** to main triggers GitHub Actions
+2. **Quality checks** run first (ESLint, TypeScript)
+3. **Docker build** with multi-stage optimization  
+4. **Registry push** to ghcr.io with commit SHA tags
+5. **Kubernetes deploy** updates running containers
+6. **Health verification** ensures successful deployment
+
 ## GitHub Actions Secrets Required
 
 For the kubectl deployment to work, ensure these secrets are configured in your GitHub repository:
@@ -217,3 +242,20 @@ To set up the kubeconfig secret:
 cat ~/.kube/config | base64 -w 0
 # Copy the output and add it as KUBE_CONFIG secret in GitHub repository settings
 ```
+
+## Key Development Constraints
+
+### Database Changes
+- **All schema changes** must go through Prisma migrations
+- **Never run direct SQL** against production database
+- **Always test migrations** with `npx prisma db push` locally first
+
+### Infrastructure Changes  
+- **Hub deployment ignores** image and replica changes (managed by GitHub Actions)
+- **Use Terraform** for all infrastructure changes, not manual kubectl commands
+- **Test in staging** before applying to production environment
+
+### Testing Requirements
+- **Database mocks required** in each test file (no global mocks)
+- **Always include auth mocks** when testing API routes
+- **User lookup pattern**: Mock `db.user.findUnique` for API route tests

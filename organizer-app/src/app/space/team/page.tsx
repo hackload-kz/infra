@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
+import { getCurrentHackathon } from '@/lib/hackathon'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { SpaceTeamManagement } from '@/components/space-team-management'
 import { JoinRequestsManagement } from '@/components/join-requests-management'
@@ -37,7 +38,7 @@ export default async function ProfileTeamPage() {
   // Check if user is an organizer
   const userIsOrganizer = isOrganizer(session.user.email)
 
-  const [participant, availableTeams] = await Promise.all([
+  const [participant, availableTeams, hackathon] = await Promise.all([
     db.participant.findFirst({
       where: { 
         user: { email: session.user.email } 
@@ -122,7 +123,8 @@ export default async function ProfileTeamPage() {
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    }),
+    getCurrentHackathon()
   ])
 
   // If no participant found and user is not an organizer, redirect to login
@@ -448,6 +450,7 @@ export default async function ProfileTeamPage() {
         <SpaceTeamManagement 
           participant={participant}
           availableTeams={availableTeams}
+          hackathon={hackathon}
         />
         </div>
       )}
