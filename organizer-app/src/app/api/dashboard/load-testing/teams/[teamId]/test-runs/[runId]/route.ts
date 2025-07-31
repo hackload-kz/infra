@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { logger, LogAction } from '@/lib/logger'
-import { TestRunStatus } from '@prisma/client'
+import { TestRunStatus, type Prisma } from '@prisma/client'
 
 // GET /api/dashboard/load-testing/teams/[teamId]/test-runs/[runId] - Получить запуск теста
 export async function GET(
@@ -100,7 +100,7 @@ export async function PUT(
       status?: TestRunStatus
       startedAt?: Date
       completedAt?: Date
-      results?: Record<string, any>
+      results?: Prisma.InputJsonValue
       comment?: string
     } = {}
     if (status !== undefined) {
@@ -108,7 +108,7 @@ export async function PUT(
       if (status === TestRunStatus.RUNNING && !existingRun.startedAt) {
         updateData.startedAt = new Date()
       }
-      if ([TestRunStatus.COMPLETED, TestRunStatus.FAILED, TestRunStatus.CANCELLED].includes(status as TestRunStatus) && !existingRun.completedAt) {
+      if ((status === TestRunStatus.COMPLETED || status === TestRunStatus.FAILED || status === TestRunStatus.CANCELLED) && !existingRun.completedAt) {
         updateData.completedAt = new Date()
       }
     }

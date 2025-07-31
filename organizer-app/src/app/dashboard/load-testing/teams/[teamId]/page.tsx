@@ -42,7 +42,7 @@ interface TestRun {
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   startedAt: string | null
   completedAt: string | null
-  results: Record<string, any> | null
+  results: Record<string, unknown> | null
   createdAt: string
   updatedAt: string
   scenario: TestScenario
