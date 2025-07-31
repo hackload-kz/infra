@@ -3,14 +3,12 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { 
   ArrowLeft, 
   Save, 
   X, 
-  Play,
   AlertCircle
 } from 'lucide-react'
 
@@ -27,9 +25,28 @@ interface TestScenario {
   }
 }
 
+interface Team {
+  id: string
+  name: string
+  nickname: string
+}
+
+interface TestRun {
+  id: string
+  comment: string | null
+  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  startedAt: string | null
+  completedAt: string | null
+  results: Record<string, any> | null
+  createdAt: string
+  updatedAt: string
+  scenario: TestScenario
+  team: Team
+}
+
 interface TestRunFormProps {
   teamId: string
-  onSuccess: (testRun: any) => void
+  onSuccess: (testRun: TestRun) => void
   onCancel: () => void
 }
 
@@ -149,7 +166,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
                 </div>
               ) : scenarios.length === 0 ? (
                 <div className="mt-1 p-3 bg-slate-700/50 border border-slate-600 rounded-md text-slate-400">
-                  Нет доступных сценариев. Создайте сценарий в разделе "Сценарии тестирования".
+                  Нет доступных сценариев. Создайте сценарий в разделе &quot;Сценарии тестирования&quot;.
                 </div>
               ) : (
                 <select
@@ -232,7 +249,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
                 <div>
                   <h4 className="text-sm font-medium text-amber-100 mb-1">Информация о выполнении</h4>
                   <ul className="text-sm text-amber-200/80 space-y-1">
-                    <li>• Тест будет создан в статусе "PENDING" (ожидание)</li>
+                    <li>• Тест будет создан в статусе &quot;PENDING&quot; (ожидание)</li>
                     <li>• Запуск можно будет начать вручную из списка тестов</li>
                     <li>• Время создания будет зафиксировано автоматически</li>
                     <li>• Статус теста можно изменить в любое время</li>

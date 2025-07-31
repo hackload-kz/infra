@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -42,7 +42,7 @@ interface TestRun {
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   startedAt: string | null
   completedAt: string | null
-  results: any | null
+  results: Record<string, any> | null
   createdAt: string
   updatedAt: string
   scenario: TestScenario
@@ -91,24 +91,7 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
     }
   }, [checkingAdmin, session, isAdmin, router])
 
-  useEffect(() => {
-    if (isAdmin && params.teamId) {
-      fetchTestRuns()
-    }
-  }, [isAdmin, params.teamId])
-
-  useEffect(() => {
-    if (data) {
-      const filtered = data.testRuns.filter(run =>
-        run.scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        run.scenario.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (run.comment && run.comment.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-      setFilteredRuns(filtered)
-    }
-  }, [data, searchTerm])
-
-  const fetchTestRuns = async () => {
+  const fetchTestRuns = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs`)
@@ -123,7 +106,24 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.teamId, router])
+
+  useEffect(() => {
+    if (isAdmin && params.teamId) {
+      fetchTestRuns()
+    }
+  }, [isAdmin, params.teamId, fetchTestRuns])
+
+  useEffect(() => {
+    if (data) {
+      const filtered = data.testRuns.filter(run =>
+        run.scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        run.scenario.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (run.comment && run.comment.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+      setFilteredRuns(filtered)
+    }
+  }, [data, searchTerm])
 
   const handleCreateRun = () => {
     setShowForm(true)

@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { logger, LogAction } from '@/lib/logger'
+import { TestRunStatus } from '@prisma/client'
 
 // GET /api/dashboard/load-testing/teams/[teamId]/test-runs/[runId] - Получить запуск теста
 export async function GET(
@@ -95,13 +96,19 @@ export async function PUT(
     }
 
     // Подготовить данные для обновления
-    const updateData: any = {}
+    const updateData: {
+      status?: TestRunStatus
+      startedAt?: Date
+      completedAt?: Date
+      results?: Record<string, any>
+      comment?: string
+    } = {}
     if (status !== undefined) {
       updateData.status = status
-      if (status === 'RUNNING' && !existingRun.startedAt) {
+      if (status === TestRunStatus.RUNNING && !existingRun.startedAt) {
         updateData.startedAt = new Date()
       }
-      if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(status) && !existingRun.completedAt) {
+      if ([TestRunStatus.COMPLETED, TestRunStatus.FAILED, TestRunStatus.CANCELLED].includes(status as TestRunStatus) && !existingRun.completedAt) {
         updateData.completedAt = new Date()
       }
     }
@@ -147,7 +154,7 @@ export async function PUT(
 
 // DELETE /api/dashboard/load-testing/teams/[teamId]/test-runs/[runId] - Удалить запуск теста
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ teamId: string; runId: string }> }
 ) {
   try {
