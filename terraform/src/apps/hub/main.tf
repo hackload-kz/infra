@@ -106,7 +106,11 @@ module "telemetry" {
         enableRemoteWriteReceiver = true
         # Enable ServiceMonitor discovery across all namespaces
         serviceMonitorNamespaceSelector = {}
-        serviceMonitorSelector = {}
+        serviceMonitorSelector = {
+          matchLabels = {
+            release = "prometheus"
+          }
+        }
         podMonitorNamespaceSelector = {}
         podMonitorSelector = {}
         additionalArgs = [

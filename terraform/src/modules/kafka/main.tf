@@ -381,6 +381,7 @@ resource "kubernetes_manifest" "kafka_servicemonitor" {
       namespace = kubernetes_namespace.kafka.metadata[0].name
       labels = {
         app = "kafka-jmx-exporter"
+        release = "prometheus"
       }
     }
     spec = {

@@ -226,6 +226,7 @@ resource "kubernetes_manifest" "postgres_servicemonitor" {
       namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
       labels = {
         app = "postgres-exporter"
+        release = "prometheus"
       }
     }
     spec = {
