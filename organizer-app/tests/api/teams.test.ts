@@ -61,6 +61,8 @@ describe('/api/teams', () => {
         name: true,
         nickname: true,
         hackathonId: true,
+        status: true,
+        level: true,
         members: {
           select: {
             id: true,
@@ -92,6 +94,8 @@ describe('/api/teams', () => {
         name: true,
         nickname: true,
         hackathonId: true,
+        status: true,
+        level: true,
         members: {
           select: {
             id: true,

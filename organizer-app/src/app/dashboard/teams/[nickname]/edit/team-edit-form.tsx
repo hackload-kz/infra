@@ -48,7 +48,7 @@ const statusLabels: Record<TeamStatus, string> = {
     NEW: 'Новая',
     INCOMPLETED: 'Не завершена',
     FINISHED: 'Завершена',
-    IN_REVIEW: 'На рассмотрении',
+    IN_REVIEW: 'На проверке',
     APPROVED: 'Одобрена',
     CANCELED: 'Отменена',
     REJECTED: 'Отклонена',
@@ -186,8 +186,8 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Название команды
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                Название команды <span className="text-red-500">*</span>
                             </label>
                             <Input
                                 type="text"
@@ -197,8 +197,8 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Никнейм (для URL)
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                Никнейм (для URL) <span className="text-red-500">*</span>
                             </label>
                             <Input
                                 type="text"
@@ -210,13 +210,13 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
                                 Статус <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={formData.status}
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value as TeamStatus })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             >
                                 {Object.entries(statusLabels).map(([value, label]) => (
@@ -227,36 +227,36 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Уровень команды
-                            </label>
-                            <select
-                                value={formData.level}
-                                onChange={(e) => setFormData({ ...formData, level: e.target.value as TeamLevel })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">Не выбран</option>
-                                {Object.entries(levelLabels).map(([value, label]) => (
-                                    <option key={value} value={value}>
-                                        {label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
                                 Лидер команды <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={formData.leaderId}
                                 onChange={(e) => setFormData({ ...formData, leaderId: e.target.value })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             >
                                 <option value="">Выберите лидера команды</option>
                                 {availableParticipants.map((participant) => (
                                     <option key={participant.id} value={participant.id}>
                                         {participant.name} ({participant.email})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                Уровень команды
+                            </label>
+                            <select
+                                value={formData.level}
+                                onChange={(e) => setFormData({ ...formData, level: e.target.value as TeamLevel })}
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Не выбран</option>
+                                {Object.entries(levelLabels).map(([value, label]) => (
+                                    <option key={value} value={value}>
+                                        {label}
                                     </option>
                                 ))}
                             </select>
@@ -268,7 +268,7 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Технологии команды</h3>
                         <div className="grid gap-6 md:grid-cols-2">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
                                     Принимаемые языки программирования
                                 </label>
                                 <div className="grid grid-cols-2 gap-2">
@@ -292,13 +292,13 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                                                 }}
                                                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="text-gray-700">{lang}</span>
+                                            <span className="text-gray-900">{lang}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-gray-900 mb-2">
                                     Технический стек
                                 </label>
                                 <div className="grid grid-cols-2 gap-2">
@@ -322,35 +322,35 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                                                 }}
                                                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
-                                            <span className="text-gray-700">{tech}</span>
+                                            <span className="text-gray-900">{tech}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
                         </div>
                         <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-900 mb-2">
                                 Описание команды
                             </label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 rows={3}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Расскажите о целях команды, опыте участников..."
                             />
                         </div>
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-900 mb-2">
                             Комментарий (только для админов)
                         </label>
                         <textarea
                             value={formData.comment}
                             onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
                             rows={4}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Комментарий для внутреннего использования..."
                         />
                     </div>
@@ -377,8 +377,8 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             {team.members.map((member) => (
                                 <div key={member.id} className="flex items-center justify-between p-3 border border-gray-200 rounded">
                                     <div>
-                                        <p className="font-medium">{member.name}</p>
-                                        <p className="text-sm text-gray-700">{member.email}</p>
+                                        <p className="font-medium text-gray-900">{member.name}</p>
+                                        <p className="text-sm text-gray-600">{member.email}</p>
                                         {member.id === team.leaderId && (
                                             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Лидер</span>
                                         )}
@@ -395,7 +395,7 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-700">В команде пока нет участников</p>
+                        <p className="text-gray-600">В команде пока нет участников</p>
                     )}
                 </div>
 
@@ -408,10 +408,10 @@ export default function TeamEditForm({ team, allParticipants }: TeamEditFormProp
                             .map((participant) => (
                                 <div key={participant.id} className="flex items-center justify-between p-3 border border-gray-200 rounded">
                                     <div>
-                                        <p className="font-medium">{participant.name}</p>
-                                        <p className="text-sm text-gray-700">{participant.email}</p>
+                                        <p className="font-medium text-gray-900">{participant.name}</p>
+                                        <p className="text-sm text-gray-600">{participant.email}</p>
                                         {participant.company && (
-                                            <p className="text-xs text-gray-600">{participant.company}</p>
+                                            <p className="text-xs text-gray-500">{participant.company}</p>
                                         )}
                                     </div>
                                     <Button

@@ -18,12 +18,14 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
   const [messages, setMessages] = useState<MessageWithRelations[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<MessageWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availableTeamStatuses, setAvailableTeamStatuses] = useState<string[]>([]);
   const [showCompose, setShowCompose] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<MessageWithRelations | null>(null);
   const [showConversation, setShowConversation] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'read' | 'unread'>('all');
   const [filterRecipient, setFilterRecipient] = useState<'all' | 'individual' | 'team'>('all');
+  const [filterTeamStatus, setFilterTeamStatus] = useState<string>('all');
 
   useEffect(() => {
     fetchMessages();
@@ -31,7 +33,7 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
 
   useEffect(() => {
     filterMessages();
-  }, [messages, searchTerm, filterStatus, filterRecipient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [messages, searchTerm, filterStatus, filterRecipient, filterTeamStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchMessages = async () => {
     try {
@@ -40,6 +42,15 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
       if (response.ok) {
         const data = await response.json();
         setMessages(data.messages);
+        
+        // Extract available team statuses from messages
+        const statuses = new Set<string>();
+        data.messages.forEach((message: MessageWithRelations) => {
+          if (message.team?.status) {
+            statuses.add(message.team.status);
+          }
+        });
+        setAvailableTeamStatuses(Array.from(statuses).sort());
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -77,6 +88,15 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
         if (filterRecipient === 'individual') return !message.teamId;
         if (filterRecipient === 'team') return !!message.teamId;
         return true;
+      });
+    }
+
+    // Team status filter (only apply when filtering by teams)
+    if (filterRecipient === 'team' && filterTeamStatus !== 'all') {
+      filtered = filtered.filter(message => {
+        if (!message.teamId) return false;
+        // Check if the message's team has the selected status
+        return message.team?.status === filterTeamStatus;
       });
     }
 
@@ -170,7 +190,14 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
             <Users className="h-4 w-4 text-gray-400" />
             <select
               value={filterRecipient}
-              onChange={(e) => setFilterRecipient(e.target.value as 'all' | 'individual' | 'team')}
+              onChange={(e) => {
+                const newValue = e.target.value as 'all' | 'individual' | 'team';
+                setFilterRecipient(newValue);
+                // Reset team status filter when changing recipient type
+                if (newValue !== 'team') {
+                  setFilterTeamStatus('all');
+                }
+              }}
               className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white"
             >
               <option value="all">Все получатели</option>
@@ -178,6 +205,23 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
               <option value="team">Команды</option>
             </select>
           </div>
+
+          {/* Team Status Filter - only show when filtering by teams */}
+          {filterRecipient === 'team' && availableTeamStatuses.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-400" />
+              <select
+                value={filterTeamStatus}
+                onChange={(e) => setFilterTeamStatus(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white"
+              >
+                <option value="all">Все статусы</option>
+                {availableTeamStatuses.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -185,6 +229,9 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
           <span>Всего сообщений: {filteredMessages.length}</span>
           <span>Непрочитанных: {filteredMessages.filter(m => m.status === MessageStatus.UNREAD).length}</span>
           <span>Командных: {filteredMessages.filter(m => m.teamId).length}</span>
+          {filterRecipient === 'team' && filterTeamStatus !== 'all' && (
+            <span>Статус &quot;{filterTeamStatus}&quot;: {filteredMessages.filter(m => m.team?.status === filterTeamStatus).length}</span>
+          )}
         </div>
       </div>
 

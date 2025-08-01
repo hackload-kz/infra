@@ -54,6 +54,17 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
   const [loading, setLoading] = useState(false);
   const [recipientCount, setRecipientCount] = useState(0);
 
+  // Status translations for team statuses
+  const statusTranslations: Record<string, string> = {
+    'NEW': 'Новая',
+    'INCOMPLETED': 'Не завершена',
+    'FINISHED': 'Завершена',
+    'IN_REVIEW': 'На проверке',
+    'APPROVED': 'Одобрена',
+    'CANCELED': 'Отменена',
+    'REJECTED': 'Отклонена'
+  };
+
   // Options for searchable selects
   const participantOptions = participants.map(p => ({
     value: p.id,
@@ -64,14 +75,17 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
   const teamOptions = teams.map(t => ({
     value: t.id,
     label: t.name,
-    sublabel: `${t.members?.length || 0} участников • ${t.status || 'Статус не указан'}`
+    sublabel: `${t.members?.length || 0} участников • ${t.status ? statusTranslations[t.status] || t.status : 'Статус не указан'}`
   }));
 
-  // Team status options
+  // Team status options with Russian translations
   const teamStatuses = Array.from(new Set(teams.map(t => t.status).filter(Boolean)));
   const teamStatusOptions = [
     { value: 'all', label: 'Все команды' },
-    ...teamStatuses.map(status => ({ value: status, label: status }))
+    ...teamStatuses.map(status => ({ 
+      value: status, 
+      label: statusTranslations[status] || status 
+    }))
   ];
 
   useEffect(() => {
@@ -317,7 +331,7 @@ export function MessageCompose({ hackathonId, onSuccess, onCancel, prefilledReci
                   <span className="font-semibold">Рассылка по командам</span>
                 </div>
                 <p className="text-amber-700 mt-1">
-                  Сообщение будет отправлено участникам {teamStatusFilter === 'all' ? 'всех команд' : `команд со статусом "${teamStatusFilter}"`}.
+                  Сообщение будет отправлено участникам {teamStatusFilter === 'all' ? 'всех команд' : `команд со статусом "${statusTranslations[teamStatusFilter] || teamStatusFilter}"`}.
                   Всего получателей: {recipientCount}
                 </p>
               </div>

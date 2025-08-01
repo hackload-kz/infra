@@ -29,7 +29,7 @@ const statusLabels: Record<TeamStatus, string> = {
     NEW: 'Новая',
     INCOMPLETED: 'Не завершена',
     FINISHED: 'Завершена',
-    IN_REVIEW: 'На рассмотрении',
+    IN_REVIEW: 'На проверке',
     APPROVED: 'Одобрена',
     CANCELED: 'Отменена',
     REJECTED: 'Отклонена',

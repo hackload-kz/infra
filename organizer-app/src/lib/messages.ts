@@ -40,6 +40,7 @@ export interface MessageWithRelations {
   team: {
     id: string;
     name: string;
+    status: string;
   } | null;
   replies: {
     id: string;
@@ -66,6 +67,7 @@ export interface MessageWithRelations {
     team: {
       id: string;
       name: string;
+      status: string;
     } | null;
   }[];
   parentMessage: {
@@ -158,7 +160,8 @@ class MessageService {
           team: {
             select: {
               id: true,
-              name: true
+              name: true,
+              status: true
             }
           },
           replies: {
@@ -180,10 +183,10 @@ class MessageService {
               team: {
                 select: {
                   id: true,
-                  name: true
+                  name: true,
+                  status: true
                 }
               },
-              replies: true,
               parentMessage: {
                 select: {
                   id: true,
@@ -261,7 +264,8 @@ class MessageService {
         team: {
           select: {
             id: true,
-            name: true
+            name: true,
+            status: true
           }
         },
         replies: {
@@ -283,7 +287,8 @@ class MessageService {
             team: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                status: true
               }
             }
           }
@@ -324,7 +329,8 @@ class MessageService {
         team: {
           select: {
             id: true,
-            name: true
+            name: true,
+            status: true
           }
         },
         replies: {
@@ -346,7 +352,8 @@ class MessageService {
             team: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                status: true
               }
             }
           }
@@ -385,7 +392,8 @@ class MessageService {
         team: {
           select: {
             id: true,
-            name: true
+            name: true,
+            status: true
           }
         },
         replies: {
@@ -407,7 +415,8 @@ class MessageService {
             team: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                status: true
               }
             }
           }
@@ -573,7 +582,8 @@ class MessageService {
           team: {
             select: {
               id: true,
-              name: true
+              name: true,
+              status: true
             }
           },
           replies: {
@@ -595,7 +605,8 @@ class MessageService {
               team: {
                 select: {
                   id: true,
-                  name: true
+                  name: true,
+                  status: true
                 }
               }
             }
@@ -661,7 +672,7 @@ class MessageService {
       include: {
         sender: { select: { id: true, name: true, email: true } },
         recipient: { select: { id: true, name: true, email: true } },
-        team: { select: { id: true, name: true } },
+        team: { select: { id: true, name: true, status: true } },
         parentMessage: { select: { id: true, subject: true } }
       }
     });
@@ -680,7 +691,7 @@ class MessageService {
         include: {
           sender: { select: { id: true, name: true, email: true } },
           recipient: { select: { id: true, name: true, email: true } },
-          team: { select: { id: true, name: true } },
+          team: { select: { id: true, name: true, status: true } },
           parentMessage: { select: { id: true, subject: true } }
         }
       });
@@ -701,12 +712,12 @@ class MessageService {
       include: {
         sender: { select: { id: true, name: true, email: true } },
         recipient: { select: { id: true, name: true, email: true } },
-        team: { select: { id: true, name: true } },
+        team: { select: { id: true, name: true, status: true } },
         replies: {
           include: {
             sender: { select: { id: true, name: true, email: true } },
             recipient: { select: { id: true, name: true, email: true } },
-            team: { select: { id: true, name: true } }
+            team: { select: { id: true, name: true, status: true } }
           }
         },
         parentMessage: { select: { id: true, subject: true } }
