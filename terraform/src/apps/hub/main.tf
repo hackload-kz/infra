@@ -22,6 +22,7 @@ module "cnpg_cluster" {
   expose_external    = var.cnpg_expose_external
   external_host      = var.cnpg_external_host
   external_port      = var.cnpg_external_port
+  enable_metrics     = var.enable_metrics
 }
 
 module "cert_manager" {
@@ -103,6 +104,11 @@ module "telemetry" {
         externalUrl = "https://${var.hub_host}/prometheus"
         routePrefix = "/prometheus"
         enableRemoteWriteReceiver = true
+        # Enable ServiceMonitor discovery across all namespaces
+        serviceMonitorNamespaceSelector = {}
+        serviceMonitorSelector = {}
+        podMonitorNamespaceSelector = {}
+        podMonitorSelector = {}
         additionalArgs = [
           {
             name  = "enable-feature"
@@ -213,8 +219,9 @@ module "hub" {
 module "kafka" {
   source = "../../modules/kafka"
 
-  namespace     = "kafka"
-  storage_class = var.storage_class
+  namespace      = "kafka"
+  storage_class  = var.storage_class
+  enable_metrics = var.enable_metrics
 }
 
 module "service_provider" {

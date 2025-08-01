@@ -50,3 +50,9 @@ variable "external_port" {
   description = "External port for PostgreSQL access"
   type        = number
 }
+
+variable "enable_metrics" {
+  description = "Enable PostgreSQL metrics collection"
+  type        = bool
+  default     = false
+}

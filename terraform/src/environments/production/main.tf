@@ -32,5 +32,8 @@ module "hub" {
   telemetry_prometheus_storage_size    = "200Gi"
   telemetry_alertmanager_storage_size  = "5Gi"
   telemetry_grafana_storage_size       = "20Gi"
+  
+  # Enable metrics collection
+  enable_metrics                       = true
 
 }

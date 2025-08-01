@@ -112,3 +112,137 @@ resource "kubernetes_manifest" "postgres-ingressroute-tcp" {
   
   depends_on = [kubernetes_service.postgres-external]
 }
+
+# PostgreSQL Exporter for metrics collection
+resource "kubernetes_deployment" "postgres_exporter" {
+  count = var.enable_metrics ? 1 : 0
+  
+  metadata {
+    name      = "postgres-exporter"
+    namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
+    labels = {
+      app = "postgres-exporter"
+    }
+  }
+  
+  spec {
+    replicas = 1
+    
+    selector {
+      match_labels = {
+        app = "postgres-exporter"
+      }
+    }
+    
+    template {
+      metadata {
+        labels = {
+          app = "postgres-exporter"
+        }
+      }
+      
+      spec {
+        container {
+          name  = "postgres-exporter"
+          image = "prometheuscommunity/postgres-exporter:v0.15.0"
+          
+          port {
+            name           = "metrics"
+            container_port = 9187
+          }
+          
+          env {
+            name  = "DATA_SOURCE_NAME"
+            value = "postgresql://${var.username}:${random_string.password.result}@postgres-cluster-rw.${kubernetes_namespace.cnpg-cluster.metadata[0].name}.svc.cluster.local:5432/app?sslmode=disable"
+          }
+          
+          env {
+            name  = "PG_EXPORTER_WEB_LISTEN_ADDRESS"
+            value = ":9187"
+          }
+          
+          env {
+            name  = "PG_EXPORTER_EXTEND_QUERY_PATH"
+            value = ""
+          }
+          
+          resources {
+            requests = {
+              cpu    = "100m"
+              memory = "128Mi"
+            }
+            limits = {
+              cpu    = "200m"
+              memory = "256Mi"
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  depends_on = [kubernetes_manifest.cnpg-cluster]
+}
+
+# PostgreSQL Exporter Service
+resource "kubernetes_service" "postgres_exporter" {
+  count = var.enable_metrics ? 1 : 0
+  
+  metadata {
+    name      = "postgres-exporter"
+    namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
+    labels = {
+      app = "postgres-exporter"
+    }
+  }
+  
+  spec {
+    selector = {
+      app = "postgres-exporter"
+    }
+    
+    port {
+      name        = "metrics"
+      port        = 9187
+      target_port = 9187
+      protocol    = "TCP"
+    }
+    
+    type = "ClusterIP"
+  }
+  
+  depends_on = [kubernetes_deployment.postgres_exporter]
+}
+
+# ServiceMonitor for PostgreSQL metrics
+resource "kubernetes_manifest" "postgres_servicemonitor" {
+  count = var.enable_metrics ? 1 : 0
+  
+  manifest = {
+    apiVersion = "monitoring.coreos.com/v1"
+    kind       = "ServiceMonitor"
+    metadata = {
+      name      = "postgres-exporter"
+      namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
+      labels = {
+        app = "postgres-exporter"
+      }
+    }
+    spec = {
+      selector = {
+        matchLabels = {
+          app = "postgres-exporter"
+        }
+      }
+      endpoints = [
+        {
+          port = "metrics"
+          path = "/metrics"
+          interval = "30s"
+        }
+      ]
+    }
+  }
+  
+  depends_on = [kubernetes_service.postgres_exporter]
+}

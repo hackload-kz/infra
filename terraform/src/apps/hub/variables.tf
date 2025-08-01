@@ -35,6 +35,12 @@ variable "cnpg_external_port" {
   type        = number
 }
 
+variable "enable_metrics" {
+  description = "Enable metrics collection for PostgreSQL and Kafka"
+  type        = bool
+  default     = false
+}
+
 variable "traefik_service_type" {
   description = "Service type for Traefik (LoadBalancer, NodePort, ClusterIP)"
   type        = string

@@ -20,3 +20,9 @@ variable "storage_size" {
   type        = string
   default     = "10Gi"
 }
+
+variable "enable_metrics" {
+  description = "Enable Kafka JMX metrics collection"
+  type        = bool
+  default     = false
+}
