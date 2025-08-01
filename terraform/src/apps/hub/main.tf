@@ -19,6 +19,9 @@ module "cnpg_cluster" {
   backup_destination = var.cnpg_backup_destination
   username           = "hackload"
   backup_retention   = var.cnpg_backup_retention
+  expose_external    = var.cnpg_expose_external
+  external_host      = var.cnpg_external_host
+  external_port      = var.cnpg_external_port
 }
 
 module "cert_manager" {
@@ -37,6 +40,8 @@ module "traefik" {
   dashboard_host          = var.traefik_dashboard_host
   dashboard_tls_enabled   = var.traefik_dashboard_tls_enabled
   dashboard_cert_resolver = module.cert_manager.cluster_issuer_name
+  expose_postgres         = var.cnpg_expose_external
+  postgres_port           = var.cnpg_external_port
 
   persistence = {
     enabled      = true

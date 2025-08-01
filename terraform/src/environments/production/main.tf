@@ -6,6 +6,9 @@ module "hub" {
   cnpg_storage_size       = "10Gi"
   cnpg_backup_destination = "https://hackloadprodcnpg.blob.core.windows.net/backups"
   cnpg_backup_retention   = "30d"
+  cnpg_expose_external    = true
+  cnpg_external_host      = "hub.hackload.kz"
+  cnpg_external_port      = var.cnpg_external_port
 
   hub_image_tag            = "sha-0d9d373"
   hub_host                 = "hub.hackload.kz"

@@ -65,3 +65,9 @@ variable "telemetry_grafana_admin_password" {
   sensitive   = true
   default     = "admin123"
 }
+
+variable "cnpg_external_port" {
+  description = "External port for PostgreSQL access"
+  type        = number
+  sensitive   = true
+}

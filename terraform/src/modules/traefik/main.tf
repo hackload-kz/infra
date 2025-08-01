@@ -49,6 +49,11 @@ resource "helm_release" "traefik" {
           expose = var.expose_dashboard
           exposedPort = var.dashboard_port
         }
+        postgres = {
+          port = 5432
+          expose = var.expose_postgres
+          exposedPort = var.postgres_port
+        }
       }
 
       ingressRoute = {

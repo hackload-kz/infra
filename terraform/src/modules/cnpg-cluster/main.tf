@@ -54,3 +54,61 @@ resource "kubernetes_manifest" "cnpg-scheduled-backup" {
     backup_schedule = var.backup_schedule,
   }))
 }
+
+# External access service for PostgreSQL
+resource "kubernetes_service" "postgres-external" {
+  count = var.expose_external ? 1 : 0
+  
+  metadata {
+    name      = "postgres-external"
+    namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
+  }
+  
+  spec {
+    selector = {
+      "cnpg.io/cluster"      = "postgres-cluster"
+      "cnpg.io/instanceRole" = "primary"
+    }
+    
+    port {
+      name        = "postgres"
+      port        = 5432
+      target_port = 5432
+      protocol    = "TCP"
+    }
+    
+    type = "ClusterIP"
+  }
+  
+  depends_on = [kubernetes_manifest.cnpg-cluster]
+}
+
+# Traefik IngressRouteTCP for external PostgreSQL access
+resource "kubernetes_manifest" "postgres-ingressroute-tcp" {
+  count = var.expose_external ? 1 : 0
+  
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "IngressRouteTCP"
+    metadata = {
+      name      = "postgres-external"
+      namespace = kubernetes_namespace.cnpg-cluster.metadata[0].name
+    }
+    spec = {
+      entryPoints = ["postgres"]
+      routes = [
+        {
+          match = "HostSNI(`*`)"
+          services = [
+            {
+              name = kubernetes_service.postgres-external[0].metadata[0].name
+              port = 5432
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
+  depends_on = [kubernetes_service.postgres-external]
+}

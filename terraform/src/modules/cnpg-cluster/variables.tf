@@ -33,3 +33,20 @@ variable "backup_destination" {
 variable "username" {
   type = string
 }
+
+variable "expose_external" {
+  description = "Whether to expose PostgreSQL externally via Traefik"
+  type        = bool
+  default     = false
+}
+
+variable "external_host" {
+  description = "External hostname for PostgreSQL access"
+  type        = string
+  default     = ""
+}
+
+variable "external_port" {
+  description = "External port for PostgreSQL access"
+  type        = number
+}

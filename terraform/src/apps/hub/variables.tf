@@ -18,6 +18,23 @@ variable "cnpg_backup_retention" {
   type = string
 }
 
+variable "cnpg_expose_external" {
+  description = "Whether to expose PostgreSQL externally via Traefik"
+  type        = bool
+  default     = false
+}
+
+variable "cnpg_external_host" {
+  description = "External hostname for PostgreSQL access"
+  type        = string  
+  default     = ""
+}
+
+variable "cnpg_external_port" {
+  description = "External port for PostgreSQL access"
+  type        = number
+}
+
 variable "traefik_service_type" {
   description = "Service type for Traefik (LoadBalancer, NodePort, ClusterIP)"
   type        = string

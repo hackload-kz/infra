@@ -229,3 +229,14 @@ variable "cert_resolvers" {
   type        = any
   default     = {}
 }
+
+variable "postgres_port" {
+  description = "Port for PostgreSQL TCP traffic"
+  type        = number
+}
+
+variable "expose_postgres" {
+  description = "Whether to expose PostgreSQL port"
+  type        = bool
+  default     = false
+}
