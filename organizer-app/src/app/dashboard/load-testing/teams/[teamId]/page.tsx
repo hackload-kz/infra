@@ -38,11 +38,13 @@ interface TestScenario {
 
 interface TestRun {
   id: string
+  runNumber: number
   comment: string | null
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   startedAt: string | null
   completedAt: string | null
   results: Record<string, unknown> | null
+  k6TestName: string | null
   createdAt: string
   updatedAt: string
   scenario: TestScenario
@@ -158,6 +160,34 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
       }
     } catch (error) {
       console.error('Error updating test run status:', error)
+    }
+  }
+
+  const handleStopK6Test = async (runId: string) => {
+    if (!confirm('Вы уверены, что хотите остановить K6 тест?')) return
+
+    try {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs/${runId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'stop' })
+      })
+
+      if (response.ok) {
+        const updatedRun = await response.json()
+        if (data) {
+          setData({
+            ...data,
+            testRuns: data.testRuns.map(run => run.id === runId ? updatedRun : run)
+          })
+        }
+      } else {
+        const errorData = await response.json()
+        alert(`Ошибка остановки теста: ${errorData.error}`)
+      }
+    } catch (error) {
+      console.error('Error stopping K6 test:', error)
+      alert('Ошибка при остановке K6 теста')
     }
   }
 
@@ -376,7 +406,12 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-medium text-white">{run.scenario.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-1 rounded-md text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                            #{run.runNumber}
+                          </span>
+                          <h3 className="text-lg font-medium text-white">{run.scenario.name}</h3>
+                        </div>
                         <span className="text-sm text-slate-300">({run.scenario.identifier})</span>
                         <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(run.status)}`}>
                           {getStatusIcon(run.status)}
@@ -412,6 +447,12 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
                             <span>Завершен: {formatDateTime(run.completedAt)}</span>
                           </div>
                         )}
+                        {run.k6TestName && (
+                          <div className="flex items-center gap-1">
+                            <Activity size={14} />
+                            <span className="text-xs font-mono bg-slate-700/50 px-2 py-1 rounded">K6: {run.k6TestName}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     
@@ -431,13 +472,15 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
                             onClick={() => handleUpdateStatus(run.id, 'COMPLETED')}
                             size="sm"
                             className="bg-green-600 hover:bg-green-700 text-white"
+                            title="Отметить как завершенный"
                           >
                             <CheckCircle size={14} />
                           </Button>
                           <Button
-                            onClick={() => handleUpdateStatus(run.id, 'CANCELLED')}
+                            onClick={() => run.k6TestName ? handleStopK6Test(run.id) : handleUpdateStatus(run.id, 'CANCELLED')}
                             size="sm"
                             className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                            title={run.k6TestName ? "Остановить K6 тест" : "Отметить как отмененный"}
                           >
                             <Pause size={14} />
                           </Button>

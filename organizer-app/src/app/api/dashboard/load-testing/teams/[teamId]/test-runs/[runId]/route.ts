@@ -77,7 +77,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { status, results, comment } = body
+    const { status, results, comment, action } = body
 
     // Проверить существование запуска
     const existingRun = await db.testRun.findFirst({
@@ -93,6 +93,60 @@ export async function PUT(
 
     if (!existingRun) {
       return NextResponse.json({ error: 'Запуск теста не найден' }, { status: 404 })
+    }
+
+    // Обработать действие "stop" - остановка K6 теста
+    if (action === 'stop') {
+      if (!existingRun.k6TestName) {
+        return NextResponse.json({ error: 'K6 тест не найден для остановки' }, { status: 400 })
+      }
+
+      try {
+        // Импортировать K6 функции для удаления теста
+        const { deleteK6TestRun } = await import('@/lib/k6')
+        
+        // Удалить K6 TestRun из Kubernetes (это остановит тест)
+        await deleteK6TestRun(existingRun.k6TestName)
+
+        // Обновить статус в базе данных
+        const testRun = await db.testRun.update({
+          where: { id: runId },
+          data: {
+            status: TestRunStatus.CANCELLED,
+            completedAt: new Date()
+          },
+          include: {
+            scenario: {
+              select: {
+                id: true,
+                name: true,
+                identifier: true,
+                description: true
+              }
+            },
+            team: {
+              select: {
+                id: true,
+                name: true,
+                nickname: true
+              }
+            }
+          }
+        })
+
+        await logger.info(LogAction.UPDATE, 'TestRun', `Остановлен K6 тест: ${existingRun.scenario.name} для команды ${existingRun.team.name}`, {
+          userEmail: session.user.email,
+          entityId: runId
+        })
+
+        return NextResponse.json(testRun)
+      } catch (k6Error) {
+        console.error('Failed to stop K6 test:', k6Error)
+        return NextResponse.json(
+          { error: 'Не удалось остановить K6 тест' },
+          { status: 500 }
+        )
+      }
     }
 
     // Подготовить данные для обновления

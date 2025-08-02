@@ -33,11 +33,13 @@ interface Team {
 
 interface TestRun {
   id: string
+  runNumber: number
   comment: string | null
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   startedAt: string | null
   completedAt: string | null
   results: Record<string, unknown> | null
+  k6TestName: string | null
   createdAt: string
   updatedAt: string
   scenario: TestScenario

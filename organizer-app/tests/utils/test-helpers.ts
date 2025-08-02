@@ -183,7 +183,7 @@ export const createMockRequest = (
   } = {}
 ): NextRequest => {
   const { method = 'GET', body, headers = {} } = options;
-  
+
   const requestInit: any = {
     method,
     headers: {
@@ -205,7 +205,7 @@ export const createMockRequest = (
 export const setupMocks = () => {
   // Mock auth
   (auth as jest.Mock).mockResolvedValue(createMockSession());
-  
+
   // Mock isOrganizer
   (isOrganizer as jest.Mock).mockImplementation((email: string) => {
     return Promise.resolve(email === 'admin@hackload.kz' || email === 'organizer@hackload.kz');
@@ -221,13 +221,13 @@ export const resetMocks = () => {
 // Common test scenarios
 export const setupActiveHackathon = () => {
   const hackathon = createMockHackathon();
-  
+
   // Mock getCurrentHackathon
   const getCurrentHackathon = jest.fn().mockResolvedValue(hackathon);
   jest.doMock('@/lib/hackathon', () => ({
     getCurrentHackathon,
   }));
-  
+
   return hackathon;
 };
 
@@ -274,7 +274,7 @@ export const createMaliciousRequest = (payload: any) => {
 export const createLargeDataRequest = () => {
   const largeTechnologies = Array.from({ length: 100 }, (_, i) => `Technology${i}`);
   const largeCloudServices = Array.from({ length: 50 }, (_, i) => `CloudService${i}`);
-  
+
   return {
     name: 'Test User',
     email: 'test@example.com',

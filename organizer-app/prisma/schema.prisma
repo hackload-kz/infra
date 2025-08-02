@@ -8,36 +8,36 @@ datasource db {
 }
 
 model Hackathon {
-  id                String                   @id @default(cuid())
-  name              String
-  slug              String                   @unique
-  description       String?
-  theme             String?
-  startDate         DateTime
-  endDate           DateTime
-  registrationStart DateTime
-  registrationEnd   DateTime
-  maxTeamSize       Int                      @default(4)
-  minTeamSize       Int                      @default(1)
-  allowTeamChanges  Boolean                  @default(true)
-  isActive          Boolean                  @default(true)
-  isPublic          Boolean                  @default(true)
-  logoUrl           String?
-  bannerUrl         String?
-  primaryColor      String?
-  secondaryColor    String?
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
-  customBanners     CustomBanner[]
-  customBannerDismissals CustomBannerDismissal[]
-  dismissedBanners  DismissedBanner[]
-  participations    HackathonParticipation[]
-  joinRequests      JoinRequest[]
-  journalEntries    JournalEntry[]
-  messages          Message[]
-  teams             Team[]
-  calendarEvents    CalendarEvent[]
+  id                      String                   @id @default(cuid())
+  name                    String
+  slug                    String                   @unique
+  description             String?
+  theme                   String?
+  startDate               DateTime
+  endDate                 DateTime
+  registrationStart       DateTime
+  registrationEnd         DateTime
+  maxTeamSize             Int                      @default(4)
+  minTeamSize             Int                      @default(1)
+  allowTeamChanges        Boolean                  @default(true)
+  isActive                Boolean                  @default(true)
+  isPublic                Boolean                  @default(true)
+  logoUrl                 String?
+  bannerUrl               String?
+  primaryColor            String?
+  secondaryColor          String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   calendarEventDismissals CalendarEventDismissal[]
+  calendarEvents          CalendarEvent[]
+  customBannerDismissals  CustomBannerDismissal[]
+  customBanners           CustomBanner[]
+  dismissedBanners        DismissedBanner[]
+  participations          HackathonParticipation[]
+  joinRequests            JoinRequest[]
+  journalEntries          JournalEntry[]
+  messages                Message[]
+  teams                   Team[]
 
   @@map("hackathons")
 }
@@ -58,27 +58,27 @@ model HackathonParticipation {
 }
 
 model Team {
-  id           String        @id @default(cuid())
-  name         String
-  nickname     String        @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  leaderId     String?       @unique
-  comment      String?
-  hackathonId  String
-  level        TeamLevel?
-  status       TeamStatus    @default(NEW)
-  acceptedLanguages String[]  @default([])
-  techStack    String[]      @default([])
-  description  String?
-  joinRequests JoinRequest[] @relation("TeamJoinRequests")
-  messages     Message[]
-  leader       Participant?  @relation("TeamLeader")
-  members      Participant[] @relation("TeamMembers")
-  hackathon    Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  calendarEvents CalendarEvent[]
-  environmentData TeamEnvironmentData[]
-  testRuns     TestRun[]
+  id                String                @id @default(cuid())
+  name              String
+  nickname          String                @unique
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  leaderId          String?               @unique
+  comment           String?
+  hackathonId       String
+  level             TeamLevel?
+  status            TeamStatus            @default(NEW)
+  acceptedLanguages String[]              @default([])
+  techStack         String[]              @default([])
+  description       String?
+  calendarEvents    CalendarEvent[]
+  joinRequests      JoinRequest[]         @relation("TeamJoinRequests")
+  messages          Message[]
+  leader            Participant?          @relation("TeamLeader")
+  members           Participant[]         @relation("TeamMembers")
+  environmentData   TeamEnvironmentData[]
+  hackathon         Hackathon             @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  testRuns          TestRun[]
 
   @@map("teams")
 }
@@ -100,7 +100,6 @@ model Participant {
   email                   String                   @unique
   city                    String?
   company                 String?
-  isActive                Boolean                  @default(true)
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
   userId                  String                   @unique
@@ -116,9 +115,11 @@ model Participant {
   telegram                String?
   githubUrl               String?
   linkedinUrl             String?
+  isActive                Boolean                  @default(true)
   programmingLanguages    String[]                 @default([])
   databases               String[]                 @default([])
   description             String?
+  calendarEventDismissals CalendarEventDismissal[]
   customBannerDismissals  CustomBannerDismissal[]
   dismissedBanners        DismissedBanner[]
   hackathonParticipations HackathonParticipation[]
@@ -126,7 +127,6 @@ model Participant {
   journalEntries          JournalEntry[]
   receivedMessages        Message[]                @relation("MessageRecipient")
   sentMessages            Message[]                @relation("MessageSender")
-  calendarEventDismissals CalendarEventDismissal[]
   ledTeam                 Team?                    @relation("TeamLeader", fields: [ledTeamId], references: [id])
   team                    Team?                    @relation("TeamMembers", fields: [teamId], references: [id])
   user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -174,34 +174,34 @@ model Message {
 }
 
 model CustomBanner {
-  id           String              @id @default(cuid())
+  id           String                  @id @default(cuid())
   title        String
   description  String
   type         CustomBannerType
   displayStart DateTime
   displayEnd   DateTime
-  allowDismiss Boolean             @default(true)
+  allowDismiss Boolean                 @default(true)
+  hackathonId  String
+  isActive     Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
   actionText   String?
   actionUrl    String?
-  hackathonId  String
-  isActive     Boolean             @default(true)
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  hackathon    Hackathon           @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   dismissals   CustomBannerDismissal[]
+  hackathon    Hackathon               @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
 
   @@map("custom_banners")
 }
 
 model CustomBannerDismissal {
-  id               String        @id @default(cuid())
-  customBannerId   String
-  participantId    String
-  hackathonId      String
-  dismissedAt      DateTime      @default(now())
-  customBanner     CustomBanner  @relation(fields: [customBannerId], references: [id], onDelete: Cascade)
-  participant      Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  hackathon        Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  customBannerId String
+  participantId  String
+  hackathonId    String
+  dismissedAt    DateTime     @default(now())
+  customBanner   CustomBanner @relation(fields: [customBannerId], references: [id], onDelete: Cascade)
+  hackathon      Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant    Participant  @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@unique([customBannerId, participantId, hackathonId])
   @@map("custom_banner_dismissals")
@@ -239,37 +239,140 @@ model JournalEntry {
 }
 
 model CalendarEvent {
-  id             String                    @id @default(cuid())
-  title          String
-  description    String                    // HTML formatted description
-  eventDate      DateTime                  // Event start date and time
-  eventEndDate   DateTime?                 // Optional event end date and time
-  link           String?                   // Optional link
-  eventType      CalendarEventType         @default(INFO)
-  isActive       Boolean                   @default(true)
-  hackathonId    String
-  teamId         String?                   // Optional team relation
-  createdAt      DateTime                  @default(now())
-  updatedAt      DateTime                  @updatedAt
-  hackathon      Hackathon                 @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  team           Team?                     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  dismissals     CalendarEventDismissal[]
+  id           String                   @id @default(cuid())
+  title        String
+  description  String
+  eventDate    DateTime
+  eventEndDate DateTime?
+  link         String?
+  eventType    CalendarEventType        @default(INFO)
+  isActive     Boolean                  @default(true)
+  hackathonId  String
+  teamId       String?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  dismissals   CalendarEventDismissal[]
+  hackathon    Hackathon                @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  team         Team?                    @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@map("calendar_events")
 }
 
 model CalendarEventDismissal {
-  id              String        @id @default(cuid())
-  eventId         String
-  participantId   String
-  hackathonId     String
-  dismissedAt     DateTime      @default(now())
-  event           CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  participant     Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  hackathon       Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  eventId       String
+  participantId String
+  hackathonId   String
+  dismissedAt   DateTime      @default(now())
+  event         CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  hackathon     Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  participant   Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, participantId, hackathonId])
   @@map("calendar_event_dismissals")
+}
+
+model TeamEnvironmentData {
+  id          String   @id @default(cuid())
+  teamId      String
+  key         String
+  value       String
+  description String?
+  category    String?
+  isSecure    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, key])
+  @@map("team_environment_data")
+}
+
+model ServiceApiKey {
+  id          String               @id @default(cuid())
+  name        String
+  keyHash     String               @unique
+  keyPrefix   String
+  description String?
+  permissions String[]             @default(["environment:write"])
+  isActive    Boolean              @default(true)
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  createdBy   String?
+  usageLogs   ServiceApiKeyUsage[]
+
+  @@map("service_api_keys")
+}
+
+model ServiceApiKeyUsage {
+  id        String        @id @default(cuid())
+  keyId     String
+  endpoint  String
+  method    String
+  userAgent String?
+  ipAddress String?
+  teamId    String?
+  success   Boolean
+  createdAt DateTime      @default(now())
+  apiKey    ServiceApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
+
+  @@map("service_api_key_usage")
+}
+
+model TestScenario {
+  id          String             @id @default(cuid())
+  name        String
+  identifier  String             @unique
+  description String?
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  createdBy   String?
+  testRuns    TestRun[]
+  steps       TestScenarioStep[]
+
+  @@map("test_scenarios")
+}
+
+model TestScenarioStep {
+  id          String       @id @default(cuid())
+  scenarioId  String
+  name        String
+  description String?
+  stepType    TestStepType
+  stepOrder   Int
+  config      Json
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  scenario    TestScenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@unique([scenarioId, stepOrder])
+  @@map("test_scenario_steps")
+}
+
+model TestRun {
+  id          String        @id @default(cuid())
+  scenarioId  String
+  teamId      String
+  runNumber   Int           @unique @default(1) // Global sequential run number across all tests
+  comment     String?
+  status      TestRunStatus @default(PENDING)
+  startedAt   DateTime?
+  completedAt DateTime?
+  results     Json?
+  k6TestName  String?       // Name of the K6 TestRun in Kubernetes
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   String?
+  scenario    TestScenario  @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  team        Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("test_runs")
 }
 
 enum TeamStatus {
@@ -337,116 +440,9 @@ enum CalendarEventType {
   DEADLINE
 }
 
-model TeamEnvironmentData {
-  id          String    @id @default(cuid())
-  teamId      String
-  key         String    // e.g., "github_repo_url", "server_ip", "aws_access_key"
-  value       String    // The actual value
-  description String?   // Optional description for the key
-  category    String?   // Optional grouping (e.g., "git", "infrastructure", "credentials")
-  isSecure    Boolean   @default(false) // Mark sensitive data for display handling
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  createdBy   String?   // Participant ID who created this entry
-  updatedBy   String?   // Participant ID who last updated this entry
-  
-  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
-  @@unique([teamId, key]) // Ensure unique keys per team
-  @@map("team_environment_data")
-}
-
-model ServiceApiKey {
-  id          String    @id @default(cuid())
-  name        String    // Human-readable name for the key
-  keyHash     String    @unique // Hashed version of the API key
-  keyPrefix   String    // First 8 characters for identification
-  description String?   // Optional description
-  permissions String[]  @default(["environment:write"]) // Scoped permissions
-  isActive    Boolean   @default(true)
-  lastUsedAt  DateTime? // Track when key was last used
-  expiresAt   DateTime? // Optional expiration date
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  createdBy   String?   // Participant ID who created this key
-  
-  usageLogs   ServiceApiKeyUsage[]
-  
-  @@map("service_api_keys")
-}
-
-model ServiceApiKeyUsage {
-  id        String        @id @default(cuid())
-  keyId     String
-  endpoint  String        // Which API endpoint was called
-  method    String        // HTTP method (GET, POST, PUT, DELETE)
-  userAgent String?       // Client user agent
-  ipAddress String?       // Client IP address
-  teamId    String?       // Team affected (if applicable)
-  success   Boolean       // Whether the request was successful
-  createdAt DateTime      @default(now())
-  
-  apiKey    ServiceApiKey @relation(fields: [keyId], references: [id], onDelete: Cascade)
-  
-  @@map("service_api_key_usage")
-}
-
-model TestScenario {
-  id          String             @id @default(cuid())
-  name        String             // Название сценария
-  identifier  String             @unique // Идентификатор сценария
-  description String?            // Описание сценария
-  isActive    Boolean            @default(true)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  createdBy   String?            // Participant ID who created this scenario
-  
-  steps       TestScenarioStep[]
-  testRuns    TestRun[]
-  
-  @@map("test_scenarios")
-}
-
-model TestScenarioStep {
-  id          String           @id @default(cuid())
-  scenarioId  String
-  name        String           // Название шага
-  description String?          // Описание шага
-  stepType    TestStepType     // k6_script или http_request
-  stepOrder   Int              // Порядок выполнения шага
-  config      Json             // Конфигурация шага (k6 скрипт или curl команда)
-  isActive    Boolean          @default(true)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  
-  scenario    TestScenario     @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
-  
-  @@unique([scenarioId, stepOrder]) // Уникальный порядок для каждого сценария
-  @@map("test_scenario_steps")
-}
-
 enum TestStepType {
   k6_script
   http_request
-}
-
-model TestRun {
-  id          String       @id @default(cuid())
-  scenarioId  String
-  teamId      String
-  comment     String?
-  status      TestRunStatus @default(PENDING)
-  startedAt   DateTime?
-  completedAt DateTime?
-  results     Json?        // Результаты тестирования
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  createdBy   String?      // Participant ID who created this run
-  
-  scenario    TestScenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
-  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
-  @@map("test_runs")
 }
 
 enum TestRunStatus {
