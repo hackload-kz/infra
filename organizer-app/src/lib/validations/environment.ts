@@ -5,7 +5,12 @@ export const environmentDataSchema = z.object({
   value: z.string().min(1).max(2000),
   description: z.string().max(500).optional(),
   category: z.string().max(50).optional(),
-  isSecure: z.boolean().optional()
+  isSecure: z.boolean().optional(),
+  isEditable: z.boolean().optional()
+})
+
+export const teamLeaderEnvironmentUpdateSchema = z.object({
+  value: z.string().min(1).max(2000)
 })
 
 export const serviceKeySchema = z.object({
@@ -29,6 +34,7 @@ export const bulkEnvironmentUpdateSchema = z.object({
 })
 
 export type EnvironmentDataInput = z.infer<typeof environmentDataSchema>
+export type TeamLeaderEnvironmentUpdateInput = z.infer<typeof teamLeaderEnvironmentUpdateSchema>
 export type ServiceKeyInput = z.infer<typeof serviceKeySchema>
 export type ServiceKeyUpdateInput = z.infer<typeof serviceKeyUpdateSchema>
 export type BulkEnvironmentUpdateInput = z.infer<typeof bulkEnvironmentUpdateSchema>

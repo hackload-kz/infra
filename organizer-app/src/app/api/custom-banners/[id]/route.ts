@@ -6,7 +6,7 @@ import { CustomBannerType } from '@prisma/client'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -20,7 +20,7 @@ export async function GET(
     }
 
     const banner = await db.customBanner.findUnique({
-      where: { id: params.id }
+      where: { id: (await params).id }
     })
 
     if (!banner) {
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -61,7 +61,7 @@ export async function PUT(
     }
 
     const banner = await db.customBanner.update({
-      where: { id: params.id },
+      where: { id: (await params).id },
       data: {
         title,
         description,
@@ -84,7 +84,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -98,7 +98,7 @@ export async function DELETE(
     }
 
     await db.customBanner.delete({
-      where: { id: params.id }
+      where: { id: (await params).id }
     })
 
     return NextResponse.json({ message: 'Banner deleted successfully' })

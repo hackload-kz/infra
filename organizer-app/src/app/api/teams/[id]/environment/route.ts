@@ -167,6 +167,24 @@ export async function POST(
       )
     }
 
+    // Handle Zod validation errors
+    if (error && typeof error === 'object' && 'issues' in error) {
+      const validationError = error as { issues: Array<{ path: string[], code: string, message: string }> }
+      if (validationError.issues && Array.isArray(validationError.issues)) {
+        const firstIssue = validationError.issues[0]
+        if (firstIssue?.path?.includes('key') && firstIssue?.code === 'invalid_string') {
+          return NextResponse.json(
+            { error: 'Ключ должен содержать только буквы, цифры, подчеркивания и дефисы' },
+            { status: 400 }
+          )
+        }
+        return NextResponse.json(
+          { error: firstIssue?.message || 'Validation error' },
+          { status: 400 }
+        )
+      }
+    }
+
     await logger.error(LogAction.CREATE, 'TeamEnvironment', 
       `Error creating environment data: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         metadata: { error: error instanceof Error ? error.stack : error }

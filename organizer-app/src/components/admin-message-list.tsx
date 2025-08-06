@@ -142,9 +142,9 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 overflow-x-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center min-w-0">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Управление сообщениями</h2>
           <p className="text-gray-600 mt-1">
@@ -158,10 +158,10 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 min-w-0">
+        <div className="flex flex-col md:flex-row gap-4 min-w-0">
           {/* Search */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-w-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Поиск по теме, содержанию или получателю..."
@@ -251,7 +251,7 @@ export function AdminMessageList({ hackathonId }: AdminMessageListProps) {
       )}
 
       {/* Messages List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 min-w-0 overflow-x-hidden">
         {filteredMessages.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-2">

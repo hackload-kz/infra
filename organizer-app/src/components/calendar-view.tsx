@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Calendar, ChevronDown, ChevronUp } from 'lucide-react'
+import { formatCalendarDate, formatCalendarTime } from '@/lib/date-utils'
 // Define the CalendarEvent type locally since it's not available in the client
 type CalendarEvent = {
   id: string
@@ -212,18 +213,10 @@ export function CalendarView({
                     {/* Date Header */}
                     <div className="mb-2">
                       <div className="text-sm font-medium text-slate-400">
-                        {eventDate.toLocaleDateString('ru-RU', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        {formatCalendarDate(eventDate)}
                       </div>
                       <div className="text-xs text-slate-500">
-                        {eventDate.toLocaleTimeString('ru-RU', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {formatCalendarTime(eventDate)}
                       </div>
                     </div>
                     
@@ -272,22 +265,14 @@ export function CalendarView({
                           ? 'text-amber-300' 
                           : 'text-slate-200'
                       }`}>
-                        {eventDate.toLocaleDateString('ru-RU', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        {formatCalendarDate(eventDate)}
                       </div>
                       <div className={`text-xs ${
                         isToday 
                           ? 'text-amber-400' 
                           : 'text-slate-400'
                       }`}>
-                        {eventDate.toLocaleTimeString('ru-RU', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {formatCalendarTime(eventDate)}
                       </div>
                     </div>
                     

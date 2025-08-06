@@ -20,8 +20,8 @@ export default async function TestScenariosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Сценарии тестирования</h1>
-        <p className="text-slate-500 mt-2">
+        <h1 className="text-3xl font-bold text-gray-900">Сценарии тестирования</h1>
+        <p className="text-gray-700 mt-2">
           Управление тестовыми сценариями и их шагами
         </p>
       </div>

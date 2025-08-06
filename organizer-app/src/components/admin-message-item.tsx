@@ -79,7 +79,7 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
               <User className="h-4 w-4 text-green-600 flex-shrink-0" />
             )}
 
-            <h3 className={`font-semibold text-lg ${isUnread ? 'text-blue-900' : 'text-gray-900'} truncate`}>
+            <h3 className={`font-semibold text-lg ${isUnread ? 'text-blue-900' : 'text-gray-900'} truncate min-w-0`}>
               {message.subject}
             </h3>
 
@@ -98,37 +98,42 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
           </div>
 
           {/* Message Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-gray-600">
-            <div>
-              <span className="font-medium">Кому:</span> {message.recipient.name}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-gray-600 min-w-0">
+            <div className="min-w-0">
+              <span className="font-medium">Кому:</span> 
+              <span className="break-words">{message.recipient.name}</span>
               <br />
-              <span className="text-gray-500">{message.recipient.email}</span>
+              <span className="text-gray-500 break-all">{message.recipient.email}</span>
             </div>
             
-            <div>
-              <span className="font-medium">От:</span> {message.sender?.name || 'Система'}
+            <div className="min-w-0">
+              <span className="font-medium">От:</span> 
+              <span className="break-words">{message.sender?.name || 'Система'}</span>
               {message.team && (
                 <>
                   <br />
-                  <span className="text-purple-600">Команда: {message.team.name}</span>
+                  <span className="text-purple-600 break-words">Команда: {message.team.name}</span>
                 </>
               )}
             </div>
             
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <span>{formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span className="break-words">{formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}</span>
             </div>
           </div>
 
           {/* Message Body */}
-          <div className="mb-4">
+          <div className="mb-4 min-w-0">
             <div 
-              className={`prose prose-sm prose-blue max-w-none text-gray-900 ${expanded ? '' : 'line-clamp-3'}`}
+              className={`prose prose-sm prose-blue max-w-full text-gray-900 break-words overflow-hidden ${expanded ? '' : 'line-clamp-3'}`}
               style={{
                 lineHeight: '1.6',
                 fontSize: '14px',
-                fontFamily: 'system-ui, -apple-system, sans-serif'
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                maxWidth: '100%'
               }}
               dangerouslySetInnerHTML={{ __html: markdownToHtml(message.body) }}
             />
@@ -137,10 +142,39 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
                 color: #2563eb !important;
                 text-decoration: underline !important;
                 font-weight: 500 !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
               }
               div :global(a:hover) {
                 color: #1d4ed8 !important;
                 text-decoration: underline !important;
+              }
+              div :global(pre) {
+                white-space: pre-wrap !important;
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+              }
+              div :global(code) {
+                word-break: break-all !important;
+                overflow-wrap: break-word !important;
+                max-width: 100% !important;
+                white-space: pre-wrap !important;
+              }
+              div :global(table) {
+                max-width: 100% !important;
+                table-layout: fixed !important;
+                word-wrap: break-word !important;
+              }
+              div :global(td), div :global(th) {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                max-width: 0 !important;
+              }
+              div :global(img) {
+                max-width: 100% !important;
+                height: auto !important;
               }
             `}</style>
             {message.body.length > 300 && (
@@ -160,11 +194,11 @@ export function AdminMessageItem({ message, onUpdate, onShowConversation }: Admi
                 <MessageCircle className="h-4 w-4" />
                 Ответы ({message.replies.length})
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-2 min-w-0">
                 {message.replies.slice(0, 2).map((reply) => (
-                  <div key={reply.id} className="text-sm">
+                  <div key={reply.id} className="text-sm min-w-0">
                     <span className="font-medium">{reply.sender?.name || 'Система'}:</span>
-                    <span className="ml-2 text-gray-600">
+                    <span className="ml-2 text-gray-600 break-words overflow-hidden">
                       {markdownToHtml(reply.body).replace(/<[^>]*>/g, '').slice(0, 100)}...
                     </span>
                   </div>

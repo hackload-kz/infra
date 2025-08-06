@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Calendar, Clock, ExternalLink, Users } from 'lucide-react'
+import { formatCalendarDate, formatCalendarTime } from '@/lib/date-utils'
 
 // Define the CalendarEvent type locally since it's not available in the client
 type CalendarEvent = {
@@ -124,12 +125,7 @@ export function CalendarBanner({ participantId, hackathonId, className = "" }: C
   }
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatCalendarDate(date)
   }
 
   if (loading) {
@@ -182,10 +178,7 @@ export function CalendarBanner({ participantId, hackathonId, className = "" }: C
             </div>
             {nextEvent.eventEndDate && (
               <span className="text-gray-500">
-                до {new Date(nextEvent.eventEndDate).toLocaleTimeString('ru-RU', { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
+                до {formatCalendarTime(nextEvent.eventEndDate)}
               </span>
             )}
           </div>

@@ -4,14 +4,14 @@ import { db } from '@/lib/db'
 import { logger, LogAction } from '@/lib/logger'
 import { getCurrentHackathon } from '@/lib/hackathon'
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     await logger.logApiCall('POST', `/api/calendar/${id}/dismiss`, session.user.email)
 
     const hackathon = await getCurrentHackathon()
@@ -72,20 +72,20 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json(dismissal)
   } catch (error) {
     const errorSession = await auth()
-    const { id } = params
+    const { id } = await params
     await logger.logApiError('POST', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     await logger.logApiCall('DELETE', `/api/calendar/${id}/dismiss`, session.user.email)
 
     const hackathon = await getCurrentHackathon()
@@ -127,7 +127,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     return NextResponse.json({ message: 'Dismissal removed successfully' })
   } catch (error) {
     const errorSession = await auth()
-    const { id } = params
+    const { id } = await params
     await logger.logApiError('DELETE', `/api/calendar/${id}/dismiss`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -31,7 +31,7 @@ export async function POST(
 
     // Check if banner exists and is dismissible
     const banner = await db.customBanner.findUnique({
-      where: { id: params.id }
+      where: { id: (await params).id }
     })
 
     if (!banner) {
@@ -46,7 +46,7 @@ export async function POST(
     await db.customBannerDismissal.upsert({
       where: {
         customBannerId_participantId_hackathonId: {
-          customBannerId: params.id,
+          customBannerId: (await params).id,
           participantId: user.participant.id,
           hackathonId
         }
@@ -55,7 +55,7 @@ export async function POST(
         dismissedAt: new Date()
       },
       create: {
-        customBannerId: params.id,
+        customBannerId: (await params).id,
         participantId: user.participant.id,
         hackathonId
       }

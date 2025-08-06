@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Calendar, Clock, Users, ExternalLink, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { formatCalendarDateTime, formatCalendarEndDate } from '@/lib/date-utils'
 // Define the CalendarEvent type locally since it's not available in the client
 type CalendarEvent = {
   id: string
@@ -79,45 +80,6 @@ export function CalendarEventItem({
     }
   }
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  const formatEndDate = (startDate: Date, endDate: Date) => {
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    
-    // Check if the end date is on the same day as start date
-    const isSameDay = start.toDateString() === end.toDateString()
-    
-    if (isSameDay) {
-      // Same day - show only time
-      return formatTime(end)
-    } else {
-      // Different day - show full date and time
-      const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-      if (daysDiff === 1) {
-        // Next day - show "завтра" + time
-        return `завтра в ${formatTime(end)}`
-      } else {
-        // Multiple days - show full date and time
-        return formatDate(end)
-      }
-    }
-  }
 
   if (isPast && isCollapsed && !isExpanded) {
     return (
@@ -128,7 +90,7 @@ export function CalendarEventItem({
         >
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-700">
-              {formatDate(event.eventDate)}
+              {formatCalendarDateTime(event.eventDate)}
             </span>
             <span className="text-sm font-medium text-gray-800">{event.title}</span>
             {event.team && (
@@ -180,12 +142,12 @@ export function CalendarEventItem({
           <div className="flex items-center space-x-4 text-sm text-gray-700 mb-3">
             <div className="flex items-center space-x-1">
               <Calendar className="h-4 w-4" />
-              <span>{formatDate(event.eventDate)}</span>
+              <span>{formatCalendarDateTime(event.eventDate)}</span>
             </div>
             {event.eventEndDate && (
               <div className="flex items-center space-x-1">
                 <Clock className="h-4 w-4" />
-                <span>до {formatEndDate(event.eventDate, event.eventEndDate)}</span>
+                <span>до {formatCalendarEndDate(event.eventDate, event.eventEndDate)}</span>
               </div>
             )}
           </div>

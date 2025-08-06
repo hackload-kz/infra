@@ -30,7 +30,7 @@ export default async function DashboardMessagesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 overflow-x-hidden">
       <AdminMessageList hackathonId={hackathon.id} />
     </div>
   )

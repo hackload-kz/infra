@@ -11,10 +11,16 @@ import {
   Github, 
   Cloud, 
   Key,
-  Settings
+  Settings,
+  Edit2,
+  Save,
+  X
 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { formatDateShort } from '@/lib/date-utils'
 
 interface TeamEnvironmentData {
   id: string
@@ -23,6 +29,7 @@ interface TeamEnvironmentData {
   description: string | null
   category: string | null
   isSecure: boolean
+  isEditable: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -38,6 +45,7 @@ interface Participant {
   id: string
   name: string
   team?: Team | null
+  ledTeam?: Team | null
 }
 
 interface TeamEnvironmentViewProps {
@@ -81,6 +89,9 @@ const getCategoryColor = (category?: string) => {
 
 export function TeamEnvironmentView({ participant, isOrganizer }: TeamEnvironmentViewProps) {
   const [visibleValues, setVisibleValues] = useState<Set<string>>(new Set())
+  const [editingItem, setEditingItem] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [loading, setLoading] = useState(false)
 
   if (!participant?.team) {
     return (
@@ -106,6 +117,7 @@ export function TeamEnvironmentView({ participant, isOrganizer }: TeamEnvironmen
 
   const { team } = participant
   const environmentData = team.environmentData || []
+  const isTeamLeader = participant.ledTeam?.id === team.id
 
   // Group data by category
   const groupedData = environmentData.reduce((acc, item) => {
@@ -145,6 +157,45 @@ export function TeamEnvironmentView({ participant, isOrganizer }: TeamEnvironmen
     }
     if (value.length <= 8) return '***'
     return value.substring(0, 4) + '***' + value.substring(value.length - 4)
+  }
+
+  const startEdit = (item: TeamEnvironmentData) => {
+    setEditingItem(item.id)
+    setEditValue(item.value)
+  }
+
+  const cancelEdit = () => {
+    setEditingItem(null)
+    setEditValue('')
+  }
+
+  const saveEdit = async (itemId: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/teams/${team.id}/environment/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          value: editValue
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to update environment data')
+      }
+
+      toast.success('Данные окружения успешно обновлены')
+      // Refresh the page to get updated data
+      window.location.reload()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Ошибка при обновлении данных')
+    } finally {
+      setLoading(false)
+      cancelEdit()
+    }
   }
 
   if (environmentData.length === 0) {
@@ -224,41 +275,91 @@ export function TeamEnvironmentView({ participant, isOrganizer }: TeamEnvironmen
                               Secure
                             </span>
                           )}
+                          {!item.isEditable && (
+                            <span className="px-2 py-1 rounded text-xs bg-slate-600/20 text-slate-300 border border-slate-600/30">
+                              <Settings className="w-3 h-3 mr-1 inline" />
+                              Read-only
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="p-3">
-                        <div className="bg-slate-900/50 rounded p-2 max-w-xs">
-                          <code className="text-sm break-all text-slate-200">{displayValue}</code>
-                        </div>
+                        {editingItem === item.id ? (
+                          <div className="max-w-xs">
+                            <Textarea
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              className="min-h-[40px] text-sm"
+                              placeholder="Введите значение"
+                            />
+                          </div>
+                        ) : (
+                          <div className="bg-slate-900/50 rounded p-2 max-w-xs">
+                            <code className="text-sm break-all text-slate-200">{displayValue}</code>
+                          </div>
+                        )}
                       </td>
                       <td className="p-3">
                         <span className="text-sm text-slate-400">{item.description || '-'}</span>
                       </td>
                       <td className="p-3">
                         <span className="text-xs text-slate-500">
-                          {item.updatedAt.toLocaleDateString('ru-RU')}
+                          {formatDateShort(item.updatedAt)}
                         </span>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-1 justify-end">
-                          {item.isSecure && (
-                            <button
-                              className="p-2 hover:bg-slate-600/50 rounded transition-colors"
-                              onClick={() => toggleValueVisibility(item.id)}
-                            >
-                              {isVisible ? (
-                                <EyeOff className="w-4 h-4 text-slate-400" />
-                              ) : (
-                                <Eye className="w-4 h-4 text-slate-400" />
+                          {editingItem === item.id ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => saveEdit(item.id)}
+                                disabled={loading}
+                                className="text-green-400 hover:text-green-300 hover:bg-green-400/10"
+                              >
+                                <Save className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={cancelEdit}
+                                disabled={loading}
+                                className="text-slate-400 hover:text-slate-300 hover:bg-slate-600/50"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {item.isSecure && (
+                                <button
+                                  className="p-2 hover:bg-slate-600/50 rounded transition-colors"
+                                  onClick={() => toggleValueVisibility(item.id)}
+                                >
+                                  {isVisible ? (
+                                    <EyeOff className="w-4 h-4 text-slate-400" />
+                                  ) : (
+                                    <Eye className="w-4 h-4 text-slate-400" />
+                                  )}
+                                </button>
                               )}
-                            </button>
+                              <button
+                                className="p-2 hover:bg-slate-600/50 rounded transition-colors"
+                                onClick={() => copyToClipboard(item.value, item.key)}
+                              >
+                                <Copy className="w-4 h-4 text-slate-400" />
+                              </button>
+                              {isTeamLeader && item.isEditable && (
+                                <button
+                                  className="p-2 hover:bg-slate-600/50 rounded transition-colors"
+                                  onClick={() => startEdit(item)}
+                                >
+                                  <Edit2 className="w-4 h-4 text-slate-400" />
+                                </button>
+                              )}
+                            </>
                           )}
-                          <button
-                            className="p-2 hover:bg-slate-600/50 rounded transition-colors"
-                            onClick={() => copyToClipboard(item.value, item.key)}
-                          >
-                            <Copy className="w-4 h-4 text-slate-400" />
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -279,6 +380,9 @@ export function TeamEnvironmentView({ participant, isOrganizer }: TeamEnvironmen
             <li>Конфиденциальные данные отображаются в замаскированном виде</li>
             <li>Нажмите на иконку глаза для просмотра полного значения</li>
             <li>Используйте кнопку копирования для быстрого копирования значений</li>
+            {isTeamLeader && (
+              <li className="text-amber-300">Как лидер команды, вы можете редактировать параметры, которые помечены как редактируемые</li>
+            )}
             <li>Данные автоматически обновляются организаторами</li>
           </ul>
         </div>

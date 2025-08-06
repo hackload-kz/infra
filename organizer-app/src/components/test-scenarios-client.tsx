@@ -132,12 +132,12 @@ export default function TestScenariosClient() {
 
   const getStatusIcon = (scenario: TestScenario) => {
     if (!scenario.isActive) {
-      return <AlertCircle className="h-4 w-4 text-slate-500" />
+      return <AlertCircle className="h-4 w-4 text-gray-500" />
     }
     if (scenario._count.steps === 0) {
-      return <Clock className="h-4 w-4 text-yellow-400" />
+      return <Clock className="h-4 w-4 text-yellow-600" />
     }
-    return <CheckCircle className="h-4 w-4 text-green-400" />
+    return <CheckCircle className="h-4 w-4 text-green-600" />
   }
 
   const getStatusText = (scenario: TestScenario) => {
@@ -170,12 +170,12 @@ export default function TestScenariosClient() {
       {/* Header Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Поиск сценариев..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-700/70 border-slate-600/50 text-white placeholder-slate-400"
+            className="pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
           />
         </div>
         <Button onClick={handleCreateScenario}>
@@ -187,15 +187,15 @@ export default function TestScenariosClient() {
       {/* Scenarios Grid */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="text-slate-200">Загрузка сценариев...</div>
+          <div className="text-gray-600">Загрузка сценариев...</div>
         </div>
       ) : filteredScenarios.length === 0 ? (
-        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-8 text-center">
-          <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">
+        <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
             {searchTerm ? 'Сценарии не найдены' : 'Нет сценариев'}
           </h3>
-          <p className="text-slate-200 mb-4">
+          <p className="text-gray-600 mb-4">
             {searchTerm 
               ? 'Попробуйте изменить условия поиска'
               : 'Создайте первый тестовый сценарий для начала работы'
@@ -211,16 +211,16 @@ export default function TestScenariosClient() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredScenarios.map((scenario) => (
-            <Card key={scenario.id} className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-6">
+            <Card key={scenario.id} className="bg-white border-gray-300 shadow-sm p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(scenario)}
-                  <span className={`text-xs px-2 py-1 rounded-full ${
+                  <span className={`text-xs px-2 py-1 rounded-full border ${
                     scenario.isActive 
                       ? scenario._count.steps > 0 
-                        ? 'bg-green-500/20 text-green-300'
-                        : 'bg-yellow-500/20 text-yellow-300'
-                      : 'bg-slate-500/20 text-slate-400'
+                        ? 'bg-green-100 text-green-800 border-green-300'
+                        : 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                      : 'bg-gray-100 text-gray-600 border-gray-300'
                   }`}>
                     {getStatusText(scenario)}
                   </span>
@@ -246,7 +246,7 @@ export default function TestScenariosClient() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDeleteScenario(scenario)}
-                    className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -255,19 +255,19 @@ export default function TestScenariosClient() {
 
               <div className="space-y-3">
                 <div>
-                  <h3 className="font-semibold text-white text-lg">{scenario.name}</h3>
-                  <p className="text-sm text-slate-300 font-mono bg-slate-900/60 px-2 py-1 rounded mt-1">
+                  <h3 className="font-semibold text-gray-900 text-lg">{scenario.name}</h3>
+                  <p className="text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded mt-1">
                     {scenario.identifier}
                   </p>
                 </div>
 
                 {scenario.description && (
-                  <p className="text-sm text-slate-200 line-clamp-2">
+                  <p className="text-sm text-gray-600 line-clamp-2">
                     {scenario.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between text-sm text-slate-300">
+                <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>{scenario._count.steps} шагов</span>
                   <span>
                     {new Date(scenario.updatedAt).toLocaleDateString('ru-RU')}

@@ -26,6 +26,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { formatDateShort } from '@/lib/date-utils'
 
 interface TeamEnvironmentData {
   id: string
@@ -34,6 +35,7 @@ interface TeamEnvironmentData {
   description: string | null
   category: string | null
   isSecure: boolean
+  isEditable: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -55,6 +57,7 @@ interface EnvironmentFormData {
   description: string
   category: string
   isSecure: boolean
+  isEditable: boolean
 }
 
 const predefinedCategories = [
@@ -114,7 +117,8 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
     value: '',
     description: '',
     category: '',
-    isSecure: false
+    isSecure: false,
+    isEditable: true
   })
 
   const [editFormData, setEditFormData] = useState<EnvironmentFormData>({
@@ -122,7 +126,8 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
     value: '',
     description: '',
     category: '',
-    isSecure: false
+    isSecure: false,
+    isEditable: true
   })
 
   // Group data by category
@@ -187,7 +192,8 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
         value: '',
         description: '',
         category: '',
-        isSecure: false
+        isSecure: false,
+        isEditable: true
       })
       setShowAddForm(false)
       toast.success('Данные окружения успешно добавлены')
@@ -264,7 +270,8 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
       value: item.value,
       description: item.description || '',
       category: item.category || '',
-      isSecure: item.isSecure
+      isSecure: item.isSecure,
+      isEditable: item.isEditable
     })
     setEditingItem(item.id)
   }
@@ -297,10 +304,18 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                   <Input
                     id="key"
                     value={formData.key}
-                    onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      // Allow only letters, numbers, underscores, and hyphens
+                      const sanitized = value.replace(/[^a-zA-Z0-9_-]/g, '')
+                      setFormData(prev => ({ ...prev, key: sanitized }))
+                    }}
                     placeholder="например: database_url"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Только буквы, цифры, подчеркивания и дефисы
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="category" className="text-gray-900 font-medium">Категория</Label>
@@ -338,15 +353,27 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                 />
               </div>
               
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isSecure"
-                  checked={formData.isSecure}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isSecure: e.target.checked }))}
-                  className="rounded"
-                />
-                <Label htmlFor="isSecure" className="text-gray-900 font-medium">Конфиденциальные данные</Label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isSecure"
+                    checked={formData.isSecure}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isSecure: e.target.checked }))}
+                    className="rounded"
+                  />
+                  <Label htmlFor="isSecure" className="text-gray-900 font-medium">Конфиденциальные данные</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isEditable"
+                    checked={formData.isEditable}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isEditable: e.target.checked }))}
+                    className="rounded"
+                  />
+                  <Label htmlFor="isEditable" className="text-gray-900 font-medium">Может редактироваться лидером команды</Label>
+                </div>
               </div>
               
               <div className="flex gap-2">
@@ -422,9 +449,17 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                                     <Input
                                       id={`edit-key-${item.id}`}
                                       value={editFormData.key}
-                                      onChange={(e) => setEditFormData(prev => ({ ...prev, key: e.target.value }))}
+                                      onChange={(e) => {
+                                        const value = e.target.value
+                                        // Allow only letters, numbers, underscores, and hyphens
+                                        const sanitized = value.replace(/[^a-zA-Z0-9_-]/g, '')
+                                        setEditFormData(prev => ({ ...prev, key: sanitized }))
+                                      }}
                                       required
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      Только буквы, цифры, подчеркивания и дефисы
+                                    </p>
                                   </div>
                                   <div>
                                     <Label htmlFor={`edit-category-${item.id}`} className="text-gray-900 font-medium">Категория</Label>
@@ -460,15 +495,27 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                                   />
                                 </div>
                                 
-                                <div className="flex items-center space-x-2">
-                                  <input
-                                    type="checkbox"
-                                    id={`edit-secure-${item.id}`}
-                                    checked={editFormData.isSecure}
-                                    onChange={(e) => setEditFormData(prev => ({ ...prev, isSecure: e.target.checked }))}
-                                    className="rounded"
-                                  />
-                                  <Label htmlFor={`edit-secure-${item.id}`} className="text-gray-900 font-medium">Конфиденциальные данные</Label>
+                                <div className="space-y-3">
+                                  <div className="flex items-center space-x-2">
+                                    <input
+                                      type="checkbox"
+                                      id={`edit-secure-${item.id}`}
+                                      checked={editFormData.isSecure}
+                                      onChange={(e) => setEditFormData(prev => ({ ...prev, isSecure: e.target.checked }))}
+                                      className="rounded"
+                                    />
+                                    <Label htmlFor={`edit-secure-${item.id}`} className="text-gray-900 font-medium">Конфиденциальные данные</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <input
+                                      type="checkbox"
+                                      id={`edit-editable-${item.id}`}
+                                      checked={editFormData.isEditable}
+                                      onChange={(e) => setEditFormData(prev => ({ ...prev, isEditable: e.target.checked }))}
+                                      className="rounded"
+                                    />
+                                    <Label htmlFor={`edit-editable-${item.id}`} className="text-gray-900 font-medium">Может редактироваться лидером команды</Label>
+                                  </div>
                                 </div>
                                 
                                 <div className="flex gap-2">
@@ -499,6 +546,12 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                                       Secure
                                     </Badge>
                                   )}
+                                  {!item.isEditable && (
+                                    <Badge variant="outline" className="text-gray-600 border-gray-200">
+                                      <Settings className="w-3 h-3 mr-1" />
+                                      Read-only
+                                    </Badge>
+                                  )}
                                 </div>
                               </td>
                               <td className="p-3">
@@ -511,7 +564,7 @@ export function DashboardEnvironmentView({ team }: DashboardEnvironmentViewProps
                               </td>
                               <td className="p-3">
                                 <span className="text-xs text-gray-600">
-                                  {new Date(item.updatedAt).toLocaleDateString('ru-RU')}
+                                  {formatDateShort(item.updatedAt)}
                                 </span>
                               </td>
                               <td className="p-3">

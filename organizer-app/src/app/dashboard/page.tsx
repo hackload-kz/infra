@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { Users, Calendar, TrendingUp, Activity, UserCheck } from 'lucide-react'
+import { Users, TrendingUp, Activity, UserCheck } from 'lucide-react'
 import Link from 'next/link'
 import { isOrganizer } from '@/lib/admin'
 
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-sm">
                     <div className="flex items-center">
                         <div className="p-2 bg-blue-100 rounded-lg">
@@ -86,18 +86,6 @@ export default async function DashboardPage() {
                         <div className="ml-4">
                             <p className="text-sm font-medium text-gray-600">Команд за неделю</p>
                             <p className="text-2xl font-bold text-gray-900">{teamsThisWeek}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-sm">
-                    <div className="flex items-center">
-                        <div className="p-2 bg-orange-100 rounded-lg">
-                            <Calendar className="h-6 w-6 text-orange-600" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Дней до хакатона</p>
-                            <p className="text-2xl font-bold text-gray-900">30</p>
                         </div>
                     </div>
                 </div>

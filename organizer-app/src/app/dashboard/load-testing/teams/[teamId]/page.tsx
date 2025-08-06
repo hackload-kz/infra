@@ -56,9 +56,10 @@ interface TeamTestRunsData {
   testRuns: TestRun[]
 }
 
-export default function TeamLoadTestingPage({ params }: { params: { teamId: string } }) {
+export default function TeamLoadTestingPage({ params }: { params: Promise<{ teamId: string }> }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [resolvedParams, setResolvedParams] = useState<{ teamId: string } | null>(null)
   const [data, setData] = useState<TeamTestRunsData | null>(null)
   const [filteredRuns, setFilteredRuns] = useState<TestRun[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,6 +67,11 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
   const [showForm, setShowForm] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
+
+  // Resolve params Promise
+  useEffect(() => {
+    params.then(setResolvedParams)
+  }, [params])
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -94,9 +100,11 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
   }, [checkingAdmin, session, isAdmin, router])
 
   const fetchTestRuns = useCallback(async () => {
+    if (!resolvedParams?.teamId) return
+    
     try {
       setLoading(true)
-      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs`)
+      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs`)
       if (response.ok) {
         const result = await response.json()
         setData(result)
@@ -108,13 +116,13 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
     } finally {
       setLoading(false)
     }
-  }, [params.teamId, router])
+  }, [resolvedParams?.teamId, router])
 
   useEffect(() => {
-    if (isAdmin && params.teamId) {
+    if (isAdmin && resolvedParams?.teamId) {
       fetchTestRuns()
     }
-  }, [isAdmin, params.teamId, fetchTestRuns])
+  }, [isAdmin, resolvedParams?.teamId, fetchTestRuns])
 
   useEffect(() => {
     if (data) {
@@ -142,8 +150,10 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
   }
 
   const handleUpdateStatus = async (runId: string, newStatus: string) => {
+    if (!resolvedParams?.teamId) return
+    
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -165,9 +175,10 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
 
   const handleStopK6Test = async (runId: string) => {
     if (!confirm('Вы уверены, что хотите остановить K6 тест?')) return
+    if (!resolvedParams?.teamId) return
 
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'stop' })
@@ -193,9 +204,10 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
 
   const handleDeleteRun = async (runId: string) => {
     if (!confirm('Вы уверены, что хотите удалить этот запуск теста?')) return
+    if (!resolvedParams?.teamId) return
 
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
         method: 'DELETE'
       })
 
@@ -265,10 +277,10 @@ export default function TeamLoadTestingPage({ params }: { params: { teamId: stri
     )
   }
 
-  if (showForm) {
+  if (showForm && resolvedParams?.teamId) {
     return (
       <TestRunForm
-        teamId={params.teamId}
+        teamId={resolvedParams.teamId}
         onSuccess={handleRunCreated}
         onCancel={() => setShowForm(false)}
       />

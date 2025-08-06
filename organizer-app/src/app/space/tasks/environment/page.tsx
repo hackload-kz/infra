@@ -29,7 +29,11 @@ export default async function EnvironmentPage() {
           environmentData: true
         }
       },
-      ledTeam: true,
+      ledTeam: {
+        include: {
+          environmentData: true
+        }
+      },
     },
   })
 

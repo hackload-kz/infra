@@ -109,43 +109,43 @@ export default function LoadTestingPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return <CheckCircle size={16} className="text-green-400" />
+        return <CheckCircle size={16} className="text-green-600" />
       case 'IN_REVIEW':
-        return <Clock size={16} className="text-yellow-400" />
+        return <Clock size={16} className="text-yellow-600" />
       case 'FINISHED':
-        return <CheckCircle size={16} className="text-blue-400" />
+        return <CheckCircle size={16} className="text-blue-600" />
       case 'CANCELED':
       case 'REJECTED':
-        return <XCircle size={16} className="text-red-400" />
+        return <XCircle size={16} className="text-red-600" />
       default:
-        return <Activity size={16} className="text-slate-400" />
+        return <Activity size={16} className="text-gray-500" />
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return 'bg-green-500/20 text-green-300 border-green-500/30'
+        return 'bg-green-100 text-green-800 border-green-300'
       case 'IN_REVIEW':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300'
       case 'FINISHED':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+        return 'bg-blue-100 text-blue-800 border-blue-300'
       case 'CANCELED':
       case 'REJECTED':
-        return 'bg-red-500/20 text-red-300 border-red-500/30'
+        return 'bg-red-100 text-red-800 border-red-300'
       case 'NEW':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+        return 'bg-blue-100 text-blue-800 border-blue-300'
       case 'INCOMPLETED':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300'
       default:
-        return 'bg-slate-500/20 text-slate-300 border-slate-500/30'
+        return 'bg-gray-100 text-gray-800 border-gray-300'
     }
   }
 
   if (status === 'loading' || checkingAdmin) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg text-slate-300">Загрузка...</div>
+        <div className="text-lg text-gray-600">Загрузка...</div>
       </div>
     )
   }
@@ -158,7 +158,7 @@ export default function LoadTestingPage() {
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-400">Доступ запрещен. Требуются права организатора.</div>
+        <div className="text-red-600">Доступ запрещен. Требуются права организатора.</div>
       </div>
     )
   }
@@ -166,8 +166,8 @@ export default function LoadTestingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Нагрузочное тестирование</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="text-3xl font-bold text-gray-900">Нагрузочное тестирование</h1>
+        <p className="mt-2 text-gray-700">
           Управление нагрузочным тестированием команд хакатона
         </p>
       </div>
@@ -175,55 +175,63 @@ export default function LoadTestingPage() {
       {/* Поиск */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
             placeholder="Поиск команд..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-700/70 border-slate-600/50 text-white placeholder-slate-400"
+            className="pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
           />
         </div>
       </div>
 
       {/* Статистика */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+        <Card className="bg-white border-gray-300 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <Users size={24} className="text-amber-400" />
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Users size={24} className="text-blue-600" />
+            </div>
             <div>
-              <p className="text-sm text-slate-300">Всего команд</p>
-              <p className="text-xl font-bold text-white">{teams.length}</p>
+              <p className="text-sm font-medium text-gray-600">Всего команд</p>
+              <p className="text-2xl font-bold text-gray-900">{teams.length}</p>
             </div>
           </div>
         </Card>
-        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+        <Card className="bg-white border-gray-300 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <Play size={24} className="text-green-400" />
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Play size={24} className="text-green-600" />
+            </div>
             <div>
-              <p className="text-sm text-slate-300">Запусков тестов</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-sm font-medium text-gray-600">Запусков тестов</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {teams.reduce((acc, team) => acc + team._count.testRuns, 0)}
               </p>
             </div>
           </div>
         </Card>
-        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+        <Card className="bg-white border-gray-300 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <CheckCircle size={24} className="text-blue-400" />
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <CheckCircle size={24} className="text-indigo-600" />
+            </div>
             <div>
-              <p className="text-sm text-slate-300">Активных команд</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-sm font-medium text-gray-600">Активных команд</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {teams.filter(team => ['APPROVED', 'FINISHED'].includes(team.status)).length}
               </p>
             </div>
           </div>
         </Card>
-        <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+        <Card className="bg-white border-gray-300 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <Activity size={24} className="text-purple-400" />
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Activity size={24} className="text-purple-600" />
+            </div>
             <div>
-              <p className="text-sm text-slate-300">Участников</p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-sm font-medium text-gray-600">Участников</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {teams.reduce((acc, team) => acc + team._count.members, 0)}
               </p>
             </div>
@@ -235,35 +243,35 @@ export default function LoadTestingPage() {
       <div className="space-y-3">
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-slate-300">Загрузка команд...</div>
+            <div className="text-gray-600">Загрузка команд...</div>
           </div>
         ) : filteredTeams.length === 0 ? (
-          <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-8 text-center">
-            <Users size={48} className="mx-auto text-slate-400 mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">
+          <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
+            <Users size={48} className="mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
               {searchTerm ? 'Команды не найдены' : 'Нет команд'}
             </h3>
-            <p className="text-slate-200">
+            <p className="text-gray-600">
               {searchTerm ? 'Попробуйте изменить параметры поиска' : 'Команды появятся здесь после регистрации участников'}
             </p>
           </Card>
         ) : (
           filteredTeams.map((team) => (
-            <Card key={team.id} className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-6 hover:bg-slate-700/80 transition-colors">
+            <Card key={team.id} className="bg-white border-gray-300 shadow-sm p-6 hover:bg-gray-50 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-medium text-white">{team.name}</h3>
-                    <span className="text-sm text-slate-300">@{team.nickname}</span>
+                    <h3 className="text-lg font-medium text-gray-900">{team.name}</h3>
+                    <span className="text-sm text-gray-600">@{team.nickname}</span>
                     <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(team.status)}`}>
                       {getStatusIcon(team.status)}
                       {team.status}
                     </div>
                     {team.level && (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
                         team.level === 'BEGINNER' 
-                          ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          ? 'bg-green-100 text-green-800 border-green-300'
+                          : 'bg-blue-100 text-blue-800 border-blue-300'
                       }`}>
                         {team.level === 'BEGINNER' ? 'Начинающие' : 'Продвинутые'}
                       </span>
@@ -271,10 +279,10 @@ export default function LoadTestingPage() {
                   </div>
                   
                   {team.description && (
-                    <p className="text-sm text-slate-200 mb-3">{team.description}</p>
+                    <p className="text-sm text-gray-600 mb-3">{team.description}</p>
                   )}
                   
-                  <div className="flex items-center gap-6 text-sm text-slate-300">
+                  <div className="flex items-center gap-6 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <Users size={14} />
                       <span>{team._count.members} участников</span>
@@ -296,7 +304,7 @@ export default function LoadTestingPage() {
                 
                 <Button
                   onClick={() => router.push(`/dashboard/load-testing/teams/${team.id}`)}
-                  className="bg-amber-400 hover:bg-amber-500 text-black font-medium flex items-center gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
                 >
                   Управление тестами
                   <ArrowRight size={16} />

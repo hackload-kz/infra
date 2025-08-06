@@ -5,14 +5,14 @@ import { logger } from '@/lib/logger'
 import { markdownToHtmlServer } from '@/lib/markdown-server'
 import { isOrganizer } from '@/lib/admin'
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     await logger.logApiCall('GET', `/api/calendar/${id}`, session.user.email)
 
     const event = await db.calendarEvent.findUnique({
@@ -50,13 +50,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json(eventWithDismissal)
   } catch (error) {
     const errorSession = await auth()
-    const { id } = params
+    const { id } = await params
     await logger.logApiError('GET', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
@@ -68,7 +68,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { 
       title, 
@@ -125,13 +125,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json(event)
   } catch (error) {
     const errorSession = await auth()
-    const { id } = params
+    const { id } = await params
     await logger.logApiError('PUT', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
@@ -143,7 +143,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
     await logger.logApiCall('DELETE', `/api/calendar/${id}`, session.user.email)
 
     const existingEvent = await db.calendarEvent.findUnique({
@@ -166,7 +166,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     return NextResponse.json({ message: 'Event deleted successfully' })
   } catch (error) {
     const errorSession = await auth()
-    const { id } = params
+    const { id } = await params
     await logger.logApiError('DELETE', `/api/calendar/${id}`, error instanceof Error ? error : new Error('Unknown error'), errorSession?.user?.email || undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

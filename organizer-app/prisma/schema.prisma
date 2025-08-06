@@ -280,6 +280,7 @@ model TeamEnvironmentData {
   description String?
   category    String?
   isSecure    Boolean  @default(false)
+  isEditable  Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdBy   String?
