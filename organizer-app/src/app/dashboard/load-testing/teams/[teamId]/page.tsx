@@ -225,30 +225,30 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'RUNNING':
-        return <Play size={16} className="text-blue-400" />
+        return <Play size={16} className="text-blue-600" />
       case 'COMPLETED':
-        return <CheckCircle size={16} className="text-green-400" />
+        return <CheckCircle size={16} className="text-green-600" />
       case 'FAILED':
-        return <XCircle size={16} className="text-red-400" />
+        return <XCircle size={16} className="text-red-600" />
       case 'CANCELLED':
-        return <Pause size={16} className="text-yellow-400" />
+        return <Pause size={16} className="text-yellow-600" />
       default:
-        return <Clock size={16} className="text-slate-400" />
+        return <Clock size={16} className="text-gray-500" />
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'RUNNING':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+        return 'bg-blue-100 text-blue-800 border-blue-300'
       case 'COMPLETED':
-        return 'bg-green-500/20 text-green-300 border-green-500/30'
+        return 'bg-green-100 text-green-800 border-green-300'
       case 'FAILED':
-        return 'bg-red-500/20 text-red-300 border-red-500/30'
+        return 'bg-red-100 text-red-800 border-red-300'
       case 'CANCELLED':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300'
       default:
-        return 'bg-slate-500/20 text-slate-300 border-slate-500/30'
+        return 'bg-gray-100 text-gray-800 border-gray-300'
     }
   }
 
@@ -259,7 +259,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   if (status === 'loading' || checkingAdmin) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg text-slate-300">Загрузка...</div>
+        <div className="text-lg text-gray-600">Загрузка...</div>
       </div>
     )
   }
@@ -272,7 +272,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-400">Доступ запрещен. Требуются права организатора.</div>
+        <div className="text-red-600">Доступ запрещен. Требуются права организатора.</div>
       </div>
     )
   }
@@ -294,15 +294,15 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
         <Button
           onClick={() => router.push('/dashboard/load-testing')}
           variant="ghost"
-          className="text-slate-300 hover:text-white"
+          className="text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft size={20} />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
             {data ? `Тестирование команды "${data.team.name}"` : 'Загрузка...'}
           </h1>
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-gray-600">
             {data ? `@${data.team.nickname} • Управление запусками нагрузочного тестирования` : ''}
           </p>
         </div>
@@ -310,7 +310,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
 
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="text-slate-300">Загрузка тестов...</div>
+          <div className="text-gray-600">Загрузка тестов...</div>
         </div>
       ) : data ? (
         <>
@@ -318,72 +318,82 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
           <div className="flex items-center gap-4">
             <Button
               onClick={handleCreateRun}
-              className="bg-amber-400 hover:bg-amber-500 text-black font-medium flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
             >
               <Plus size={16} />
               Новый тест
             </Button>
             <div className="relative flex-1">
-              <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="Поиск тестов..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-slate-700/70 border-slate-600/50 text-white placeholder-slate-400"
+                className="pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
               />
             </div>
           </div>
 
           {/* Статистика */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+            <Card className="bg-white border-gray-300 shadow-sm p-4">
               <div className="flex items-center gap-3">
-                <Activity size={24} className="text-amber-400" />
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <Activity size={24} className="text-indigo-600" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-300">Всего тестов</p>
-                  <p className="text-xl font-bold text-white">{data.testRuns.length}</p>
+                  <p className="text-sm font-medium text-gray-600">Всего тестов</p>
+                  <p className="text-2xl font-bold text-gray-900">{data.testRuns.length}</p>
                 </div>
               </div>
             </Card>
-            <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+            <Card className="bg-white border-gray-300 shadow-sm p-4">
               <div className="flex items-center gap-3">
-                <Play size={24} className="text-blue-400" />
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Play size={24} className="text-blue-600" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-300">Выполняется</p>
-                  <p className="text-xl font-bold text-white">
+                  <p className="text-sm font-medium text-gray-600">Выполняется</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {data.testRuns.filter(run => run.status === 'RUNNING').length}
                   </p>
                 </div>
               </div>
             </Card>
-            <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+            <Card className="bg-white border-gray-300 shadow-sm p-4">
               <div className="flex items-center gap-3">
-                <CheckCircle size={24} className="text-green-400" />
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <CheckCircle size={24} className="text-green-600" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-300">Завершено</p>
-                  <p className="text-xl font-bold text-white">
+                  <p className="text-sm font-medium text-gray-600">Завершено</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {data.testRuns.filter(run => run.status === 'COMPLETED').length}
                   </p>
                 </div>
               </div>
             </Card>
-            <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+            <Card className="bg-white border-gray-300 shadow-sm p-4">
               <div className="flex items-center gap-3">
-                <XCircle size={24} className="text-red-400" />
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <XCircle size={24} className="text-red-600" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-300">Ошибки</p>
-                  <p className="text-xl font-bold text-white">
+                  <p className="text-sm font-medium text-gray-600">Ошибки</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {data.testRuns.filter(run => run.status === 'FAILED').length}
                   </p>
                 </div>
               </div>
             </Card>
-            <Card className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-4">
+            <Card className="bg-white border-gray-300 shadow-sm p-4">
               <div className="flex items-center gap-3">
-                <Clock size={24} className="text-slate-400" />
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Clock size={24} className="text-gray-500" />
+                </div>
                 <div>
-                  <p className="text-sm text-slate-300">Ожидание</p>
-                  <p className="text-xl font-bold text-white">
+                  <p className="text-sm font-medium text-gray-600">Ожидание</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {data.testRuns.filter(run => run.status === 'PENDING').length}
                   </p>
                 </div>
@@ -394,18 +404,18 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
           {/* Список запусков */}
           <div className="space-y-3">
             {filteredRuns.length === 0 ? (
-              <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/30 p-8 text-center">
-                <Activity size={48} className="mx-auto text-slate-500 mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">
+              <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
+                <Activity size={48} className="mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {searchTerm ? 'Тесты не найдены' : 'Нет запусков тестов'}
                 </h3>
-                <p className="text-slate-400 mb-4">
+                <p className="text-gray-600 mb-4">
                   {searchTerm ? 'Попробуйте изменить параметры поиска' : 'Создайте первый запуск теста для этой команды'}
                 </p>
                 {!searchTerm && (
                   <Button
                     onClick={handleCreateRun}
-                    className="bg-amber-400 hover:bg-amber-500 text-black font-medium"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                   >
                     <Plus size={16} className="mr-2" />
                     Создать тест
@@ -414,17 +424,17 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
               </Card>
             ) : (
               filteredRuns.map((run) => (
-                <Card key={run.id} className="bg-slate-800/70 backdrop-blur-sm border-slate-600/40 p-6">
+                <Card key={run.id} className="bg-white border-gray-300 shadow-sm p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-1 rounded-md text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                          <span className="px-2 py-1 rounded-md text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-300">
                             #{run.runNumber}
                           </span>
-                          <h3 className="text-lg font-medium text-white">{run.scenario.name}</h3>
+                          <h3 className="text-lg font-medium text-gray-900">{run.scenario.name}</h3>
                         </div>
-                        <span className="text-sm text-slate-300">({run.scenario.identifier})</span>
+                        <span className="text-sm text-gray-600">({run.scenario.identifier})</span>
                         <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(run.status)}`}>
                           {getStatusIcon(run.status)}
                           {run.status}
@@ -432,17 +442,17 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                       </div>
                       
                       {run.scenario.description && (
-                        <p className="text-sm text-slate-200 mb-2">{run.scenario.description}</p>
+                        <p className="text-sm text-gray-700 mb-2">{run.scenario.description}</p>
                       )}
                       
                       {run.comment && (
                         <div className="flex items-start gap-2 mb-3">
-                          <MessageSquare size={14} className="text-slate-300 mt-0.5" />
-                          <p className="text-sm text-slate-200">{run.comment}</p>
+                          <MessageSquare size={14} className="text-gray-500 mt-0.5" />
+                          <p className="text-sm text-gray-700">{run.comment}</p>
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-6 text-sm text-slate-300">
+                      <div className="flex items-center gap-6 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar size={14} />
                           <span>Создан: {formatDateTime(run.createdAt)}</span>
@@ -462,7 +472,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                         {run.k6TestName && (
                           <div className="flex items-center gap-1">
                             <Activity size={14} />
-                            <span className="text-xs font-mono bg-slate-700/50 px-2 py-1 rounded">K6: {run.k6TestName}</span>
+                            <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">K6: {run.k6TestName}</span>
                           </div>
                         )}
                       </div>
@@ -511,7 +521,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                         onClick={() => handleDeleteRun(run.id)}
                         size="sm"
                         variant="ghost"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-100"
                       >
                         <Trash2 size={14} />
                       </Button>
@@ -524,7 +534,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
         </>
       ) : (
         <div className="flex items-center justify-center py-8">
-          <div className="text-red-400">Команда не найдена</div>
+          <div className="text-red-600">Команда не найдена</div>
         </div>
       )}
     </div>

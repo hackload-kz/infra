@@ -138,36 +138,36 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
         <Button
           onClick={onCancel}
           variant="ghost"
-          className="text-slate-300 hover:text-white"
+          className="text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft size={20} />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-white">Новый запуск теста</h1>
-          <p className="mt-2 text-slate-500">
+          <h1 className="text-2xl font-bold text-gray-900">Новый запуск теста</h1>
+          <p className="mt-2 text-gray-600">
             Создание нового запуска нагрузочного тестирования
           </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700/30 p-6">
-          <h2 className="text-lg font-medium text-white mb-4">
+        <Card className="bg-white border-gray-300 shadow-sm p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">
             Параметры теста
           </h2>
 
           <div className="space-y-4">
             {/* Выбор сценария */}
             <div>
-              <Label htmlFor="scenario" className="text-slate-300">
+              <Label htmlFor="scenario" className="text-gray-700 font-medium">
                 Сценарий тестирования *
               </Label>
               {loadingScenarios ? (
-                <div className="mt-1 p-3 bg-slate-700/50 border border-slate-600 rounded-md text-slate-400">
+                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
                   Загрузка сценариев...
                 </div>
               ) : scenarios.length === 0 ? (
-                <div className="mt-1 p-3 bg-slate-700/50 border border-slate-600 rounded-md text-slate-400">
+                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
                   Нет доступных сценариев. Создайте сценарий в разделе &quot;Сценарии тестирования&quot;.
                 </div>
               ) : (
@@ -175,7 +175,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
                   id="scenario"
                   value={selectedScenario}
                   onChange={(e) => setSelectedScenario(e.target.value)}
-                  className="mt-1 block w-full bg-slate-700/50 border border-slate-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  className="mt-1 block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={loading}
                 >
                   <option value="">Выберите сценарий...</option>
@@ -187,7 +187,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
                 </select>
               )}
               {errors.scenario && (
-                <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <AlertCircle size={14} />
                   {errors.scenario}
                 </p>
@@ -196,28 +196,28 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
 
             {/* Детали выбранного сценария */}
             {selectedScenario && (
-              <div className="bg-slate-700/30 p-4 rounded-md">
-                <h3 className="text-sm font-medium text-white mb-2">Детали сценария</h3>
+              <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Детали сценария</h3>
                 {(() => {
                   const scenario = getSelectedScenarioDetails()
                   return scenario ? (
-                    <div className="space-y-2 text-sm text-slate-300">
+                    <div className="space-y-2 text-sm text-gray-600">
                       <div>
-                        <span className="font-medium text-white">Название:</span> {scenario.name}
+                        <span className="font-medium text-gray-900">Название:</span> {scenario.name}
                       </div>
                       <div>
-                        <span className="font-medium text-white">Идентификатор:</span> {scenario.identifier}
+                        <span className="font-medium text-gray-900">Идентификатор:</span> {scenario.identifier}
                       </div>
                       {scenario.description && (
                         <div>
-                          <span className="font-medium text-white">Описание:</span> {scenario.description}
+                          <span className="font-medium text-gray-900">Описание:</span> {scenario.description}
                         </div>
                       )}
                       <div>
-                        <span className="font-medium text-white">Количество шагов:</span> {scenario._count.steps}
+                        <span className="font-medium text-gray-900">Количество шагов:</span> {scenario._count.steps}
                       </div>
                       <div>
-                        <span className="font-medium text-white">Создан:</span> {new Date(scenario.createdAt).toLocaleString('ru-RU')}
+                        <span className="font-medium text-gray-900">Создан:</span> {new Date(scenario.createdAt).toLocaleString('ru-RU')}
                       </div>
                     </div>
                   ) : null
@@ -227,7 +227,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
 
             {/* Комментарий */}
             <div>
-              <Label htmlFor="comment" className="text-slate-300">
+              <Label htmlFor="comment" className="text-gray-700 font-medium">
                 Комментарий
               </Label>
               <Textarea
@@ -235,22 +235,22 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Описание цели теста, ожидаемых результатов или особых условий..."
-                className="mt-1 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 focus:ring-amber-400 focus:border-transparent resize-none"
+                className="mt-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={3}
                 disabled={loading}
               />
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-gray-600">
                 Необязательное поле для дополнительной информации о запуске
               </p>
             </div>
 
             {/* Информация о времени выполнения */}
-            <div className="bg-amber-900/20 border border-amber-500/30 p-4 rounded-md">
+            <div className="bg-blue-50 border border-blue-300 p-4 rounded-md">
               <div className="flex items-start gap-2">
-                <AlertCircle size={16} className="text-amber-400 mt-0.5" />
+                <AlertCircle size={16} className="text-blue-600 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-medium text-amber-100 mb-1">Информация о выполнении</h4>
-                  <ul className="text-sm text-amber-200/80 space-y-1">
+                  <h4 className="text-sm font-medium text-blue-900 mb-1">Информация о выполнении</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Тест будет создан в статусе &quot;PENDING&quot; (ожидание)</li>
                     <li>• Запуск можно будет начать вручную из списка тестов</li>
                     <li>• Время создания будет зафиксировано автоматически</li>
@@ -262,7 +262,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
 
             {/* Ошибки формы */}
             {errors.submit && (
-              <div className="p-4 rounded-md border bg-red-500/20 text-red-300 border-red-500/30">
+              <div className="p-4 rounded-md border bg-red-100 text-red-800 border-red-300">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={16} />
                   <span>{errors.submit}</span>
@@ -277,11 +277,11 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
           <Button
             type="submit"
             disabled={loading || loadingScenarios || scenarios.length === 0}
-            className="bg-amber-400 hover:bg-amber-500 text-black font-medium flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 Создание...
               </>
             ) : (
@@ -296,7 +296,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel }: TestRunForm
             onClick={onCancel}
             variant="ghost"
             disabled={loading}
-            className="text-slate-300 hover:text-white"
+            className="text-gray-600 hover:text-gray-900"
           >
             <X size={16} className="mr-2" />
             Отмена

@@ -17,7 +17,13 @@ export const serviceKeySchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   permissions: z.array(z.string()).default(['environment:write']),
-  expiresAt: z.string().datetime().optional()
+  expiresAt: z.string()
+    .optional()
+    .refine((value) => {
+      if (!value) return true;
+      // Allow datetime-local format (YYYY-MM-DDTHH:mm) or full ISO datetime
+      return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{3})?Z?)?$/.test(value) && !isNaN(Date.parse(value));
+    }, "Invalid datetime format")
 })
 
 export const serviceKeyUpdateSchema = z.object({
@@ -25,7 +31,14 @@ export const serviceKeyUpdateSchema = z.object({
   description: z.string().max(500).optional(),
   permissions: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
-  expiresAt: z.string().datetime().optional().nullable()
+  expiresAt: z.string()
+    .optional()
+    .nullable()
+    .refine((value) => {
+      if (!value) return true;
+      // Allow datetime-local format (YYYY-MM-DDTHH:mm) or full ISO datetime
+      return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{3})?Z?)?$/.test(value) && !isNaN(Date.parse(value));
+    }, "Invalid datetime format")
 })
 
 export const bulkEnvironmentUpdateSchema = z.object({
