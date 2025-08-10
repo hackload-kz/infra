@@ -323,7 +323,7 @@ export async function checkK6TestRunStatus(testRunName: string) {
     })
 
     // Kubernetes client возвращает данные напрямую в response
-    const testRun = response as any
+    const testRun = response as { status?: { stage?: string; conditions?: Array<{ type: string; status: string }>; jobName?: string } }
 
     const status = testRun?.status
     const stage = status?.stage
@@ -416,7 +416,7 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
           )
           
           if (matchingPods.length > 0) {
-            podsResponse = { body: { items: matchingPods } } as any
+            podsResponse = { items: matchingPods } as { items: Array<{ metadata?: { name?: string }; status?: { phase?: string } }> }
           }
         }
       } catch (error) {
@@ -433,7 +433,7 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
     const allLogs: string[] = []
     
     // Get logs from all pods if parallelism > 1
-    for (const pod of podsResponse.items as any[]) {
+    for (const pod of podsResponse.items as Array<{ metadata?: { name?: string }; spec?: { containers?: Array<{ name: string }> } }>) {
       const podName = pod.metadata?.name
       
       if (!podName) {
@@ -450,7 +450,7 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
 
         // Handle different log response structures
         const logData = logsResponse
-        const logText = typeof logData === 'string' ? logData : ((logData as any)?.toString() || '')
+        const logText = typeof logData === 'string' ? logData : (String(logData) || '')
         
         // Add container header and logs
         const containerHeader = `\n=== Container: ${podName} ===\n`
@@ -534,7 +534,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
           )
           
           if (matchingPods.length > 0) {
-            podsResponse = { body: { items: matchingPods } } as any
+            podsResponse = { items: matchingPods } as { items: Array<{ metadata?: { name?: string }; status?: { phase?: string } }> }
           }
         }
       } catch (error) {
@@ -550,7 +550,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
       }
     }
 
-    const podStatuses = podsResponse.items.map((pod: any) => ({
+    const podStatuses = podsResponse.items.map((pod: { metadata?: { name?: string }; status?: { phase?: string } }) => ({
       name: pod.metadata?.name || 'unknown',
       phase: pod.status?.phase || 'unknown'
     }))

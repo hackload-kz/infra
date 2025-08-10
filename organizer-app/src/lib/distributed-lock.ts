@@ -54,7 +54,8 @@ export class DistributedLockManager {
             instanceId: INSTANCE_ID,
             expiresAt,
             heartbeatAt: new Date(),
-            metadata: (metadata || {}) as any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            metadata: (metadata as any) || null
           }
         })
 
@@ -85,7 +86,8 @@ export class DistributedLockManager {
                   data: {
                     expiresAt: new Date(Date.now() + ttlMs),
                     heartbeatAt: new Date(),
-                    metadata: (metadata || {}) as any
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            metadata: (metadata as any) || null
                   }
                 })
 
@@ -115,7 +117,8 @@ export class DistributedLockManager {
                       acquiredAt: new Date(),
                       expiresAt: new Date(Date.now() + ttlMs),
                       heartbeatAt: new Date(),
-                      metadata: (metadata || {}) as any
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            metadata: (metadata as any) || null
                     }
                   })
 

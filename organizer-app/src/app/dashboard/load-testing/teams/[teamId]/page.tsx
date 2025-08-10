@@ -152,6 +152,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     setShowForm(true)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleRunCreated = (newRun: any) => {
     if (data) {
       setData({
