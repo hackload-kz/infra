@@ -6,17 +6,6 @@ const nextConfig: NextConfig = {
     '/api/**/*': ['./node_modules/@prisma/client/**/*'],
   },
   
-  // External packages for server components
-  serverExternalPackages: ['@kubernetes/client-node'],
-  
-  // Оптимизации компилятора
-  compiler: {
-    // Удаляем только console.log в production, оставляем console.info, console.warn, console.error
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['info', 'warn', 'error']
-    } : false,
-  },
-  
   // Экспериментальные оптимизации
   experimental: {
     // Оптимизация сборки
@@ -29,11 +18,27 @@ const nextConfig: NextConfig = {
       'class-variance-authority'
     ],
     // Кэширование сборки
-    webpackBuildWorker: true,
+    webpackBuildWorker: process.env.SKIP_ENV_VALIDATION !== '1',
+  },
+  
+  // External packages for server components
+  serverExternalPackages: ['@kubernetes/client-node'],
+  
+  // Оптимизации компилятора
+  compiler: {
+    // Удаляем только console.log в production, оставляем console.info, console.warn, console.error
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['info', 'warn', 'error']
+    } : false,
   },
   
   // Оптимизации Webpack
   webpack: (config, { dev }) => {
+    // Skip optimizations during Docker build to avoid runtime errors
+    if (process.env.SKIP_ENV_VALIDATION === '1') {
+      return config;
+    }
+    
     // Только для production сборки
     if (!dev) {
       // Кэширование

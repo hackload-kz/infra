@@ -1,17 +1,42 @@
-import * as k8s from '@kubernetes/client-node'
+// Prevent Kubernetes client from loading during build
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let k8s: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let kc: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let customObjectsApi: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let coreV1Api: any = null;
 
-const kc = new k8s.KubeConfig()
+// Initialize Kubernetes client only when needed and not during build
+const initK8sClient = async () => {
+  if (k8s !== null) return;
+  
+  // Skip initialization during Docker build
+  if (process.env.SKIP_ENV_VALIDATION === '1') {
+    console.log('Skipping Kubernetes client initialization during build');
+    return;
+  }
+  
+  try {
+    k8s = await import('@kubernetes/client-node');
+    kc = new k8s.KubeConfig();
 
-// Load config from service account when running in cluster
-if (process.env.KUBERNETES_SERVICE_HOST) {
-  kc.loadFromCluster()
-} else {
-  // For local development, load from kubeconfig
-  kc.loadFromDefault()
-}
+    // Load config from service account when running in cluster
+    if (process.env.KUBERNETES_SERVICE_HOST) {
+      kc.loadFromCluster();
+    } else {
+      // For local development, load from kubeconfig
+      kc.loadFromDefault();
+    }
 
-const customObjectsApi = kc.makeApiClient(k8s.CustomObjectsApi)
-const coreV1Api = kc.makeApiClient(k8s.CoreV1Api)
+    customObjectsApi = kc.makeApiClient(k8s.CustomObjectsApi);
+    coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+  } catch (error) {
+    console.error('Failed to initialize Kubernetes client:', error);
+    throw error;
+  }
+};
 
 export interface LoadTestConfig {
   url: string
@@ -34,6 +59,8 @@ export interface K6TestRunConfig {
 
 // Legacy function for backward compatibility
 export async function createK6Test(config: LoadTestConfig): Promise<string> {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   const testId = `load-test-${Date.now()}`
 
   const k6Script = `
@@ -114,6 +141,8 @@ export default function() {
 
 // New function that follows the specific K6 TestRun specification
 export async function createK6TestRun(config: K6TestRunConfig): Promise<string> {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   // Generate test name: teamNickname + scenarioIdentifier + stepName + runNumber
   const sanitizedStepName = config.stepName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
   const testRunName = `${config.teamNickname}-${config.scenarioIdentifier}-${sanitizedStepName}-${config.runNumber}`
@@ -214,6 +243,8 @@ export async function createK6TestRun(config: K6TestRunConfig): Promise<string> 
 }
 
 export async function getK6TestRunStatus(testRunName: string) {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   try {
     const response = await customObjectsApi.getNamespacedCustomObject({
       group: 'k6.io',
@@ -231,6 +262,8 @@ export async function getK6TestRunStatus(testRunName: string) {
 }
 
 export async function deleteK6TestRun(testRunName: string) {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   try {
     const configMapName = `${testRunName}-config`
 
@@ -295,6 +328,8 @@ export function mapK6StageToStatus(stage: string): 'PENDING' | 'RUNNING' | 'SUCC
 
 // Get all K6 test runs with their current status
 export async function getAllK6TestRuns() {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   try {
     const response = await customObjectsApi.listNamespacedCustomObject({
       group: 'k6.io',
@@ -313,6 +348,8 @@ export async function getAllK6TestRuns() {
 
 // Check if K6 TestRun exists and get its status
 export async function checkK6TestRunStatus(testRunName: string) {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   try {
     const response = await customObjectsApi.getNamespacedCustomObject({
       group: 'k6.io',
@@ -354,9 +391,12 @@ export async function checkK6TestRunStatus(testRunName: string) {
 
 // Get container logs for a K6 TestRun, supporting multiple containers from parallelism
 export async function getK6TestRunLogs(testRunName: string, tailLines: number = 100) {
+  await initK8sClient();
+  if (!coreV1Api) throw new Error('Kubernetes client not initialized');
   try {
-    const coreApi = kc.makeApiClient(k8s.CoreV1Api)
-    let podsResponse: k8s.V1PodList | null = null
+    const coreApi = coreV1Api
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let podsResponse: any = null
 
     // Strategy 1: Try to get job name from TestRun status
     try {
@@ -411,7 +451,8 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
         // Check if we have items to filter
         if (responseBody?.items) {
           // Filter pods that contain the testRunName in their name
-          const matchingPods = responseBody.items.filter(pod => 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const matchingPods = responseBody.items.filter((pod: any) => 
             pod.metadata?.name?.includes(testRunName)
           )
           
@@ -482,9 +523,12 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
   hasCompletedPods: boolean
   podStatuses: Array<{ name: string, phase: string }>
 }> {
+  await initK8sClient();
+  if (!coreV1Api) throw new Error('Kubernetes client not initialized');
   try {
-    const coreApi = kc.makeApiClient(k8s.CoreV1Api)
-    let podsResponse: k8s.V1PodList | null = null
+    const coreApi = coreV1Api
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let podsResponse: any = null
 
     // Try multiple strategies to find pods (same as in log collection)
     
@@ -529,7 +573,8 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
         })
         const responseBody = allPodsSearchResponse
         if (responseBody?.items) {
-          const matchingPods = responseBody.items.filter(pod => 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const matchingPods = responseBody.items.filter((pod: any) => 
             pod.metadata?.name?.includes(testRunName)
           )
           
@@ -556,8 +601,10 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
     }))
 
     // Check if any pods are in Error state (indicating test failure due to thresholds)
-    const hasFailedPods = podStatuses.some(pod => pod.phase === 'Failed' || pod.phase === 'Error')
-    const hasCompletedPods = podStatuses.some(pod => pod.phase === 'Succeeded' || pod.phase === 'Completed')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hasFailedPods = podStatuses.some((pod: any) => pod.phase === 'Failed' || pod.phase === 'Error')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hasCompletedPods = podStatuses.some((pod: any) => pod.phase === 'Succeeded' || pod.phase === 'Completed')
 
     return {
       hasFailedPods,
@@ -577,6 +624,8 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
 
 // Enhanced status mapping that checks pod statuses for finished tests
 export async function getK6TestRunActualStatus(testRunName: string): Promise<'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'DELETED'> {
+  await initK8sClient();
+  if (!customObjectsApi) throw new Error('Kubernetes client not initialized');
   try {
     const testRunStatus = await checkK6TestRunStatus(testRunName)
     
