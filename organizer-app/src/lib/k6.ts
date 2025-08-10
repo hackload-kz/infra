@@ -18,8 +18,8 @@ const initK8sClient = async () => {
   console.info('[K8S-DEBUG]   SKIP_ENV_VALIDATION:', process.env.SKIP_ENV_VALIDATION);
   console.info('[K8S-DEBUG]   NODE_ENV:', process.env.NODE_ENV);
   
-  // Skip initialization during Docker build
-  if (process.env.SKIP_ENV_VALIDATION === '1') {
+  // Skip initialization only during Docker build (not in production runtime)
+  if (process.env.SKIP_ENV_VALIDATION === '1' && process.env.NODE_ENV !== 'production') {
     console.info('[K8S-DEBUG] Skipping Kubernetes client initialization during build');
     return;
   }
