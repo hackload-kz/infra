@@ -24,7 +24,7 @@ export async function GET(
     // Проверить существование команды
     const team = await db.team.findUnique({
       where: { id: teamId },
-      select: { id: true, name: true, nickname: true }
+      select: { id: true, name: true, nickname: true, k6EnvironmentVars: true }
     })
 
     if (!team) {
@@ -90,7 +90,13 @@ export async function POST(
 
     // Проверить существование команды
     const team = await db.team.findUnique({
-      where: { id: teamId }
+      where: { id: teamId },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        k6EnvironmentVars: true
+      }
     })
 
     if (!team) {
@@ -238,7 +244,8 @@ export default function() {
           stepOrder: step.stepOrder,
           runNumber,
           k6Script,
-          parallelism: parsedParallelism
+          parallelism: parsedParallelism,
+          environmentVars: team.k6EnvironmentVars ? team.k6EnvironmentVars as Record<string, string> : undefined
         })
 
         // Обновить запись шага с именем K6 теста

@@ -80,7 +80,7 @@ interface TestRunDetails {
 export default function TestRunDetailsPage({ 
   params 
 }: { 
-  params: { teamId: string; runId: string } 
+  params: Promise<{ teamId: string; runId: string }> 
 }) {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -91,6 +91,16 @@ export default function TestRunDetailsPage({
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set())
   const [stepLogs, setStepLogs] = useState<Record<string, string>>({})
   const [loadingLogs, setLoadingLogs] = useState<Set<string>>(new Set())
+  const [resolvedParams, setResolvedParams] = useState<{ teamId: string; runId: string } | null>(null)
+
+  // Resolve params promise
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params
+      setResolvedParams(resolved)
+    }
+    resolveParams()
+  }, [params])
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -119,27 +129,29 @@ export default function TestRunDetailsPage({
   }, [checkingAdmin, session, isAdmin, router])
 
   const fetchTestRunDetails = useCallback(async () => {
+    if (!resolvedParams) return
+    
     try {
       setLoading(true)
-      const response = await fetch(`/api/dashboard/load-testing/teams/${params.teamId}/test-runs/${params.runId}/steps`)
+      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${resolvedParams.runId}/steps`)
       if (response.ok) {
         const result = await response.json()
         setData(result)
       } else if (response.status === 404) {
-        router.push(`/dashboard/load-testing/teams/${params.teamId}`)
+        router.push(`/dashboard/load-testing/teams/${resolvedParams.teamId}`)
       }
     } catch (error) {
       console.error('Error fetching test run details:', error)
     } finally {
       setLoading(false)
     }
-  }, [params.teamId, params.runId, router])
+  }, [resolvedParams, router])
 
   useEffect(() => {
-    if (isAdmin && params.teamId && params.runId) {
+    if (isAdmin && resolvedParams?.teamId && resolvedParams?.runId) {
       fetchTestRunDetails()
     }
-  }, [isAdmin, params.teamId, params.runId, fetchTestRunDetails])
+  }, [isAdmin, resolvedParams, fetchTestRunDetails])
 
   const loadStepLogs = async (stepId: string) => {
     if (loadingLogs.has(stepId)) return
@@ -264,7 +276,7 @@ export default function TestRunDetailsPage({
       {/* Заголовок */}
       <div className="flex items-center gap-4">
         <Button
-          onClick={() => router.push(`/dashboard/load-testing/teams/${params.teamId}`)}
+          onClick={() => resolvedParams && router.push(`/dashboard/load-testing/teams/${resolvedParams.teamId}`)}
           variant="ghost"
           className="text-slate-300 hover:text-white"
         >

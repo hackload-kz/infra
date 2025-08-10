@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { 
   ArrowLeft,
   Plus,
@@ -20,7 +21,10 @@ import {
   Calendar,
   MessageSquare,
   Activity,
-  Eye
+  Eye,
+  Settings,
+  Save,
+  X
 } from 'lucide-react'
 import TestRunForm from '@/components/test-run-form'
 
@@ -28,6 +32,7 @@ interface Team {
   id: string
   name: string
   nickname: string
+  k6EnvironmentVars: Record<string, string> | null
 }
 
 interface TestScenario {
@@ -68,6 +73,9 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   const [isAdmin, setIsAdmin] = useState(false)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
   const [teamId, setTeamId] = useState<string | null>(null)
+  const [showEnvVars, setShowEnvVars] = useState(false)
+  const [envVarsText, setEnvVarsText] = useState('')
+  const [savingEnvVars, setSavingEnvVars] = useState(false)
 
   // Resolve params promise
   useEffect(() => {
@@ -144,7 +152,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     setShowForm(true)
   }
 
-  const handleRunCreated = (newRun: TestRun) => {
+  const handleRunCreated = (newRun: any) => {
     if (data) {
       setData({
         ...data,
@@ -227,6 +235,67 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     }
   }
 
+  const handleShowEnvVars = () => {
+    if (data?.team) {
+      // Initialize the text area with existing environment variables
+      const envVars = data.team.k6EnvironmentVars || {}
+      setEnvVarsText(JSON.stringify(envVars, null, 2))
+      setShowEnvVars(true)
+    }
+  }
+
+  const handleSaveEnvVars = async () => {
+    if (!teamId) return
+
+    try {
+      setSavingEnvVars(true)
+      
+      // Parse and validate JSON
+      let envVarsObject: Record<string, string> = {}
+      if (envVarsText.trim()) {
+        envVarsObject = JSON.parse(envVarsText)
+        
+        // Validate that all values are strings
+        for (const [key, value] of Object.entries(envVarsObject)) {
+          if (typeof value !== 'string') {
+            throw new Error(`Environment variable "${key}" must have a string value`)
+          }
+        }
+      }
+
+      const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/environment-variables`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ environmentVars: envVarsObject })
+      })
+
+      if (response.ok) {
+        const updatedTeam = await response.json()
+        if (data) {
+          setData({
+            ...data,
+            team: { ...data.team, k6EnvironmentVars: updatedTeam.k6EnvironmentVars }
+          })
+        }
+        setShowEnvVars(false)
+        alert('Environment variables saved successfully!')
+      } else {
+        const errorData = await response.json()
+        alert(`Error saving environment variables: ${errorData.error}`)
+      }
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        alert('Invalid JSON format. Please check your syntax.')
+      } else if (error instanceof Error) {
+        alert(`Error: ${error.message}`)
+      } else {
+        alert('Unknown error occurred while saving environment variables')
+      }
+    } finally {
+      setSavingEnvVars(false)
+    }
+  }
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'RUNNING':
@@ -292,6 +361,108 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     )
   }
 
+  if (showEnvVars) {
+    return (
+      <div className="space-y-6">
+        {/* Заголовок */}
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setShowEnvVars(false)}
+            variant="ghost"
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Переменные окружения K6
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {data ? `${data.team.name} (@${data.team.nickname}) • Настройка переменных окружения для K6 тестов` : ''}
+            </p>
+          </div>
+        </div>
+
+        {/* Environment Variables Form */}
+        <Card className="bg-white border-gray-300 shadow-sm p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Environment Variables (JSON)
+              </label>
+              <p className="text-sm text-gray-500 mb-3">
+                Введите переменные окружения в формате JSON. Эти переменные будут доступны во всех K6 тестах команды.
+              </p>
+              <p className="text-sm text-gray-600 mb-3">
+                <strong>Использование в K6 скриптах:</strong> <code>__ENV.API_URL</code>, <code>__ENV.API_VERSION</code>
+              </p>
+              <p className="text-sm text-gray-600 mb-3">
+                Пример переменных:
+                <code className="block mt-1 p-2 bg-gray-100 rounded text-xs">
+{`{
+  "API_URL": "https://api.example.com",
+  "API_VERSION": "v1",
+  "TIMEOUT": "30s"
+}`}
+                </code>
+              </p>
+              <p className="text-sm text-gray-600 mb-3">
+                Пример использования в K6 скрипте:
+                <code className="block mt-1 p-2 bg-gray-100 rounded text-xs">
+{`import http from 'k6/http';
+
+export default function () {
+  const response = http.get(\`\${__ENV.API_URL}/\${__ENV.API_VERSION}/users\`);
+  // ...
+}`}
+                </code>
+              </p>
+              <Textarea
+                value={envVarsText}
+                onChange={(e) => setEnvVarsText(e.target.value)}
+                placeholder='{\n  "API_URL": "https://api.example.com",\n  "API_VERSION": "v1"\n}'
+                className="min-h-[200px] font-mono text-sm"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={() => setShowEnvVars(false)}
+                variant="outline"
+                className="text-gray-700 border-gray-300"
+              >
+                <X size={16} className="mr-2" />
+                Отмена
+              </Button>
+              <Button
+                onClick={handleSaveEnvVars}
+                disabled={savingEnvVars}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Save size={16} className="mr-2" />
+                {savingEnvVars ? 'Сохранение...' : 'Сохранить'}
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Current Environment Variables Display */}
+        {data?.team.k6EnvironmentVars && Object.keys(data.team.k6EnvironmentVars).length > 0 && (
+          <Card className="bg-white border-gray-300 shadow-sm p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Текущие переменные</h3>
+            <div className="space-y-2">
+              {Object.entries(data.team.k6EnvironmentVars).map(([key, value]) => (
+                <div key={key} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="font-mono text-sm text-gray-900">{key}</span>
+                  <span className="font-mono text-sm text-gray-600">{value}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Заголовок */}
@@ -327,6 +498,14 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
             >
               <Plus size={16} />
               Новый тест
+            </Button>
+            <Button
+              onClick={handleShowEnvVars}
+              variant="outline"
+              className="text-gray-700 border-gray-300 hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Settings size={16} />
+              Переменные окружения
             </Button>
             <div className="relative flex-1">
               <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />

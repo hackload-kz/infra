@@ -54,7 +54,7 @@ export class DistributedLockManager {
             instanceId: INSTANCE_ID,
             expiresAt,
             heartbeatAt: new Date(),
-            metadata: metadata || {}
+            metadata: (metadata || {}) as any
           }
         })
 
@@ -85,7 +85,7 @@ export class DistributedLockManager {
                   data: {
                     expiresAt: new Date(Date.now() + ttlMs),
                     heartbeatAt: new Date(),
-                    metadata: metadata || {}
+                    metadata: (metadata || {}) as any
                   }
                 })
 
@@ -115,7 +115,7 @@ export class DistributedLockManager {
                       acquiredAt: new Date(),
                       expiresAt: new Date(Date.now() + ttlMs),
                       heartbeatAt: new Date(),
-                      metadata: metadata || {}
+                      metadata: (metadata || {}) as any
                     }
                   })
 

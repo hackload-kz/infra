@@ -80,7 +80,7 @@ export async function GET(
       totalSteps: testRun.steps.length,
       pendingSteps: testRun.steps.filter(s => s.status === 'PENDING').length,
       runningSteps: testRun.steps.filter(s => s.status === 'RUNNING').length,
-      completedSteps: testRun.steps.filter(s => s.status === 'COMPLETED').length,
+      completedSteps: testRun.steps.filter(s => s.status === 'SUCCEEDED').length,
       failedSteps: testRun.steps.filter(s => s.status === 'FAILED').length,
       cancelledSteps: testRun.steps.filter(s => s.status === 'CANCELLED').length,
       deletedSteps: testRun.steps.filter(s => s.status === 'DELETED').length,

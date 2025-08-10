@@ -71,6 +71,7 @@ model Team {
   acceptedLanguages String[]              @default([])
   techStack         String[]              @default([])
   description       String?
+  k6EnvironmentVars Json?
   calendarEvents    CalendarEvent[]
   joinRequests      JoinRequest[]         @relation("TeamJoinRequests")
   messages          Message[]

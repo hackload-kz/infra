@@ -162,7 +162,7 @@ export async function PUT(
       if (status === TestRunStatus.RUNNING && !existingRun.startedAt) {
         updateData.startedAt = new Date()
       }
-      if ((status === TestRunStatus.COMPLETED || status === TestRunStatus.FAILED || status === TestRunStatus.CANCELLED) && !existingRun.completedAt) {
+      if ((status === TestRunStatus.SUCCEEDED || status === TestRunStatus.FAILED || status === TestRunStatus.CANCELLED) && !existingRun.completedAt) {
         updateData.completedAt = new Date()
       }
     }

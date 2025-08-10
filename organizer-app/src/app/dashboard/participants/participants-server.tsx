@@ -28,6 +28,7 @@ export async function ParticipantsServer() {
                     acceptedLanguages: true,
                     techStack: true,
                     description: true,
+                    k6EnvironmentVars: true,
                 }
             },
         },

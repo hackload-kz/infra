@@ -29,6 +29,7 @@ export interface K6TestRunConfig {
   runNumber: number // Global sequential run number
   k6Script: string
   parallelism?: number // Number of parallel K6 containers (default: 1)
+  environmentVars?: Record<string, string> // Team environment variables for K6
 }
 
 // Legacy function for backward compatibility
@@ -178,7 +179,12 @@ export async function createK6TestRun(config: K6TestRunConfig): Promise<string> 
           {
             name: 'K6_PROMETHEUS_RW_PUSH_INTERVAL',
             value: '5s'
-          }
+          },
+          // Add team environment variables
+          ...(config.environmentVars ? Object.entries(config.environmentVars).map(([key, value]) => ({
+            name: key,
+            value: value
+          })) : [])
         ]
       }
     }
@@ -317,7 +323,7 @@ export async function checkK6TestRunStatus(testRunName: string) {
     })
 
     // Kubernetes client возвращает данные напрямую в response
-    const testRun = response.body || (response as unknown)
+    const testRun = response as any
 
     const status = testRun?.status
     const stage = status?.stage
@@ -364,8 +370,8 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
           })
           
           // Handle different response structures
-          const responseBody = podSearchResponse.body || podSearchResponse
-          podsResponse = { body: responseBody } as any
+          const responseBody = podSearchResponse
+          podsResponse = responseBody
         } catch (podError) {
           console.warn(`Failed to find pods with job-name: ${podError instanceof Error ? podError.message : 'Unknown error'}`)
           podsResponse = null
@@ -377,7 +383,7 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
     }
 
     // Strategy 2: If no pods found, try finding pods by k6_cr label (K6 TestRun name)
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items || podsResponse.body.items.length === 0) {
+    if (!podsResponse || !podsResponse.items || podsResponse.items.length === 0) {
       try {
         const podSearchResponse = await coreApi.listNamespacedPod({
           namespace: 'k6-runs',
@@ -385,8 +391,8 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
         })
         
         // Handle different response structures
-        const responseBody = podSearchResponse.body || podSearchResponse
-        podsResponse = { body: responseBody } as any
+        const responseBody = podSearchResponse
+        podsResponse = responseBody
       } catch (error) {
         console.warn(`Failed to find pods with k6_cr label: ${error instanceof Error ? error.message : 'Unknown error'}`)
         podsResponse = null // Reset to null on error
@@ -394,15 +400,14 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
     }
 
     // Strategy 3: If still no pods, try broader search with partial name match
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items || podsResponse.body.items.length === 0) {
+    if (!podsResponse || !podsResponse.items || podsResponse.items.length === 0) {
       try {
         const allPodsSearchResponse = await coreApi.listNamespacedPod({
           namespace: 'k6-runs'
         })
         
         // Handle different response structures
-        const responseBody = allPodsSearchResponse.body || allPodsSearchResponse
-        
+        const responseBody = allPodsSearchResponse
         // Check if we have items to filter
         if (responseBody?.items) {
           // Filter pods that contain the testRunName in their name
@@ -419,16 +424,16 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
       }
     }
 
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items || podsResponse.body.items.length === 0) {
+    if (!podsResponse || !podsResponse.items || podsResponse.items.length === 0) {
       console.log(`No pods found for K6 TestRun: ${testRunName}`)
       return null
     }
 
-    console.log(`Found ${podsResponse.body.items.length} pod(s) for K6 TestRun: ${testRunName}`)
+    console.log(`Found ${podsResponse.items.length} pod(s) for K6 TestRun: ${testRunName}`)
     const allLogs: string[] = []
     
     // Get logs from all pods if parallelism > 1
-    for (const pod of podsResponse.body.items) {
+    for (const pod of podsResponse.items as any[]) {
       const podName = pod.metadata?.name
       
       if (!podName) {
@@ -444,8 +449,8 @@ export async function getK6TestRunLogs(testRunName: string, tailLines: number = 
         })
 
         // Handle different log response structures
-        const logData = logsResponse.body || logsResponse
-        const logText = typeof logData === 'string' ? logData : (logData?.toString() || '')
+        const logData = logsResponse
+        const logText = typeof logData === 'string' ? logData : ((logData as any)?.toString() || '')
         
         // Add container header and logs
         const containerHeader = `\n=== Container: ${podName} ===\n`
@@ -492,8 +497,8 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
             namespace: 'k6-runs',
             labelSelector: `job-name=${testRunStatus.jobName}`
           })
-          const responseBody = podSearchResponse.body || podSearchResponse
-          podsResponse = { body: responseBody } as any
+          const responseBody = podSearchResponse
+          podsResponse = responseBody
         } catch (podError) {
           // Continue to next strategy
         }
@@ -503,27 +508,26 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
     }
 
     // Strategy 2: Try k6_cr label
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items || podsResponse.body.items.length === 0) {
+    if (!podsResponse || !podsResponse.items || podsResponse.items.length === 0) {
       try {
         const podSearchResponse = await coreApi.listNamespacedPod({
           namespace: 'k6-runs',
           labelSelector: `k6_cr=${testRunName}`
         })
-        const responseBody = podSearchResponse.body || podSearchResponse
-        podsResponse = { body: responseBody } as any
+        const responseBody = podSearchResponse
+        podsResponse = responseBody
       } catch (error) {
         // Continue to next strategy
       }
     }
 
     // Strategy 3: Broader search
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items || podsResponse.body.items.length === 0) {
+    if (!podsResponse || !podsResponse.items || podsResponse.items.length === 0) {
       try {
         const allPodsSearchResponse = await coreApi.listNamespacedPod({
           namespace: 'k6-runs'
         })
-        const responseBody = allPodsSearchResponse.body || allPodsSearchResponse
-        
+        const responseBody = allPodsSearchResponse
         if (responseBody?.items) {
           const matchingPods = responseBody.items.filter(pod => 
             pod.metadata?.name?.includes(testRunName)
@@ -538,7 +542,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
       }
     }
 
-    if (!podsResponse || !podsResponse.body || !podsResponse.body.items) {
+    if (!podsResponse || !podsResponse.items) {
       return {
         hasFailedPods: false,
         hasCompletedPods: false,
@@ -546,7 +550,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
       }
     }
 
-    const podStatuses = podsResponse.body.items.map(pod => ({
+    const podStatuses = podsResponse.items.map((pod: any) => ({
       name: pod.metadata?.name || 'unknown',
       phase: pod.status?.phase || 'unknown'
     }))
