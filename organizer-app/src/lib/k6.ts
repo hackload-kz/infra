@@ -12,28 +12,63 @@ let coreV1Api: any = null;
 const initK8sClient = async () => {
   if (k8s !== null) return;
   
+  console.log('[K8S-DEBUG] Starting Kubernetes client initialization...');
+  console.log('[K8S-DEBUG] Environment check:');
+  console.log('[K8S-DEBUG]   KUBERNETES_SERVICE_HOST:', process.env.KUBERNETES_SERVICE_HOST);
+  console.log('[K8S-DEBUG]   SKIP_ENV_VALIDATION:', process.env.SKIP_ENV_VALIDATION);
+  console.log('[K8S-DEBUG]   NODE_ENV:', process.env.NODE_ENV);
+  
   // Skip initialization during Docker build
   if (process.env.SKIP_ENV_VALIDATION === '1') {
-    console.log('Skipping Kubernetes client initialization during build');
+    console.log('[K8S-DEBUG] Skipping Kubernetes client initialization during build');
     return;
   }
   
   try {
+    console.log('[K8S-DEBUG] Importing @kubernetes/client-node...');
     k8s = await import('@kubernetes/client-node');
+    console.log('[K8S-DEBUG] Successfully imported kubernetes client library');
+    
+    console.log('[K8S-DEBUG] Creating KubeConfig instance...');
     kc = new k8s.KubeConfig();
+    console.log('[K8S-DEBUG] KubeConfig instance created');
 
     // Load config from service account when running in cluster
     if (process.env.KUBERNETES_SERVICE_HOST) {
+      console.log('[K8S-DEBUG] Running in cluster, loading from cluster config...');
+      console.log('[K8S-DEBUG] Checking service account files...');
+      
+      // Check if required service account files exist
+      const fs = require('fs');
+      const tokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
+      const caPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
+      const namespacePath = '/var/run/secrets/kubernetes.io/serviceaccount/namespace';
+      
+      console.log('[K8S-DEBUG]   Token file exists:', fs.existsSync(tokenPath));
+      console.log('[K8S-DEBUG]   CA cert file exists:', fs.existsSync(caPath));
+      console.log('[K8S-DEBUG]   Namespace file exists:', fs.existsSync(namespacePath));
+      
       kc.loadFromCluster();
+      console.log('[K8S-DEBUG] Cluster config loaded successfully');
     } else {
-      // For local development, load from kubeconfig
+      console.log('[K8S-DEBUG] Running locally, loading from default kubeconfig...');
       kc.loadFromDefault();
+      console.log('[K8S-DEBUG] Default config loaded successfully');
     }
 
+    console.log('[K8S-DEBUG] Creating API clients...');
     customObjectsApi = kc.makeApiClient(k8s.CustomObjectsApi);
+    console.log('[K8S-DEBUG] CustomObjectsApi client created');
     coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+    console.log('[K8S-DEBUG] CoreV1Api client created');
+    console.log('[K8S-DEBUG] Kubernetes client initialized successfully!');
   } catch (error) {
-    console.error('Failed to initialize Kubernetes client:', error);
+    console.error('[K8S-DEBUG] Failed to initialize Kubernetes client:', error);
+    console.error('[K8S-DEBUG] Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
     throw error;
   }
 };

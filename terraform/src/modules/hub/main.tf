@@ -5,6 +5,67 @@ resource "kubernetes_namespace" "hub" {
   }
 }
 
+# K6 namespace for running load tests
+resource "kubernetes_namespace" "k6_runs" {
+  metadata {
+    name = "k6-runs"
+  }
+}
+
+# ServiceAccount for hub application to access Kubernetes API
+resource "kubernetes_service_account" "hub_k6" {
+  metadata {
+    name      = "hub-k6-service-account"
+    namespace = kubernetes_namespace.hub.metadata[0].name
+  }
+}
+
+# RBAC Role for accessing K6 resources and ConfigMaps
+resource "kubernetes_role" "hub_k6" {
+  metadata {
+    namespace = kubernetes_namespace.k6_runs.metadata[0].name
+    name      = "hub-k6-role"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["configmaps"]
+    verbs      = ["get", "list", "create", "update", "patch", "delete"]
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "pods/log"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["k6.io"]
+    resources  = ["testruns", "k6s"]
+    verbs      = ["get", "list", "create", "update", "patch", "delete", "watch"]
+  }
+}
+
+# RBAC RoleBinding to bind the ServiceAccount to the Role
+resource "kubernetes_role_binding" "hub_k6" {
+  metadata {
+    name      = "hub-k6-rolebinding"
+    namespace = kubernetes_namespace.k6_runs.metadata[0].name
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.hub_k6.metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.hub_k6.metadata[0].name
+    namespace = kubernetes_namespace.hub.metadata[0].name
+  }
+}
+
 resource "kubernetes_secret" "registry_credentials" {
 
   metadata {
@@ -56,6 +117,8 @@ resource "kubernetes_deployment" "hub" {
       }
 
       spec {
+        service_account_name = kubernetes_service_account.hub_k6.metadata[0].name
+        
         image_pull_secrets {
           name = kubernetes_secret.registry_credentials.metadata[0].name
         }
