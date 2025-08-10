@@ -5,7 +5,8 @@ export async function register() {
     return
   }
   
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
+  // Initialize background jobs in Node.js environment (both production and development)
+  if (typeof window === 'undefined') {
     // Инициализация фоновых джоб при запуске Node.js процесса
     console.info('🚀 Instrumentation: Starting background jobs initialization...')
     
