@@ -12,31 +12,31 @@ let coreV1Api: any = null;
 const initK8sClient = async () => {
   if (k8s !== null) return;
   
-  console.log('[K8S-DEBUG] Starting Kubernetes client initialization...');
-  console.log('[K8S-DEBUG] Environment check:');
-  console.log('[K8S-DEBUG]   KUBERNETES_SERVICE_HOST:', process.env.KUBERNETES_SERVICE_HOST);
-  console.log('[K8S-DEBUG]   SKIP_ENV_VALIDATION:', process.env.SKIP_ENV_VALIDATION);
-  console.log('[K8S-DEBUG]   NODE_ENV:', process.env.NODE_ENV);
+  console.info('[K8S-DEBUG] Starting Kubernetes client initialization...');
+  console.info('[K8S-DEBUG] Environment check:');
+  console.info('[K8S-DEBUG]   KUBERNETES_SERVICE_HOST:', process.env.KUBERNETES_SERVICE_HOST);
+  console.info('[K8S-DEBUG]   SKIP_ENV_VALIDATION:', process.env.SKIP_ENV_VALIDATION);
+  console.info('[K8S-DEBUG]   NODE_ENV:', process.env.NODE_ENV);
   
   // Skip initialization during Docker build
   if (process.env.SKIP_ENV_VALIDATION === '1') {
-    console.log('[K8S-DEBUG] Skipping Kubernetes client initialization during build');
+    console.info('[K8S-DEBUG] Skipping Kubernetes client initialization during build');
     return;
   }
   
   try {
-    console.log('[K8S-DEBUG] Importing @kubernetes/client-node...');
+    console.info('[K8S-DEBUG] Importing @kubernetes/client-node...');
     k8s = await import('@kubernetes/client-node');
-    console.log('[K8S-DEBUG] Successfully imported kubernetes client library');
+    console.info('[K8S-DEBUG] Successfully imported kubernetes client library');
     
-    console.log('[K8S-DEBUG] Creating KubeConfig instance...');
+    console.info('[K8S-DEBUG] Creating KubeConfig instance...');
     kc = new k8s.KubeConfig();
-    console.log('[K8S-DEBUG] KubeConfig instance created');
+    console.info('[K8S-DEBUG] KubeConfig instance created');
 
     // Load config from service account when running in cluster
     if (process.env.KUBERNETES_SERVICE_HOST) {
-      console.log('[K8S-DEBUG] Running in cluster, loading from cluster config...');
-      console.log('[K8S-DEBUG] Checking service account files...');
+      console.info('[K8S-DEBUG] Running in cluster, loading from cluster config...');
+      console.info('[K8S-DEBUG] Checking service account files...');
       
       // Check if required service account files exist
       const { existsSync } = await import('fs');
@@ -44,24 +44,24 @@ const initK8sClient = async () => {
       const caPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
       const namespacePath = '/var/run/secrets/kubernetes.io/serviceaccount/namespace';
       
-      console.log('[K8S-DEBUG]   Token file exists:', existsSync(tokenPath));
-      console.log('[K8S-DEBUG]   CA cert file exists:', existsSync(caPath));
-      console.log('[K8S-DEBUG]   Namespace file exists:', existsSync(namespacePath));
+      console.info('[K8S-DEBUG]   Token file exists:', existsSync(tokenPath));
+      console.info('[K8S-DEBUG]   CA cert file exists:', existsSync(caPath));
+      console.info('[K8S-DEBUG]   Namespace file exists:', existsSync(namespacePath));
       
       kc.loadFromCluster();
-      console.log('[K8S-DEBUG] Cluster config loaded successfully');
+      console.info('[K8S-DEBUG] Cluster config loaded successfully');
     } else {
-      console.log('[K8S-DEBUG] Running locally, loading from default kubeconfig...');
+      console.info('[K8S-DEBUG] Running locally, loading from default kubeconfig...');
       kc.loadFromDefault();
-      console.log('[K8S-DEBUG] Default config loaded successfully');
+      console.info('[K8S-DEBUG] Default config loaded successfully');
     }
 
-    console.log('[K8S-DEBUG] Creating API clients...');
+    console.info('[K8S-DEBUG] Creating API clients...');
     customObjectsApi = kc.makeApiClient(k8s.CustomObjectsApi);
-    console.log('[K8S-DEBUG] CustomObjectsApi client created');
+    console.info('[K8S-DEBUG] CustomObjectsApi client created');
     coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-    console.log('[K8S-DEBUG] CoreV1Api client created');
-    console.log('[K8S-DEBUG] Kubernetes client initialized successfully!');
+    console.info('[K8S-DEBUG] CoreV1Api client created');
+    console.info('[K8S-DEBUG] Kubernetes client initialized successfully!');
   } catch (error) {
     console.error('[K8S-DEBUG] Failed to initialize Kubernetes client:', error);
     console.error('[K8S-DEBUG] Error details:', {
