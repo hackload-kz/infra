@@ -39,14 +39,14 @@ const initK8sClient = async () => {
       console.log('[K8S-DEBUG] Checking service account files...');
       
       // Check if required service account files exist
-      const fs = require('fs');
+      const { existsSync } = await import('fs');
       const tokenPath = '/var/run/secrets/kubernetes.io/serviceaccount/token';
       const caPath = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
       const namespacePath = '/var/run/secrets/kubernetes.io/serviceaccount/namespace';
       
-      console.log('[K8S-DEBUG]   Token file exists:', fs.existsSync(tokenPath));
-      console.log('[K8S-DEBUG]   CA cert file exists:', fs.existsSync(caPath));
-      console.log('[K8S-DEBUG]   Namespace file exists:', fs.existsSync(namespacePath));
+      console.log('[K8S-DEBUG]   Token file exists:', existsSync(tokenPath));
+      console.log('[K8S-DEBUG]   CA cert file exists:', existsSync(caPath));
+      console.log('[K8S-DEBUG]   Namespace file exists:', existsSync(namespacePath));
       
       kc.loadFromCluster();
       console.log('[K8S-DEBUG] Cluster config loaded successfully');
