@@ -74,7 +74,6 @@ data:
       authenticationRate.add(isAuthenticated ? 1 : 0);
       
       if (!isAuthenticated) {
-        console.log('Authentication failed for VU', __VU);
         return; // Skip rest if auth fails
       }
       

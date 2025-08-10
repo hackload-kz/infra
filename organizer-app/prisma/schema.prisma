@@ -324,6 +324,20 @@ model ServiceApiKeyUsage {
   @@map("service_api_key_usage")
 }
 
+model DistributedLock {
+  id          String    @id @default(cuid())
+  lockName    String    @unique
+  instanceId  String    // Unique identifier for the app instance/replica
+  acquiredAt  DateTime  @default(now())
+  expiresAt   DateTime
+  heartbeatAt DateTime  @default(now())
+  metadata    Json?     // Additional metadata about the lock
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("distributed_locks")
+}
+
 model TestScenario {
   id          String             @id @default(cuid())
   name        String
@@ -372,8 +386,32 @@ model TestRun {
   createdBy   String?
   scenario    TestScenario  @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
   team        Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  steps       TestRunStep[]
 
   @@map("test_runs")
+}
+
+model TestRunStep {
+  id               String                @id @default(cuid())
+  testRunId        String
+  scenarioStepId   String
+  stepName         String
+  stepOrder        Int
+  stepType         TestStepType
+  k6TestName       String?               // Name of the K6 TestRun in Kubernetes for this step
+  status           TestRunStepStatus     @default(PENDING)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  lastStatusCheck  DateTime?
+  containerLogs    String?               // Container output logs with headers for multiple containers
+  k6Results        Json?                 // K6 test results for this step
+  errorMessage     String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  testRun          TestRun               @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+
+  @@unique([testRunId, stepOrder])
+  @@map("test_run_steps")
 }
 
 enum TeamStatus {
@@ -449,7 +487,16 @@ enum TestStepType {
 enum TestRunStatus {
   PENDING
   RUNNING
-  COMPLETED
+  SUCCEEDED
   FAILED
   CANCELLED
+}
+
+enum TestRunStepStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  DELETED
 }

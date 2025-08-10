@@ -98,11 +98,20 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { scenarioId, comment } = body
+    const { scenarioId, comment, parallelism } = body
 
     if (!scenarioId) {
       return NextResponse.json(
         { error: 'Сценарий тестирования обязателен' },
+        { status: 400 }
+      )
+    }
+
+    // Validate parallelism parameter
+    const parsedParallelism = parallelism ? parseInt(parallelism, 10) : 1
+    if (parallelism && (isNaN(parsedParallelism) || parsedParallelism < 1 || parsedParallelism > 10)) {
+      return NextResponse.json(
+        { error: 'Parallelism должно быть числом от 1 до 10' },
         { status: 400 }
       )
     }
@@ -206,6 +215,18 @@ export default function() {
         continue
       }
 
+      // Создать запись шага в базе данных
+      const testRunStep = await db.testRunStep.create({
+        data: {
+          testRunId: testRun.id,
+          scenarioStepId: step.id,
+          stepName: step.name,
+          stepOrder: step.stepOrder,
+          stepType: step.stepType,
+          status: 'PENDING'
+        }
+      })
+
       try {
         // Создать K6 TestRun для этого шага
         const k6TestName = await createK6TestRun({
@@ -216,12 +237,33 @@ export default function() {
           stepName: step.name,
           stepOrder: step.stepOrder,
           runNumber,
-          k6Script
+          k6Script,
+          parallelism: parsedParallelism
+        })
+
+        // Обновить запись шага с именем K6 теста
+        await db.testRunStep.update({
+          where: { id: testRunStep.id },
+          data: {
+            k6TestName,
+            status: 'RUNNING',
+            startedAt: new Date()
+          }
         })
 
         k6TestNames.push(k6TestName)
       } catch (error) {
         console.error(`Failed to create K6 TestRun for step ${step.name}:`, error)
+        
+        // Обновить статус шага на FAILED
+        await db.testRunStep.update({
+          where: { id: testRunStep.id },
+          data: {
+            status: 'FAILED',
+            errorMessage: error instanceof Error ? error.message : 'Unknown error'
+          }
+        })
+        
         failedSteps.push(step.name)
       }
     }

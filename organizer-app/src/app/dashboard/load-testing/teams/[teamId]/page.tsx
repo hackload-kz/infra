@@ -19,7 +19,8 @@ import {
   Trash2,
   Calendar,
   MessageSquare,
-  Activity
+  Activity,
+  Eye
 } from 'lucide-react'
 import TestRunForm from '@/components/test-run-form'
 
@@ -40,7 +41,7 @@ interface TestRun {
   id: string
   runNumber: number
   comment: string | null
-  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED'
   startedAt: string | null
   completedAt: string | null
   results: Record<string, unknown> | null
@@ -59,7 +60,6 @@ interface TeamTestRunsData {
 export default function TeamLoadTestingPage({ params }: { params: Promise<{ teamId: string }> }) {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [resolvedParams, setResolvedParams] = useState<{ teamId: string } | null>(null)
   const [data, setData] = useState<TeamTestRunsData | null>(null)
   const [filteredRuns, setFilteredRuns] = useState<TestRun[]>([])
   const [loading, setLoading] = useState(true)
@@ -67,10 +67,15 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   const [showForm, setShowForm] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
+  const [teamId, setTeamId] = useState<string | null>(null)
 
-  // Resolve params Promise
+  // Resolve params promise
   useEffect(() => {
-    params.then(setResolvedParams)
+    const resolveParams = async () => {
+      const resolvedParams = await params
+      setTeamId(resolvedParams.teamId)
+    }
+    resolveParams()
   }, [params])
 
   useEffect(() => {
@@ -100,11 +105,11 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   }, [checkingAdmin, session, isAdmin, router])
 
   const fetchTestRuns = useCallback(async () => {
-    if (!resolvedParams?.teamId) return
+    if (!teamId) return
     
     try {
       setLoading(true)
-      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs`)
+      const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/test-runs`)
       if (response.ok) {
         const result = await response.json()
         setData(result)
@@ -116,13 +121,13 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     } finally {
       setLoading(false)
     }
-  }, [resolvedParams?.teamId, router])
+  }, [teamId, router])
 
   useEffect(() => {
-    if (isAdmin && resolvedParams?.teamId) {
+    if (isAdmin && teamId) {
       fetchTestRuns()
     }
-  }, [isAdmin, resolvedParams?.teamId, fetchTestRuns])
+  }, [isAdmin, teamId, fetchTestRuns])
 
   useEffect(() => {
     if (data) {
@@ -150,10 +155,10 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   }
 
   const handleUpdateStatus = async (runId: string, newStatus: string) => {
-    if (!resolvedParams?.teamId) return
+    if (!teamId) return
     
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/test-runs/${runId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -174,11 +179,11 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   }
 
   const handleStopK6Test = async (runId: string) => {
+    if (!teamId) return
     if (!confirm('Вы уверены, что хотите остановить K6 тест?')) return
-    if (!resolvedParams?.teamId) return
 
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/test-runs/${runId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'stop' })
@@ -203,11 +208,11 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   }
 
   const handleDeleteRun = async (runId: string) => {
+    if (!teamId) return
     if (!confirm('Вы уверены, что хотите удалить этот запуск теста?')) return
-    if (!resolvedParams?.teamId) return
 
     try {
-      const response = await fetch(`/api/dashboard/load-testing/teams/${resolvedParams.teamId}/test-runs/${runId}`, {
+      const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/test-runs/${runId}`, {
         method: 'DELETE'
       })
 
@@ -226,7 +231,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     switch (status) {
       case 'RUNNING':
         return <Play size={16} className="text-blue-600" />
-      case 'COMPLETED':
+      case 'SUCCEEDED':
         return <CheckCircle size={16} className="text-green-600" />
       case 'FAILED':
         return <XCircle size={16} className="text-red-600" />
@@ -241,7 +246,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     switch (status) {
       case 'RUNNING':
         return 'bg-blue-100 text-blue-800 border-blue-300'
-      case 'COMPLETED':
+      case 'SUCCEEDED':
         return 'bg-green-100 text-green-800 border-green-300'
       case 'FAILED':
         return 'bg-red-100 text-red-800 border-red-300'
@@ -277,10 +282,10 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     )
   }
 
-  if (showForm && resolvedParams?.teamId) {
+  if (showForm && teamId) {
     return (
       <TestRunForm
-        teamId={resolvedParams.teamId}
+        teamId={teamId}
         onSuccess={handleRunCreated}
         onCancel={() => setShowForm(false)}
       />
@@ -368,7 +373,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                 <div>
                   <p className="text-sm font-medium text-gray-600">Завершено</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {data.testRuns.filter(run => run.status === 'COMPLETED').length}
+                    {data.testRuns.filter(run => run.status === 'SUCCEEDED').length}
                   </p>
                 </div>
               </div>
@@ -479,6 +484,15 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                     </div>
                     
                     <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => router.push(`/dashboard/load-testing/teams/${teamId}/test-runs/${run.id}`)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-slate-300 hover:text-white"
+                        title="Посмотреть детали и логи"
+                      >
+                        <Eye size={14} />
+                      </Button>
                       {run.status === 'PENDING' && (
                         <Button
                           onClick={() => handleUpdateStatus(run.id, 'RUNNING')}
@@ -491,7 +505,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                       {run.status === 'RUNNING' && (
                         <>
                           <Button
-                            onClick={() => handleUpdateStatus(run.id, 'COMPLETED')}
+                            onClick={() => handleUpdateStatus(run.id, 'SUCCEEDED')}
                             size="sm"
                             className="bg-green-600 hover:bg-green-700 text-white"
                             title="Отметить как завершенный"
@@ -508,7 +522,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
                           </Button>
                         </>
                       )}
-                      {['COMPLETED', 'FAILED', 'CANCELLED'].includes(run.status) && (
+                      {['SUCCEEDED', 'FAILED', 'CANCELLED'].includes(run.status) && (
                         <Button
                           onClick={() => handleUpdateStatus(run.id, 'PENDING')}
                           size="sm"
