@@ -21,14 +21,14 @@ const getSyncIntervalMs = (): number => {
  */
 export function startK6StepsSyncJob(customIntervalMs?: number) {
   if (syncInterval) {
-    console.log('K6 steps sync job already running')
+    console.info('K6 steps sync job already running')
     return
   }
 
   const intervalMs = customIntervalMs || getSyncIntervalMs()
   const intervalSeconds = Math.round(intervalMs / 1000)
 
-  console.log(`Starting K6 steps sync job (every ${intervalSeconds} seconds)`)
+  console.info(`Starting K6 steps sync job (every ${intervalSeconds} seconds)`)
   
   // Запустить немедленно
   runSyncWithErrorHandling()
@@ -46,7 +46,7 @@ export function stopK6StepsSyncJob() {
   if (syncInterval) {
     clearInterval(syncInterval)
     syncInterval = null
-    console.log('K6 steps sync job stopped')
+    console.info('K6 steps sync job stopped')
   }
 }
 
@@ -55,14 +55,14 @@ export function stopK6StepsSyncJob() {
  */
 export function startLockCleanupJob() {
   if (cleanupInterval) {
-    console.log('Lock cleanup job already running')
+    console.info('Lock cleanup job already running')
     return
   }
 
   // Run cleanup every 5 minutes
   const cleanupIntervalMs = 5 * 60 * 1000 // 5 minutes
   
-  console.log('Starting distributed lock cleanup job (every 5 minutes)')
+  console.info('Starting distributed lock cleanup job (every 5 minutes)')
   
   // Run immediately
   runLockCleanupWithErrorHandling()
@@ -80,7 +80,7 @@ export function stopLockCleanupJob() {
   if (cleanupInterval) {
     clearInterval(cleanupInterval)
     cleanupInterval = null
-    console.log('Lock cleanup job stopped')
+    console.info('Lock cleanup job stopped')
   }
 }
 
@@ -105,9 +105,9 @@ async function runLockCleanupWithErrorHandling() {
     const duration = Date.now() - startTime
     
     if (cleanedCount > 0) {
-      console.log(`🧹 [${timestamp}] [${instanceId}] Cleaned up ${cleanedCount} expired locks (${duration}ms)`)
+      console.info(`🧹 [${timestamp}] [${instanceId}] Cleaned up ${cleanedCount} expired locks (${duration}ms)`)
     } else {
-      console.log(`🧹 [${timestamp}] [${instanceId}] No expired locks to clean up (${duration}ms)`)
+      console.info(`🧹 [${timestamp}] [${instanceId}] No expired locks to clean up (${duration}ms)`)
     }
     
   } catch (error) {
@@ -134,7 +134,7 @@ async function runSyncWithErrorHandling() {
   try {
     const startTime = Date.now()
     const timestamp = new Date().toISOString()
-    console.log(`⏰ [${timestamp}] [${instanceId}] Attempting to acquire sync lock...`)
+    console.info(`⏰ [${timestamp}] [${instanceId}] Attempting to acquire sync lock...`)
     
     // Execute sync within distributed lock
     const result = await withLock(
@@ -142,7 +142,7 @@ async function runSyncWithErrorHandling() {
       async () => {
         const syncStartTime = Date.now()
         const syncTimestamp = new Date().toISOString()
-        console.log(`🔒 [${syncTimestamp}] [${instanceId}] Lock acquired, starting K6 steps sync...`)
+        console.info(`🔒 [${syncTimestamp}] [${instanceId}] Lock acquired, starting K6 steps sync...`)
         
         const syncResult = await syncK6TestRunSteps()
         
@@ -156,7 +156,7 @@ async function runSyncWithErrorHandling() {
           instance: instanceId
         }
         
-        console.log(`✅ [${new Date().toISOString()}] [${instanceId}] K6 steps sync completed:`, summary)
+        console.info(`✅ [${new Date().toISOString()}] [${instanceId}] K6 steps sync completed:`, summary)
         
         // Логировать ошибки, если есть
         if (syncResult.errorSteps > 0) {
@@ -170,12 +170,12 @@ async function runSyncWithErrorHandling() {
         
         // Логировать обновленные логи
         if (summary.logsUpdated > 0) {
-          console.log(`📋 [${new Date().toISOString()}] [${instanceId}] Updated logs for ${summary.logsUpdated} steps`)
+          console.info(`📋 [${new Date().toISOString()}] [${instanceId}] Updated logs for ${summary.logsUpdated} steps`)
         }
         
         // Если нет активных шагов
         if (syncResult.totalSteps === 0) {
-          console.log(`😴 [${new Date().toISOString()}] [${instanceId}] No active K6 steps to sync`)
+          console.info(`😴 [${new Date().toISOString()}] [${instanceId}] No active K6 steps to sync`)
         }
         
         return syncResult
@@ -195,7 +195,7 @@ async function runSyncWithErrorHandling() {
     if (result === null) {
       // Failed to acquire lock - another replica is probably running the sync
       const duration = Date.now() - startTime
-      console.log(`🔒 [${new Date().toISOString()}] [${instanceId}] Sync skipped - lock held by another instance (${duration}ms)`)
+      console.info(`🔒 [${new Date().toISOString()}] [${instanceId}] Sync skipped - lock held by another instance (${duration}ms)`)
     }
     
   } catch (error) {
