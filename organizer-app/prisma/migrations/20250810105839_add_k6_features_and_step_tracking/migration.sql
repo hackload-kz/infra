@@ -13,10 +13,13 @@ ALTER TYPE "TestRunStatus" ADD VALUE 'SUCCEEDED';
 CREATE TABLE "distributed_locks" (
     "id" TEXT NOT NULL,
     "lockName" TEXT NOT NULL,
-    "lockedBy" TEXT NOT NULL,
-    "lockedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "instanceId" TEXT NOT NULL,
+    "acquiredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "expiresAt" TIMESTAMP(3) NOT NULL,
+    "heartbeatAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "distributed_locks_pkey" PRIMARY KEY ("id")
 );
