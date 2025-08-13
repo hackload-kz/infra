@@ -52,7 +52,7 @@ export default async function EventProviderDocPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   // Read markdown documentation
-  const docsPath = path.resolve('/app/docs/event-provider.md')
+  const docsPath = path.join(process.cwd(), 'public', 'docs', 'event-provider.md')
   let markdownContent = ''
   
   try {
