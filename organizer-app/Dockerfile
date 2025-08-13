@@ -33,9 +33,9 @@ RUN --mount=type=cache,target=/root/.npm \
 
 # Копируем только необходимые файлы для сборки
 COPY next.config.ts ./
-COPY tailwind.config.ts ./
+COPY tailwind.config.js ./
 COPY tsconfig.json ./
-COPY postcss.config.js ./
+COPY postcss.config.mjs ./
 COPY prisma ./prisma/
 
 # Генерируем Prisma Client
