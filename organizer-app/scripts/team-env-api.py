@@ -47,16 +47,50 @@ class TeamEnvAPI:
                 if 'team' in data:
                     team_data = data['team']
                     print(f"📋 Found {len(team_data['environment'])} variables:")
+                    variables = []
                     for var in team_data['environment']:
                         secure_indicator = "🔒" if var['isSecure'] else "🔓"
+                        var_info = {
+                            'key': var['key'],
+                            'value': var['value'],
+                            'category': var.get('category', 'general'),
+                            'isSecure': var['isSecure'],
+                            'description': var.get('description', '')
+                        }
+                        variables.append(var_info)
                         print(f"  {secure_indicator} {var['key']}={var['value']} ({var.get('category', 'general')})")
                         if var.get('description'):
                             print(f"    📝 {var['description']}")
+                    
+                    print(f"\n📄 Variable values list:")
+                    for var in variables:
+                        print(f"  {var['key']}: {var['value']}")
             else:
                 print(f"✅ Retrieved environment variables for all teams")
                 print(f"📋 Found {len(data['teams'])} teams:")
+                all_variables = {}
                 for team in data['teams']:
+                    team_vars = []
+                    for var in team['environment']:
+                        var_info = {
+                            'key': var['key'],
+                            'value': var['value'],
+                            'category': var.get('category', 'general'),
+                            'isSecure': var['isSecure'],
+                            'description': var.get('description', '')
+                        }
+                        team_vars.append(var_info)
+                    all_variables[team['teamSlug']] = team_vars
                     print(f"  • {team['teamSlug']} ({team['teamName']}) - {len(team['environment'])} variables")
+                
+                print(f"\n📄 All teams variable values:")
+                for team_slug, variables in all_variables.items():
+                    if variables:
+                        print(f"  {team_slug}:")
+                        for var in variables:
+                            print(f"    {var['key']}: {var['value']}")
+                    else:
+                        print(f"  {team_slug}: (no variables)")
             
             return data
         except requests.exceptions.RequestException as e:

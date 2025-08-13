@@ -5,7 +5,11 @@ import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { 
   Settings,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  Ticket,
+  CalendarDays,
+  BookOpen
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -113,6 +117,79 @@ export default async function SpaceTasksPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Documentation Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 mb-6">
+          <BookOpen className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-white">Документация API</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Payment Gateway Documentation */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-green-400/20 rounded-lg flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Payment Gateway</h3>
+                <p className="text-slate-400 text-sm">Интеграция с платежным шлюзом</p>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Руководство по интеграции платежного шлюза, обработке платежей и управлению транзакциями.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <Link href="/space/tasks/payment-gateway">
+                Открыть документацию
+              </Link>
+            </Button>
+          </div>
+
+          {/* Billetter API Documentation */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-blue-400/20 rounded-lg flex items-center justify-center">
+                <Ticket className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Billetter API</h3>
+                <p className="text-slate-400 text-sm">API управления билетами</p>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Документация API для управления билетами, регистрацией участников и валидацией QR-кодов.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <Link href="/space/tasks/billetter-api">
+                Открыть документацию
+              </Link>
+            </Button>
+          </div>
+
+          {/* Event Provider Documentation */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-purple-400/20 rounded-lg flex items-center justify-center">
+                <CalendarDays className="w-5 h-5 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Event Provider</h3>
+                <p className="text-slate-400 text-sm">Провайдер управления событиями</p>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Руководство по интеграции с внешними платформами управления событиями и синхронизации данных.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <Link href="/space/tasks/event-provider">
+                Открыть документацию
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
