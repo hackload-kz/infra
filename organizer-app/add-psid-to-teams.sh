@@ -17,9 +17,9 @@ SERVICE_API_KEY="${2:-}"
 
 # PSID Configuration
 PSID_KEY="PSID"
-PSID_VALUE="null"
+PSID_VALUE="Заполни меня"
 PSID_CATEGORY="cloud"
-PSID_DESCRIPTION="Public Service Identity - Cloud service identifier"
+PSID_DESCRIPTION="ID Платежного аккаунта PS.KZ"
 PSID_IS_SECURE=false
 PSID_IS_EDITABLE=true
 
