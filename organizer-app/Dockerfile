@@ -44,6 +44,7 @@ RUN npx prisma generate
 # Копируем исходный код
 COPY src ./src/
 COPY public ./public/
+COPY docs ./docs/
 
 # Оптимизации сборки
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -82,6 +83,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
+# Копируем документацию
+COPY --from=builder --chown=nextjs:nodejs /app/docs ./docs
 
 # Копируем скрипт запуска
 COPY docker-entrypoint.sh ./
