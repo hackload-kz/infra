@@ -52,7 +52,7 @@ export default async function BilletterApiDocPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   // Read markdown documentation
-  const docsPath = path.join(process.cwd(), 'docs', 'billetter-api.md')
+  const docsPath = path.resolve('/app/docs/billetter-api.md')
   let markdownContent = ''
   
   try {

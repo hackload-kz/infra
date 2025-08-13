@@ -52,7 +52,7 @@ export default async function PaymentGatewayDocPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   // Read markdown documentation
-  const docsPath = path.join(process.cwd(), 'docs', 'payment-gateway.md')
+  const docsPath = path.resolve('/app/docs/payment-gateway.md')
   let markdownContent = ''
   
   try {
