@@ -9,6 +9,164 @@ import {
   hasPermission 
 } from '@/lib/service-keys'
 import { notifyTeamEnvironmentUpdate } from '@/lib/journal'
+import { maskSensitiveValue } from '@/lib/service-keys'
+
+export async function GET(request: NextRequest) {
+  let authResult: { keyId: string; permissions: string[] } | null = null
+  
+  try {
+    // Authenticate service account
+    const apiKey = request.headers.get('X-API-Key')
+    authResult = await authenticateServiceAccount(apiKey)
+    
+    if (!authResult) {
+      await logApiKeyUsage({
+        keyId: 'unknown',
+        endpoint: '/api/service/teams/environment',
+        method: 'GET',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
+    }
+
+    // Check permissions
+    if (!hasPermission(authResult.permissions, 'environment:read')) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: '/api/service/teams/environment',
+        method: 'GET',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    // Get query parameters
+    const { searchParams } = new URL(request.url)
+    const teamSlug = searchParams.get('team')
+    const category = searchParams.get('category')
+    
+    let teams: Array<{ id: string; nickname: string; name: string }>
+    
+    if (teamSlug) {
+      // Get specific team
+      const team = await db.team.findUnique({
+        where: { nickname: teamSlug },
+        select: { id: true, nickname: true, name: true }
+      })
+      
+      if (!team) {
+        await logApiKeyUsage({
+          keyId: authResult.keyId,
+          endpoint: '/api/service/teams/environment',
+          method: 'GET',
+          userAgent: request.headers.get('User-Agent') || undefined,
+          ipAddress: getClientIP(request.headers) || undefined,
+          success: false
+        })
+        
+        return NextResponse.json({ error: 'Team not found' }, { status: 404 })
+      }
+      
+      teams = [team]
+    } else {
+      // Get all teams
+      teams = await db.team.findMany({
+        select: { id: true, nickname: true, name: true },
+        orderBy: { nickname: 'asc' }
+      })
+    }
+
+    const teamsWithEnvironment = []
+    
+    for (const team of teams) {
+      // Fetch environment data for this team
+      const environmentData = await db.teamEnvironmentData.findMany({
+        where: {
+          teamId: team.id,
+          ...(category && { category })
+        },
+        orderBy: [
+          { category: 'asc' },
+          { key: 'asc' }
+        ]
+      })
+
+      // Service API always masks sensitive data
+      const maskedData = environmentData.map(item => ({
+        ...item,
+        value: maskSensitiveValue(item.value, item.isSecure, false)
+      }))
+
+      teamsWithEnvironment.push({
+        teamId: team.id,
+        teamSlug: team.nickname,
+        teamName: team.name,
+        environment: maskedData,
+        categories: [...new Set(environmentData.map(item => item.category).filter(Boolean))]
+      })
+    }
+
+    // Log successful usage
+    await logApiKeyUsage({
+      keyId: authResult.keyId,
+      endpoint: '/api/service/teams/environment',
+      method: 'GET',
+      userAgent: request.headers.get('User-Agent') || undefined,
+      ipAddress: getClientIP(request.headers) || undefined,
+      success: true
+    })
+
+    // Log audit trail
+    await logger.info(LogAction.READ, 'TeamEnvironment', 
+      `Environment data accessed via service API`, {
+        metadata: { 
+          teamSlug: teamSlug || 'all',
+          category,
+          teamsCount: teams.length,
+          serviceKeyId: authResult.keyId
+        }
+      })
+
+    const response = {
+      teams: teamsWithEnvironment,
+      ...(teamSlug && { team: teamsWithEnvironment[0] })
+    }
+
+    return NextResponse.json(response)
+
+  } catch (error) {
+    // Log failed usage if we have auth info
+    if (authResult) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: '/api/service/teams/environment',
+        method: 'GET',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+    }
+
+    await logger.error(LogAction.READ, 'TeamEnvironment', 
+      `Error in environment data read: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        metadata: { 
+          error: error instanceof Error ? error.stack : error,
+          serviceKeyId: authResult?.keyId
+        }
+      })
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
 
 export async function PUT(request: NextRequest) {
   let authResult: { keyId: string; permissions: string[] } | null = null

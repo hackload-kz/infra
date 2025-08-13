@@ -91,6 +91,20 @@ export async function PUT(
 
     let environmentData
     if (existingEntry) {
+      // Check if variable is editable
+      if (existingEntry.isEditable === false) {
+        await logApiKeyUsage({
+          keyId: authResult.keyId,
+          endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+          method: 'PUT',
+          userAgent: request.headers.get('User-Agent') || undefined,
+          ipAddress: getClientIP(request.headers) || undefined,
+          success: false
+        })
+        
+        return NextResponse.json({ error: 'Environment variable is not editable' }, { status: 403 })
+      }
+
       // Update existing entry
       environmentData = await db.teamEnvironmentData.update({
         where: { id: existingEntry.id },
@@ -161,6 +175,163 @@ export async function PUT(
 
     await logger.error(LogAction.UPDATE, 'TeamEnvironment', 
       `Error in single environment data update: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        metadata: { 
+          error: error instanceof Error ? error.stack : error,
+          serviceKeyId: authResult?.keyId
+        }
+      })
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ teamSlug: string; key: string }> }
+) {
+  let authResult: { keyId: string; permissions: string[] } | null = null
+  
+  try {
+    const { teamSlug, key } = await params
+
+    // Authenticate service account
+    const apiKey = request.headers.get('X-API-Key')
+    authResult = await authenticateServiceAccount(apiKey)
+    
+    if (!authResult) {
+      await logApiKeyUsage({
+        keyId: 'unknown',
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
+    }
+
+    // Check permissions
+    if (!hasPermission(authResult.permissions, 'environment:write')) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    // Find team by slug
+    const team = await db.team.findUnique({
+      where: { nickname: teamSlug }
+    })
+
+    if (!team) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 })
+    }
+
+    // Check if entry exists
+    const existingEntry = await db.teamEnvironmentData.findUnique({
+      where: {
+        teamId_key: {
+          teamId: team.id,
+          key
+        }
+      }
+    })
+
+    if (!existingEntry) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Environment variable not found' }, { status: 404 })
+    }
+
+    // Check if variable is editable
+    if (existingEntry.isEditable === false) {
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+      
+      return NextResponse.json({ error: 'Environment variable is not editable' }, { status: 403 })
+    }
+
+    // Delete the entry
+    await db.teamEnvironmentData.delete({
+      where: { id: existingEntry.id }
+    })
+
+    // Log successful usage
+    await logApiKeyUsage({
+      keyId: authResult.keyId,
+      endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+      method: 'DELETE',
+      userAgent: request.headers.get('User-Agent') || undefined,
+      ipAddress: getClientIP(request.headers) || undefined,
+      teamId: team.id,
+      success: true
+    })
+
+    // Log audit trail
+    await logger.info(LogAction.DELETE, 'TeamEnvironment', 
+      `Environment data deleted via service API for team ${team.id}`, {
+        metadata: { 
+          teamId: team.id, 
+          teamSlug,
+          key,
+          category: existingEntry.category,
+          serviceKeyId: authResult.keyId
+        }
+      })
+
+    // Notify team members
+    await notifyTeamEnvironmentUpdate(team.id, [key])
+
+    return NextResponse.json({ message: 'Environment variable deleted successfully' })
+
+  } catch (error) {
+    // Log failed usage if we have auth info
+    if (authResult) {
+      const { teamSlug, key } = await params
+      await logApiKeyUsage({
+        keyId: authResult.keyId,
+        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
+        method: 'DELETE',
+        userAgent: request.headers.get('User-Agent') || undefined,
+        ipAddress: getClientIP(request.headers) || undefined,
+        success: false
+      })
+    }
+
+    await logger.error(LogAction.DELETE, 'TeamEnvironment', 
+      `Error in environment data delete: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         metadata: { 
           error: error instanceof Error ? error.stack : error,
           serviceKeyId: authResult?.keyId

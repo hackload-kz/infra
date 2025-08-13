@@ -18,12 +18,50 @@ class TeamEnvAPI:
         self.api_key = api_key
         self.dry_run = dry_run
 
-    def get_team_env_vars(self, team_nickname: str) -> Optional[Dict]:
-        """Get environment variables for a team."""
-        # Note: Service API doesn't have GET endpoint, so this would need team ID + session auth
-        # For now, we'll return a placeholder response indicating the limitation
-        print(f"ℹ️ GET endpoint not available via service API. Use dashboard to view team environment variables.")
-        return None
+    def get_team_env_vars(self, team_nickname: str = None) -> Optional[Dict]:
+        """Get environment variables for a team or all teams."""
+        url = f"{self.api_base_url}/api/service/teams/environment"
+        
+        headers = {
+            'X-API-Key': self.api_key,
+            'Content-Type': 'application/json'
+        }
+        
+        params = {}
+        if team_nickname:
+            params['team'] = team_nickname
+        
+        if self.dry_run:
+            print(f"[DRY RUN] Would GET from {url}")
+            if params:
+                print(f"[DRY RUN] Query params: {params}")
+            return {"dry_run": True}
+        
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            if team_nickname:
+                print(f"✅ Retrieved environment variables for team {team_nickname}")
+                if 'team' in data:
+                    team_data = data['team']
+                    print(f"📋 Found {len(team_data['environment'])} variables:")
+                    for var in team_data['environment']:
+                        secure_indicator = "🔒" if var['isSecure'] else "🔓"
+                        print(f"  {secure_indicator} {var['key']}={var['value']} ({var.get('category', 'general')})")
+                        if var.get('description'):
+                            print(f"    📝 {var['description']}")
+            else:
+                print(f"✅ Retrieved environment variables for all teams")
+                print(f"📋 Found {len(data['teams'])} teams:")
+                for team in data['teams']:
+                    print(f"  • {team['teamSlug']} ({team['teamName']}) - {len(team['environment'])} variables")
+            
+            return data
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Error getting env vars: {e}")
+            return None
 
     def set_team_env_var(self, team_nickname: str, key: str, value: str, 
                         description: str = "", category: str = "general", 
@@ -60,8 +98,25 @@ class TeamEnvAPI:
 
     def delete_team_env_var(self, team_nickname: str, key: str) -> bool:
         """Delete an environment variable for a team."""
-        print(f"⚠️ DELETE endpoint not available via service API. Use dashboard to delete environment variables.")
-        return False
+        url = f"{self.api_base_url}/api/service/teams/{team_nickname}/environment/{key}"
+        
+        headers = {
+            'X-API-Key': self.api_key,
+            'Content-Type': 'application/json'
+        }
+        
+        if self.dry_run:
+            print(f"[DRY RUN] Would DELETE from {url}")
+            return True
+        
+        try:
+            response = requests.delete(url, headers=headers)
+            response.raise_for_status()
+            print(f"✅ Deleted {key} for team {team_nickname}")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Error deleting {key} for team {team_nickname}: {e}")
+            return False
 
 
 def load_teams_data(teams_file: str) -> List[Dict]:
@@ -108,7 +163,7 @@ def main():
     
     # Get variables
     get_parser = subparsers.add_parser('get', help='Get environment variables')
-    get_parser.add_argument('--team', required=True, help='Team nickname')
+    get_parser.add_argument('--team', help='Team nickname (if not specified, gets all teams)')
     
     # Delete variable
     del_parser = subparsers.add_parser('delete', help='Delete environment variable')
@@ -169,7 +224,25 @@ def main():
             sys.exit(1)
     
     elif args.action == 'delete':
-        api.delete_team_env_var('', args.key)  # Will show unsupported message
+        if args.team:
+            # Apply to specific team
+            teams = [{'teamNickname': args.team}]
+        else:
+            # Apply to all approved teams
+            teams = load_teams_data(args.teams_file)
+        
+        success_count = 0
+        total_count = len(teams)
+        
+        for team in teams:
+            team_nickname = team['teamNickname']
+            success = api.delete_team_env_var(team_nickname, args.key)
+            if success:
+                success_count += 1
+        
+        print(f"\n📊 Summary: {success_count}/{total_count} teams processed successfully")
+        if success_count < total_count:
+            sys.exit(1)
     else:
         parser.print_help()
 
