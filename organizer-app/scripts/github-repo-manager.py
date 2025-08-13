@@ -136,22 +136,22 @@ class TeamEnvAPI:
         self.api_base_url = api_base_url.rstrip('/')
         self.api_key = api_key
         self.dry_run = dry_run
-        self.headers = {
-            'Authorization': f'Bearer {api_key}',
-            'Content-Type': 'application/json'
-        }
 
     def set_repo_env_var(self, team_nickname: str, repo_url: str) -> bool:
         """Set the repository URL as an environment variable."""
-        url = f"{self.api_base_url}/api/teams/{team_nickname}/env"
+        url = f"{self.api_base_url}/api/service/teams/{team_nickname}/environment/Repo"
+        
+        # Service API uses X-API-Key header
+        headers = {
+            'X-API-Key': self.api_key,
+            'Content-Type': 'application/json'
+        }
         
         data = {
-            "key": "Repo",
             "value": repo_url,
             "description": "Репозиторий для хранения кода в рамках хакатона",
-            "category": "general",
-            "isSecure": False,
-            "isEditable": False  # Read-only
+            "category": "development",
+            "isSecure": False
         }
         
         if self.dry_run:
@@ -159,7 +159,7 @@ class TeamEnvAPI:
             return True
         
         try:
-            response = requests.post(url, headers=self.headers, json=data)
+            response = requests.put(url, headers=headers, json=data)
             response.raise_for_status()
             print(f"✅ Set Repo URL for team {team_nickname}")
             return True

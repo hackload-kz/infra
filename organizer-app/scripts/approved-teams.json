@@ -1,0 +1,2151 @@
+{
+  "exportDate": "2025-08-13T07:36:17.669Z",
+  "totalTeams": 58,
+  "totalEnvironmentVariables": 62,
+  "filters": {
+    "teamIds": [],
+    "categories": [],
+    "includeValues": true
+  },
+  "data": [
+    {
+      "teamId": "cmcymbpkx000k3f01fi6yx83c",
+      "teamName": " NBA",
+      "teamNickname": "NBA",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Nursultan Stanbek",
+        "email": "sta****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Бакдаулет Абдумуминов",
+          "email": "bak****@gmail.com"
+        },
+        {
+          "name": "АЗАМАТ СМАН",
+          "email": "aza****@gmail.com"
+        },
+        {
+          "name": "Myrzan Bekzat",
+          "email": "myr****@gmail.com"
+        },
+        {
+          "name": "Nursultan Stanbek",
+          "email": "sta****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:43.423Z",
+          "updatedAt": "2025-08-07T17:59:43.423Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/NBA",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:33:41.639Z",
+          "updatedAt": "2025-08-12T16:33:41.639Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcvran050009as015l69o1ac",
+      "teamName": " Rorobotics",
+      "teamNickname": "rorobotics",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Дмитрий",
+        "email": "int****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Биржан",
+          "email": "bim****@gmail.com"
+        },
+        {
+          "name": "Ильяс",
+          "email": "ily****@mail.ru"
+        },
+        {
+          "name": "Олег Стельвага",
+          "email": "zom****@gmail.com"
+        },
+        {
+          "name": "Дмитрий",
+          "email": "int****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746306",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:44.552Z",
+          "updatedAt": "2025-08-12T17:09:47.657Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/rorobotics",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:33:48.991Z",
+          "updatedAt": "2025-08-12T16:33:48.991Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdbqlis5000ja60156bh2i4g",
+      "teamName": "1011",
+      "teamNickname": "team-1011",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Арыстан",
+        "email": "ama****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Tamirlan",
+          "email": "t.n****@gmail.com"
+        },
+        {
+          "name": "Жанболат",
+          "email": "eer****@gmail.com"
+        },
+        {
+          "name": "Арыстан",
+          "email": "ama****@gmail.com"
+        },
+        {
+          "name": "Rustem Kaimolla",
+          "email": "kai****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:46.151Z",
+          "updatedAt": "2025-08-07T17:59:46.151Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/team-1011",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:33:56.415Z",
+          "updatedAt": "2025-08-12T16:33:56.415Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcxhjvib00027001ums5lm5i",
+      "teamName": "AMD RYZEN 5 9600X AM5 OEM",
+      "teamNickname": "amdryzen9600x",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Arnur ",
+        "email": "arc****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Medeu",
+          "email": "med****@gmail.com"
+        },
+        {
+          "name": "Nurken",
+          "email": "nur****@gmail.com"
+        },
+        {
+          "name": "Омаргалы Битебаев",
+          "email": "oma****@gmail.com"
+        },
+        {
+          "name": "Arnur ",
+          "email": "arc****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746021",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:49.069Z",
+          "updatedAt": "2025-08-11T09:10:07.126Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/amdryzen9600x",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:03.479Z",
+          "updatedAt": "2025-08-12T16:34:03.479Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcvx7696000pas01h4ibobgv",
+      "teamName": "Datafy",
+      "teamNickname": "datafy",
+      "teamStatus": "APPROVED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Глеб",
+        "email": "kuk****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Толеби",
+          "email": "t.r****@gmail.com"
+        },
+        {
+          "name": "Bauyrgazy",
+          "email": "bau****@gmail.com"
+        },
+        {
+          "name": "Глеб",
+          "email": "kuk****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:49.864Z",
+          "updatedAt": "2025-08-07T17:59:49.864Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/datafy",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:08.579Z",
+          "updatedAt": "2025-08-12T16:34:08.579Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdhn9l1j004fe001351kw465",
+      "teamName": "Deploy",
+      "teamNickname": "Deploy",
+      "teamStatus": "REJECTED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Zako Zzako",
+        "email": "zza****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Zako Zzako",
+          "email": "zza****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcvsm8hi000bas017qfd6dv0",
+      "teamName": "Detrimentals",
+      "teamNickname": "DTRS",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Дархан",
+        "email": "cry****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Дархан",
+          "email": "cry****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmd8gbmem001g5i01i82gdox2",
+      "teamName": "Dotnet",
+      "teamNickname": "Dotcom",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Nerzul",
+        "email": "ner****@bk.ru"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Dilshat Osmanov",
+          "email": "dil****@gmail.com"
+        },
+        {
+          "name": "Baurzhan K.",
+          "email": "uly****@gmail.com"
+        },
+        {
+          "name": "Nerzul",
+          "email": "ner****@bk.ru"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:50.640Z",
+          "updatedAt": "2025-08-07T17:59:50.640Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/Dotcom",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:14.891Z",
+          "updatedAt": "2025-08-12T16:34:14.891Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcvxubh70011as01orezwtmz",
+      "teamName": "Enigma",
+      "teamNickname": "Team-enigma",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Раимбек Бекетов",
+        "email": "koz****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Aibek Jussupov",
+          "email": "aib****@gmail.com"
+        },
+        {
+          "name": "Раимбек Бекетов",
+          "email": "koz****@gmail.com"
+        },
+        {
+          "name": "Алибек Амиров",
+          "email": "ami****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:51.187Z",
+          "updatedAt": "2025-08-07T17:59:51.187Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/Team-enigma",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:21.454Z",
+          "updatedAt": "2025-08-12T16:34:21.454Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcudjk790007as01usu72lub",
+      "teamName": "FairLix",
+      "teamNickname": "fair-lix",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Айдос",
+        "email": "lee****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Айдос",
+          "email": "lee****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdcol78g001lc2019ep47pfg",
+      "teamName": "Gang of Fourth reich",
+      "teamNickname": "reich-goodfellas",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Nurqali Yermukhan (Yermukhan)",
+        "email": "erm****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Адилет",
+          "email": "add****@gmail.com"
+        },
+        {
+          "name": "Nurqali Yermukhan (Yermukhan)",
+          "email": "erm****@gmail.com"
+        },
+        {
+          "name": "Bekzat Zharylkassyn",
+          "email": "bek****@gmail.com"
+        },
+        {
+          "name": "Yernur Abylkanov",
+          "email": "yab****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746293",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:52.212Z",
+          "updatedAt": "2025-08-12T15:10:47.498Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/reich-goodfellas",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:28.592Z",
+          "updatedAt": "2025-08-12T16:34:28.592Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmd787okj000s6r01fpw80mvw",
+      "teamName": "Girlgorithm",
+      "teamNickname": "3G",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Samal",
+        "email": "erk****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Samal",
+          "email": "erk****@gmail.com"
+        },
+        {
+          "name": "Амина",
+          "email": "ami****@gmail.com"
+        },
+        {
+          "name": "Аружан Тлеукулова",
+          "email": "aru****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T17:59:56.340Z",
+          "updatedAt": "2025-08-07T17:59:56.340Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/3G",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:34.897Z",
+          "updatedAt": "2025-08-12T16:34:34.897Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdabjwrx001e9b01d2doff27",
+      "teamName": "HKB crew",
+      "teamNickname": "hkb-crew",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Amanbek Faizolla",
+        "email": "rah****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Nurdaulet Toleugaliyev",
+          "email": "znb****@gmail.com"
+        },
+        {
+          "name": "Bauyrzhan Kilybay",
+          "email": "bau****@gmail.com"
+        },
+        {
+          "name": "Amanbek Faizolla",
+          "email": "rah****@gmail.com"
+        },
+        {
+          "name": "Alima Kassenkazy",
+          "email": "ali****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:00.822Z",
+          "updatedAt": "2025-08-07T18:00:00.822Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/hkb-crew",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:42.498Z",
+          "updatedAt": "2025-08-12T16:34:42.498Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdj1jclj001w9u01u34ms1jp",
+      "teamName": "IPC-3",
+      "teamNickname": "IPC-3",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Daniyar K",
+        "email": "d4y****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Daniyar K",
+          "email": "d4y****@gmail.com"
+        },
+        {
+          "name": "Suban Ibraimov",
+          "email": "ibr****@gmail.com"
+        },
+        {
+          "name": "Александр",
+          "email": "van****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746342",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:01.869Z",
+          "updatedAt": "2025-08-13T02:50:22.948Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/IPC-3",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:48.709Z",
+          "updatedAt": "2025-08-12T16:34:48.709Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcvsqaqx000fas01fqwvzjwh",
+      "teamName": "InSight",
+      "teamNickname": "insight",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Рашитов Ришат",
+        "email": "raw****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Рашитов Ришат",
+          "email": "raw****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmclll5rn0006d001g5n7knxs",
+      "teamName": "MN Partners",
+      "teamNickname": "mnp",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Султанбек",
+        "email": "sul****@gmail.com"
+      },
+      "memberCount": 5,
+      "members": [
+        {
+          "name": "Alua",
+          "email": "inf****@gmail.com"
+        },
+        {
+          "name": "Жасулан",
+          "email": "zha****@gmail.com"
+        },
+        {
+          "name": "Дархан",
+          "email": "dar****@gmail.com"
+        },
+        {
+          "name": "Батыр",
+          "email": "bat****@gmail.com"
+        },
+        {
+          "name": "Султанбек",
+          "email": "sul****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746103",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:03.526Z",
+          "updatedAt": "2025-08-11T16:45:27.468Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/mnp",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:34:56.589Z",
+          "updatedAt": "2025-08-12T16:34:56.589Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmclpo5xb000k9901geywbx5h",
+      "teamName": "Manhattan",
+      "teamNickname": "Giffo",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Faizulla Galimzhanov",
+        "email": "gal****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Faizulla Galimzhanov",
+          "email": "gal****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcly6bon000wd0017b26b95i",
+      "teamName": "Memelopers from the outer space",
+      "teamNickname": "memelopers",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Asliddin",
+        "email": "asl****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Asliddin",
+          "email": "asl****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcnezvgh001h9901o5avkwhc",
+      "teamName": "MetaLoad",
+      "teamNickname": "metaload-akbori",
+      "teamStatus": "APPROVED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Баят",
+        "email": "tur****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Дармен",
+          "email": "dar****@gmail.com"
+        },
+        {
+          "name": "Диас",
+          "email": "myg****@gmail.com"
+        },
+        {
+          "name": "Dauren",
+          "email": "mrh****@gmail.com"
+        },
+        {
+          "name": "Баят",
+          "email": "tur****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746081",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:05.160Z",
+          "updatedAt": "2025-08-11T12:48:11.776Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/metaload-akbori",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:03.478Z",
+          "updatedAt": "2025-08-12T16:35:03.478Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcoyhcgu00009s015kuk9iw6",
+      "teamName": "Mission: Implausible",
+      "teamNickname": "Mis-Imp",
+      "teamStatus": "APPROVED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Амир",
+        "email": "rai****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Sabina",
+          "email": "sab****@gmail.com"
+        },
+        {
+          "name": "Сымбат",
+          "email": "sym****@gmail.com"
+        },
+        {
+          "name": "Амир",
+          "email": "rai****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746257",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:06.319Z",
+          "updatedAt": "2025-08-12T11:50:25.444Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/Mis-Imp",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:07.905Z",
+          "updatedAt": "2025-08-12T16:35:07.905Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcq24s4b000c9s01bqyalnpv",
+      "teamName": "NISTYAK",
+      "teamNickname": "nistyak",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Kassymzhomart",
+        "email": "s.k****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Kassymzhomart",
+          "email": "s.k****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcxklzn100063f01xbxrt24h",
+      "teamName": "NativeBPM",
+      "teamNickname": "nativebpm",
+      "teamStatus": "REJECTED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Сауран",
+        "email": "sba****@outlook.com"
+      },
+      "memberCount": 2,
+      "members": [
+        {
+          "name": "Сауран",
+          "email": "sba****@outlook.com"
+        },
+        {
+          "name": "Эдуард",
+          "email": "ezi****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmd37je7500019g01woxlwoc7",
+      "teamName": "NullPointerException",
+      "teamNickname": "NPE",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Акмаль",
+        "email": "akm****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Sarvar",
+          "email": "mrs****@gmail.com"
+        },
+        {
+          "name": "Afanasii",
+          "email": "afa****@gmail.com"
+        },
+        {
+          "name": "Азамат",
+          "email": "aza****@gmail.com"
+        },
+        {
+          "name": "Акмаль",
+          "email": "akm****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746337",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:08.409Z",
+          "updatedAt": "2025-08-12T20:30:12.339Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/NPE",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:15.550Z",
+          "updatedAt": "2025-08-12T16:35:15.550Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcw78bu4001nas012n297iwa",
+      "teamName": "Nurislam",
+      "teamNickname": "Nurislam",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Нурислам",
+        "email": "ask****@gmail.com"
+      },
+      "memberCount": 2,
+      "members": [
+        {
+          "name": "Арман",
+          "email": "and****@gmail.com"
+        },
+        {
+          "name": "Нурислам",
+          "email": "ask****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmclm61tu000dd001btqrk9wq",
+      "teamName": "Octopussy",
+      "teamNickname": "OCTP",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Амерлан",
+        "email": "ame****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Амерлан",
+          "email": "ame****@gmail.com"
+        },
+        {
+          "name": "Тимур Кудайбергенов",
+          "email": "man****@gmail.com"
+        },
+        {
+          "name": "Азамат Базарбай",
+          "email": "aza****@gmail.com"
+        },
+        {
+          "name": "Roman Yurchenko",
+          "email": "luc****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:10.920Z",
+          "updatedAt": "2025-08-07T18:00:10.920Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/OCTP",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:21.465Z",
+          "updatedAt": "2025-08-12T16:35:21.465Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmd5ia7rc000g7w01wwhjzm9h",
+      "teamName": "OyuTeam",
+      "teamNickname": "oyu",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Alibek Bakdaulet",
+        "email": "ali****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Damir Mertl",
+          "email": "d.d****@aues.kz"
+        },
+        {
+          "name": "Alibek Bakdaulet",
+          "email": "ali****@gmail.com"
+        },
+        {
+          "name": "Глеб Тараканов",
+          "email": "gle****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "679971",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:11.910Z",
+          "updatedAt": "2025-08-12T04:35:45.722Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/oyu",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:28.082Z",
+          "updatedAt": "2025-08-12T16:35:28.082Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmd5zxyr400076u0108kh5n3b",
+      "teamName": "Qaskeleng most wanted",
+      "teamNickname": "qaskeleng-most-wanted",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Arystan Bissimbayev",
+        "email": "bis****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Sungkar Daulet",
+          "email": "dau****@gmail.com"
+        },
+        {
+          "name": "Abu Said Manap",
+          "email": "abu****@gmail.com"
+        },
+        {
+          "name": "Arystan Bissimbayev",
+          "email": "bis****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:12.778Z",
+          "updatedAt": "2025-08-07T18:00:12.778Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/qaskeleng-most-wanted",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:34.037Z",
+          "updatedAt": "2025-08-12T16:35:34.037Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmd4ccajz001pb601j0ke7km7",
+      "teamName": "Qoqys",
+      "teamNickname": "qoqys",
+      "teamStatus": "REJECTED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Temirlan",
+        "email": "tem****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Temirlan",
+          "email": "tem****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcluk5d4000w99017leei4t4",
+      "teamName": "Roaster",
+      "teamNickname": "roaster",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Mashkhurbek Muhamadjonov",
+        "email": "muh****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Mashkhurbek Muhamadjonov",
+          "email": "muh****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdebcvuk003yc201jbsui6w2",
+      "teamName": "Snoonu team",
+      "teamNickname": "snoonu-team",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Sergey Kuzmin",
+        "email": "kuz****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Sergey Kuzmin",
+          "email": "kuz****@gmail.com"
+        },
+        {
+          "name": "Akhmetzhan Kussainov",
+          "email": "kus****@gmail.com"
+        },
+        {
+          "name": "Андрей Суховицкий",
+          "email": "and****@gmail.com"
+        },
+        {
+          "name": "Лена Макарова",
+          "email": "kao****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746201",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:14.781Z",
+          "updatedAt": "2025-08-12T08:23:22.139Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/snoonu-team",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:41.537Z",
+          "updatedAt": "2025-08-12T16:35:41.537Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcx0fpxq001zas01m37u7fnc",
+      "teamName": "TechAlash",
+      "teamNickname": "TechAlash",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Suienish Mirambekov",
+        "email": "mir****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Suienish Mirambekov",
+          "email": "mir****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcm0qbnp0012d001scd8nr9y",
+      "teamName": "Texas Developer Group",
+      "teamNickname": "teD-G",
+      "teamStatus": "APPROVED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Каныш",
+        "email": "kan****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Ракымжан",
+          "email": "rak****@gmail.com"
+        },
+        {
+          "name": "Каныш",
+          "email": "kan****@gmail.com"
+        },
+        {
+          "name": "Никита",
+          "email": "hor****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:17.782Z",
+          "updatedAt": "2025-08-07T18:00:17.782Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/teD-G",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:46.747Z",
+          "updatedAt": "2025-08-12T16:35:46.747Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcud6gs60001as0157cylht8",
+      "teamName": "Tyshkas",
+      "teamNickname": "Tyshkas",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Елтаев Валихан",
+        "email": "val****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Елтаев Валихан",
+          "email": "val****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcm2thwd0019d001475eqwu2",
+      "teamName": "WebKiller",
+      "teamNickname": "WeK ",
+      "teamStatus": "NEW",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Bella",
+        "email": "kra****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Bella",
+          "email": "kra****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdhcrj3k0036e0010lsglclf",
+      "teamName": "Webnetic Systems",
+      "teamNickname": "webnetic-systems",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Mansur",
+        "email": "rom****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Mansur",
+          "email": "rom****@gmail.com"
+        },
+        {
+          "name": "Nurasyl Orazbek",
+          "email": "nur****@gmail.com"
+        },
+        {
+          "name": "Aknur",
+          "email": "whi****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746263",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:21.526Z",
+          "updatedAt": "2025-08-12T12:05:28.817Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/webnetic-systems",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:53.309Z",
+          "updatedAt": "2025-08-12T16:35:53.309Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcvymsu9001eas0149756ecu",
+      "teamName": "Xattab Team",
+      "teamNickname": "xattab-team",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Diyorbek",
+        "email": "bdv****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Diyorbek",
+          "email": "bdv****@gmail.com"
+        },
+        {
+          "name": "Zikrulloh",
+          "email": "fro****@yandex.com"
+        },
+        {
+          "name": "Жандос",
+          "email": "zha****@gmail.com"
+        },
+        {
+          "name": "Dilshod",
+          "email": "avl****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:22.430Z",
+          "updatedAt": "2025-08-07T18:00:22.430Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/xattab-team",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:35:59.610Z",
+          "updatedAt": "2025-08-12T16:35:59.610Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcx9mgt000048r017h2ax2u0",
+      "teamName": "Yama Coders",
+      "teamNickname": "yama-code",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Almas Nurakhmetov",
+        "email": "nur****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Almas Nurakhmetov",
+          "email": "nur****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdhlmcvw004nbz014flxxwd3",
+      "teamName": "ZeroDowntime",
+      "teamNickname": "zero-downtime",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Temirlan Nurbay",
+        "email": "n.t****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Temirlan Nurbay",
+          "email": "n.t****@gmail.com"
+        },
+        {
+          "name": "Rakhat Meiramov",
+          "email": "mei****@gmail.com"
+        },
+        {
+          "name": "Ердиас Талгатов",
+          "email": "erd****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746297",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:23.076Z",
+          "updatedAt": "2025-08-12T16:05:52.217Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/zero-downtime",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:06.655Z",
+          "updatedAt": "2025-08-12T16:36:06.655Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcw4dg3n000may011h8la68q",
+      "teamName": "Zulu",
+      "teamNickname": "zulu ",
+      "teamStatus": "NEW",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Sanzhar",
+        "email": "bis****@gmail.com"
+      },
+      "memberCount": 2,
+      "members": [
+        {
+          "name": "Sanzhar",
+          "email": "bis****@gmail.com"
+        },
+        {
+          "name": "Денис",
+          "email": "den****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdhajr3j0025e001zp02c1sv",
+      "teamName": "donerteam",
+      "teamNickname": "imba-doner-nafastapi",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Abylai Bakytzhan",
+        "email": "aby****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Abylai Bakytzhan",
+          "email": "aby****@gmail.com"
+        },
+        {
+          "name": "Ilyas",
+          "email": "iag****@gmail.com"
+        },
+        {
+          "name": "Alnur Zholdas",
+          "email": "zho****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:24.040Z",
+          "updatedAt": "2025-08-07T18:00:24.040Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/imba-doner-nafastapi",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:12.787Z",
+          "updatedAt": "2025-08-12T16:36:12.787Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcki6w0400007i012vogppai",
+      "teamName": "drim-dev",
+      "teamNickname": "drim-dev",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Дмитрий Мельник",
+        "email": "dmt****@gmail.com"
+      },
+      "memberCount": 2,
+      "members": [
+        {
+          "name": "Stanislav",
+          "email": "bel****@gmail.com"
+        },
+        {
+          "name": "Дмитрий Мельник",
+          "email": "dmt****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdham77b0026bz01fcz4a3fd",
+      "teamName": "helloalem",
+      "teamNickname": "alem",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Abylaikhan Zulbukharov",
+        "email": "l1p****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Alimukhamed Tlekbai",
+          "email": "ali****@gmail.com"
+        },
+        {
+          "name": "Abylaikhan Zulbukharov",
+          "email": "l1p****@gmail.com"
+        },
+        {
+          "name": "Dias Kappassov",
+          "email": "dia****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "599778",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:25.804Z",
+          "updatedAt": "2025-08-11T18:15:14.883Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/alem",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:18.769Z",
+          "updatedAt": "2025-08-12T16:36:18.769Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcnulnb7001yd001r9sdm47u",
+      "teamName": "kruzenshtern",
+      "teamNickname": "kruzenshtern2",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Zhalgas",
+        "email": "jal****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Zhalgas",
+          "email": "jal****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcwdzpr6001pas01v5n4rkhs",
+      "teamName": "kz.cdcvmm",
+      "teamNickname": "cdcvmm",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Константин",
+        "email": "zhi****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Константин",
+          "email": "zhi****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmd7h5skf00015i01a8ls9e60",
+      "teamName": "los-lobos",
+      "teamNickname": "los-lobos",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Sultan Yelikbayev",
+        "email": "sul****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Sultan Yelikbayev",
+          "email": "sul****@gmail.com"
+        },
+        {
+          "name": "Илимбек",
+          "email": "ili****@gmail.com"
+        },
+        {
+          "name": "Adilzhan Mustafin",
+          "email": "adi****@mail.ru"
+        },
+        {
+          "name": "Алихан",
+          "email": "ali****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "746261",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:28.255Z",
+          "updatedAt": "2025-08-12T11:58:03.997Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/los-lobos",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:26.150Z",
+          "updatedAt": "2025-08-12T16:36:26.150Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdh4avfv000jbz0101mcul2w",
+      "teamName": "nxnames",
+      "teamNickname": "team-nxnames",
+      "teamStatus": "REJECTED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "amiosamu",
+        "email": "dam****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "amiosamu",
+          "email": "dam****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdiy5033000cb501ydlsyeln",
+      "teamName": "omar and askha prince",
+      "teamNickname": "prince",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Andrey Komarov (sup)",
+        "email": "sup****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Andrey Komarov (sup)",
+          "email": "sup****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcvxuxm00015as01fp5qi0hc",
+      "teamName": "psycho-coders",
+      "teamNickname": "psycho-coders",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Din",
+        "email": "dim****@gmail.com"
+      },
+      "memberCount": 2,
+      "members": [
+        {
+          "name": "Din",
+          "email": "dim****@gmail.com"
+        },
+        {
+          "name": "Berdibek",
+          "email": "kbe****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmd5mtk01001w8d01j8e7rlfv",
+      "teamName": "stfmt.gorilla/net/http",
+      "teamNickname": "copilot-grandmasters",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Kassymkhan Talgatuly",
+        "email": "kas****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Aibek Meirkhanov",
+          "email": "aib****@gmail.com"
+        },
+        {
+          "name": "Нуралы Жоламан",
+          "email": "zol****@gmail.com"
+        },
+        {
+          "name": "Kassymkhan Talgatuly",
+          "email": "kas****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:28.799Z",
+          "updatedAt": "2025-08-07T18:00:28.799Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/copilot-grandmasters",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:32.373Z",
+          "updatedAt": "2025-08-12T16:36:32.373Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmd2xdqdm00082501f9ujhiiz",
+      "teamName": "vibe-coders",
+      "teamNickname": "vibe-coders",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Gabdylgaziz Zhagypar",
+        "email": "g_z****@kbtu.kz"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "AIBEK",
+          "email": "pig****@gmail.com"
+        },
+        {
+          "name": "Marif",
+          "email": "mar****@yandex.ru"
+        },
+        {
+          "name": "Gabdylgaziz Zhagypar",
+          "email": "g_z****@kbtu.kz"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:29.292Z",
+          "updatedAt": "2025-08-07T18:00:29.292Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/vibe-coders",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:38.853Z",
+          "updatedAt": "2025-08-12T16:36:38.853Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmdecb097004kc201xh4571uz",
+      "teamName": "winterfell",
+      "teamNickname": "winterfell",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Амир",
+        "email": "isl****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Амир",
+          "email": "isl****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcvydsj4001aas01rjw6qb3g",
+      "teamName": "zloi",
+      "teamNickname": "#0000FF",
+      "teamStatus": "NEW",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Manas",
+        "email": "ole****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Manas",
+          "email": "ole****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdbuh806000oa601boo94ux5",
+      "teamName": "Булбул",
+      "teamNickname": "Bulbul",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Nurmyshev Serik",
+        "email": "s.n****@gmail.com"
+      },
+      "memberCount": 4,
+      "members": [
+        {
+          "name": "Raimbek",
+          "email": "rai****@gmail.com"
+        },
+        {
+          "name": "Serik Shaikamalov",
+          "email": "ser****@gmail.com"
+        },
+        {
+          "name": "Nurmyshev Serik",
+          "email": "s.n****@gmail.com"
+        },
+        {
+          "name": "Айдос Алибек",
+          "email": "ali****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "494103",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:30.004Z",
+          "updatedAt": "2025-08-11T09:36:41.071Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/Bulbul",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:46.569Z",
+          "updatedAt": "2025-08-12T16:36:46.569Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcnnbfpn001sd001y8f8ocy1",
+      "teamName": "Вайб кодинг",
+      "teamNickname": "VibeCode",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Алишер ",
+        "email": "ali****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Jasulan Delegat",
+          "email": "ale****@gmail.com"
+        },
+        {
+          "name": "Алишер ",
+          "email": "ali****@gmail.com"
+        },
+        {
+          "name": "Tair",
+          "email": "tai****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "Заполни меня",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:30.639Z",
+          "updatedAt": "2025-08-07T18:00:30.639Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/VibeCode",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:36:53.687Z",
+          "updatedAt": "2025-08-12T16:36:53.687Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmcm6u9qv001fd0018ri31n4s",
+      "teamName": "Новая команда 4",
+      "teamNickname": "Make",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "MAGZHAN",
+        "email": "ama****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "MAGZHAN",
+          "email": "ama****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmdh6r5e5000wbz01395splmc",
+      "teamName": "Че там",
+      "teamNickname": "che-tam",
+      "teamStatus": "APPROVED",
+      "teamLevel": "ADVANCED",
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Abzalkhan Ondakanov",
+        "email": "abz****@gmail.com"
+      },
+      "memberCount": 3,
+      "members": [
+        {
+          "name": "Ruslan Bazarbayev",
+          "email": "baz****@gmail.com"
+        },
+        {
+          "name": "Abzalkhan Ondakanov",
+          "email": "abz****@gmail.com"
+        },
+        {
+          "name": "Zanggar Kambekov",
+          "email": "zan****@gmail.com"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "745673",
+          "description": "ID Платежного аккаунта PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-07T18:00:31.857Z",
+          "updatedAt": "2025-08-11T09:01:13.629Z"
+        },
+        {
+          "key": "Repo",
+          "value": "https://github.com/hackload-kz/che-tam",
+          "description": "Репозиторий для хранения кода в рамках хакатона",
+          "category": "development",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-12T16:37:00.648Z",
+          "updatedAt": "2025-08-12T16:37:00.648Z"
+        }
+      ]
+    },
+    {
+      "teamId": "cmct4v36i0003dw01dkdnicxf",
+      "teamName": "Я только потестировать",
+      "teamNickname": "testing",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "NoGamer",
+        "email": "wel****@mysummit.school"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "NoGamer",
+          "email": "wel****@mysummit.school"
+        }
+      ],
+      "environmentVariables": []
+    },
+    {
+      "teamId": "cmcp1eyyo00099s01i70l34s1",
+      "teamName": "восьмиклассники ",
+      "teamNickname": "8th-graders",
+      "teamStatus": "REJECTED",
+      "teamLevel": null,
+      "hackathon": "HackLoad 2025",
+      "leader": {
+        "name": "Даурен Баймурза ",
+        "email": "hay****@gmail.com"
+      },
+      "memberCount": 1,
+      "members": [
+        {
+          "name": "Даурен Баймурза ",
+          "email": "hay****@gmail.com"
+        }
+      ],
+      "environmentVariables": []
+    }
+  ]
+}

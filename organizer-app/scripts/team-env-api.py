@@ -17,49 +17,40 @@ class TeamEnvAPI:
         self.api_base_url = api_base_url.rstrip('/')
         self.api_key = api_key
         self.dry_run = dry_run
-        self.headers = {
-            'Authorization': f'Bearer {api_key}',
-            'Content-Type': 'application/json'
-        }
 
     def get_team_env_vars(self, team_nickname: str) -> Optional[Dict]:
         """Get environment variables for a team."""
-        url = f"{self.api_base_url}/api/teams/{team_nickname}/env"
-        
-        if self.dry_run:
-            print(f"[DRY RUN] Would GET {url}")
-            return {}
-        
-        try:
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Error getting env vars for team {team_nickname}: {e}")
-            return None
+        # Note: Service API doesn't have GET endpoint, so this would need team ID + session auth
+        # For now, we'll return a placeholder response indicating the limitation
+        print(f"ℹ️ GET endpoint not available via service API. Use dashboard to view team environment variables.")
+        return None
 
     def set_team_env_var(self, team_nickname: str, key: str, value: str, 
                         description: str = "", category: str = "general", 
                         is_secure: bool = False, is_editable: bool = True) -> bool:
         """Set or update an environment variable for a team."""
-        url = f"{self.api_base_url}/api/teams/{team_nickname}/env"
+        url = f"{self.api_base_url}/api/service/teams/{team_nickname}/environment/{key}"
+        
+        # Service API uses X-API-Key header instead of Bearer
+        headers = {
+            'X-API-Key': self.api_key,
+            'Content-Type': 'application/json'
+        }
         
         data = {
-            "key": key,
             "value": value,
             "description": description,
             "category": category,
-            "isSecure": is_secure,
-            "isEditable": is_editable
+            "isSecure": is_secure
         }
         
         if self.dry_run:
-            print(f"[DRY RUN] Would POST to {url}")
+            print(f"[DRY RUN] Would PUT to {url}")
             print(f"[DRY RUN] Data: {json.dumps(data, indent=2, ensure_ascii=False)}")
             return True
         
         try:
-            response = requests.post(url, headers=self.headers, json=data)
+            response = requests.put(url, headers=headers, json=data)
             response.raise_for_status()
             print(f"✅ Set {key}={value} for team {team_nickname}")
             return True
@@ -69,20 +60,8 @@ class TeamEnvAPI:
 
     def delete_team_env_var(self, team_nickname: str, key: str) -> bool:
         """Delete an environment variable for a team."""
-        url = f"{self.api_base_url}/api/teams/{team_nickname}/env/{key}"
-        
-        if self.dry_run:
-            print(f"[DRY RUN] Would DELETE {url}")
-            return True
-        
-        try:
-            response = requests.delete(url, headers=self.headers)
-            response.raise_for_status()
-            print(f"✅ Deleted {key} for team {team_nickname}")
-            return True
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Error deleting {key} for team {team_nickname}: {e}")
-            return False
+        print(f"⚠️ DELETE endpoint not available via service API. Use dashboard to delete environment variables.")
+        return False
 
 
 def load_teams_data(teams_file: str) -> List[Dict]:
@@ -155,13 +134,10 @@ def main():
         return
     
     if args.action == 'get':
-        env_vars = api.get_team_env_vars(args.team)
-        if env_vars is not None:
-            print(f"📋 Environment variables for team {args.team}:")
-            print(json.dumps(env_vars, indent=2, ensure_ascii=False))
+        api.get_team_env_vars(args.team)
         return
     
-    if args.action in ['set', 'delete']:
+    if args.action == 'set':
         if args.team:
             # Apply to specific team
             teams = [{'teamNickname': args.team}]
@@ -175,18 +151,15 @@ def main():
         for team in teams:
             team_nickname = team['teamNickname']
             
-            if args.action == 'set':
-                success = api.set_team_env_var(
-                    team_nickname, 
-                    args.key, 
-                    args.value,
-                    args.description,
-                    args.category,
-                    args.secure,
-                    not args.readonly  # isEditable is opposite of readonly
-                )
-            elif args.action == 'delete':
-                success = api.delete_team_env_var(team_nickname, args.key)
+            success = api.set_team_env_var(
+                team_nickname, 
+                args.key, 
+                args.value,
+                args.description,
+                args.category,
+                args.secure,
+                not args.readonly  # isEditable is opposite of readonly
+            )
             
             if success:
                 success_count += 1
@@ -194,6 +167,9 @@ def main():
         print(f"\n📊 Summary: {success_count}/{total_count} teams processed successfully")
         if success_count < total_count:
             sys.exit(1)
+    
+    elif args.action == 'delete':
+        api.delete_team_env_var('', args.key)  # Will show unsupported message
     else:
         parser.print_help()
 
