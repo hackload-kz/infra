@@ -75,7 +75,8 @@ export async function PUT(
       value: body.value,
       description: body.description,
       category: body.category,
-      isSecure: body.isSecure
+      isSecure: body.isSecure,
+      isEditable: body.isEditable
     }
     const validatedData = environmentDataSchema.parse(updateData)
 
@@ -91,28 +92,18 @@ export async function PUT(
 
     let environmentData
     if (existingEntry) {
-      // Check if variable is editable
-      if (existingEntry.isEditable === false) {
-        await logApiKeyUsage({
-          keyId: authResult.keyId,
-          endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
-          method: 'PUT',
-          userAgent: request.headers.get('User-Agent') || undefined,
-          ipAddress: getClientIP(request.headers) || undefined,
-          success: false
-        })
-        
-        return NextResponse.json({ error: 'Environment variable is not editable' }, { status: 403 })
-      }
-
-      // Update existing entry
+      // Service accounts with environment:write permission can update read-only variables
+      // This allows administrative scripts to manage environment variables properly
+      
+      // Update existing entry (including metadata)
       environmentData = await db.teamEnvironmentData.update({
         where: { id: existingEntry.id },
         data: {
           value: validatedData.value,
           description: validatedData.description,
           category: validatedData.category,
-          isSecure: validatedData.isSecure
+          isSecure: validatedData.isSecure,
+          isEditable: validatedData.isEditable
         }
       })
     } else {
@@ -124,7 +115,8 @@ export async function PUT(
           value: validatedData.value,
           description: validatedData.description,
           category: validatedData.category,
-          isSecure: validatedData.isSecure
+          isSecure: validatedData.isSecure,
+          isEditable: validatedData.isEditable
         }
       })
     }
@@ -149,6 +141,7 @@ export async function PUT(
           key,
           category: validatedData.category,
           isSecure: validatedData.isSecure,
+          isEditable: validatedData.isEditable,
           serviceKeyId: authResult.keyId,
           operation: existingEntry ? 'update' : 'create'
         }
@@ -269,19 +262,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Environment variable not found' }, { status: 404 })
     }
 
-    // Check if variable is editable
-    if (existingEntry.isEditable === false) {
-      await logApiKeyUsage({
-        keyId: authResult.keyId,
-        endpoint: `/api/service/teams/${teamSlug}/environment/${key}`,
-        method: 'DELETE',
-        userAgent: request.headers.get('User-Agent') || undefined,
-        ipAddress: getClientIP(request.headers) || undefined,
-        success: false
-      })
-      
-      return NextResponse.json({ error: 'Environment variable is not editable' }, { status: 403 })
-    }
+    // Service accounts with environment:write permission can delete read-only variables
+    // This allows administrative scripts to manage environment variables properly
 
     // Delete the entry
     await db.teamEnvironmentData.delete({

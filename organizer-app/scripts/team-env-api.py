@@ -159,14 +159,57 @@ def load_teams_data(teams_file: str) -> List[Dict]:
         with open(teams_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
             teams = data.get('data', [])
+            
             # Filter for approved teams only
-            return [team for team in teams if team.get('teamStatus') == 'APPROVED']
+            approved_teams = [team for team in teams if team.get('teamStatus') == 'APPROVED']
+            
+            total_teams = len(teams)
+            approved_count = len(approved_teams)
+            rejected_count = total_teams - approved_count
+            
+            print(f"📊 Team Statistics:")
+            print(f"   Total teams: {total_teams}")
+            print(f"   ✅ Approved teams: {approved_count}")
+            print(f"   ❌ Rejected/Other teams: {rejected_count}")
+            print()
+            
+            return approved_teams
     except FileNotFoundError:
         print(f"❌ Teams file not found: {teams_file}")
         sys.exit(1)
     except json.JSONDecodeError as e:
         print(f"❌ Invalid JSON in teams file: {e}")
         sys.exit(1)
+
+
+def validate_approved_teams(teams: List[Dict]) -> bool:
+    """Validate that we're only processing approved teams."""
+    non_approved_teams = [team for team in teams if team.get('teamStatus') != 'APPROVED']
+    
+    if non_approved_teams:
+        print("❌ ERROR: Found non-approved teams in the dataset!")
+        for team in non_approved_teams:
+            print(f"   - {team.get('teamName', 'Unknown')} ({team.get('teamNickname', 'Unknown')}): {team.get('teamStatus', 'Unknown')}")
+        print()
+        print("This script should only process APPROVED teams.")
+        print("Please verify the data source and filtering logic.")
+        return False
+    
+    return True
+
+
+def validate_team_exists(team_nickname: str, approved_teams: List[Dict]) -> bool:
+    """Validate that a specific team exists and is approved."""
+    team_nicknames = {team['teamNickname'] for team in approved_teams}
+    
+    if team_nickname not in team_nicknames:
+        print(f"❌ ERROR: Team '{team_nickname}' not found in approved teams!")
+        print(f"Available approved teams:")
+        for team in approved_teams:
+            print(f"   - {team['teamNickname']} ({team['teamName']})")
+        return False
+    
+    return True
 
 
 def main():
@@ -217,28 +260,68 @@ def main():
     
     if args.action == 'list':
         teams = load_teams_data(args.teams_file)
+        
+        # Validate that we only have approved teams
+        if not validate_approved_teams(teams):
+            sys.exit(1)
+        
         print(f"📋 Found {len(teams)} approved teams:")
-        for team in teams:
-            print(f"  • {team['teamNickname']} - {team['teamName']}")
+        for i, team in enumerate(teams, 1):
+            status = team.get('teamStatus', 'UNKNOWN')
+            member_count = team.get('memberCount', len(team.get('members', [])))
+            print(f"  {i:2d}. {team['teamNickname']} - {team['teamName']}")
+            print(f"      Status: {status} | Members: {member_count}")
         return
     
     if args.action == 'get':
+        if args.team:
+            # If specific team requested, validate it exists and is approved
+            approved_teams = load_teams_data(args.teams_file)
+            if not validate_approved_teams(approved_teams):
+                sys.exit(1)
+            if not validate_team_exists(args.team, approved_teams):
+                sys.exit(1)
+            print(f"🎯 Getting variables for specific approved team: {args.team}")
+        else:
+            print(f"🌐 Getting variables for all teams")
+        
         api.get_team_env_vars(args.team)
         return
     
     if args.action == 'set':
+        # Load approved teams for validation
+        approved_teams = load_teams_data(args.teams_file)
+        
+        # Validate that we only have approved teams
+        if not validate_approved_teams(approved_teams):
+            sys.exit(1)
+        
         if args.team:
-            # Apply to specific team
-            teams = [{'teamNickname': args.team}]
+            # Apply to specific team - validate it exists and is approved
+            if not validate_team_exists(args.team, approved_teams):
+                sys.exit(1)
+            teams = [{'teamNickname': args.team, 'teamName': f'Specific team: {args.team}'}]
+            print(f"🎯 Setting variable for specific approved team: {args.team}")
         else:
             # Apply to all approved teams
-            teams = load_teams_data(args.teams_file)
+            teams = approved_teams
+            print(f"🌐 Setting variable for all {len(teams)} approved teams")
+        
+        print(f"📝 Variable: {args.key}={args.value}")
+        print(f"📋 Description: {args.description or '(no description)'}")
+        print(f"🏷️ Category: {args.category}")
+        print(f"🔒 Secure: {'Yes' if args.secure else 'No'}")
+        print(f"✏️ Editable: {'No' if args.readonly else 'Yes'}")
+        print()
         
         success_count = 0
         total_count = len(teams)
         
-        for team in teams:
+        for i, team in enumerate(teams, 1):
             team_nickname = team['teamNickname']
+            team_name = team.get('teamName', 'Unknown')
+            
+            print(f"🔄 Processing team {i}/{total_count}: {team_nickname} ({team_name})")
             
             success = api.set_team_env_var(
                 team_nickname, 
@@ -252,31 +335,61 @@ def main():
             
             if success:
                 success_count += 1
+                print(f"   ✅ Success")
+            else:
+                print(f"   ❌ Failed")
         
         print(f"\n📊 Summary: {success_count}/{total_count} teams processed successfully")
         if success_count < total_count:
+            print(f"⚠️ {total_count - success_count} teams had errors")
             sys.exit(1)
+        else:
+            print("✅ All teams processed successfully!")
     
     elif args.action == 'delete':
+        # Load approved teams for validation
+        approved_teams = load_teams_data(args.teams_file)
+        
+        # Validate that we only have approved teams
+        if not validate_approved_teams(approved_teams):
+            sys.exit(1)
+        
         if args.team:
-            # Apply to specific team
-            teams = [{'teamNickname': args.team}]
+            # Apply to specific team - validate it exists and is approved
+            if not validate_team_exists(args.team, approved_teams):
+                sys.exit(1)
+            teams = [{'teamNickname': args.team, 'teamName': f'Specific team: {args.team}'}]
+            print(f"🎯 Deleting variable from specific approved team: {args.team}")
         else:
             # Apply to all approved teams
-            teams = load_teams_data(args.teams_file)
+            teams = approved_teams
+            print(f"🌐 Deleting variable from all {len(teams)} approved teams")
+        
+        print(f"🗑️ Variable to delete: {args.key}")
+        print()
         
         success_count = 0
         total_count = len(teams)
         
-        for team in teams:
+        for i, team in enumerate(teams, 1):
             team_nickname = team['teamNickname']
+            team_name = team.get('teamName', 'Unknown')
+            
+            print(f"🔄 Processing team {i}/{total_count}: {team_nickname} ({team_name})")
+            
             success = api.delete_team_env_var(team_nickname, args.key)
             if success:
                 success_count += 1
+                print(f"   ✅ Success")
+            else:
+                print(f"   ❌ Failed")
         
         print(f"\n📊 Summary: {success_count}/{total_count} teams processed successfully")
         if success_count < total_count:
+            print(f"⚠️ {total_count - success_count} teams had errors")
             sys.exit(1)
+        else:
+            print("✅ All teams processed successfully!")
     else:
         parser.print_help()
 

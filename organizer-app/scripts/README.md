@@ -4,12 +4,13 @@ Simple, focused scripts for managing HackLoad 2025 team environments, repositori
 
 ## Overview
 
-This collection provides four main scripts:
+This collection provides five main scripts:
 
 1. **`team-env-api.py`** - Core environment variable management
 2. **`github-repo-manager.py`** - GitHub repository creation and permissions
 3. **`psid-manager.py`** - PSID value management
 4. **`godaddy-subdomain-manager.py`** - GoDaddy subdomain management and domain environment variables
+5. **`set-endpoint-urls.py`** - Specialized script to set ENDPOINT_URL environment variables
 
 All scripts support dry-run mode and work with approved teams only (`teamStatus: "APPROVED"`).
 
@@ -47,21 +48,29 @@ export GODADDY_DOMAIN="hackload.kz"  # Optional, defaults to hackload.kz
 
 ### 1. Team Environment API (`team-env-api.py`)
 
-Core script for managing team environment variables.
+Core script for managing team environment variables with **enhanced approved team filtering and validation**.
+
+#### Key Features
+- ✅ **Approved Teams Only**: Automatically filters to process only teams with `teamStatus: "APPROVED"`
+- ✅ **Team Validation**: Validates specific team requests against approved teams list
+- ✅ **Statistics Display**: Shows total vs approved vs rejected team counts
+- ✅ **Enhanced Progress**: Team-by-team progress reporting with success/failure tracking
+- ✅ **Safety Checks**: Prevents operations on non-approved teams
 
 #### Usage Examples
 
 ```bash
-# List all approved teams
+# List all approved teams with detailed info
 ./team-env-api.py list
+# Output shows: rorobotics - Rorobotics (Status: APPROVED | Members: 4)
 
-# Get environment variables for a specific team
+# Get environment variables for a specific approved team
 ./team-env-api.py get --team rorobotics
 
-# Set a variable for all approved teams
+# Set a variable for all approved teams (25 teams shown in progress)
 ./team-env-api.py set API_KEY "secret123" --description "API access key"
 
-# Set a secure, read-only variable for a specific team
+# Set a secure, read-only variable for a specific approved team
 ./team-env-api.py set DATABASE_URL "postgresql://..." \
   --team rorobotics --secure --readonly --category database
 
@@ -70,21 +79,53 @@ Core script for managing team environment variables.
 
 # Dry run (show what would be done)
 ./team-env-api.py set TEST_VAR "value" --dry-run
+
+# Try to use non-approved team (will fail with helpful error)
+./team-env-api.py set TEST_VAR "value" --team rejected-team
+# Error: Team 'rejected-team' not found in approved teams!
 ```
 
 #### Command Reference
 
-- `list` - Show all approved teams
-- `get --team TEAM` - Get environment variables for a team  
+- `list` - Show all approved teams with status and member counts
+- `get --team TEAM` - Get environment variables for a specific approved team  
 - `set KEY VALUE [options]` - Set environment variable
 - `delete KEY [options]` - Delete environment variable
 
+#### Enhanced Output
+
+**Statistics Display:**
+```
+📊 Team Statistics:
+   Total teams: 58
+   ✅ Approved teams: 25
+   ❌ Rejected/Other teams: 33
+```
+
+**Progress Tracking:**
+```
+🔄 Processing team 1/25: rorobotics ( Rorobotics)
+   ✅ Success
+🔄 Processing team 2/25: team-1011 (1011)
+   ✅ Success
+
+📊 Summary: 25/25 teams processed successfully
+✅ All teams processed successfully!
+```
+
 #### Set Command Options
-- `--team TEAM` - Apply to specific team (default: all approved teams)
+- `--team TEAM` - Apply to specific approved team (validated against approved list)
 - `--description TEXT` - Variable description
 - `--category CATEGORY` - Variable category (default: general)
 - `--secure` - Mark as secure/sensitive
 - `--readonly` - Mark as read-only (not editable by team)
+
+#### Enhanced Validation
+
+- **Approved Teams Only**: Script automatically filters input data to include only approved teams
+- **Team Existence Check**: When `--team` is specified, validates the team exists in approved list
+- **Helpful Error Messages**: Shows available approved teams when invalid team is specified
+- **Data Integrity**: Prevents accidental operations on rejected/withdrawn teams
 
 ### 2. GitHub Repository Manager (`github-repo-manager.py`)
 
@@ -219,6 +260,10 @@ Or as array:
 
 # 3. Update PSIDs from provided file
 ./psid-manager.py update team-psids.csv
+
+# 4. Set ENDPOINT_URL for all teams
+./set-endpoint-urls.py --dry-run  # Preview first
+./set-endpoint-urls.py
 ```
 
 ### Daily Operations
@@ -232,6 +277,9 @@ Or as array:
 
 # Update specific team's PSID
 ./psid-manager.py set team-name 987654
+
+# Update endpoint URLs if domain changes
+./set-endpoint-urls.py --base-domain new-domain.com
 ```
 
 ### Maintenance
@@ -327,6 +375,111 @@ export GODADDY_DOMAIN="hub.hackload.kz"
 ```
 
 **Prerequisites**: Ensure `hub.hackload.kz` is properly configured as a subdomain and managed by your GoDaddy account.
+
+### 5. ENDPOINT_URL Environment Variable Setup (`set-endpoint-urls.py`)
+
+Specialized script to set `ENDPOINT_URL` environment variables for all approved teams with their Billeter API endpoints.
+
+#### Key Features
+- ✅ **Approved Teams Only**: Automatically processes only teams with `teamStatus: "APPROVED"`
+- ✅ **URL Generation**: Creates `https://<team-nickname>.<base-domain>` format URLs
+- ✅ **Read-only Variables**: Sets environment variables as read-only (non-editable by teams)
+- ✅ **Flexible Domain**: Supports custom base domains for different environments
+- ✅ **Progress Tracking**: Shows detailed progress for each team processed
+
+#### Usage Examples
+
+```bash
+# Set ENDPOINT_URL for all approved teams with default domain
+./set-endpoint-urls.py
+
+# Preview what would be done (dry run)
+./set-endpoint-urls.py --dry-run
+
+# Use custom base domain
+./set-endpoint-urls.py --base-domain "api.custom-domain.com"
+
+# Use custom teams file
+./set-endpoint-urls.py --teams-file custom-teams.json
+
+# Example with all options
+./set-endpoint-urls.py --dry-run \
+  --teams-file approved-teams.json \
+  --base-domain hub.hackload.kz \
+  --api-key your-api-key
+```
+
+#### What It Does
+
+For each approved team, the script:
+
+1. **Generates Endpoint URL**
+   - Format: `https://<team-nickname>.<base-domain>`
+   - Example: `https://rorobotics.hub.hackload.kz`
+
+2. **Sets Environment Variable**
+   - Key: `ENDPOINT_URL`
+   - Value: Generated URL
+   - Description: "Доменное имя, которое будет использоваться при обращение к Billeter API команды"
+   - Category: `api`
+   - Read-only: `true` (teams cannot edit)
+   - Secure: `false` (not sensitive data)
+
+3. **Validates Team Status**
+   - Only processes approved teams
+   - Provides statistics on total vs approved teams
+   - Shows detailed progress for each team
+
+#### Generated URLs Examples
+
+With default base domain (`hub.hackload.kz`):
+- `rorobotics` → `https://rorobotics.hub.hackload.kz`
+- `team-1011` → `https://team-1011.hub.hackload.kz` 
+- `amdryzen9600x` → `https://amdryzen9600x.hub.hackload.kz`
+
+With custom base domain (`api.example.com`):
+- `rorobotics` → `https://rorobotics.api.example.com`
+
+#### Command Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--teams-file` | Path to teams JSON file | `approved-teams.json` |
+| `--api-base-url` | API base URL for requests | `https://hub.hackload.kz` |
+| `--api-key` | Service API key | `$SERVICE_API_KEY` |
+| `--base-domain` | Base domain for endpoint URLs | `hub.hackload.kz` |
+| `--dry-run` | Show what would be done | `false` |
+
+#### Output Example
+
+```
+📊 Team Statistics:
+   Total teams: 58
+   ✅ Approved teams: 25
+   ❌ Rejected/Other teams: 33
+
+🌐 Setting ENDPOINT_URL for 25 approved teams
+📋 Variable: ENDPOINT_URL
+🏷️ Category: api
+📝 Description: Доменное имя, которое будет использоваться при обращение к Billeter API команды
+🔒 Secure: No
+✏️ Editable: No (Read-only)
+
+🔄 Processing team 1/25: rorobotics ( Rorobotics)
+   Status: APPROVED | Members: 4
+   Endpoint URL: https://rorobotics.hub.hackload.kz
+   ✅ Success
+
+📊 Summary: 25/25 teams processed successfully
+✅ All teams processed successfully!
+```
+
+#### Use Cases
+
+1. **Initial Setup**: Set endpoint URLs for all teams when first deploying Billeter API
+2. **Domain Migration**: Update all teams' endpoint URLs when changing base domain
+3. **Environment Setup**: Configure different endpoint URLs for staging/production
+4. **Team Onboarding**: Automatically configure new approved teams
 
 #### Common Issues
 

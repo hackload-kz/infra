@@ -199,7 +199,19 @@ def load_teams_data(teams_file: str) -> List[Dict]:
             data = json.load(f)
             teams = data.get('data', [])
             # Filter for approved teams only
-            return [team for team in teams if team.get('teamStatus') == 'APPROVED']
+            approved_teams = [team for team in teams if team.get('teamStatus') == 'APPROVED']
+            
+            total_teams = len(teams)
+            approved_count = len(approved_teams)
+            rejected_count = total_teams - approved_count
+            
+            print(f"📊 Team Statistics:")
+            print(f"   Total teams: {total_teams}")
+            print(f"   ✅ Approved teams: {approved_count}")
+            print(f"   ❌ Rejected/Other teams: {rejected_count}")
+            print()
+            
+            return approved_teams
     except FileNotFoundError:
         print(f"❌ Teams file not found: {teams_file}")
         sys.exit(1)
@@ -233,15 +245,30 @@ def sync_team_repositories(teams: List[Dict], github_api: GitHubAPI,
     """Synchronize repositories for all teams."""
     success_count = 0
     total_count = len(teams)
+    repo_created_count = 0
+    repo_updated_count = 0
+    collaborators_managed_count = 0
+    env_vars_set_count = 0
     
     # Get org members to avoid removing them
     org_members = github_api.get_org_members()
     
-    for team in teams:
+    print(f"🔐 Found {len(org_members)} organization members (will be preserved as collaborators)")
+    print()
+    
+    for i, team in enumerate(teams, 1):
         team_name = team['teamName']
         team_nickname = team['teamNickname']
+        team_status = team.get('teamStatus', 'UNKNOWN')
+        member_count = team.get('memberCount', len(team.get('members', [])))
         
-        print(f"\n🔄 Processing team: {team_name} ({team_nickname})")
+        print(f"🔄 Processing team {i}/{total_count}: {team_name} ({team_nickname})")
+        print(f"   Status: {team_status} | Members: {member_count}")
+        
+        # Validate team data
+        if not team_nickname:
+            print(f"⚠️ Skipping team {team_name}: No team nickname")
+            continue
         
         # 1. Create or update repository
         description = f"HackLoad 2025 - Репозиторий команды {team_name}"
@@ -250,47 +277,116 @@ def sync_team_repositories(teams: List[Dict], github_api: GitHubAPI,
         if not repo_created:
             print(f"❌ Failed to create/access repository for team {team_nickname}")
             continue
+        else:
+            repo_created_count += 1
         
         # 2. Manage collaborators
+        collaborators_updated = False
         if email_to_github:
             current_collaborators = github_api.get_collaborators(team_nickname)
             
             # Get expected collaborators from team members
             expected_collaborators = set()
-            for member in team['members']:
+            member_github_mapping = {}
+            
+            for member in team.get('members', []):
+                name = member.get('name', 'Unknown')
                 email = member.get('email', '')
+                
+                if not email:
+                    print(f"   ⚠️ Member {name}: No email address")
+                    continue
+                    
                 github_url = email_to_github.get(email)
                 if github_url:
                     username = extract_github_username(github_url)
                     if username:
                         expected_collaborators.add(username)
+                        member_github_mapping[username] = name
                     else:
-                        print(f"⚠️ Could not extract username from GitHub URL: {github_url}")
+                        print(f"   ⚠️ Member {name}: Invalid GitHub URL format: {github_url}")
                 else:
-                    print(f"⚠️ No GitHub URL found for member: {email}")
+                    print(f"   ⚠️ Member {name}: No GitHub URL found for email: {email}")
+            
+            print(f"   Expected collaborators: {len(expected_collaborators)}")
+            print(f"   Current collaborators: {len(current_collaborators)}")
             
             # Add missing collaborators
+            added_count = 0
             for username in expected_collaborators:
                 if username not in current_collaborators:
-                    github_api.add_collaborator(team_nickname, username)
+                    member_name = member_github_mapping.get(username, username)
+                    if github_api.add_collaborator(team_nickname, username):
+                        print(f"   ✅ Added: {username} ({member_name})")
+                        added_count += 1
                     time.sleep(0.5)  # Rate limiting
             
             # Remove unauthorized collaborators (but keep org members)
+            removed_count = 0
             for username in current_collaborators:
                 if username not in expected_collaborators and username not in org_members:
-                    github_api.remove_collaborator(team_nickname, username)
+                    if github_api.remove_collaborator(team_nickname, username):
+                        print(f"   🗑️ Removed: {username}")
+                        removed_count += 1
                     time.sleep(0.5)  # Rate limiting
+            
+            if added_count > 0 or removed_count > 0:
+                collaborators_updated = True
+                collaborators_managed_count += 1
+                print(f"   📝 Collaborators updated: +{added_count}, -{removed_count}")
+            else:
+                print(f"   ✅ Collaborators already in sync")
         
         # 3. Set repository URL as environment variable
+        env_var_set = False
         if team_env_api:
             repo_url = f"https://github.com/{github_api.org}/{team_nickname}"
-            team_env_api.set_repo_env_var(team_nickname, repo_url)
+            if team_env_api.set_repo_env_var(team_nickname, repo_url):
+                env_var_set = True
+                env_vars_set_count += 1
         
-        success_count += 1
-        time.sleep(2)  # Rate limiting between teams
+        if repo_created and (not email_to_github or collaborators_updated or not collaborators_updated) and (not team_env_api or env_var_set):
+            success_count += 1
+            print(f"   ✅ Team processing completed successfully")
+        else:
+            print(f"   ⚠️ Team processing completed with warnings")
+        
+        # Rate limiting between teams
+        if i < total_count:  # Don't sleep after the last team
+            time.sleep(2)
+        print()
     
-    print(f"\n📊 Summary: {success_count}/{total_count} teams processed successfully")
+    print("=" * 60)
+    print("📊 SYNCHRONIZATION SUMMARY")
+    print("=" * 60)
+    print(f"Teams processed: {success_count}/{total_count}")
+    print(f"Repositories created/verified: {repo_created_count}")
+    print(f"Teams with collaborator updates: {collaborators_managed_count}")
+    print(f"Environment variables set: {env_vars_set_count}")
+    print(f"Organization members preserved: {len(org_members)}")
+    
+    if success_count == total_count:
+        print("✅ All teams processed successfully!")
+    else:
+        print(f"⚠️ {total_count - success_count} teams had issues")
+    
     return success_count == total_count
+
+
+def validate_approved_teams(teams: List[Dict]) -> bool:
+    """Validate that we're only processing approved teams."""
+    non_approved_teams = [team for team in teams if team.get('teamStatus') != 'APPROVED']
+    
+    if non_approved_teams:
+        print("❌ ERROR: Found non-approved teams in the dataset!")
+        for team in non_approved_teams:
+            print(f"   - {team.get('teamName', 'Unknown')} ({team.get('teamNickname', 'Unknown')}): {team.get('teamStatus', 'Unknown')}")
+        print()
+        print("This script should only process APPROVED teams.")
+        print("Please verify the data source and filtering logic.")
+        return False
+    
+    return True
 
 
 def main():
@@ -339,6 +435,10 @@ def main():
     
     print(f"📋 Found {len(teams)} approved teams")
     print(f"👥 Found {len(email_to_github)} members with GitHub URLs")
+    
+    # Validate that we only have approved teams
+    if not validate_approved_teams(teams):
+        sys.exit(1)
     
     if args.dry_run:
         print("🧪 DRY RUN MODE - No changes will be made")

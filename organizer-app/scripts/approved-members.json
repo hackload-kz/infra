@@ -1,6 +1,6 @@
 {
-  "exportDate": "2025-08-13T07:36:20.762Z",
-  "totalParticipants": 108,
+  "exportDate": "2025-08-14T19:36:03.507Z",
+  "totalParticipants": 104,
   "exportType": "large-teams",
   "hackathon": {
     "id": "cmct461me00007dgvujg82z6s",
@@ -14,7 +14,7 @@
     {
       "id": "cmd41d6gf000v9g0197ninkg0",
       "name": "Myrzan Bekzat",
-      "email": "m**********t@gmail.com",
+      "email": "m******t@gmail.com",
       "city": "Almaty",
       "company": "Q",
       "telegram": "@bekzat_myrzan",
@@ -33,7 +33,7 @@
         "name": " NBA",
         "nickname": "NBA",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -44,7 +44,7 @@
     {
       "id": "cmcym9aw2000j7001dbo5nt29",
       "name": "Nursultan Stanbek",
-      "email": "s*********4@gmail.com",
+      "email": "s******4@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "https://t.me/totsamyinurs",
@@ -63,7 +63,7 @@
         "name": " NBA",
         "nickname": "NBA",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -74,7 +74,7 @@
     {
       "id": "cmd2xwtj4000y8301yxuutfyx",
       "name": "АЗАМАТ СМАН",
-      "email": "a*********8@gmail.com",
+      "email": "a******8@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@sman028",
@@ -93,7 +93,7 @@
         "name": " NBA",
         "nickname": "NBA",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -104,7 +104,7 @@
     {
       "id": "cmcyo0mck000o70014gy1my3k",
       "name": "Бакдаулет Абдумуминов",
-      "email": "b******************v@gmail.com",
+      "email": "b******v@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@bakdaulet_dev",
@@ -123,7 +123,7 @@
         "name": " NBA",
         "nickname": "NBA",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -134,7 +134,7 @@
     {
       "id": "cmd8wkmrd00hg5i01gmvkply1",
       "name": "Биржан",
-      "email": "b*******i@gmail.com",
+      "email": "b******i@gmail.com",
       "city": "Павлодар",
       "company": "IFO",
       "telegram": "BauR",
@@ -166,9 +166,9 @@
     {
       "id": "cmclibv890007at019ytyk9dw",
       "name": "Дмитрий",
-      "email": "i********r@gmail.com",
+      "email": "i******r@gmail.com",
       "city": "Павлодар, Казахстан",
-      "company": null,
+      "company": "Rorobotics",
       "telegram": "@intensedr",
       "githubUrl": "https://github.com/intensedr/",
       "linkedinUrl": null,
@@ -198,7 +198,7 @@
     {
       "id": "cmdh2sylx0003bz016r010i9i",
       "name": "Ильяс",
-      "email": "i********7@mail.ru",
+      "email": "i******7@mail.ru",
       "city": "Павлодар",
       "company": "AdovDev",
       "telegram": "@Ilyas_Adov",
@@ -240,7 +240,7 @@
     {
       "id": "cmdj0ayz5001o9u012pa9e2g6",
       "name": "Олег Стельвага",
-      "email": "z********9@gmail.com",
+      "email": "z******9@gmail.com",
       "city": "Павлодар",
       "company": "-",
       "telegram": "@stelvaga",
@@ -279,7 +279,7 @@
     {
       "id": "cmd8mtdik001za601a6363eub",
       "name": "Rustem Kaimolla",
-      "email": "k************m@gmail.com",
+      "email": "k******m@gmail.com",
       "city": "Almaty",
       "company": "Full Menu",
       "telegram": "overwritelife",
@@ -321,7 +321,7 @@
     {
       "id": "cmda8exls00129b01otm9ppee",
       "name": "Tamirlan",
-      "email": "t***********y@gmail.com",
+      "email": "t******y@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "https://t.me/privet_xyz",
@@ -363,7 +363,7 @@
     {
       "id": "cmdbpsyv2000da601x0qizh2e",
       "name": "Арыстан",
-      "email": "a****************n@gmail.com",
+      "email": "a******n@gmail.com",
       "city": "Астана",
       "company": "BCC",
       "telegram": "@one_nine_two",
@@ -447,7 +447,7 @@
     {
       "id": "cmcltot4o000vd001qori648n",
       "name": "Arnur ",
-      "email": "a*******0@gmail.com",
+      "email": "a******0@gmail.com",
       "city": "Astana",
       "company": "Cerebro",
       "telegram": "@amd_ryzen_5_9600x",
@@ -517,7 +517,7 @@
     {
       "id": "cmcy8tx79000e7001pamx8m60",
       "name": "Nurken",
-      "email": "n**********7@gmail.com",
+      "email": "n******7@gmail.com",
       "city": "Астана",
       "company": null,
       "telegram": "@yankyankyanknk",
@@ -547,7 +547,7 @@
     {
       "id": "cmd4bk2rb001e9g01v77jlj44",
       "name": "Омаргалы Битебаев",
-      "email": "o*********s@gmail.com",
+      "email": "o******s@gmail.com",
       "city": "Семей",
       "company": null,
       "telegram": "@hAckeeVo",
@@ -577,7 +577,7 @@
     {
       "id": "cmcvxa7ev0008ay01pig5rov9",
       "name": "Bauyrgazy",
-      "email": "b*************1@gmail.com",
+      "email": "b******1@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -596,7 +596,7 @@
         "name": "Datafy",
         "nickname": "datafy",
         "level": null,
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -607,7 +607,7 @@
     {
       "id": "cmcvx7699000ras01nw1acnwl",
       "name": "Глеб",
-      "email": "k**********b@gmail.com",
+      "email": "k******b@gmail.com",
       "city": "Алматы",
       "company": "Datafy",
       "telegram": null,
@@ -626,7 +626,7 @@
         "name": "Datafy",
         "nickname": "datafy",
         "level": null,
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -637,7 +637,7 @@
     {
       "id": "cmcvxa7rz000vas015ojy2kop",
       "name": "Толеби",
-      "email": "t********v@gmail.com",
+      "email": "t******v@gmail.com",
       "city": "Алматы",
       "company": "Datafy",
       "telegram": "@gkhjlg",
@@ -656,7 +656,7 @@
         "name": "Datafy",
         "nickname": "datafy",
         "level": null,
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -686,7 +686,7 @@
         "name": "Dotnet",
         "nickname": "Dotcom",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -697,7 +697,7 @@
     {
       "id": "cmd8iikhf001aa601sxzmea2a",
       "name": "Dilshat Osmanov",
-      "email": "d***************5@gmail.com",
+      "email": "d******5@gmail.com",
       "city": "Алматы",
       "company": "Unicore.one",
       "telegram": "@dilshat_osmanov",
@@ -716,7 +716,7 @@
         "name": "Dotnet",
         "nickname": "Dotcom",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -746,7 +746,7 @@
         "name": "Dotnet",
         "nickname": "Dotcom",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -757,7 +757,7 @@
     {
       "id": "cmdj9unpc003j9u018g043nr6",
       "name": "Aibek Jussupov",
-      "email": "a************v@gmail.com",
+      "email": "a******v@gmail.com",
       "city": null,
       "company": null,
       "telegram": "@aibakaiba",
@@ -780,7 +780,7 @@
         "name": "Enigma",
         "nickname": "Team-enigma",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [
           "React",
           "Angular",
@@ -813,7 +813,7 @@
     {
       "id": "cmcz19l2u0001bz01y844ntwd",
       "name": "Алибек Амиров",
-      "email": "a**********k@gmail.com",
+      "email": "a******k@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@AmirovA_qq",
@@ -832,7 +832,7 @@
         "name": "Enigma",
         "nickname": "Team-enigma",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [
           "React",
           "Angular",
@@ -865,7 +865,7 @@
     {
       "id": "cmcvxubha0013as01u2u4m7cl",
       "name": "Раимбек Бекетов",
-      "email": "k****************k@gmail.com",
+      "email": "k******k@gmail.com",
       "city": "Дубай",
       "company": "X-flames",
       "telegram": "@Joyboy_r",
@@ -898,7 +898,7 @@
         "name": "Enigma",
         "nickname": "Team-enigma",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [
           "React",
           "Angular",
@@ -931,7 +931,7 @@
     {
       "id": "cmde0s8z7002xa601o3j4vpcq",
       "name": "Bekzat Zharylkassyn",
-      "email": "b********1@gmail.com",
+      "email": "b******1@gmail.com",
       "city": "Almaty",
       "company": "BCC HUB",
       "telegram": "Https://t.me/bekka811",
@@ -973,7 +973,7 @@
     {
       "id": "cmdcoj0sh001fc2017er29gd7",
       "name": "Nurqali Yermukhan (Yermukhan)",
-      "email": "e************i@gmail.com",
+      "email": "e******i@gmail.com",
       "city": "Almaty",
       "company": "ACB HUB",
       "telegram": "@yermukhannn",
@@ -1017,7 +1017,7 @@
     {
       "id": "cmdil4blx006wbz01x3mdw2qm",
       "name": "Yernur Abylkanov",
-      "email": "y********v@gmail.com",
+      "email": "y******v@gmail.com",
       "city": "Almaty",
       "company": "IKOD",
       "telegram": "@yabylkanov",
@@ -1059,7 +1059,7 @@
     {
       "id": "cmclkutyf000399019diqk3vo",
       "name": "Адилет",
-      "email": "a***************3@gmail.com",
+      "email": "a******3@gmail.com",
       "city": "Алматы",
       "company": "Phoenix Lab",
       "telegram": "@adiletkk",
@@ -1102,7 +1102,7 @@
     {
       "id": "cmcoyzxdc0002b0015l28gtlc",
       "name": "Samal",
-      "email": "e*********6@gmail.com",
+      "email": "e******6@gmail.com",
       "city": "Almaty",
       "company": null,
       "telegram": "samyerkn",
@@ -1132,7 +1132,7 @@
     {
       "id": "cmcuvcyv50003ay01z7nphyfo",
       "name": "Амина",
-      "email": "a************5@gmail.com",
+      "email": "a******5@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "https://github.com/Aminashhh",
@@ -1162,7 +1162,7 @@
     {
       "id": "cmd8vaovy003da601yoeq94ln",
       "name": "Аружан Тлеукулова",
-      "email": "a**************a@gmail.com",
+      "email": "a******a@gmail.com",
       "city": "Алматы",
       "company": "-",
       "telegram": "@tleukulova",
@@ -1192,7 +1192,7 @@
     {
       "id": "cmdiztxpm000hb501whp3podx",
       "name": "Alima Kassenkazy",
-      "email": "a***********7@gmail.com",
+      "email": "a******7@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "@username_zm",
@@ -1446,7 +1446,7 @@
     {
       "id": "cmdj1u4af00249u01oywbj53p",
       "name": "Suban Ibraimov",
-      "email": "i*********4@gmail.com",
+      "email": "i******4@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -1489,7 +1489,7 @@
     {
       "id": "cmdj24q8t0015b501siinrq93",
       "name": "Александр",
-      "email": "v**************r@gmail.com",
+      "email": "v******r@gmail.com",
       "city": null,
       "company": null,
       "telegram": "@vanzha_alexander",
@@ -1540,7 +1540,7 @@
     {
       "id": "cmclos0rn000i99018iavu39e",
       "name": "Alua",
-      "email": "i**********2@gmail.com",
+      "email": "i******2@gmail.com",
       "city": "Astana",
       "company": "Mn partners",
       "telegram": "@alua_d",
@@ -1570,7 +1570,7 @@
     {
       "id": "cmcm6r33e00179901vtcd3d9i",
       "name": "Батыр",
-      "email": "b***********v@gmail.com",
+      "email": "b******v@gmail.com",
       "city": "Астана",
       "company": "MN Partners",
       "telegram": "@Kenzhaev_B",
@@ -1600,7 +1600,7 @@
     {
       "id": "cmcllok1u000a9901hk2054w0",
       "name": "Дархан",
-      "email": "d***************6@gmail.com",
+      "email": "d******6@gmail.com",
       "city": "Астана",
       "company": "MN Partners",
       "telegram": "@lcwhitelily",
@@ -1630,7 +1630,7 @@
     {
       "id": "cmcllz2gc000bd001tyi66tq6",
       "name": "Жасулан",
-      "email": "z********1@gmail.com",
+      "email": "z******1@gmail.com",
       "city": "Астана",
       "company": "MN Partners",
       "telegram": "https://t.me/DAYLOR",
@@ -1660,7 +1660,7 @@
     {
       "id": "cmclll5rq0008d0017wo2wdos",
       "name": "Султанбек",
-      "email": "s****************v@gmail.com",
+      "email": "s******v@gmail.com",
       "city": "Астана",
       "company": "MN Partners",
       "telegram": "@kh_slt",
@@ -1690,7 +1690,7 @@
     {
       "id": "cme8ppkz404qgb6496d8y88vb",
       "name": "Dauren",
-      "email": "m*******0@gmail.com",
+      "email": "m******0@gmail.com",
       "city": null,
       "company": null,
       "telegram": "https://t.me/GinkoGintoki",
@@ -1726,7 +1726,7 @@
     {
       "id": "cmcnezvgk001j9901ab847b4w",
       "name": "Баят",
-      "email": "t*******v@gmail.com",
+      "email": "t******v@gmail.com",
       "city": "Астана",
       "company": "ТОО Proper Solutions",
       "telegram": "@akbori",
@@ -1764,7 +1764,7 @@
     {
       "id": "cmcoe81ve001o9901n9r62oue",
       "name": "Дармен",
-      "email": "d************z@gmail.com",
+      "email": "d******z@gmail.com",
       "city": "Астана",
       "company": null,
       "telegram": null,
@@ -1831,19 +1831,30 @@
     {
       "id": "cmcoyvy4300059s0140rchtxh",
       "name": "Sabina",
-      "email": "s****************a@gmail.com",
+      "email": "s******a@gmail.com",
       "city": "Almaty",
-      "company": null,
-      "telegram": null,
-      "githubUrl": null,
-      "linkedinUrl": null,
-      "programmingLanguages": [],
-      "databases": [],
+      "company": "-",
+      "telegram": "@Sabina_B_T",
+      "githubUrl": "https://github.com/SabinaTolkynbekova",
+      "linkedinUrl": "https://www.linkedin.com/in/sabina-tolkynbekova-626a9a219?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      "programmingLanguages": [
+        "Python",
+        "C++",
+        "JavaScript",
+        "TypeScript",
+        "Java"
+      ],
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "SQLite",
+        "SQL Server"
+      ],
       "technologies": "[\"Другое\"]",
       "cloudProviders": "[\"Другое\"]",
       "cloudServices": "[\"Другое\"]",
       "experienceLevel": "Junior (младший специалист)",
-      "description": null,
+      "description": "Учусь на cs, хочется набраться опыта в таких видах хакатонов, чтобы развиваться как в техническом плане так и личностном и выходить из зоны комфорта.",
       "createdAt": "2025-07-04T15:26:23.859Z",
       "team": {
         "id": "cmcoyhcgu00009s015kuk9iw6",
@@ -1861,7 +1872,7 @@
     {
       "id": "cmcoyhci000029s01neg5m0ju",
       "name": "Амир",
-      "email": "r**********3@gmail.com",
+      "email": "r******3@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@sunlitdev",
@@ -1891,18 +1902,18 @@
     {
       "id": "cmcoyzgnb00089s01zsebw74w",
       "name": "Сымбат",
-      "email": "s*******d@gmail.com",
+      "email": "s******d@gmail.com",
       "city": "Алматы",
       "company": null,
-      "telegram": null,
-      "githubUrl": null,
+      "telegram": "@nuralievaasss",
+      "githubUrl": "https://github.com/symbattad",
       "linkedinUrl": null,
       "programmingLanguages": [],
       "databases": [],
-      "technologies": "[]",
+      "technologies": "[\"Затрудняюсь ответить\"]",
       "cloudProviders": "[]",
       "cloudServices": "[]",
-      "experienceLevel": null,
+      "experienceLevel": "Junior (младший специалист)",
       "description": null,
       "createdAt": "2025-07-04T15:29:07.847Z",
       "team": {
@@ -1921,7 +1932,7 @@
     {
       "id": "cmcn4lrfa001ld0012bu1dsn2",
       "name": "Afanasii",
-      "email": "a*************n@gmail.com",
+      "email": "a******n@gmail.com",
       "city": "Almaty",
       "company": "Kaspi",
       "telegram": "@tether757",
@@ -1951,7 +1962,7 @@
     {
       "id": "cmcm0my3900129901sbw0h0zd",
       "name": "Sarvar",
-      "email": "m*********8@gmail.com",
+      "email": "m******8@gmail.com",
       "city": "Almaty",
       "company": "AmanIT",
       "telegram": "@doubletrbl",
@@ -1981,7 +1992,7 @@
     {
       "id": "cmcm13q810017d001qc5flr5d",
       "name": "Азамат",
-      "email": "a**************v@gmail.com",
+      "email": "a******v@gmail.com",
       "city": "Алматы",
       "company": "Equator ",
       "telegram": "@azamat_shauyenbekov",
@@ -2011,7 +2022,7 @@
     {
       "id": "cmclxiq0m00109901tjmnnfq3",
       "name": "Акмаль",
-      "email": "a*******3@gmail.com",
+      "email": "a******3@gmail.com",
       "city": "Шымкент",
       "company": "Radar payments",
       "telegram": "@akmal_rakhim",
@@ -2041,7 +2052,7 @@
     {
       "id": "cmd5jt1ow000l7w01skukcpcb",
       "name": "Roman Yurchenko",
-      "email": "l*********r@gmail.com",
+      "email": "l******r@gmail.com",
       "city": "Almaty",
       "company": null,
       "telegram": "https://t.me/luckytyper_reboot",
@@ -2071,7 +2082,7 @@
     {
       "id": "cmclmdgv3000f9901j7y6luo1",
       "name": "Азамат Базарбай",
-      "email": "a***************7@gmail.com",
+      "email": "a******7@gmail.com",
       "city": "Almaty",
       "company": null,
       "telegram": null,
@@ -2101,14 +2112,19 @@
     {
       "id": "cmclm61tx000fd0017n7rz4l9",
       "name": "Амерлан",
-      "email": "a**************v@gmail.com",
+      "email": "a******v@gmail.com",
       "city": "Алматы",
       "company": "Oitech",
-      "telegram": null,
-      "githubUrl": null,
+      "telegram": "@DooD13Z",
+      "githubUrl": "https://github.com/Amerlan",
       "linkedinUrl": null,
-      "programmingLanguages": [],
-      "databases": [],
+      "programmingLanguages": [
+        "Python"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "MySQL"
+      ],
       "technologies": "[\"Не используем облачные технологии\"]",
       "cloudProviders": "[\"Другое\"]",
       "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Infrastructure as a Service\"]",
@@ -2166,7 +2182,7 @@
     {
       "id": "cmd5i9j7p001k8d01glp1yr8l",
       "name": "Alibek Bakdaulet",
-      "email": "a*************t@gmail.com",
+      "email": "a******t@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@auchiha",
@@ -2196,7 +2212,7 @@
     {
       "id": "cmdn0u7yn000a6p01im78m75c",
       "name": "Damir Mertl",
-      "email": "d**********v@aues.kz",
+      "email": "d******v@aues.kz",
       "city": null,
       "company": null,
       "telegram": null,
@@ -2256,7 +2272,7 @@
     {
       "id": "cmd64usk300036q01q5axh63w",
       "name": "Abu Said Manap",
-      "email": "a***********p@gmail.com",
+      "email": "a******p@gmail.com",
       "city": "Astana",
       "company": "DAR Tech",
       "telegram": "@abunyawa",
@@ -2286,7 +2302,7 @@
     {
       "id": "cmd5zv16k00016u01agm7ye2p",
       "name": "Arystan Bissimbayev",
-      "email": "b*****************n@gmail.com",
+      "email": "b******n@gmail.com",
       "city": "Астана",
       "company": "Yandex",
       "telegram": "@aarst",
@@ -2319,7 +2335,7 @@
     {
       "id": "cmd8fgt52000za601n9xt7yvz",
       "name": "Sungkar Daulet",
-      "email": "d************r@gmail.com",
+      "email": "d******r@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": null,
@@ -2349,7 +2365,7 @@
     {
       "id": "cmdhicixz003xbz01s2i70xyf",
       "name": "Akhmetzhan Kussainov",
-      "email": "k******************n@gmail.com",
+      "email": "k******n@gmail.com",
       "city": "Алматы",
       "company": "Snoonu",
       "telegram": "@a_kussainov",
@@ -2391,7 +2407,7 @@
     {
       "id": "cmdeai48t003rc201pkrb70le",
       "name": "Sergey Kuzmin",
-      "email": "k********f@gmail.com",
+      "email": "k******f@gmail.com",
       "city": "Алматы",
       "company": "Snoonu",
       "telegram": "@fortmon",
@@ -2430,7 +2446,7 @@
     {
       "id": "cmdiqfrb6000f9u010aakogiy",
       "name": "Андрей Суховицкий",
-      "email": "a***********a@gmail.com",
+      "email": "a******a@gmail.com",
       "city": "Санкт-Петербург",
       "company": null,
       "telegram": "@sukhoa",
@@ -2472,7 +2488,7 @@
     {
       "id": "cmdipq9qs00099u01eg4x9of4",
       "name": "Лена Макарова",
-      "email": "k*******t@gmail.com",
+      "email": "k******t@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -2508,105 +2524,9 @@
       }
     },
     {
-      "id": "cmcm0qbnt0014d0013xfkx1rt",
-      "name": "Каныш",
-      "email": "k***********k@gmail.com",
-      "city": "Шымкент",
-      "company": "КБТУ",
-      "telegram": null,
-      "githubUrl": null,
-      "linkedinUrl": null,
-      "programmingLanguages": [],
-      "databases": [],
-      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
-      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\",\"Cloud24\"]",
-      "cloudServices": "[\"Infrastructure as a Service\",\"Не используем облачные технологии\",\"Database as a Service\"]",
-      "experienceLevel": "Junior (младший специалист)",
-      "description": null,
-      "createdAt": "2025-07-02T13:54:42.185Z",
-      "team": {
-        "id": "cmcm0qbnp0012d001scd8nr9y",
-        "name": "Texas Developer Group",
-        "nickname": "teD-G",
-        "level": null,
-        "status": "APPROVED",
-        "techStack": [],
-        "acceptedLanguages": [],
-        "_count": {
-          "members": 3
-        }
-      }
-    },
-    {
-      "id": "cmd4c7gyn001l9g01yhe2dv6r",
-      "name": "Никита",
-      "email": "h******b@gmail.com",
-      "city": "Алматы",
-      "company": null,
-      "telegram": "https://t.me/rar2000q",
-      "githubUrl": "https://github.com/Mikita-ala",
-      "linkedinUrl": null,
-      "programmingLanguages": [
-        "Go",
-        "C++"
-      ],
-      "databases": [
-        "PostgreSQL",
-        "SQLite"
-      ],
-      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\",\"Офисные приложения (ЭДО / почта)\"]",
-      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Yandex Cloud\"]",
-      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\",\"Monitoring as a Service\",\"Kubernetes as a Service\"]",
-      "experienceLevel": "Junior (младший специалист)",
-      "description": null,
-      "createdAt": "2025-07-15T09:35:49.152Z",
-      "team": {
-        "id": "cmcm0qbnp0012d001scd8nr9y",
-        "name": "Texas Developer Group",
-        "nickname": "teD-G",
-        "level": null,
-        "status": "APPROVED",
-        "techStack": [],
-        "acceptedLanguages": [],
-        "_count": {
-          "members": 3
-        }
-      }
-    },
-    {
-      "id": "cmcm52ji2001dd001ksxjep4s",
-      "name": "Ракымжан",
-      "email": "r************1@gmail.com",
-      "city": "Алматы",
-      "company": "-",
-      "telegram": null,
-      "githubUrl": null,
-      "linkedinUrl": null,
-      "programmingLanguages": [],
-      "databases": [],
-      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
-      "cloudProviders": "[\"Yandex Cloud\",\"Oblako.kz\",\"Cloud24\",\"NLS Kazakhstan\"]",
-      "cloudServices": "[\"Database as a Service\",\"Kubernetes as a Service\"]",
-      "experienceLevel": "Junior (младший специалист)",
-      "description": null,
-      "createdAt": "2025-07-02T15:56:10.683Z",
-      "team": {
-        "id": "cmcm0qbnp0012d001scd8nr9y",
-        "name": "Texas Developer Group",
-        "nickname": "teD-G",
-        "level": null,
-        "status": "APPROVED",
-        "techStack": [],
-        "acceptedLanguages": [],
-        "_count": {
-          "members": 3
-        }
-      }
-    },
-    {
       "id": "cmdhfenz5003qbz01tckxrx6o",
       "name": "Aknur",
-      "email": "w************a@gmail.com",
+      "email": "w******a@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "@whiteeray",
@@ -2644,7 +2564,7 @@
     {
       "id": "cmdhb6c950038bz01ti43en4l",
       "name": "Mansur",
-      "email": "r**********4@gmail.com",
+      "email": "r******4@gmail.com",
       "city": "Нур-Султан",
       "company": null,
       "telegram": "@scrameee",
@@ -2690,7 +2610,7 @@
     {
       "id": "cmdhcvsgw003ae001fvz3grk2",
       "name": "Nurasyl Orazbek",
-      "email": "n*********1@gmail.com",
+      "email": "n******1@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "@nurasyl_orazbek",
@@ -2736,7 +2656,7 @@
     {
       "id": "cmcvz902z001has01iuumdp4p",
       "name": "Dilshod",
-      "email": "a*************d@gmail.com",
+      "email": "a******d@gmail.com",
       "city": "Samarqand",
       "company": "Unicon-Soft LLC",
       "telegram": "@doinoss",
@@ -2773,7 +2693,7 @@
     {
       "id": "cmclqbuuw000o9901cmg4xnl6",
       "name": "Diyorbek",
-      "email": "b*******b@gmail.com",
+      "email": "b******b@gmail.com",
       "city": "Tashkent, Uzbekistan",
       "company": "payme.uz",
       "telegram": "@Rustamjonov_Diyorbek",
@@ -2803,7 +2723,7 @@
     {
       "id": "cmcvzov8g000eay01ct34udk6",
       "name": "Zikrulloh",
-      "email": "f***********h@yandex.com",
+      "email": "f******h@yandex.com",
       "city": "Tashkent",
       "company": "Payme Uz",
       "telegram": null,
@@ -2833,7 +2753,7 @@
     {
       "id": "cmcw6xfv4000tay01r3oblofx",
       "name": "Жандос",
-      "email": "z******************v@gmail.com",
+      "email": "z******v@gmail.com",
       "city": "Astana",
       "company": "Ikap",
       "telegram": "@zhandos717",
@@ -2863,7 +2783,7 @@
     {
       "id": "cmde5pbex003kc2013hgnatbs",
       "name": "Rakhat Meiramov",
-      "email": "m*************t@gmail.com",
+      "email": "m******t@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -2902,7 +2822,7 @@
     {
       "id": "cmdearwcl003ca601js50hkm3",
       "name": "Temirlan Nurbay",
-      "email": "n************5@gmail.com",
+      "email": "n******5@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -2945,7 +2865,7 @@
     {
       "id": "cmdhkabt4004hbz01qzvrcvm8",
       "name": "Ердиас Талгатов",
-      "email": "e*******9@gmail.com",
+      "email": "e******9@gmail.com",
       "city": "Астана",
       "company": "RCEH",
       "telegram": "@yerdias0356",
@@ -2988,7 +2908,7 @@
     {
       "id": "cmdert2vl004sc201mzx89wqp",
       "name": "Abylai Bakytzhan",
-      "email": "a********a@gmail.com",
+      "email": "a******a@gmail.com",
       "city": "Almaty",
       "company": "Yoko",
       "telegram": "@lubasu",
@@ -3033,7 +2953,7 @@
     {
       "id": "cmdhas77z002xe0018ykwywhz",
       "name": "Alnur Zholdas",
-      "email": "z***********r@gmail.com",
+      "email": "z******r@gmail.com",
       "city": "Almaty",
       "company": null,
       "telegram": "@bmwyy",
@@ -3077,7 +2997,7 @@
     {
       "id": "cmdhanxx3002qbz01of8sv8wn",
       "name": "Ilyas",
-      "email": "i********1@gmail.com",
+      "email": "i******1@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "iagadilov",
@@ -3125,7 +3045,7 @@
     {
       "id": "cmdhaftu9001mbz01wooc483c",
       "name": "Abylaikhan Zulbukharov",
-      "email": "l********5@gmail.com",
+      "email": "l******5@gmail.com",
       "city": null,
       "company": null,
       "telegram": null,
@@ -3161,7 +3081,7 @@
     {
       "id": "cmdhajgph001ubz01ih040olm",
       "name": "Alimukhamed Tlekbai",
-      "email": "a*********i@gmail.com",
+      "email": "a******i@gmail.com",
       "city": "Астана",
       "company": "Doodocs.kz",
       "telegram": "@atlekbai",
@@ -3204,7 +3124,7 @@
     {
       "id": "cmdhakcsx0020bz01v07wp60u",
       "name": "Dias Kappassov",
-      "email": "d***********v@gmail.com",
+      "email": "d******v@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "@diaskappassov",
@@ -3246,7 +3166,7 @@
     {
       "id": "cmd4iu0bn00047w016v764gf1",
       "name": "Adilzhan Mustafin",
-      "email": "a*******4@mail.ru",
+      "email": "a******4@mail.ru",
       "city": "Алматы",
       "company": "S1lk Pay",
       "telegram": "@m0ku5atsu",
@@ -3269,14 +3189,14 @@
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
-          "members": 4
+          "members": 3
         }
       }
     },
     {
       "id": "cmcq3yebq000g9s017lyvqn99",
       "name": "Sultan Yelikbayev",
-      "email": "s**************v@gmail.com",
+      "email": "s******v@gmail.com",
       "city": "Almaty",
       "company": "Airba Group",
       "telegram": "@yelSul",
@@ -3299,44 +3219,14 @@
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
-          "members": 4
-        }
-      }
-    },
-    {
-      "id": "cmcrd16jl0006b001ie37rjmb",
-      "name": "Алихан",
-      "email": "a***************6@gmail.com",
-      "city": "Астана",
-      "company": "Freedom Ticketon (новый Тикетон)",
-      "telegram": "@kubigator",
-      "githubUrl": "https://github.com/asharapat",
-      "linkedinUrl": "https://www.linkedin.com/in/alikhan-sharapat-430b06129/",
-      "programmingLanguages": [],
-      "databases": [],
-      "technologies": "[\"Не используем облачные технологии\"]",
-      "cloudProviders": "[\"PS Cloud Services\",\"Cloud24\",\"Yandex Cloud\",\"VK Cloud\"]",
-      "cloudServices": "[\"Infrastructure as a Service\"]",
-      "experienceLevel": "Middle (специалист / инженер)",
-      "description": null,
-      "createdAt": "2025-07-06T07:37:55.042Z",
-      "team": {
-        "id": "cmd7h5skf00015i01a8ls9e60",
-        "name": "los-lobos",
-        "nickname": "los-lobos",
-        "level": "ADVANCED",
-        "status": "APPROVED",
-        "techStack": [],
-        "acceptedLanguages": [],
-        "_count": {
-          "members": 4
+          "members": 3
         }
       }
     },
     {
       "id": "cmd7il15l000e5i01pmts2ha8",
       "name": "Илимбек",
-      "email": "i******************0@gmail.com",
+      "email": "i******0@gmail.com",
       "city": "Bishkek",
       "company": null,
       "telegram": "@sonaasd",
@@ -3359,14 +3249,14 @@
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
-          "members": 4
+          "members": 3
         }
       }
     },
     {
       "id": "cmd2xoee0000g83012j67fa0m",
       "name": "Aibek Meirkhanov",
-      "email": "a************v@gmail.com",
+      "email": "a******v@gmail.com",
       "city": "Алматы",
       "company": "Halyk Bank",
       "telegram": "mrkhnov",
@@ -3396,7 +3286,7 @@
     {
       "id": "cmd5md649001q8d01lt7e47ez",
       "name": "Kassymkhan Talgatuly",
-      "email": "k************3@gmail.com",
+      "email": "k******3@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@kassymkhn",
@@ -3426,7 +3316,7 @@
     {
       "id": "cmd75f60100086r01xrs4d8yd",
       "name": "Нуралы Жоламан",
-      "email": "z**********y@gmail.com",
+      "email": "z******y@gmail.com",
       "city": "Уральск",
       "company": null,
       "telegram": "https://t.me/qaz1wsx2edc1",
@@ -3456,7 +3346,7 @@
     {
       "id": "cmd2xl7i2000683019dfrzgnb",
       "name": "AIBEK",
-      "email": "p*******e@gmail.com",
+      "email": "p******e@gmail.com",
       "city": "Алмата",
       "company": "Halykbank",
       "telegram": "@neo_hk",
@@ -3475,7 +3365,7 @@
         "name": "vibe-coders",
         "nickname": "vibe-coders",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3486,7 +3376,7 @@
     {
       "id": "cmd2wthct00022501kshx0gml",
       "name": "Gabdylgaziz Zhagypar",
-      "email": "g********r@kbtu.kz",
+      "email": "g******r@kbtu.kz",
       "city": "Almaty",
       "company": "Halyk Bank",
       "telegram": "@gabdyq",
@@ -3505,7 +3395,7 @@
         "name": "vibe-coders",
         "nickname": "vibe-coders",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3535,7 +3425,7 @@
         "name": "vibe-coders",
         "nickname": "vibe-coders",
         "level": "ADVANCED",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3546,7 +3436,7 @@
     {
       "id": "cmdbu8uzx000dc201z04no3o2",
       "name": "Nurmyshev Serik",
-      "email": "s*********v@gmail.com",
+      "email": "s******v@gmail.com",
       "city": "Astana",
       "company": "Satushi",
       "telegram": "@fanskiy",
@@ -3590,7 +3480,7 @@
     {
       "id": "cmcxaqqum0002ek018r83nfmt",
       "name": "Raimbek",
-      "email": "r********7@gmail.com",
+      "email": "r******7@gmail.com",
       "city": "Шымкент",
       "company": null,
       "telegram": "@skythet",
@@ -3634,7 +3524,7 @@
     {
       "id": "cmdc42y8s0015a601mdbubahj",
       "name": "Serik Shaikamalov",
-      "email": "s***************v@gmail.com",
+      "email": "s******v@gmail.com",
       "city": "Алматы",
       "company": "ТОО HajjTravel",
       "telegram": "@serikshaikamalov",
@@ -3684,7 +3574,7 @@
     {
       "id": "cmdihpelb0066e001vzgrbvim",
       "name": "Айдос Алибек",
-      "email": "a**********1@gmail.com",
+      "email": "a******1@gmail.com",
       "city": "астана",
       "company": null,
       "telegram": null,
@@ -3721,7 +3611,7 @@
     {
       "id": "cmcnndrsl001wd001tixnsspl",
       "name": "Jasulan Delegat",
-      "email": "a***************2@gmail.com",
+      "email": "a******2@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "@zixxxos",
@@ -3740,7 +3630,7 @@
         "name": "Вайб кодинг",
         "nickname": "VibeCode",
         "level": "BEGINNER",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3751,7 +3641,7 @@
     {
       "id": "cmd8xafs500hq5i01ptdvt92f",
       "name": "Tair",
-      "email": "t*******7@gmail.com",
+      "email": "t******7@gmail.com",
       "city": "Астана",
       "company": null,
       "telegram": "@tttttairrrrr",
@@ -3770,7 +3660,7 @@
         "name": "Вайб кодинг",
         "nickname": "VibeCode",
         "level": "BEGINNER",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3781,7 +3671,7 @@
     {
       "id": "cmcnnbfpp001ud0012h1v8yj5",
       "name": "Алишер ",
-      "email": "a**************n@gmail.com",
+      "email": "a******n@gmail.com",
       "city": "Астана ",
       "company": null,
       "telegram": "@bushido111",
@@ -3800,7 +3690,7 @@
         "name": "Вайб кодинг",
         "nickname": "VibeCode",
         "level": "BEGINNER",
-        "status": "APPROVED",
+        "status": "REJECTED",
         "techStack": [],
         "acceptedLanguages": [],
         "_count": {
@@ -3811,7 +3701,7 @@
     {
       "id": "cmdh6hb0o000qbz01slm2bbm5",
       "name": "Abzalkhan Ondakanov",
-      "email": "a****************v@gmail.com",
+      "email": "a******v@gmail.com",
       "city": "Алматы",
       "company": null,
       "telegram": "@abzalkhan00",
@@ -3858,7 +3748,7 @@
     {
       "id": "cmdhr3l670053e001th8utd2o",
       "name": "Ruslan Bazarbayev",
-      "email": "b************s@gmail.com",
+      "email": "b******s@gmail.com",
       "city": "Astana",
       "company": null,
       "telegram": "https://t.me/vossilly",
@@ -3906,7 +3796,7 @@
     {
       "id": "cmdhrjc3l005he001vze17wgy",
       "name": "Zanggar Kambekov",
-      "email": "z*************v@gmail.com",
+      "email": "z******v@gmail.com",
       "city": "Астана",
       "company": null,
       "telegram": "@i_am_currently_trippin",
