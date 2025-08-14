@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import MarkdownRenderer from '@/components/markdown-renderer'
-import { Ticket, ArrowLeft } from 'lucide-react'
+import { Scroll, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import fs from 'fs'
@@ -13,7 +13,7 @@ import { getDocsFileInfo } from '@/lib/file-utils'
 
 export const dynamic = 'force-dynamic'
 
-export default async function BilletterApiDocPage() {
+export default async function EventLegendPage() {
   const session = await auth()
 
   if (!session?.user?.email) {
@@ -53,15 +53,15 @@ export default async function BilletterApiDocPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   // Get file information and content
-  const fileInfo = await getDocsFileInfo('billetter-api.md')
-  const docsPath = path.join(process.cwd(), 'public', 'docs', 'billetter-api.md')
+  const fileInfo = await getDocsFileInfo('event-legend.md')
+  const docsPath = path.join(process.cwd(), 'public', 'docs', 'event-legend.md')
   let markdownContent = ''
   
   try {
     markdownContent = fs.readFileSync(docsPath, 'utf8')
   } catch (error) {
-    console.error('Error reading Billetter API documentation:', error)
-    markdownContent = '# Billetter API Documentation\n\nDocumentation not available. Please contact support.'
+    console.error('Error reading event legend documentation:', error)
+    markdownContent = '# Легенда мероприятия\n\nДокументация недоступна. Обратитесь в техническую поддержку.'
   }
 
   return (
@@ -79,19 +79,19 @@ export default async function BilletterApiDocPage() {
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 bg-blue-400/20 rounded-lg flex items-center justify-center">
-            <Ticket className="w-6 h-6 text-blue-400" />
+          <div className="w-12 h-12 bg-indigo-400/20 rounded-lg flex items-center justify-center">
+            <Scroll className="w-6 h-6 text-indigo-400" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">
-              Billetter API Documentation
+              Легенда мероприятия
             </h1>
             <p className="text-slate-400">
-              API для управления билетами и регистрацией участников
+              Сценарий и контекст хакатона
             </p>
           </div>
         </div>
-        <div className="w-16 h-1 bg-blue-400 rounded-full"></div>
+        <div className="w-16 h-1 bg-indigo-400 rounded-full"></div>
       </div>
 
       {/* Documentation Content */}

@@ -1,340 +1,344 @@
-# Billetter API Documentation
+# Billetter API
 
-## Overview
+Полная спецификация API для системы бронирования и продажи билетов. Ваш сервис **должен точно соответствовать** этому интерфейсу.
 
-The Billetter API provides comprehensive ticketing and registration management for hackathon events. This service handles participant registration, ticket validation, and event capacity management.
+## 📥 Скачать спецификацию
 
-## Key Features
+**[Скачать Billetter-api.json](/docs/Biletter-api.json)** - полная OpenAPI 3.1.1 спецификация
 
-- **Multi-tier Registration**: Support for different participant categories
-- **Capacity Management**: Automatic capacity tracking and waitlist management
-- **QR Code Integration**: Generate and validate QR codes for check-in
-- **Batch Operations**: Bulk registration and ticket management
-- **Real-time Analytics**: Live registration statistics and reporting
+## 🏗️ Архитектура API
 
-## Authentication
-
-All API requests require authentication using API keys:
-
-```http
-Authorization: Bearer {your-api-key}
-Content-Type: application/json
+### Базовый URL
+```
+https://localhost:8081
 ```
 
-## API Endpoints
+### Основные сущности
 
-### Registration Management
+#### События (Events)
+- **ID**: уникальный идентификатор события
+- **Название**: название события
+- **Тип**: внутреннее или внешнее событие
 
-#### Create Registration
-```http
-POST /api/billetter/registrations
-Content-Type: application/json
+#### Бронирования (Bookings)
+- **ID**: уникальный идентификатор бронирования
+- **ID события**: ссылка на конкретное событие
+- **Статус**: создано → выбраны места → инициирован платеж → подтверждено/отменено
 
-{
-  "participantId": "participant-123",
-  "eventId": "hackathon-2025",
-  "ticketType": "standard",
-  "metadata": {
-    "teamName": "CodeCrafters",
-    "dietary": "vegetarian"
-  }
-}
-```
+#### Места (Seats)
+- **ID**: уникальный идентификатор места
+- **Ряд**: номер ряда
+- **Номер**: номер места в ряду
+- **Статус резервации**: свободно/занято
 
-#### Get Registration Details
-```http
-GET /api/billetter/registrations/{registrationId}
-```
+---
 
-#### Update Registration
-```http
-PUT /api/billetter/registrations/{registrationId}
-Content-Type: application/json
+## 📋 Эндпоинты API
 
-{
-  "ticketType": "premium",
-  "metadata": {
-    "dietary": "vegan"
-  }
-}
-```
+### 🎭 События (Events)
 
-#### Cancel Registration
-```http
-DELETE /api/billetter/registrations/{registrationId}
-```
+#### `POST /api/events` - Создать событие
 
-### Ticket Management
+**Описание**: Создает новое событие в системе и возвращает его уникальный идентификатор.
 
-#### Generate Ticket
-```http
-POST /api/billetter/tickets/generate
-Content-Type: application/json
-
-{
-  "registrationId": "reg-123",
-  "format": "qr_code"
-}
-```
-
-#### Validate Ticket
-```http
-POST /api/billetter/tickets/validate
-Content-Type: application/json
-
-{
-  "ticketCode": "QR123456789",
-  "eventId": "hackathon-2025"
-}
-```
-
-#### Bulk Ticket Operations
-```http
-POST /api/billetter/tickets/bulk
-Content-Type: application/json
-
-{
-  "operation": "generate",
-  "registrationIds": ["reg-123", "reg-124", "reg-125"],
-  "format": "qr_code"
-}
-```
-
-### Event Management
-
-#### Get Event Capacity
-```http
-GET /api/billetter/events/{eventId}/capacity
-```
-
-#### Update Event Settings
-```http
-PUT /api/billetter/events/{eventId}/settings
-Content-Type: application/json
-
-{
-  "maxCapacity": 500,
-  "enableWaitlist": true,
-  "registrationDeadline": "2025-03-01T23:59:59Z"
-}
-```
-
-#### Get Registration Statistics
-```http
-GET /api/billetter/events/{eventId}/stats
-```
-
-## Response Formats
-
-### Registration Response
+**Тело запроса**:
 ```json
 {
-  "id": "reg-123",
-  "participantId": "participant-123",
-  "eventId": "hackathon-2025",
-  "ticketType": "standard",
-  "status": "confirmed",
-  "registrationDate": "2025-01-15T10:30:00Z",
-  "qrCode": "QR123456789",
-  "metadata": {
-    "teamName": "CodeCrafters",
-    "dietary": "vegetarian"
+  "title": "string",      // Название события (обязательно)
+  "external": false       // Внешнее событие (по умолчанию false)
+}
+```
+
+**Ответ `201`**:
+```json
+{
+  "id": 123              // ID созданного события
+}
+```
+
+---
+
+#### `GET /api/events` - Получить список событий
+
+**Описание**: Возвращает список всех доступных событий в системе.
+
+**Ответ `200`**:
+```json
+[
+  {
+    "id": 123,           // ID события
+    "title": "Концерт"   // Название события
   }
+]
+```
+
+---
+
+### 🎫 Бронирования (Bookings)
+
+#### `POST /api/bookings` - Создать бронирование
+
+**Описание**: Создает новое бронирование для указанного события. После создания можно выбирать места.
+
+**Тело запроса**:
+```json
+{
+  "event_id": 123        // ID события для бронирования
 }
 ```
 
-### Capacity Response
+**Ответ `201`**:
 ```json
 {
-  "eventId": "hackathon-2025",
-  "maxCapacity": 500,
-  "currentRegistrations": 347,
-  "availableSpots": 153,
-  "waitlistEnabled": true,
-  "waitlistCount": 23
+  "id": 456             // ID созданного бронирования
 }
 ```
 
-### Statistics Response
+---
+
+#### `GET /api/bookings` - Получить список бронирований
+
+**Описание**: Возвращает все бронирования текущего пользователя.
+
+**Ответ `200`**:
 ```json
-{
-  "eventId": "hackathon-2025",
-  "totalRegistrations": 347,
-  "confirmedAttendees": 298,
-  "checkedInCount": 156,
-  "ticketTypes": {
-    "standard": 280,
-    "premium": 67
-  },
-  "registrationTrend": [
-    {"date": "2025-01-01", "count": 45},
-    {"date": "2025-01-02", "count": 78}
-  ]
-}
-```
-
-## Ticket Types
-
-### Standard Ticket
-- Basic event access
-- Welcome package
-- Lunch and refreshments
-- Access to main venue
-
-### Premium Ticket
-- All standard features
-- Priority seating
-- Networking dinner
-- Exclusive workshop access
-- Premium swag package
-
-### Team Ticket
-- Discounted rate for teams (4+ members)
-- Team workspace allocation
-- Team building activities
-- Shared resource access
-
-## QR Code Integration
-
-### QR Code Format
-QR codes contain encrypted participant information:
-
-```
-Format: {eventId}:{participantId}:{timestamp}:{checksum}
-Example: hackathon-2025:participant-123:1642176000:abc123
-```
-
-### Check-in Process
-1. Scan QR code using mobile app or scanner
-2. Validate ticket through API
-3. Mark participant as checked in
-4. Display welcome message and event information
-
-## Webhook Events
-
-Configure webhooks to receive real-time notifications:
-
-### Available Events
-- `registration.created` - New registration completed
-- `registration.cancelled` - Registration cancelled
-- `ticket.validated` - Ticket successfully validated
-- `capacity.reached` - Event capacity reached
-- `waitlist.added` - Participant added to waitlist
-
-### Webhook Payload Example
-```json
-{
-  "event": "registration.created",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "data": {
-    "registrationId": "reg-123",
-    "participantId": "participant-123",
-    "eventId": "hackathon-2025",
-    "ticketType": "standard"
+[
+  {
+    "id": 456,           // ID бронирования
+    "event_id": 123      // ID связанного события
   }
-}
+]
 ```
 
-## Error Handling
+---
 
-### Status Codes
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `409` - Conflict (e.g., capacity reached)
-- `500` - Internal Server Error
+#### `PATCH /api/bookings/initiatePayment` - Инициировать платеж
 
-### Error Response Format
+**Описание**: Переводит бронирование в статус ожидания платежа. После этого места блокируются для других пользователей.
+
+**Тело запроса**:
 ```json
 {
-  "error": {
-    "code": "CAPACITY_EXCEEDED",
-    "message": "Event has reached maximum capacity",
-    "details": {
-      "currentCapacity": 500,
-      "maxCapacity": 500,
-      "waitlistAvailable": true
-    }
-  }
+  "booking_id": 456      // ID бронирования для оплаты
 }
 ```
 
-## SDK Examples
+**Ответ `200`**: `Бронь ожидает подтверждения платежа`
 
-### JavaScript/Node.js
-```javascript
-const BilletterAPI = require('billetter-api');
+---
 
-const client = new BilletterAPI({
-  apiKey: process.env.BILLETTER_API_KEY,
-  environment: 'production'
-});
+#### `PATCH /api/bookings/cancel` - Отменить бронирование
 
-// Create registration
-const registration = await client.registrations.create({
-  participantId: 'participant-123',
-  eventId: 'hackathon-2025',
-  ticketType: 'standard'
-});
+**Описание**: Отменяет бронирование и освобождает все выбранные места.
 
-// Generate ticket
-const ticket = await client.tickets.generate({
-  registrationId: registration.id,
-  format: 'qr_code'
-});
-
-console.log('QR Code:', ticket.qrCode);
+**Тело запроса**:
+```json
+{
+  "booking_id": 456      // ID бронирования для отмены
+}
 ```
 
-### Python
-```python
-from billetter_api import BilletterClient
+**Ответ `200`**: `Бронь успешно отменена`
 
-client = BilletterClient(
-    api_key=os.environ['BILLETTER_API_KEY'],
-    environment='production'
-)
+---
 
-# Create registration
-registration = client.registrations.create(
-    participant_id='participant-123',
-    event_id='hackathon-2025',
-    ticket_type='standard'
-)
+### 💺 Места (Seats)
 
-# Generate ticket
-ticket = client.tickets.generate(
-    registration_id=registration['id'],
-    format='qr_code'
-)
+#### `GET /api/seats` - Получить список мест
 
-print(f"QR Code: {ticket['qr_code']}")
+**Описание**: Возвращает список мест для указанного события с их статусом резервации.
+
+**Параметры запроса**:
+- `event_id` (обязательно): ID события
+- `page` (опционально): Номер страницы (минимум 1)
+- `pageSize` (опционально): Размер страницы (1-20)
+
+**Пример запроса**:
+```
+GET /api/seats?event_id=123&page=1&pageSize=10
 ```
 
-## Rate Limits
+**Ответ `200`**:
+```json
+[
+  {
+    "id": 789,           // ID места
+    "row": 1,            // Номер ряда
+    "number": 15,        // Номер места
+    "reserved": false    // Статус резервации
+  }
+]
+```
 
-- **General API**: 1000 requests per minute
-- **Bulk Operations**: 100 requests per minute
-- **Webhook Delivery**: 500 requests per minute
+---
 
-## Testing
+#### `PATCH /api/seats/select` - Выбрать место
 
-### Test Environment
-- **Base URL**: `https://api-test.billetter.com`
-- **Test Event ID**: `test-hackathon-2025`
-- **API Key**: Contact support for test credentials
+**Описание**: Добавляет место в бронирование. Место становится недоступным для других пользователей.
 
-### Mock Data
-Use test participant IDs for development:
-- `test-participant-001` to `test-participant-100`
+**Тело запроса**:
+```json
+{
+  "booking_id": 456,     // ID бронирования
+  "seat_id": 789         // ID места для выбора
+}
+```
 
-## Support
+**Ответы**:
+- `200`: `Место успешно добавлено в бронь`
+- `419`: `Не удалось добавить место в бронь`
 
-For API issues:
-- Documentation: https://docs.billetter.com
-- Support Email: api-support@billetter.com
-- Status Page: https://status.billetter.com
-- GitHub Issues: https://github.com/billetter/api-issues
+---
+
+#### `PATCH /api/seats/release` - Освободить место
+
+**Описание**: Убирает место из бронирования. Место становится доступным для других пользователей.
+
+**Тело запроса**:
+```json
+{
+  "seat_id": 789         // ID места для освобождения
+}
+```
+
+**Ответы**:
+- `200`: `Место успешно освобождено`
+- `419`: `Не удалось освободить место`
+
+---
+
+### 💳 Платежи (Payments)
+
+#### `GET /api/payments/success` - Уведомление об успешном платеже
+
+**Описание**: Callback-эндпоинт, который вызывает платежная система при успешной оплате. Бронирование подтверждается.
+
+**Параметры запроса**:
+- `orderId` (обязательно): ID заказа (соответствует booking_id)
+
+**Пример запроса**:
+```
+GET /api/payments/success?orderId=456
+```
+
+**Ответ `200`**: `OK`
+
+---
+
+#### `GET /api/payments/fail` - Уведомление о неуспешном платеже
+
+**Описание**: Callback-эндпоинт, который вызывает платежная система при неуспешной оплате. Бронирование отменяется, места освобождаются.
+
+**Параметры запроса**:
+- `orderId` (обязательно): ID заказа (соответствует booking_id)
+
+**Пример запроса**:
+```
+GET /api/payments/fail?orderId=456
+```
+
+**Ответ `200`**: `OK`
+
+---
+
+## 🔄 Жизненный цикл бронирования
+
+### 1. Создание события
+```http
+POST /api/events
+{
+  "title": "Концерт Селесты Морейры",
+  "external": false
+}
+```
+
+### 2. Просмотр доступных мест
+```http
+GET /api/seats?event_id=123&page=1&pageSize=20
+```
+
+### 3. Создание бронирования
+```http
+POST /api/bookings
+{
+  "event_id": 123
+}
+```
+
+### 4. Выбор мест
+```http
+PATCH /api/seats/select
+{
+  "booking_id": 456,
+  "seat_id": 789
+}
+```
+
+### 5. Инициация платежа
+```http
+PATCH /api/bookings/initiatePayment
+{
+  "booking_id": 456
+}
+```
+
+### 6. Обработка результата платежа
+- **Успех**: `GET /api/payments/success?orderId=456`
+- **Неудача**: `GET /api/payments/fail?orderId=456`
+
+---
+
+## ⚠️ Важные требования
+
+### Обязательная реализация
+- **Все эндпоинты** должны быть реализованы точно по спецификации
+- **Форматы данных** должны соответствовать JSON схемам
+- **HTTP статус-коды** должны быть корректными
+- **Параметры запросов** должны валидироваться
+
+### Особенности реализации
+- **Пагинация** для списка мест обязательна
+- **Атомарность операций** выбора/освобождения мест
+- **Таймауты резервации** для предотвращения блокировки мест
+- **Идемпотентность** операций платежей
+
+### Обработка ошибок
+- **404** - ресурс не найден
+- **400** - неверные параметры запроса
+- **419** - конфликт при резервации места
+- **500** - внутренняя ошибка сервера
+
+---
+
+## 🧪 Тестирование
+
+### Сценарии для тестирования
+1. **Полный цикл успешного бронирования**
+2. **Отмена бронирования на разных этапах**
+3. **Конкурентное бронирование одного места**
+4. **Неуспешные платежи и откаты**
+5. **Пагинация больших списков мест**
+
+### Нагрузочное тестирование
+- **80% билетов** должны быть проданы в первые 4 часа
+- **100,000 мест** на концерт Селесты Морейры
+- **Одновременные пользователи**: до 10,000
+
+---
+
+## 📚 Дополнительные ресурсы
+
+- **OpenAPI спецификация**: [Billetter-api.json](/docs/Biletter-api.json)
+- **Swagger UI**: Импортируйте JSON файл для интерактивной документации
+- **Постман коллекция**: Сгенерируйте из OpenAPI спецификации
+
+---
+
+## 🚨 Критические моменты
+
+1. **Точное соответствие API** - любые отклонения приведут к сбоям интеграции
+2. **Производительность** - система должна выдерживать пиковые нагрузки
+3. **Надежность** - обработка сбоев платежной системы
+4. **Безопасность** - защита от спама и злоупотреблений при бронировании
+
+**Помните**: Ваша реализация будет тестироваться автоматически против этой спецификации!

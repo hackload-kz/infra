@@ -5,10 +5,21 @@ import { useEffect, useState } from 'react'
 
 interface MarkdownRendererProps {
   content: string
+  lastModified?: Date | null
 }
 
-export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, lastModified }: MarkdownRendererProps) {
   const [htmlContent, setHtmlContent] = useState('')
+
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   useEffect(() => {
     // Configure marked for better rendering
@@ -20,7 +31,18 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     // Convert markdown to HTML
     const processMarkdown = async () => {
       try {
-        const rawHtml = await marked(content)
+        let processedContent = content
+        
+        // Inject last modified date if available
+        if (lastModified) {
+          const dateString = formatDate(lastModified)
+          processedContent = content.replace(
+            /^(# .+)$/m,
+            `$1\n\n*Последнее обновление: ${dateString}*`
+          )
+        }
+        
+        const rawHtml = await marked(processedContent)
         
         // Basic sanitization - remove potentially dangerous elements
         const cleanHtml = rawHtml
@@ -38,7 +60,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     }
     
     processMarkdown()
-  }, [content])
+  }, [content, lastModified])
 
   return (
     <div 

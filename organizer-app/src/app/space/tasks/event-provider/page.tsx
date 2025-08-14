@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import fs from 'fs'
 import path from 'path'
+import { getDocsFileInfo } from '@/lib/file-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,7 +52,8 @@ export default async function EventProviderDocPage() {
 
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
-  // Read markdown documentation
+  // Get file information and content
+  const fileInfo = await getDocsFileInfo('event-provider.md')
   const docsPath = path.join(process.cwd(), 'public', 'docs', 'event-provider.md')
   let markdownContent = ''
   
@@ -94,7 +96,10 @@ export default async function EventProviderDocPage() {
 
       {/* Documentation Content */}
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-8">
-        <MarkdownRenderer content={markdownContent} />
+        <MarkdownRenderer 
+          content={markdownContent} 
+          lastModified={fileInfo.commitDate || fileInfo.lastModified}
+        />
       </div>
     </PersonalCabinetLayout>
   )

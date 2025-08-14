@@ -3,13 +3,18 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
+import { getDocsFileInfo, formatDate } from '@/lib/file-utils'
 import { 
   Settings,
   AlertCircle,
   CreditCard,
   Ticket,
   CalendarDays,
-  BookOpen
+  BookOpen,
+  FileText,
+  Clock,
+  Scroll,
+  ClipboardList
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -57,7 +62,14 @@ export default async function SpaceTasksPage() {
     image: session.user?.image || undefined
   }
 
-
+  // Get file information for documentation files
+  const [paymentGatewayInfo, billetterApiInfo, eventProviderInfo, projectRequirementsInfo, eventLegendInfo] = await Promise.all([
+    getDocsFileInfo('payment-gateway.md'),
+    getDocsFileInfo('billetter-api.md'),
+    getDocsFileInfo('event-provider.md'),
+    getDocsFileInfo('project-requirements.md'),
+    getDocsFileInfo('event-legend.md')
+  ])
   
   const hasTeam = !!(participant?.team || participant?.ledTeam)
   const environmentDataCount = participant?.team?.environmentData?.length || 0
@@ -121,23 +133,93 @@ export default async function SpaceTasksPage() {
         </div>
       </div>
 
-      {/* Documentation Section */}
+      {/* Requirements Section */}
+      <div className="space-y-6 mb-12">
+        <div className="flex items-center gap-3 mb-6">
+          <ClipboardList className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-white">Требования</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Project Requirements Documentation */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-orange-400/20 rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-orange-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white">Требования к проекту</h3>
+                <p className="text-slate-400 text-sm">Техническое задание</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500 text-xs">
+                    {formatDate(projectRequirementsInfo.commitDate || projectRequirementsInfo.lastModified)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Полное техническое задание, критерии оценки и требования к проектам участников.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <Link href="/space/tasks/project-requirements">
+                Открыть документацию
+              </Link>
+            </Button>
+          </div>
+
+          {/* Event Legend Documentation */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-10 h-10 bg-indigo-400/20 rounded-lg flex items-center justify-center">
+                <Scroll className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white">Легенда мероприятия</h3>
+                <p className="text-slate-400 text-sm">Сценарий хакатона</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500 text-xs">
+                    {formatDate(eventLegendInfo.commitDate || eventLegendInfo.lastModified)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Погрузитесь в атмосферу хакатона и узнайте контекст задач, которые предстоит решить.
+            </p>
+            <Button asChild size="sm" className="w-full">
+              <Link href="/space/tasks/event-legend">
+                Открыть документацию
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* API Documentation Section */}
       <div className="space-y-6">
         <div className="flex items-center gap-3 mb-6">
           <BookOpen className="w-6 h-6 text-amber-400" />
           <h2 className="text-2xl font-bold text-white">Документация API</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Payment Gateway Documentation */}
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 hover:bg-slate-800/70 transition-colors">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-10 h-10 bg-green-400/20 rounded-lg flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-green-400" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white">Payment Gateway</h3>
                 <p className="text-slate-400 text-sm">Интеграция с платежным шлюзом</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500 text-xs">
+                    {formatDate(paymentGatewayInfo.commitDate || paymentGatewayInfo.lastModified)}
+                  </span>
+                </div>
               </div>
             </div>
             <p className="text-slate-300 text-sm mb-4">
@@ -156,9 +238,15 @@ export default async function SpaceTasksPage() {
               <div className="w-10 h-10 bg-blue-400/20 rounded-lg flex items-center justify-center">
                 <Ticket className="w-5 h-5 text-blue-400" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white">Billetter API</h3>
                 <p className="text-slate-400 text-sm">API управления билетами</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500 text-xs">
+                    {formatDate(billetterApiInfo.commitDate || billetterApiInfo.lastModified)}
+                  </span>
+                </div>
               </div>
             </div>
             <p className="text-slate-300 text-sm mb-4">
@@ -177,9 +265,15 @@ export default async function SpaceTasksPage() {
               <div className="w-10 h-10 bg-purple-400/20 rounded-lg flex items-center justify-center">
                 <CalendarDays className="w-5 h-5 text-purple-400" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white">Event Provider</h3>
                 <p className="text-slate-400 text-sm">Провайдер управления событиями</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Clock className="w-3 h-3 text-slate-500" />
+                  <span className="text-slate-500 text-xs">
+                    {formatDate(eventProviderInfo.commitDate || eventProviderInfo.lastModified)}
+                  </span>
+                </div>
               </div>
             </div>
             <p className="text-slate-300 text-sm mb-4">
