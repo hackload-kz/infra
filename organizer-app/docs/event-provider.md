@@ -1,464 +1,270 @@
-# Event Provider Documentation
+# Hackload Ticketing Service Provider
 
-## Overview
+## Обзор
 
-The Event Provider API enables seamless integration with external event management platforms. This service provides comprehensive event creation, management, and synchronization capabilities for hackathon organizers.
+Hackload Ticketing Service Provider — это REST API сервис для управления заказами билетов и бронированием мест. Сервис предоставляет две основные роли пользователей:
+- **Администратор**: Может создавать и управлять местами/сиденьями в заведении
+- **Партнеры**: Могут создавать заказы, выбирать места и управлять бронированием
 
-## Core Features
 
-- **Multi-platform Integration**: Connect with popular event platforms
-- **Real-time Synchronization**: Automatic data sync between platforms
-- **Event Lifecycle Management**: From creation to post-event analytics
-- **Attendee Management**: Comprehensive participant tracking
-- **Custom Branding**: Maintain consistent branding across platforms
+## Эндпоинты API
 
-## Supported Platforms
+### Эндпоинты партнеров
 
-### Eventbrite Integration
-- Event creation and management
-- Ticket sales and registration
-- Attendee tracking and check-in
-- Analytics and reporting
+#### 1. Начать заказ
+Создает новый заказ и возвращает ID заказа.
 
-### Meetup Integration
-- Group and event management
-- RSVP tracking
-- Member communication
-- Venue coordination
+**Эндпоинт:** `POST /api/partners/v1/orders`
 
-### Custom Platform Integration
-- REST API integration
-- Webhook support
-- Custom data mapping
-- Real-time synchronization
-
-## Authentication
-
-The Event Provider API uses OAuth 2.0 for secure authentication:
-
-```http
-Authorization: Bearer {access_token}
-Content-Type: application/json
-```
-
-### OAuth Flow
-1. Redirect user to authorization endpoint
-2. User grants permission
-3. Exchange authorization code for access token
-4. Use access token for API requests
-
-## API Endpoints
-
-### Event Management
-
-#### Create Event
-```http
-POST /api/event-provider/events
-Content-Type: application/json
-
-{
-  "title": "HackLoad 2025",
-  "description": "Annual hackathon event",
-  "startDate": "2025-03-15T09:00:00Z",
-  "endDate": "2025-03-17T18:00:00Z",
-  "location": {
-    "venue": "Tech Hub",
-    "address": "123 Innovation Street",
-    "city": "San Francisco",
-    "country": "USA"
-  },
-  "capacity": 500,
-  "platforms": ["eventbrite", "meetup"]
-}
-```
-
-#### Update Event
-```http
-PUT /api/event-provider/events/{eventId}
-Content-Type: application/json
-
-{
-  "title": "HackLoad 2025 - Updated",
-  "capacity": 600,
-  "platforms": ["eventbrite", "meetup", "facebook"]
-}
-```
-
-#### Get Event Details
-```http
-GET /api/event-provider/events/{eventId}
-```
-
-#### Sync Event Data
-```http
-POST /api/event-provider/events/{eventId}/sync
-Content-Type: application/json
-
-{
-  "platforms": ["eventbrite", "meetup"],
-  "syncType": "full"
-}
-```
-
-### Attendee Management
-
-#### Get Attendees
-```http
-GET /api/event-provider/events/{eventId}/attendees
-```
-
-#### Sync Attendee Data
-```http
-POST /api/event-provider/events/{eventId}/attendees/sync
-Content-Type: application/json
-
-{
-  "platforms": ["eventbrite"],
-  "includeWaitlist": true
-}
-```
-
-#### Export Attendee List
-```http
-GET /api/event-provider/events/{eventId}/attendees/export?format=csv
-```
-
-### Platform Integration
-
-#### Connect Platform
-```http
-POST /api/event-provider/platforms/connect
-Content-Type: application/json
-
-{
-  "platform": "eventbrite",
-  "credentials": {
-    "apiKey": "your-api-key",
-    "organizationId": "your-org-id"
-  }
-}
-```
-
-#### Get Platform Status
-```http
-GET /api/event-provider/platforms/{platform}/status
-```
-
-#### Disconnect Platform
-```http
-DELETE /api/event-provider/platforms/{platform}
-```
-
-## Data Models
-
-### Event Object
+**Ответ (201 Created):**
 ```json
 {
-  "id": "event-123",
-  "title": "HackLoad 2025",
-  "description": "Annual hackathon event",
-  "startDate": "2025-03-15T09:00:00Z",
-  "endDate": "2025-03-17T18:00:00Z",
-  "location": {
-    "venue": "Tech Hub",
-    "address": "123 Innovation Street",
-    "city": "San Francisco",
-    "country": "USA",
-    "coordinates": {
-      "latitude": 37.7749,
-      "longitude": -122.4194
-    }
-  },
-  "capacity": 500,
-  "registeredCount": 347,
-  "waitlistCount": 23,
-  "status": "published",
-  "platforms": {
-    "eventbrite": {
-      "eventId": "eb-123456",
-      "url": "https://eventbrite.com/e/123456",
-      "status": "live"
-    },
-    "meetup": {
-      "eventId": "mu-789012",
-      "url": "https://meetup.com/event/789012",
-      "status": "published"
-    }
-  },
-  "createdAt": "2025-01-15T10:30:00Z",
-  "updatedAt": "2025-01-20T15:45:00Z"
+  "order_id": "98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88"
 }
 ```
 
-### Attendee Object
+**Пример:**
+```bash
+curl -X POST "http://localhost:8080/api/partners/v1/orders"
+```
+
+#### 2. Получить заказ
+Получает детали заказа по ID.
+
+**Эндпоинт:** `GET /api/partners/v1/orders/{id}`
+
+**Ответ (200 OK):**
 ```json
 {
-  "id": "attendee-123",
-  "eventId": "event-123",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "registrationDate": "2025-01-15T10:30:00Z",
-  "status": "confirmed",
-  "ticketType": "standard",
-  "checkInStatus": "pending",
-  "platform": "eventbrite",
-  "platformAttendeeId": "eb-att-123456",
-  "metadata": {
-    "company": "Tech Corp",
-    "experience": "intermediate",
-    "dietary": "vegetarian"
-  }
+  "id": "98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88",
+  "status": "STARTED",
+  "started_at": 1753513916968,
+  "updated_at": 1753513966871,
+  "places_count": 1
 }
 ```
 
-## Platform-Specific Features
+**Пример:**
+```bash
+curl -X GET "http://localhost:8080/api/partners/v1/orders/98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88"
+```
 
-### Eventbrite Integration
+#### 3. Отправить заказ
+Отправляет заказ на обработку. После отправки можно только подтвердить или отменить заказ.
 
-#### Features
-- Automated ticket creation
-- Payment processing
-- Custom registration forms
-- Email marketing integration
-- Analytics and reporting
+**Эндпоинт:** `PATCH /api/partners/v1/orders/{id}/submit`
 
-#### Configuration
+**Ответ:** `200 OK` (без тела)
+
+**Пример:**
+```bash
+curl -X PATCH "http://localhost:8080/api/partners/v1/orders/98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88/submit"
+```
+
+#### 4. Подтвердить заказ
+Подтверждает заказ (терминальный статус - дальнейшие изменения невозможны).
+
+**Эндпоинт:** `PATCH /api/partners/v1/orders/{id}/confirm`
+
+**Ответ:** `200 OK` (без тела)
+
+**Пример:**
+```bash
+curl -X PATCH "http://localhost:8080/api/partners/v1/orders/98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88/confirm"
+```
+
+#### 5. Отменить заказ
+Отменяет заказ. Подтвержденные заказы не могут быть отменены.
+
+**Эндпоинт:** `PATCH /api/partners/v1/orders/{id}/cancel`
+
+**Ответ:** `200 OK` (без тела)
+
+**Пример:**
+```bash
+curl -X PATCH "http://localhost:8080/api/partners/v1/orders/98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88/cancel"
+```
+
+#### 6. Список мест
+Получает доступные места с пагинацией.
+
+**Эндпоинт:** `GET /api/partners/v1/places?page={page}&pageSize={pageSize}`
+
+**Параметры запроса:**
+- `page` (необязательно): Номер страницы (по умолчанию: 1, минимум: 1)
+- `pageSize` (необязательно): Элементов на странице (по умолчанию: 20, максимум: 1000)
+
+**Ответ (200 OK):**
+```json
+[
+  {
+    "id": "1bf2726c-b6b7-459f-be3f-8124ecd7c619",
+    "row": 1,
+    "seat": 1,
+    "is_free": true
+  }
+]
+```
+
+**Пример:**
+```bash
+curl -X GET "http://localhost:8080/api/partners/v1/places?page=1&pageSize=20"
+```
+
+#### 7. Получить отдельное место
+Получает детали конкретного места.
+
+**Эндпоинт:** `GET /api/partners/v1/places/{id}`
+
+**Ответ (200 OK):**
 ```json
 {
-  "platform": "eventbrite",
-  "config": {
-    "ticketTypes": [
-      {
-        "name": "Early Bird",
-        "price": 50,
-        "quantity": 100,
-        "salesStart": "2025-01-01T00:00:00Z",
-        "salesEnd": "2025-02-01T23:59:59Z"
-      },
-      {
-        "name": "Regular",
-        "price": 75,
-        "quantity": 400,
-        "salesStart": "2025-02-01T00:00:00Z",
-        "salesEnd": "2025-03-14T23:59:59Z"
-      }
-    ],
-    "customQuestions": [
-      {
-        "question": "Years of programming experience",
-        "type": "dropdown",
-        "options": ["0-1", "2-5", "6-10", "10+"],
-        "required": true
-      }
-    ]
-  }
+  "id": "1bf2726c-b6b7-459f-be3f-8124ecd7c619",
+  "row": 1,
+  "seat": 1,
+  "is_free": true
 }
 ```
 
-### Meetup Integration
+**Пример:**
+```bash
+curl -X GET "http://localhost:8080/api/partners/v1/places/1bf2726c-b6b7-459f-be3f-8124ecd7c619"
+```
 
-#### Features
-- Group management
-- RSVP tracking
-- Member messaging
-- Event promotion
-- Community building
+#### 8. Выбрать место
+Выбирает/резервирует место для заказа.
 
-#### Configuration
+**Эндпоинт:** `PATCH /api/partners/v1/places/{id}/select`
+
+**Тело запроса:**
 ```json
 {
-  "platform": "meetup",
-  "config": {
-    "groupUrlname": "hackload-community",
-    "rsvpLimit": 500,
-    "guestLimit": 1,
-    "announceTo": "members",
-    "eventPhotos": [
-      "https://example.com/photo1.jpg",
-      "https://example.com/photo2.jpg"
-    ]
-  }
+  "order_id": "98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88"
 }
 ```
 
-## Webhook Events
+**Ответ:** `204 No Content` (без тела)
 
-Subscribe to real-time event notifications:
-
-### Available Events
-- `event.created` - New event created
-- `event.updated` - Event details changed
-- `attendee.registered` - New attendee registered
-- `attendee.cancelled` - Registration cancelled
-- `sync.completed` - Platform sync finished
-- `platform.connected` - New platform connected
-
-### Webhook Configuration
-```http
-POST /api/event-provider/webhooks
-Content-Type: application/json
-
-{
-  "url": "https://your-app.com/webhooks/event-provider",
-  "events": ["attendee.registered", "sync.completed"],
-  "secret": "your-webhook-secret"
-}
+**Пример:**
+```bash
+curl -X PATCH "http://localhost:8080/api/partners/v1/places/1bf2726c-b6b7-459f-be3f-8124ecd7c619/select" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "order_id": "98c123b9-fc80-4d6b-a3f6-0cbe84e0fd88"
+  }'
 ```
 
-### Webhook Payload
-```json
-{
-  "id": "webhook-123",
-  "event": "attendee.registered",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "data": {
-    "eventId": "event-123",
-    "attendeeId": "attendee-456",
-    "platform": "eventbrite",
-    "registrationDate": "2025-01-15T10:30:00Z"
-  }
-}
+#### 9. Освободить место
+Освобождает выбранное место (работает только с начатыми заказами).
+
+**Эндпоинт:** `PATCH /api/partners/v1/places/{id}/release`
+
+**Ответ:** `204 No Content` (без тела)
+
+**Пример:**
+```bash
+curl -X PATCH "http://localhost:8080/api/partners/v1/places/1bf2726c-b6b7-459f-be3f-8124ecd7c619/release"
 ```
 
-## Synchronization
+## Сценарии использования сервиса
 
-### Sync Types
+### Типичный рабочий процесс заказа
 
-#### Full Sync
-- Complete data synchronization
-- Compares all fields
-- Updates discrepancies
-- Resource intensive
+1. **Начать новый заказ**
+   - Вызвать `POST /api/partners/v1/orders`
+   - Получить ID заказа для последующих операций
 
-#### Incremental Sync
-- Only new/changed data
-- Based on timestamps
-- Faster performance
-- Regular intervals
+2. **Просмотреть доступные места**
+   - Вызвать `GET /api/partners/v1/places` для просмотра доступных мест
+   - Фильтровать по `is_free: true` для поиска свободных мест
 
-#### Manual Sync
-- On-demand synchronization
-- Specific data subsets
-- Error recovery
-- Testing purposes
+3. **Выбрать места для заказа**
+   - Вызвать `PATCH /api/partners/v1/places/{id}/select` для каждого желаемого места
+   - Место становится `is_free: false` и резервируется для вашего заказа
 
-### Sync Configuration
-```json
-{
-  "syncSettings": {
-    "autoSync": true,
-    "interval": "15m",
-    "platforms": ["eventbrite", "meetup"],
-    "dataTypes": ["attendees", "event_details"],
-    "conflictResolution": "platform_priority",
-    "notifyOnConflict": true
-  }
-}
+4. **Просмотреть заказ**
+   - Вызвать `GET /api/partners/v1/orders/{id}` для проверки деталей заказа
+   - Убедиться, что `places_count` соответствует выбранным местам
+
+5. **Отправить заказ**
+   - Вызвать `PATCH /api/partners/v1/orders/{id}/submit`
+   - Статус заказа изменится на `SUBMITTED`
+   - Больше нельзя добавлять/удалять места
+
+6. **Финальное действие**
+   - **Подтвердить:** Вызвать `PATCH /api/partners/v1/orders/{id}/confirm` (терминальный)
+   - **Отменить:** Вызвать `PATCH /api/partners/v1/orders/{id}/cancel`
+
+### Состояния заказа и переходы
+
+```
+STARTED → SUBMITTED → CONFIRMED (терминальный)
+   ↓         ↓
+CANCELLED ← CANCELLED
 ```
 
-## Error Handling
+- **STARTED**: Можно добавлять/удалять места, отправлять или отменять
+- **SUBMITTED**: Можно только подтвердить или отменить
+- **CONFIRMED**: Терминальное состояние (изменения невозможны)
+- **CANCELLED**: Терминальное состояние (изменения невозможны)
 
-### Error Response Format
-```json
-{
-  "error": {
-    "code": "PLATFORM_UNAVAILABLE",
-    "message": "Eventbrite API is currently unavailable",
-    "platform": "eventbrite",
-    "retryAfter": 300,
-    "details": {
-      "httpStatus": 503,
-      "platformError": "Service Temporarily Unavailable"
-    }
-  }
-}
-```
+### Административная настройка
 
-### Common Error Codes
-- `INVALID_CREDENTIALS` - Authentication failed
-- `PLATFORM_UNAVAILABLE` - External platform down
-- `RATE_LIMIT_EXCEEDED` - API rate limit reached
-- `SYNC_CONFLICT` - Data conflict during sync
-- `EVENT_NOT_FOUND` - Event doesn't exist
-- `PERMISSION_DENIED` - Insufficient permissions
+1. **Создать планировку заведения**
+   - Использовать `POST /api/admin/v1/places` для создания мест
+   - Настроить ряды и номера мест согласно планировке заведения
 
-## SDK Examples
+## Обработка ошибок
 
-### JavaScript/Node.js
-```javascript
-const EventProvider = require('event-provider-sdk');
+### Коды состояния HTTP
 
-const client = new EventProvider({
-  apiKey: process.env.EVENT_PROVIDER_API_KEY,
-  environment: 'production'
-});
+- **200 OK**: Запрос успешно выполнен
+- **201 Created**: Ресурс успешно создан
+- **204 No Content**: Запрос выполнен успешно без тела ответа
+- **404 Not Found**: Ресурс не найден
+- **409 Conflict**: Нарушение бизнес-правил
+- **422 Unprocessable Entity**: Неверный формат запроса
+- **403 Forbidden**: Операция не разрешена
+- **500 Internal Server Error**: Ошибка сервера
 
-// Create event
-const event = await client.events.create({
-  title: 'HackLoad 2025',
-  startDate: '2025-03-15T09:00:00Z',
-  endDate: '2025-03-17T18:00:00Z',
-  platforms: ['eventbrite', 'meetup']
-});
+### Ошибки бизнес-логики (409 Conflict)
 
-// Sync attendees
-const syncResult = await client.events.syncAttendees(event.id, {
-  platforms: ['eventbrite']
-});
+#### Ошибки, связанные с заказами
+- **OrderNotStartedException**: Попытка операций с не начатым заказом
+- **OrderNotSubmittedException**: Попытка подтвердить заказ, который не был отправлен
+- **OrderAlreadyCancelledException**: Попытка операций с отмененным заказом
+- **ConfirmedOrderCanNotBeCancelledException**: Попытка отменить подтвержденный заказ
+- **NoPlacesAddedException**: Попытка отправить заказ без мест
 
-console.log(`Synced ${syncResult.count} attendees`);
-```
+#### Ошибки, связанные с местами (409 Conflict)
+- **PlaceAlreadySelectedException**: Попытка выбрать уже зарезервированное место
+- **PlaceCanNotBeAddedToOrderException**: Место не может быть добавлено к указанному заказу
 
-### Python
-```python
-from event_provider import EventProviderClient
+#### Ошибки, связанные с местами (403 Forbidden)
+- **PlaceSelectedForAnotherOrderException**: Попытка освободить место, выбранное для другого заказа
 
-client = EventProviderClient(
-    api_key=os.environ['EVENT_PROVIDER_API_KEY'],
-    environment='production'
-)
+#### Другие ошибки
+- **PlaceNotAddedException**: Попытка удалить место, которое не было добавлено к заказу
 
-# Create event
-event = client.events.create(
-    title='HackLoad 2025',
-    start_date='2025-03-15T09:00:00Z',
-    end_date='2025-03-17T18:00:00Z',
-    platforms=['eventbrite', 'meetup']
-)
+### Формат ответа об ошибке
 
-# Sync attendees
-sync_result = client.events.sync_attendees(
-    event['id'],
-    platforms=['eventbrite']
-)
+Ошибки возвращают соответствующие коды состояния HTTP. Для нарушений бизнес-логики проверьте ожидаемые коды состояния в конкретных эндпоинтах выше.
 
-print(f"Synced {sync_result['count']} attendees")
-```
+## Лучшие практики
 
-## Best Practices
+### Для партнеров
 
-### Platform Management
-1. **Redundancy**: Use multiple platforms for critical events
-2. **Monitoring**: Track platform availability and performance
-3. **Fallbacks**: Have backup registration methods
-4. **Testing**: Test integrations before going live
+1. **Управление заказами**
+   - Всегда начинайте с создания заказа
+   - Проверяйте статус заказа перед выполнением операций
+   - Отправляйте заказы только когда все желаемые места выбраны
 
-### Data Synchronization
-1. **Regular Syncing**: Schedule automatic sync intervals
-2. **Conflict Resolution**: Define clear conflict resolution rules
-3. **Monitoring**: Track sync success rates and errors
-4. **Backup**: Maintain local copies of critical data
+2. **Выбор мест**
+   - Проверяйте статус `is_free` перед попыткой выбора
+   - Корректно обрабатывайте конфликты когда места уже заняты
+   - Своевременно освобождайте места если заказ отменен
 
-### Security
-1. **Credential Management**: Securely store platform credentials
-2. **Access Control**: Limit platform access to necessary users
-3. **Audit Logging**: Track all platform interactions
-4. **Encryption**: Encrypt sensitive data in transit and at rest
-
-## Support
-
-For Event Provider API support:
-- Documentation: https://docs.event-provider.com
-- Support Email: support@event-provider.com
-- Status Page: https://status.event-provider.com
-- Community Forum: https://community.event-provider.com
+3. **Обработка ошибок**
+   - Реализуйте логику повторных попыток для ответов 409 Conflict
+   - Обрабатывайте ответы 404 для несуществующих ресурсов
+   - Ведите логи и мониторинг ошибок 500 для системных проблем

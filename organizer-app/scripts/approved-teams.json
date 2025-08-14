@@ -1,10 +1,13 @@
 {
-  "exportDate": "2025-08-13T07:36:17.669Z",
+  "exportDate": "2025-08-14T10:24:18.934Z",
   "totalTeams": 58,
-  "totalEnvironmentVariables": 62,
+  "totalEnvironmentVariables": 63,
   "filters": {
     "teamIds": [],
-    "categories": [],
+    "categories": [
+      "cloud",
+      "development"
+    ],
     "includeValues": true
   },
   "data": [
@@ -12,30 +15,30 @@
       "teamId": "cmcymbpkx000k3f01fi6yx83c",
       "teamName": " NBA",
       "teamNickname": "NBA",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "ADVANCED",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Nursultan Stanbek",
-        "email": "sta****@gmail.com"
+        "email": "s*********4@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Бакдаулет Абдумуминов",
-          "email": "bak****@gmail.com"
+          "email": "b******************v@gmail.com"
         },
         {
           "name": "АЗАМАТ СМАН",
-          "email": "aza****@gmail.com"
+          "email": "a*********8@gmail.com"
         },
         {
           "name": "Myrzan Bekzat",
-          "email": "myr****@gmail.com"
+          "email": "m**********t@gmail.com"
         },
         {
           "name": "Nursultan Stanbek",
-          "email": "sta****@gmail.com"
+          "email": "s*********4@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -70,25 +73,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Дмитрий",
-        "email": "int****@gmail.com"
+        "email": "i********r@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Биржан",
-          "email": "bim****@gmail.com"
+          "email": "b*******i@gmail.com"
         },
         {
           "name": "Ильяс",
-          "email": "ily****@mail.ru"
+          "email": "i********7@mail.ru"
         },
         {
           "name": "Олег Стельвага",
-          "email": "zom****@gmail.com"
+          "email": "z********9@gmail.com"
         },
         {
           "name": "Дмитрий",
-          "email": "int****@gmail.com"
+          "email": "i********r@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -123,37 +126,37 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Арыстан",
-        "email": "ama****@gmail.com"
+        "email": "a****************n@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Tamirlan",
-          "email": "t.n****@gmail.com"
+          "email": "t***********y@gmail.com"
         },
         {
           "name": "Жанболат",
-          "email": "eer****@gmail.com"
+          "email": "e****o@gmail.com"
         },
         {
           "name": "Арыстан",
-          "email": "ama****@gmail.com"
+          "email": "a****************n@gmail.com"
         },
         {
           "name": "Rustem Kaimolla",
-          "email": "kai****@gmail.com"
+          "email": "k************m@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "746428",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T17:59:46.151Z",
-          "updatedAt": "2025-08-07T17:59:46.151Z"
+          "updatedAt": "2025-08-13T12:51:41.832Z"
         },
         {
           "key": "Repo",
@@ -176,25 +179,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Arnur ",
-        "email": "arc****@gmail.com"
+        "email": "a*******0@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Medeu",
-          "email": "med****@gmail.com"
+          "email": "m******7@gmail.com"
         },
         {
           "name": "Nurken",
-          "email": "nur****@gmail.com"
+          "email": "n**********7@gmail.com"
         },
         {
           "name": "Омаргалы Битебаев",
-          "email": "oma****@gmail.com"
+          "email": "o*********s@gmail.com"
         },
         {
           "name": "Arnur ",
-          "email": "arc****@gmail.com"
+          "email": "a*******0@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -224,26 +227,26 @@
       "teamId": "cmcvx7696000pas01h4ibobgv",
       "teamName": "Datafy",
       "teamNickname": "datafy",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": null,
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Глеб",
-        "email": "kuk****@gmail.com"
+        "email": "k**********b@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Толеби",
-          "email": "t.r****@gmail.com"
+          "email": "t********v@gmail.com"
         },
         {
           "name": "Bauyrgazy",
-          "email": "bau****@gmail.com"
+          "email": "b*************1@gmail.com"
         },
         {
           "name": "Глеб",
-          "email": "kuk****@gmail.com"
+          "email": "k**********b@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -278,13 +281,17 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Zako Zzako",
-        "email": "zza****@gmail.com"
+        "email": "z*******8@gmail.com"
       },
-      "memberCount": 1,
+      "memberCount": 2,
       "members": [
         {
+          "name": "Дастан Салабаев",
+          "email": "s*********s@gmail.com"
+        },
+        {
           "name": "Zako Zzako",
-          "email": "zza****@gmail.com"
+          "email": "z*******8@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -298,13 +305,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Дархан",
-        "email": "cry****@gmail.com"
+        "email": "c***********n@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Дархан",
-          "email": "cry****@gmail.com"
+          "email": "c***********n@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -313,26 +320,26 @@
       "teamId": "cmd8gbmem001g5i01i82gdox2",
       "teamName": "Dotnet",
       "teamNickname": "Dotcom",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "ADVANCED",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Nerzul",
-        "email": "ner****@bk.ru"
+        "email": "n****r@bk.ru"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Dilshat Osmanov",
-          "email": "dil****@gmail.com"
+          "email": "d***************5@gmail.com"
         },
         {
           "name": "Baurzhan K.",
-          "email": "uly****@gmail.com"
+          "email": "u*****n@gmail.com"
         },
         {
           "name": "Nerzul",
-          "email": "ner****@bk.ru"
+          "email": "n****r@bk.ru"
         }
       ],
       "environmentVariables": [
@@ -362,26 +369,26 @@
       "teamId": "cmcvxubh70011as01orezwtmz",
       "teamName": "Enigma",
       "teamNickname": "Team-enigma",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "ADVANCED",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Раимбек Бекетов",
-        "email": "koz****@gmail.com"
+        "email": "k****************k@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
-          "name": "Aibek Jussupov",
-          "email": "aib****@gmail.com"
+          "name": "Раимбек Бекетов",
+          "email": "k****************k@gmail.com"
         },
         {
-          "name": "Раимбек Бекетов",
-          "email": "koz****@gmail.com"
+          "name": "Aibek Jussupov",
+          "email": "a************v@gmail.com"
         },
         {
           "name": "Алибек Амиров",
-          "email": "ami****@gmail.com"
+          "email": "a**********k@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -416,13 +423,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Айдос",
-        "email": "lee****@gmail.com"
+        "email": "l******3@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Айдос",
-          "email": "lee****@gmail.com"
+          "email": "l******3@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -436,25 +443,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Nurqali Yermukhan (Yermukhan)",
-        "email": "erm****@gmail.com"
+        "email": "e************i@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Адилет",
-          "email": "add****@gmail.com"
+          "email": "a***************3@gmail.com"
         },
         {
           "name": "Nurqali Yermukhan (Yermukhan)",
-          "email": "erm****@gmail.com"
+          "email": "e************i@gmail.com"
         },
         {
           "name": "Bekzat Zharylkassyn",
-          "email": "bek****@gmail.com"
+          "email": "b********1@gmail.com"
         },
         {
           "name": "Yernur Abylkanov",
-          "email": "yab****@gmail.com"
+          "email": "y********v@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -489,33 +496,33 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Samal",
-        "email": "erk****@gmail.com"
+        "email": "e*********6@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Samal",
-          "email": "erk****@gmail.com"
+          "email": "e*********6@gmail.com"
         },
         {
           "name": "Амина",
-          "email": "ami****@gmail.com"
+          "email": "a************5@gmail.com"
         },
         {
           "name": "Аружан Тлеукулова",
-          "email": "aru****@gmail.com"
+          "email": "a**************a@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "ID 746538",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T17:59:56.340Z",
-          "updatedAt": "2025-08-07T17:59:56.340Z"
+          "updatedAt": "2025-08-13T13:35:56.990Z"
         },
         {
           "key": "Repo",
@@ -538,37 +545,37 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Amanbek Faizolla",
-        "email": "rah****@gmail.com"
+        "email": "r******7@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Nurdaulet Toleugaliyev",
-          "email": "znb****@gmail.com"
+          "email": "z****g@gmail.com"
         },
         {
           "name": "Bauyrzhan Kilybay",
-          "email": "bau****@gmail.com"
+          "email": "b******k@gmail.com"
         },
         {
           "name": "Amanbek Faizolla",
-          "email": "rah****@gmail.com"
+          "email": "r******7@gmail.com"
         },
         {
           "name": "Alima Kassenkazy",
-          "email": "ali****@gmail.com"
+          "email": "a***********7@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "746457",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:00.822Z",
-          "updatedAt": "2025-08-07T18:00:00.822Z"
+          "updatedAt": "2025-08-13T09:02:40.732Z"
         },
         {
           "key": "Repo",
@@ -591,21 +598,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Daniyar K",
-        "email": "d4y****@gmail.com"
+        "email": "d*****n@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Daniyar K",
-          "email": "d4y****@gmail.com"
+          "email": "d*****n@gmail.com"
         },
         {
           "name": "Suban Ibraimov",
-          "email": "ibr****@gmail.com"
+          "email": "i*********4@gmail.com"
         },
         {
           "name": "Александр",
-          "email": "van****@gmail.com"
+          "email": "v**************r@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -640,13 +647,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Рашитов Ришат",
-        "email": "raw****@gmail.com"
+        "email": "r*********v@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Рашитов Ришат",
-          "email": "raw****@gmail.com"
+          "email": "r*********v@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -660,29 +667,29 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Султанбек",
-        "email": "sul****@gmail.com"
+        "email": "s****************v@gmail.com"
       },
       "memberCount": 5,
       "members": [
         {
           "name": "Alua",
-          "email": "inf****@gmail.com"
+          "email": "i**********2@gmail.com"
         },
         {
           "name": "Жасулан",
-          "email": "zha****@gmail.com"
+          "email": "z********1@gmail.com"
         },
         {
           "name": "Дархан",
-          "email": "dar****@gmail.com"
+          "email": "d***************6@gmail.com"
         },
         {
           "name": "Батыр",
-          "email": "bat****@gmail.com"
+          "email": "b***********v@gmail.com"
         },
         {
           "name": "Султанбек",
-          "email": "sul****@gmail.com"
+          "email": "s****************v@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -717,13 +724,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Faizulla Galimzhanov",
-        "email": "gal****@gmail.com"
+        "email": "g******************a@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Faizulla Galimzhanov",
-          "email": "gal****@gmail.com"
+          "email": "g******************a@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -737,13 +744,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Asliddin",
-        "email": "asl****@gmail.com"
+        "email": "a******************v@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Asliddin",
-          "email": "asl****@gmail.com"
+          "email": "a******************v@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -757,25 +764,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Баят",
-        "email": "tur****@gmail.com"
+        "email": "t*******v@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Дармен",
-          "email": "dar****@gmail.com"
+          "email": "d************z@gmail.com"
         },
         {
           "name": "Диас",
-          "email": "myg****@gmail.com"
+          "email": "m******l@gmail.com"
         },
         {
           "name": "Dauren",
-          "email": "mrh****@gmail.com"
+          "email": "m*******0@gmail.com"
         },
         {
           "name": "Баят",
-          "email": "tur****@gmail.com"
+          "email": "t*******v@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -810,21 +817,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Амир",
-        "email": "rai****@gmail.com"
+        "email": "r**********3@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
-          "name": "Sabina",
-          "email": "sab****@gmail.com"
-        },
-        {
           "name": "Сымбат",
-          "email": "sym****@gmail.com"
+          "email": "s*******d@gmail.com"
         },
         {
           "name": "Амир",
-          "email": "rai****@gmail.com"
+          "email": "r**********3@gmail.com"
+        },
+        {
+          "name": "Sabina",
+          "email": "s****************a@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -859,13 +866,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Kassymzhomart",
-        "email": "s.k****@gmail.com"
+        "email": "s*************t@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Kassymzhomart",
-          "email": "s.k****@gmail.com"
+          "email": "s*************t@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -879,17 +886,17 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Сауран",
-        "email": "sba****@outlook.com"
+        "email": "s**********v@outlook.com"
       },
       "memberCount": 2,
       "members": [
         {
           "name": "Сауран",
-          "email": "sba****@outlook.com"
+          "email": "s**********v@outlook.com"
         },
         {
           "name": "Эдуард",
-          "email": "ezi****@gmail.com"
+          "email": "e*****v@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -903,25 +910,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Акмаль",
-        "email": "akm****@gmail.com"
+        "email": "a*******3@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Sarvar",
-          "email": "mrs****@gmail.com"
+          "email": "m*********8@gmail.com"
         },
         {
           "name": "Afanasii",
-          "email": "afa****@gmail.com"
+          "email": "a*************n@gmail.com"
         },
         {
           "name": "Азамат",
-          "email": "aza****@gmail.com"
+          "email": "a**************v@gmail.com"
         },
         {
           "name": "Акмаль",
-          "email": "akm****@gmail.com"
+          "email": "a*******3@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -956,17 +963,17 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Нурислам",
-        "email": "ask****@gmail.com"
+        "email": "a**********r@gmail.com"
       },
       "memberCount": 2,
       "members": [
         {
           "name": "Арман",
-          "email": "and****@gmail.com"
+          "email": "a**************r@gmail.com"
         },
         {
           "name": "Нурислам",
-          "email": "ask****@gmail.com"
+          "email": "a**********r@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -980,37 +987,37 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Амерлан",
-        "email": "ame****@gmail.com"
+        "email": "a**************v@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
-          "name": "Амерлан",
-          "email": "ame****@gmail.com"
+          "name": "Тимур Кудайбергенов",
+          "email": "m******a@gmail.com"
         },
         {
-          "name": "Тимур Кудайбергенов",
-          "email": "man****@gmail.com"
+          "name": "Амерлан",
+          "email": "a**************v@gmail.com"
         },
         {
           "name": "Азамат Базарбай",
-          "email": "aza****@gmail.com"
+          "email": "a***************7@gmail.com"
         },
         {
           "name": "Roman Yurchenko",
-          "email": "luc****@gmail.com"
+          "email": "l*********r@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "645807",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:10.920Z",
-          "updatedAt": "2025-08-07T18:00:10.920Z"
+          "updatedAt": "2025-08-13T09:05:19.256Z"
         },
         {
           "key": "Repo",
@@ -1033,21 +1040,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Alibek Bakdaulet",
-        "email": "ali****@gmail.com"
+        "email": "a*************t@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Damir Mertl",
-          "email": "d.d****@aues.kz"
+          "email": "d**********v@aues.kz"
         },
         {
           "name": "Alibek Bakdaulet",
-          "email": "ali****@gmail.com"
+          "email": "a*************t@gmail.com"
         },
         {
           "name": "Глеб Тараканов",
-          "email": "gle****@gmail.com"
+          "email": "g*****d@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1077,26 +1084,26 @@
       "teamId": "cmd5zxyr400076u0108kh5n3b",
       "teamName": "Qaskeleng most wanted",
       "teamNickname": "qaskeleng-most-wanted",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "ADVANCED",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Arystan Bissimbayev",
-        "email": "bis****@gmail.com"
+        "email": "b*****************n@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
+          "name": "Arystan Bissimbayev",
+          "email": "b*****************n@gmail.com"
+        },
+        {
           "name": "Sungkar Daulet",
-          "email": "dau****@gmail.com"
+          "email": "d************r@gmail.com"
         },
         {
           "name": "Abu Said Manap",
-          "email": "abu****@gmail.com"
-        },
-        {
-          "name": "Arystan Bissimbayev",
-          "email": "bis****@gmail.com"
+          "email": "a***********p@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1131,13 +1138,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Temirlan",
-        "email": "tem****@gmail.com"
+        "email": "t*********3@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Temirlan",
-          "email": "tem****@gmail.com"
+          "email": "t*********3@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1151,13 +1158,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Mashkhurbek Muhamadjonov",
-        "email": "muh****@gmail.com"
+        "email": "m***********************k@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Mashkhurbek Muhamadjonov",
-          "email": "muh****@gmail.com"
+          "email": "m***********************k@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1171,25 +1178,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Sergey Kuzmin",
-        "email": "kuz****@gmail.com"
+        "email": "k********f@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Sergey Kuzmin",
-          "email": "kuz****@gmail.com"
+          "email": "k********f@gmail.com"
         },
         {
           "name": "Akhmetzhan Kussainov",
-          "email": "kus****@gmail.com"
+          "email": "k******************n@gmail.com"
         },
         {
           "name": "Андрей Суховицкий",
-          "email": "and****@gmail.com"
+          "email": "a***********a@gmail.com"
         },
         {
           "name": "Лена Макарова",
-          "email": "kao****@gmail.com"
+          "email": "k*******t@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1224,13 +1231,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Suienish Mirambekov",
-        "email": "mir****@gmail.com"
+        "email": "m**************y@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Suienish Mirambekov",
-          "email": "mir****@gmail.com"
+          "email": "m**************y@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1239,26 +1246,26 @@
       "teamId": "cmcm0qbnp0012d001scd8nr9y",
       "teamName": "Texas Developer Group",
       "teamNickname": "teD-G",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": null,
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Каныш",
-        "email": "kan****@gmail.com"
+        "email": "k***********k@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Ракымжан",
-          "email": "rak****@gmail.com"
+          "email": "r************1@gmail.com"
         },
         {
           "name": "Каныш",
-          "email": "kan****@gmail.com"
+          "email": "k***********k@gmail.com"
         },
         {
           "name": "Никита",
-          "email": "hor****@gmail.com"
+          "email": "h******b@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1293,13 +1300,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Елтаев Валихан",
-        "email": "val****@gmail.com"
+        "email": "v************y@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Елтаев Валихан",
-          "email": "val****@gmail.com"
+          "email": "v************y@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1307,19 +1314,19 @@
     {
       "teamId": "cmcm2thwd0019d001475eqwu2",
       "teamName": "WebKiller",
-      "teamNickname": "WeK ",
-      "teamStatus": "NEW",
+      "teamNickname": "WeK",
+      "teamStatus": "REJECTED",
       "teamLevel": null,
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Bella",
-        "email": "kra****@gmail.com"
+        "email": "k*********y@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Bella",
-          "email": "kra****@gmail.com"
+          "email": "k*********y@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1333,21 +1340,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Mansur",
-        "email": "rom****@gmail.com"
+        "email": "r**********4@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Mansur",
-          "email": "rom****@gmail.com"
+          "email": "r**********4@gmail.com"
         },
         {
           "name": "Nurasyl Orazbek",
-          "email": "nur****@gmail.com"
+          "email": "n*********1@gmail.com"
         },
         {
           "name": "Aknur",
-          "email": "whi****@gmail.com"
+          "email": "w************a@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1382,37 +1389,37 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Diyorbek",
-        "email": "bdv****@gmail.com"
+        "email": "b*******b@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
-          "name": "Diyorbek",
-          "email": "bdv****@gmail.com"
-        },
-        {
           "name": "Zikrulloh",
-          "email": "fro****@yandex.com"
+          "email": "f***********h@yandex.com"
         },
         {
           "name": "Жандос",
-          "email": "zha****@gmail.com"
+          "email": "z******************v@gmail.com"
+        },
+        {
+          "name": "Diyorbek",
+          "email": "b*******b@gmail.com"
         },
         {
           "name": "Dilshod",
-          "email": "avl****@gmail.com"
+          "email": "a*************d@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "746677",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:22.430Z",
-          "updatedAt": "2025-08-07T18:00:22.430Z"
+          "updatedAt": "2025-08-14T09:44:45.724Z"
         },
         {
           "key": "Repo",
@@ -1435,13 +1442,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Almas Nurakhmetov",
-        "email": "nur****@gmail.com"
+        "email": "n****************1@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Almas Nurakhmetov",
-          "email": "nur****@gmail.com"
+          "email": "n****************1@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1455,21 +1462,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Temirlan Nurbay",
-        "email": "n.t****@gmail.com"
+        "email": "n************5@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Temirlan Nurbay",
-          "email": "n.t****@gmail.com"
+          "email": "n************5@gmail.com"
         },
         {
           "name": "Rakhat Meiramov",
-          "email": "mei****@gmail.com"
+          "email": "m*************t@gmail.com"
         },
         {
           "name": "Ердиас Талгатов",
-          "email": "erd****@gmail.com"
+          "email": "e*******9@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1498,26 +1505,37 @@
     {
       "teamId": "cmcw4dg3n000may011h8la68q",
       "teamName": "Zulu",
-      "teamNickname": "zulu ",
-      "teamStatus": "NEW",
-      "teamLevel": null,
+      "teamNickname": "zulu",
+      "teamStatus": "APPROVED",
+      "teamLevel": "BEGINNER",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Sanzhar",
-        "email": "bis****@gmail.com"
+        "email": "b*******v@gmail.com"
       },
       "memberCount": 2,
       "members": [
         {
           "name": "Sanzhar",
-          "email": "bis****@gmail.com"
+          "email": "b*******v@gmail.com"
         },
         {
           "name": "Денис",
-          "email": "den****@gmail.com"
+          "email": "d*********v@gmail.com"
         }
       ],
-      "environmentVariables": []
+      "environmentVariables": [
+        {
+          "key": "PSID",
+          "value": "720682",
+          "description": "Аккаунт PS.KZ",
+          "category": "cloud",
+          "isSecure": false,
+          "isEditable": true,
+          "createdAt": "2025-08-13T15:08:12.096Z",
+          "updatedAt": "2025-08-13T15:08:12.096Z"
+        }
+      ]
     },
     {
       "teamId": "cmdhajr3j0025e001zp02c1sv",
@@ -1528,33 +1546,33 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Abylai Bakytzhan",
-        "email": "aby****@gmail.com"
+        "email": "a********a@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Abylai Bakytzhan",
-          "email": "aby****@gmail.com"
+          "email": "a********a@gmail.com"
         },
         {
           "name": "Ilyas",
-          "email": "iag****@gmail.com"
+          "email": "i********1@gmail.com"
         },
         {
           "name": "Alnur Zholdas",
-          "email": "zho****@gmail.com"
+          "email": "z***********r@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "746282",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:24.040Z",
-          "updatedAt": "2025-08-07T18:00:24.040Z"
+          "updatedAt": "2025-08-13T09:06:37.635Z"
         },
         {
           "key": "Repo",
@@ -1577,17 +1595,17 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Дмитрий Мельник",
-        "email": "dmt****@gmail.com"
+        "email": "d*********k@gmail.com"
       },
       "memberCount": 2,
       "members": [
         {
           "name": "Stanislav",
-          "email": "bel****@gmail.com"
+          "email": "b***************v@gmail.com"
         },
         {
           "name": "Дмитрий Мельник",
-          "email": "dmt****@gmail.com"
+          "email": "d*********k@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1601,21 +1619,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Abylaikhan Zulbukharov",
-        "email": "l1p****@gmail.com"
+        "email": "l********5@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Alimukhamed Tlekbai",
-          "email": "ali****@gmail.com"
+          "email": "a*********i@gmail.com"
         },
         {
           "name": "Abylaikhan Zulbukharov",
-          "email": "l1p****@gmail.com"
+          "email": "l********5@gmail.com"
         },
         {
           "name": "Dias Kappassov",
-          "email": "dia****@gmail.com"
+          "email": "d***********v@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1650,13 +1668,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Zhalgas",
-        "email": "jal****@gmail.com"
+        "email": "j********8@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Zhalgas",
-          "email": "jal****@gmail.com"
+          "email": "j********8@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1670,13 +1688,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Константин",
-        "email": "zhi****@gmail.com"
+        "email": "z*****n@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Константин",
-          "email": "zhi****@gmail.com"
+          "email": "z*****n@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1690,37 +1708,33 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Sultan Yelikbayev",
-        "email": "sul****@gmail.com"
+        "email": "s**************v@gmail.com"
       },
-      "memberCount": 4,
+      "memberCount": 3,
       "members": [
         {
           "name": "Sultan Yelikbayev",
-          "email": "sul****@gmail.com"
+          "email": "s**************v@gmail.com"
         },
         {
           "name": "Илимбек",
-          "email": "ili****@gmail.com"
+          "email": "i******************0@gmail.com"
         },
         {
           "name": "Adilzhan Mustafin",
-          "email": "adi****@mail.ru"
-        },
-        {
-          "name": "Алихан",
-          "email": "ali****@gmail.com"
+          "email": "a*******4@mail.ru"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "746261",
+          "value": "746432",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:28.255Z",
-          "updatedAt": "2025-08-12T11:58:03.997Z"
+          "updatedAt": "2025-08-13T08:12:29.141Z"
         },
         {
           "key": "Repo",
@@ -1743,13 +1757,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "amiosamu",
-        "email": "dam****@gmail.com"
+        "email": "d*********v@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "amiosamu",
-          "email": "dam****@gmail.com"
+          "email": "d*********v@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1763,13 +1777,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Andrey Komarov (sup)",
-        "email": "sup****@gmail.com"
+        "email": "s*******i@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Andrey Komarov (sup)",
-          "email": "sup****@gmail.com"
+          "email": "s*******i@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1783,17 +1797,17 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Din",
-        "email": "dim****@gmail.com"
+        "email": "d********3@gmail.com"
       },
       "memberCount": 2,
       "members": [
         {
           "name": "Din",
-          "email": "dim****@gmail.com"
+          "email": "d********3@gmail.com"
         },
         {
           "name": "Berdibek",
-          "email": "kbe****@gmail.com"
+          "email": "k******9@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1807,33 +1821,33 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Kassymkhan Talgatuly",
-        "email": "kas****@gmail.com"
+        "email": "k************3@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Aibek Meirkhanov",
-          "email": "aib****@gmail.com"
+          "email": "a************v@gmail.com"
         },
         {
           "name": "Нуралы Жоламан",
-          "email": "zol****@gmail.com"
+          "email": "z**********y@gmail.com"
         },
         {
           "name": "Kassymkhan Talgatuly",
-          "email": "kas****@gmail.com"
+          "email": "k************3@gmail.com"
         }
       ],
       "environmentVariables": [
         {
           "key": "PSID",
-          "value": "Заполни меня",
+          "value": "746472",
           "description": "ID Платежного аккаунта PS.KZ",
           "category": "cloud",
           "isSecure": false,
           "isEditable": true,
           "createdAt": "2025-08-07T18:00:28.799Z",
-          "updatedAt": "2025-08-07T18:00:28.799Z"
+          "updatedAt": "2025-08-13T09:53:50.523Z"
         },
         {
           "key": "Repo",
@@ -1851,26 +1865,26 @@
       "teamId": "cmd2xdqdm00082501f9ujhiiz",
       "teamName": "vibe-coders",
       "teamNickname": "vibe-coders",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "ADVANCED",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Gabdylgaziz Zhagypar",
-        "email": "g_z****@kbtu.kz"
+        "email": "g********r@kbtu.kz"
       },
       "memberCount": 3,
       "members": [
         {
+          "name": "Gabdylgaziz Zhagypar",
+          "email": "g********r@kbtu.kz"
+        },
+        {
           "name": "AIBEK",
-          "email": "pig****@gmail.com"
+          "email": "p*******e@gmail.com"
         },
         {
           "name": "Marif",
-          "email": "mar****@yandex.ru"
-        },
-        {
-          "name": "Gabdylgaziz Zhagypar",
-          "email": "g_z****@kbtu.kz"
+          "email": "m******6@yandex.ru"
         }
       ],
       "environmentVariables": [
@@ -1905,13 +1919,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Амир",
-        "email": "isl****@gmail.com"
+        "email": "i**********o@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Амир",
-          "email": "isl****@gmail.com"
+          "email": "i**********o@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1919,19 +1933,19 @@
     {
       "teamId": "cmcvydsj4001aas01rjw6qb3g",
       "teamName": "zloi",
-      "teamNickname": "#0000FF",
-      "teamStatus": "NEW",
+      "teamNickname": "0000FF",
+      "teamStatus": "REJECTED",
       "teamLevel": null,
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Manas",
-        "email": "ole****@gmail.com"
+        "email": "o******y@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Manas",
-          "email": "ole****@gmail.com"
+          "email": "o******y@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -1945,25 +1959,25 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Nurmyshev Serik",
-        "email": "s.n****@gmail.com"
+        "email": "s*********v@gmail.com"
       },
       "memberCount": 4,
       "members": [
         {
           "name": "Raimbek",
-          "email": "rai****@gmail.com"
+          "email": "r********7@gmail.com"
         },
         {
           "name": "Serik Shaikamalov",
-          "email": "ser****@gmail.com"
+          "email": "s***************v@gmail.com"
         },
         {
           "name": "Nurmyshev Serik",
-          "email": "s.n****@gmail.com"
+          "email": "s*********v@gmail.com"
         },
         {
           "name": "Айдос Алибек",
-          "email": "ali****@gmail.com"
+          "email": "a**********1@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -1993,26 +2007,26 @@
       "teamId": "cmcnnbfpn001sd001y8f8ocy1",
       "teamName": "Вайб кодинг",
       "teamNickname": "VibeCode",
-      "teamStatus": "APPROVED",
+      "teamStatus": "REJECTED",
       "teamLevel": "BEGINNER",
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Алишер ",
-        "email": "ali****@gmail.com"
+        "email": "a**************n@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
-          "name": "Jasulan Delegat",
-          "email": "ale****@gmail.com"
+          "name": "Алишер ",
+          "email": "a**************n@gmail.com"
         },
         {
-          "name": "Алишер ",
-          "email": "ali****@gmail.com"
+          "name": "Jasulan Delegat",
+          "email": "a***************2@gmail.com"
         },
         {
           "name": "Tair",
-          "email": "tai****@gmail.com"
+          "email": "t*******7@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -2047,13 +2061,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "MAGZHAN",
-        "email": "ama****@gmail.com"
+        "email": "a**********4@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "MAGZHAN",
-          "email": "ama****@gmail.com"
+          "email": "a**********4@gmail.com"
         }
       ],
       "environmentVariables": []
@@ -2067,21 +2081,21 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Abzalkhan Ondakanov",
-        "email": "abz****@gmail.com"
+        "email": "a****************v@gmail.com"
       },
       "memberCount": 3,
       "members": [
         {
           "name": "Ruslan Bazarbayev",
-          "email": "baz****@gmail.com"
+          "email": "b************s@gmail.com"
         },
         {
           "name": "Abzalkhan Ondakanov",
-          "email": "abz****@gmail.com"
+          "email": "a****************v@gmail.com"
         },
         {
           "name": "Zanggar Kambekov",
-          "email": "zan****@gmail.com"
+          "email": "z*************v@gmail.com"
         }
       ],
       "environmentVariables": [
@@ -2116,13 +2130,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "NoGamer",
-        "email": "wel****@mysummit.school"
+        "email": "w*****e@mysummit.school"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "NoGamer",
-          "email": "wel****@mysummit.school"
+          "email": "w*****e@mysummit.school"
         }
       ],
       "environmentVariables": []
@@ -2136,13 +2150,13 @@
       "hackathon": "HackLoad 2025",
       "leader": {
         "name": "Даурен Баймурза ",
-        "email": "hay****@gmail.com"
+        "email": "h*******j@gmail.com"
       },
       "memberCount": 1,
       "members": [
         {
           "name": "Даурен Баймурза ",
-          "email": "hay****@gmail.com"
+          "email": "h*******j@gmail.com"
         }
       ],
       "environmentVariables": []

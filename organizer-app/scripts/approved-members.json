@@ -1,2151 +1,3953 @@
 {
-  "exportDate": "2025-08-13T07:36:17.669Z",
-  "totalTeams": 58,
-  "totalEnvironmentVariables": 62,
+  "exportDate": "2025-08-13T07:36:20.762Z",
+  "totalParticipants": 108,
+  "exportType": "large-teams",
+  "hackathon": {
+    "id": "cmct461me00007dgvujg82z6s",
+    "name": "HackLoad 2025"
+  },
   "filters": {
-    "teamIds": [],
-    "categories": [],
-    "includeValues": true
+    "exportType": "large-teams",
+    "useRawQuery": false
   },
   "data": [
     {
-      "teamId": "cmcymbpkx000k3f01fi6yx83c",
-      "teamName": " NBA",
-      "teamNickname": "NBA",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Nursultan Stanbek",
-        "email": "sta****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Бакдаулет Абдумуминов",
-          "email": "bak****@gmail.com"
-        },
-        {
-          "name": "АЗАМАТ СМАН",
-          "email": "aza****@gmail.com"
-        },
-        {
-          "name": "Myrzan Bekzat",
-          "email": "myr****@gmail.com"
-        },
-        {
-          "name": "Nursultan Stanbek",
-          "email": "sta****@gmail.com"
+      "id": "cmd41d6gf000v9g0197ninkg0",
+      "name": "Myrzan Bekzat",
+      "email": "m**********t@gmail.com",
+      "city": "Almaty",
+      "company": "Q",
+      "telegram": "@bekzat_myrzan",
+      "githubUrl": "https://github.com/myrzanbekzatwork",
+      "linkedinUrl": "https://www.linkedin.com/in/bekzat-myrzan",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-15T04:32:19.696Z",
+      "team": {
+        "id": "cmcymbpkx000k3f01fi6yx83c",
+        "name": " NBA",
+        "nickname": "NBA",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:43.423Z",
-          "updatedAt": "2025-08-07T17:59:43.423Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/NBA",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:33:41.639Z",
-          "updatedAt": "2025-08-12T16:33:41.639Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcvran050009as015l69o1ac",
-      "teamName": " Rorobotics",
-      "teamNickname": "rorobotics",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Дмитрий",
-        "email": "int****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Биржан",
-          "email": "bim****@gmail.com"
-        },
-        {
-          "name": "Ильяс",
-          "email": "ily****@mail.ru"
-        },
-        {
-          "name": "Олег Стельвага",
-          "email": "zom****@gmail.com"
-        },
-        {
-          "name": "Дмитрий",
-          "email": "int****@gmail.com"
+      "id": "cmcym9aw2000j7001dbo5nt29",
+      "name": "Nursultan Stanbek",
+      "email": "s*********4@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "https://t.me/totsamyinurs",
+      "githubUrl": "https://github.com/nursdev",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Monitoring as a Service\",\"Database as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-11T09:30:33.698Z",
+      "team": {
+        "id": "cmcymbpkx000k3f01fi6yx83c",
+        "name": " NBA",
+        "nickname": "NBA",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746306",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:44.552Z",
-          "updatedAt": "2025-08-12T17:09:47.657Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/rorobotics",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:33:48.991Z",
-          "updatedAt": "2025-08-12T16:33:48.991Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmdbqlis5000ja60156bh2i4g",
-      "teamName": "1011",
-      "teamNickname": "team-1011",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Арыстан",
-        "email": "ama****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Tamirlan",
-          "email": "t.n****@gmail.com"
-        },
-        {
-          "name": "Жанболат",
-          "email": "eer****@gmail.com"
-        },
-        {
-          "name": "Арыстан",
-          "email": "ama****@gmail.com"
-        },
-        {
-          "name": "Rustem Kaimolla",
-          "email": "kai****@gmail.com"
+      "id": "cmd2xwtj4000y8301yxuutfyx",
+      "name": "АЗАМАТ СМАН",
+      "email": "a*********8@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@sman028",
+      "githubUrl": "https://github.com/azamat028",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Hoster.KZ\",\"VK Cloud\",\"PS Cloud Services\",\"Cloud24\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-14T10:07:51.424Z",
+      "team": {
+        "id": "cmcymbpkx000k3f01fi6yx83c",
+        "name": " NBA",
+        "nickname": "NBA",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:46.151Z",
-          "updatedAt": "2025-08-07T17:59:46.151Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/team-1011",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:33:56.415Z",
-          "updatedAt": "2025-08-12T16:33:56.415Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcxhjvib00027001ums5lm5i",
-      "teamName": "AMD RYZEN 5 9600X AM5 OEM",
-      "teamNickname": "amdryzen9600x",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Arnur ",
-        "email": "arc****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Medeu",
-          "email": "med****@gmail.com"
-        },
-        {
-          "name": "Nurken",
-          "email": "nur****@gmail.com"
-        },
-        {
-          "name": "Омаргалы Битебаев",
-          "email": "oma****@gmail.com"
-        },
-        {
-          "name": "Arnur ",
-          "email": "arc****@gmail.com"
+      "id": "cmcyo0mck000o70014gy1my3k",
+      "name": "Бакдаулет Абдумуминов",
+      "email": "b******************v@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@bakdaulet_dev",
+      "githubUrl": "https://github.com/bakdaulet13",
+      "linkedinUrl": "https://www.linkedin.com/in/bakdaulet-abdumuminov-1a4418231/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Monitoring as a Service\",\"Infrastructure as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-11T10:19:47.876Z",
+      "team": {
+        "id": "cmcymbpkx000k3f01fi6yx83c",
+        "name": " NBA",
+        "nickname": "NBA",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746021",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:49.069Z",
-          "updatedAt": "2025-08-11T09:10:07.126Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/amdryzen9600x",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:03.479Z",
-          "updatedAt": "2025-08-12T16:34:03.479Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcvx7696000pas01h4ibobgv",
-      "teamName": "Datafy",
-      "teamNickname": "datafy",
-      "teamStatus": "APPROVED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Глеб",
-        "email": "kuk****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Толеби",
-          "email": "t.r****@gmail.com"
-        },
-        {
-          "name": "Bauyrgazy",
-          "email": "bau****@gmail.com"
-        },
-        {
-          "name": "Глеб",
-          "email": "kuk****@gmail.com"
+      "id": "cmd8wkmrd00hg5i01gmvkply1",
+      "name": "Биржан",
+      "email": "b*******i@gmail.com",
+      "city": "Павлодар",
+      "company": "IFO",
+      "telegram": "BauR",
+      "githubUrl": "https://github.com/ROBOTIS-GIT",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Всё перечисленное (частично)\",\"Система учета (1С, SAP, ERP)\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"Oblako.kz\",\"Cloud24\",\"NLS Kazakhstan\",\"VK Cloud\",\"Yandex Cloud\",\"KT Cloud Lab\",\"PS Cloud Services\"]",
+      "cloudServices": "[\"Disaster Recovery as a Service\",\"Backup as a Service\",\"Monitoring as a Service\",\"Database as a Service\",\"Kubernetes as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-18T14:17:00.217Z",
+      "team": {
+        "id": "cmcvran050009as015l69o1ac",
+        "name": " Rorobotics",
+        "nickname": "rorobotics",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "GCP"
+        ],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:49.864Z",
-          "updatedAt": "2025-08-07T17:59:49.864Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/datafy",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:08.579Z",
-          "updatedAt": "2025-08-12T16:34:08.579Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmdhn9l1j004fe001351kw465",
-      "teamName": "Deploy",
-      "teamNickname": "Deploy",
-      "teamStatus": "REJECTED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Zako Zzako",
-        "email": "zza****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Zako Zzako",
-          "email": "zza****@gmail.com"
+      "id": "cmclibv890007at019ytyk9dw",
+      "name": "Дмитрий",
+      "email": "i********r@gmail.com",
+      "city": "Павлодар, Казахстан",
+      "company": null,
+      "telegram": "@intensedr",
+      "githubUrl": "https://github.com/intensedr/",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Другое\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-02T05:19:34.618Z",
+      "team": {
+        "id": "cmcvran050009as015l69o1ac",
+        "name": " Rorobotics",
+        "nickname": "rorobotics",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "GCP"
+        ],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcvsm8hi000bas017qfd6dv0",
-      "teamName": "Detrimentals",
-      "teamNickname": "DTRS",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Дархан",
-        "email": "cry****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Дархан",
-          "email": "cry****@gmail.com"
-        }
+      "id": "cmdh2sylx0003bz016r010i9i",
+      "name": "Ильяс",
+      "email": "i********7@mail.ru",
+      "city": "Павлодар",
+      "company": "AdovDev",
+      "telegram": "@Ilyas_Adov",
+      "githubUrl": "https://github.com/IlyasAdov",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "JavaScript",
+        "PHP"
       ],
-      "environmentVariables": []
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "Redis",
+        "MongoDB",
+        "SQLite",
+        "Firebase"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Hoster.KZ\"]",
+      "cloudServices": "[]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-24T07:33:35.925Z",
+      "team": {
+        "id": "cmcvran050009as015l69o1ac",
+        "name": " Rorobotics",
+        "nickname": "rorobotics",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "GCP"
+        ],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmd8gbmem001g5i01i82gdox2",
-      "teamName": "Dotnet",
-      "teamNickname": "Dotcom",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Nerzul",
-        "email": "ner****@bk.ru"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Dilshat Osmanov",
-          "email": "dil****@gmail.com"
-        },
-        {
-          "name": "Baurzhan K.",
-          "email": "uly****@gmail.com"
-        },
-        {
-          "name": "Nerzul",
-          "email": "ner****@bk.ru"
-        }
+      "id": "cmdj0ayz5001o9u012pa9e2g6",
+      "name": "Олег Стельвага",
+      "email": "z********9@gmail.com",
+      "city": "Павлодар",
+      "company": "-",
+      "telegram": "@stelvaga",
+      "githubUrl": "https://github.com/sadnim",
+      "linkedinUrl": "https://www.linkedin.com/in/stelvaga/",
+      "programmingLanguages": [
+        "Python"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:50.640Z",
-          "updatedAt": "2025-08-07T17:59:50.640Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/Dotcom",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:14.891Z",
-          "updatedAt": "2025-08-12T16:34:14.891Z"
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis"
+      ],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"PS Cloud Services\",\"VK Cloud\",\"Cloud24\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Database as a Service\",\"Infrastructure as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": "I am a hidden scientist. I put my screwdriver everywhere",
+      "createdAt": "2025-07-25T15:59:09.713Z",
+      "team": {
+        "id": "cmcvran050009as015l69o1ac",
+        "name": " Rorobotics",
+        "nickname": "rorobotics",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "GCP"
+        ],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmcvxubh70011as01orezwtmz",
-      "teamName": "Enigma",
-      "teamNickname": "Team-enigma",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Раимбек Бекетов",
-        "email": "koz****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Aibek Jussupov",
-          "email": "aib****@gmail.com"
-        },
-        {
-          "name": "Раимбек Бекетов",
-          "email": "koz****@gmail.com"
-        },
-        {
-          "name": "Алибек Амиров",
-          "email": "ami****@gmail.com"
-        }
+      "id": "cmd8mtdik001za601a6363eub",
+      "name": "Rustem Kaimolla",
+      "email": "k************m@gmail.com",
+      "city": "Almaty",
+      "company": "Full Menu",
+      "telegram": "overwritelife",
+      "githubUrl": "https://github.com/rustem-kaimolla/",
+      "linkedinUrl": "https://www.linkedin.com/in/rustem-kaimolla-671318271",
+      "programmingLanguages": [
+        "PHP"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:51.187Z",
-          "updatedAt": "2025-08-07T17:59:51.187Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/Team-enigma",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:21.454Z",
-          "updatedAt": "2025-08-12T16:34:21.454Z"
+      "databases": [
+        "PostgreSQL",
+        "MySQL",
+        "SQLite",
+        "Redis"
+      ],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\",\"Oblako.kz\",\"Hoster.KZ\",\"Cloud24\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": "Опыт: 5+\nСтек: PHP основной(go дополнительный), Postgres, Redis, K3S, K9, Gitlab CI/CD.\n\nМогу усилить девопса по мониторингу и HA, но не основной стек",
+      "createdAt": "2025-07-18T09:43:51.980Z",
+      "team": {
+        "id": "cmdbqlis5000ja60156bh2i4g",
+        "name": "1011",
+        "nickname": "team-1011",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmcudjk790007as01usu72lub",
-      "teamName": "FairLix",
-      "teamNickname": "fair-lix",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Айдос",
-        "email": "lee****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Айдос",
-          "email": "lee****@gmail.com"
-        }
+      "id": "cmda8exls00129b01otm9ppee",
+      "name": "Tamirlan",
+      "email": "t***********y@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "https://t.me/privet_xyz",
+      "githubUrl": "https://github.com/t1m0nya0",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Python",
+        "Go"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "MongoDB"
+      ],
+      "technologies": "[\"Всё перечисленное (частично)\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Serverspace\",\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\",\"Oblako.kz\",\"Cloud24\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": "Знаю как в постгре ложаться данные в пэйджы, и зачем придумали 2PL в MVCC дисн\nБэкенд + Девопс\nЛюблю хайлоад",
+      "createdAt": "2025-07-19T12:36:15.904Z",
+      "team": {
+        "id": "cmdbqlis5000ja60156bh2i4g",
+        "name": "1011",
+        "nickname": "team-1011",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmdcol78g001lc2019ep47pfg",
-      "teamName": "Gang of Fourth reich",
-      "teamNickname": "reich-goodfellas",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Nurqali Yermukhan (Yermukhan)",
-        "email": "erm****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Адилет",
-          "email": "add****@gmail.com"
-        },
-        {
-          "name": "Nurqali Yermukhan (Yermukhan)",
-          "email": "erm****@gmail.com"
-        },
-        {
-          "name": "Bekzat Zharylkassyn",
-          "email": "bek****@gmail.com"
-        },
-        {
-          "name": "Yernur Abylkanov",
-          "email": "yab****@gmail.com"
-        }
+      "id": "cmdbpsyv2000da601x0qizh2e",
+      "name": "Арыстан",
+      "email": "a****************n@gmail.com",
+      "city": "Астана",
+      "company": "BCC",
+      "telegram": "@one_nine_two",
+      "githubUrl": "https://github.com/ars192",
+      "linkedinUrl": "https://www.linkedin.com/in/ars192/",
+      "programmingLanguages": [
+        "Go"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746293",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:52.212Z",
-          "updatedAt": "2025-08-12T15:10:47.498Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/reich-goodfellas",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:28.592Z",
-          "updatedAt": "2025-08-12T16:34:28.592Z"
+      "databases": [
+        "PostgreSQL",
+        "MongoDB",
+        "Redis"
+      ],
+      "technologies": "[\"Другое\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-20T13:30:50.366Z",
+      "team": {
+        "id": "cmdbqlis5000ja60156bh2i4g",
+        "name": "1011",
+        "nickname": "team-1011",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmd787okj000s6r01fpw80mvw",
-      "teamName": "Girlgorithm",
-      "teamNickname": "3G",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Samal",
-        "email": "erk****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Samal",
-          "email": "erk****@gmail.com"
-        },
-        {
-          "name": "Амина",
-          "email": "ami****@gmail.com"
-        },
-        {
-          "name": "Аружан Тлеукулова",
-          "email": "aru****@gmail.com"
-        }
+      "id": "cmdbx97be000nc2013534jw2v",
+      "name": "Жанболат",
+      "email": "e****o@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@eerzho",
+      "githubUrl": "https://github.com/eerzho",
+      "linkedinUrl": "https://www.linkedin.com/in/eerzho/",
+      "programmingLanguages": [
+        "Go",
+        "PHP",
+        "Python"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T17:59:56.340Z",
-          "updatedAt": "2025-08-07T17:59:56.340Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/3G",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:34.897Z",
-          "updatedAt": "2025-08-12T16:34:34.897Z"
+      "databases": [
+        "PostgreSQL",
+        "MongoDB",
+        "Redis"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-20T16:59:25.130Z",
+      "team": {
+        "id": "cmdbqlis5000ja60156bh2i4g",
+        "name": "1011",
+        "nickname": "team-1011",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmdabjwrx001e9b01d2doff27",
-      "teamName": "HKB crew",
-      "teamNickname": "hkb-crew",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Amanbek Faizolla",
-        "email": "rah****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Nurdaulet Toleugaliyev",
-          "email": "znb****@gmail.com"
-        },
-        {
-          "name": "Bauyrzhan Kilybay",
-          "email": "bau****@gmail.com"
-        },
-        {
-          "name": "Amanbek Faizolla",
-          "email": "rah****@gmail.com"
-        },
-        {
-          "name": "Alima Kassenkazy",
-          "email": "ali****@gmail.com"
-        }
+      "id": "cmcltot4o000vd001qori648n",
+      "name": "Arnur ",
+      "email": "a*******0@gmail.com",
+      "city": "Astana",
+      "company": "Cerebro",
+      "telegram": "@amd_ryzen_5_9600x",
+      "githubUrl": "https://github.com/amdryzen5600x",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Python",
+        "Go",
+        "Rust",
+        "JavaScript",
+        "TypeScript"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:00.822Z",
-          "updatedAt": "2025-08-07T18:00:00.822Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/hkb-crew",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:42.498Z",
-          "updatedAt": "2025-08-12T16:34:42.498Z"
+      "databases": [
+        "SQLite",
+        "Redis",
+        "PostgreSQL"
+      ],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": "цель, получить опыт в проектировании и разворачивании высоконагруженных приложений, тем более что покупка билетов и первоначальных ажиотаж это знакомые мне проблемы\n\nтут не было выбора, но писать планирую на эликсире",
+      "createdAt": "2025-07-02T10:37:34.200Z",
+      "team": {
+        "id": "cmcxhjvib00027001ums5lm5i",
+        "name": "AMD RYZEN 5 9600X AM5 OEM",
+        "nickname": "amdryzen9600x",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmdj1jclj001w9u01u34ms1jp",
-      "teamName": "IPC-3",
-      "teamNickname": "IPC-3",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Daniyar K",
-        "email": "d4y****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Daniyar K",
-          "email": "d4y****@gmail.com"
-        },
-        {
-          "name": "Suban Ibraimov",
-          "email": "ibr****@gmail.com"
-        },
-        {
-          "name": "Александр",
-          "email": "van****@gmail.com"
+      "id": "cmcxhwjhi000470011711gbmf",
+      "name": "Medeu",
+      "email": "m******7@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": "@AmadeoMartell",
+      "githubUrl": "https://github.com/AmadeoMartell",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Infrastructure as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-10T14:40:53.670Z",
+      "team": {
+        "id": "cmcxhjvib00027001ums5lm5i",
+        "name": "AMD RYZEN 5 9600X AM5 OEM",
+        "nickname": "amdryzen9600x",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746342",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:01.869Z",
-          "updatedAt": "2025-08-13T02:50:22.948Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/IPC-3",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:48.709Z",
-          "updatedAt": "2025-08-12T16:34:48.709Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcvsqaqx000fas01fqwvzjwh",
-      "teamName": "InSight",
-      "teamNickname": "insight",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Рашитов Ришат",
-        "email": "raw****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Рашитов Ришат",
-          "email": "raw****@gmail.com"
+      "id": "cmcy8tx79000e7001pamx8m60",
+      "name": "Nurken",
+      "email": "n**********7@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": "@yankyankyanknk",
+      "githubUrl": "https://github.com/NurkenInc",
+      "linkedinUrl": "https://www.linkedin.com/in/nurken-kenes-59a9a3238/?originalSubdomain=kz",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[\"PS Cloud Services\"]",
+      "cloudServices": "[\"Disaster Recovery as a Service\",\"Kubernetes as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-11T03:14:41.109Z",
+      "team": {
+        "id": "cmcxhjvib00027001ums5lm5i",
+        "name": "AMD RYZEN 5 9600X AM5 OEM",
+        "nickname": "amdryzen9600x",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmclll5rn0006d001g5n7knxs",
-      "teamName": "MN Partners",
-      "teamNickname": "mnp",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Султанбек",
-        "email": "sul****@gmail.com"
-      },
-      "memberCount": 5,
-      "members": [
-        {
-          "name": "Alua",
-          "email": "inf****@gmail.com"
-        },
-        {
-          "name": "Жасулан",
-          "email": "zha****@gmail.com"
-        },
-        {
-          "name": "Дархан",
-          "email": "dar****@gmail.com"
-        },
-        {
-          "name": "Батыр",
-          "email": "bat****@gmail.com"
-        },
-        {
-          "name": "Султанбек",
-          "email": "sul****@gmail.com"
+      "id": "cmd4bk2rb001e9g01v77jlj44",
+      "name": "Омаргалы Битебаев",
+      "email": "o*********s@gmail.com",
+      "city": "Семей",
+      "company": null,
+      "telegram": "@hAckeeVo",
+      "githubUrl": "https://github.com/OMaRgaLy",
+      "linkedinUrl": "https://linkedin.com/in/bitebayev",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Всё перечисленное (частично)\",\"Базы данных\",\"Web-приложения / Backend\",\"Офисные приложения (ЭДО / почта)\",\"Система учета (1С, SAP, ERP)\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Oblako.kz\"]",
+      "cloudServices": "[\"Monitoring as a Service\",\"Database as a Service\",\"Backup as a Service\",\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-15T09:17:37.655Z",
+      "team": {
+        "id": "cmcxhjvib00027001ums5lm5i",
+        "name": "AMD RYZEN 5 9600X AM5 OEM",
+        "nickname": "amdryzen9600x",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746103",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:03.526Z",
-          "updatedAt": "2025-08-11T16:45:27.468Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/mnp",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:34:56.589Z",
-          "updatedAt": "2025-08-12T16:34:56.589Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmclpo5xb000k9901geywbx5h",
-      "teamName": "Manhattan",
-      "teamNickname": "Giffo",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Faizulla Galimzhanov",
-        "email": "gal****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Faizulla Galimzhanov",
-          "email": "gal****@gmail.com"
+      "id": "cmcvxa7ev0008ay01pig5rov9",
+      "name": "Bauyrgazy",
+      "email": "b*************1@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-09T12:15:53.095Z",
+      "team": {
+        "id": "cmcvx7696000pas01h4ibobgv",
+        "name": "Datafy",
+        "nickname": "datafy",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcly6bon000wd0017b26b95i",
-      "teamName": "Memelopers from the outer space",
-      "teamNickname": "memelopers",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Asliddin",
-        "email": "asl****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Asliddin",
-          "email": "asl****@gmail.com"
+      "id": "cmcvx7699000ras01nw1acnwl",
+      "name": "Глеб",
+      "email": "k**********b@gmail.com",
+      "city": "Алматы",
+      "company": "Datafy",
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-09T12:13:31.630Z",
+      "team": {
+        "id": "cmcvx7696000pas01h4ibobgv",
+        "name": "Datafy",
+        "nickname": "datafy",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcnezvgh001h9901o5avkwhc",
-      "teamName": "MetaLoad",
-      "teamNickname": "metaload-akbori",
-      "teamStatus": "APPROVED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Баят",
-        "email": "tur****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Дармен",
-          "email": "dar****@gmail.com"
-        },
-        {
-          "name": "Диас",
-          "email": "myg****@gmail.com"
-        },
-        {
-          "name": "Dauren",
-          "email": "mrh****@gmail.com"
-        },
-        {
-          "name": "Баят",
-          "email": "tur****@gmail.com"
+      "id": "cmcvxa7rz000vas015ojy2kop",
+      "name": "Толеби",
+      "email": "t********v@gmail.com",
+      "city": "Алматы",
+      "company": "Datafy",
+      "telegram": "@gkhjlg",
+      "githubUrl": "https://github.com/tol7bi",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-09T12:15:53.566Z",
+      "team": {
+        "id": "cmcvx7696000pas01h4ibobgv",
+        "name": "Datafy",
+        "nickname": "datafy",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746081",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:05.160Z",
-          "updatedAt": "2025-08-11T12:48:11.776Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/metaload-akbori",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:03.478Z",
-          "updatedAt": "2025-08-12T16:35:03.478Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcoyhcgu00009s015kuk9iw6",
-      "teamName": "Mission: Implausible",
-      "teamNickname": "Mis-Imp",
-      "teamStatus": "APPROVED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Амир",
-        "email": "rai****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Sabina",
-          "email": "sab****@gmail.com"
-        },
-        {
-          "name": "Сымбат",
-          "email": "sym****@gmail.com"
-        },
-        {
-          "name": "Амир",
-          "email": "rai****@gmail.com"
+      "id": "cmd8gj6fg001l5i01ax1k6ldx",
+      "name": "Baurzhan K.",
+      "email": "u*****n@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": "@iollou",
+      "githubUrl": "https://github.com/ulyozen",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-18T06:47:58.540Z",
+      "team": {
+        "id": "cmd8gbmem001g5i01i82gdox2",
+        "name": "Dotnet",
+        "nickname": "Dotcom",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746257",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:06.319Z",
-          "updatedAt": "2025-08-12T11:50:25.444Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/Mis-Imp",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:07.905Z",
-          "updatedAt": "2025-08-12T16:35:07.905Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcq24s4b000c9s01bqyalnpv",
-      "teamName": "NISTYAK",
-      "teamNickname": "nistyak",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Kassymzhomart",
-        "email": "s.k****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Kassymzhomart",
-          "email": "s.k****@gmail.com"
+      "id": "cmd8iikhf001aa601sxzmea2a",
+      "name": "Dilshat Osmanov",
+      "email": "d***************5@gmail.com",
+      "city": "Алматы",
+      "company": "Unicore.one",
+      "telegram": "@dilshat_osmanov",
+      "githubUrl": "https://github.com/DilshatOsmanov",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-18T07:43:29.331Z",
+      "team": {
+        "id": "cmd8gbmem001g5i01i82gdox2",
+        "name": "Dotnet",
+        "nickname": "Dotcom",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcxklzn100063f01xbxrt24h",
-      "teamName": "NativeBPM",
-      "teamNickname": "nativebpm",
-      "teamStatus": "REJECTED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Сауран",
-        "email": "sba****@outlook.com"
-      },
-      "memberCount": 2,
-      "members": [
-        {
-          "name": "Сауран",
-          "email": "sba****@outlook.com"
-        },
-        {
-          "name": "Эдуард",
-          "email": "ezi****@gmail.com"
+      "id": "cmd8ga4s4001a5i01dul7beug",
+      "name": "Nerzul",
+      "email": "n****r@bk.ru",
+      "city": "Astana",
+      "company": ".net",
+      "telegram": "@nerkur",
+      "githubUrl": "https://github.com/Bartemeus",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Всё перечисленное (частично)\",\"Система учета (1С, SAP, ERP)\",\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"KT Cloud Lab\",\"Serverspace\",\"Yandex Cloud\",\"VK Cloud\",\"SmartCloud\",\"Oblako.kz\",\"Hoster.KZ\",\"Cloud24\",\"Cloupard\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Monitoring as a Service\",\"Database as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-18T06:40:56.500Z",
+      "team": {
+        "id": "cmd8gbmem001g5i01i82gdox2",
+        "name": "Dotnet",
+        "nickname": "Dotcom",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmd37je7500019g01woxlwoc7",
-      "teamName": "NullPointerException",
-      "teamNickname": "NPE",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Акмаль",
-        "email": "akm****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Sarvar",
-          "email": "mrs****@gmail.com"
-        },
-        {
-          "name": "Afanasii",
-          "email": "afa****@gmail.com"
-        },
-        {
-          "name": "Азамат",
-          "email": "aza****@gmail.com"
-        },
-        {
-          "name": "Акмаль",
-          "email": "akm****@gmail.com"
-        }
+      "id": "cmdj9unpc003j9u018g043nr6",
+      "name": "Aibek Jussupov",
+      "email": "a************v@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": "@aibakaiba",
+      "githubUrl": "https://github.com/kaibatv",
+      "linkedinUrl": "https://www.linkedin.com/in/aibek-jussupov-845b92313/",
+      "programmingLanguages": [
+        "Python"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746337",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:08.409Z",
-          "updatedAt": "2025-08-12T20:30:12.339Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/NPE",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:15.550Z",
-          "updatedAt": "2025-08-12T16:35:15.550Z"
+      "databases": [
+        "Firebase"
+      ],
+      "technologies": "[\"Другое\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Другое\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": "Basic analytics knowledge",
+      "createdAt": "2025-07-25T20:26:24.768Z",
+      "team": {
+        "id": "cmcvxubh70011as01orezwtmz",
+        "name": "Enigma",
+        "nickname": "Team-enigma",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Angular",
+          "ASP.NET",
+          "PostgreSQL",
+          "MongoDB",
+          "Docker",
+          "AWS",
+          "Vue.js",
+          "Spring",
+          "Django",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "C#",
+          "C++",
+          "Java",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
         }
-      ]
+      }
     },
     {
-      "teamId": "cmcw78bu4001nas012n297iwa",
-      "teamName": "Nurislam",
-      "teamNickname": "Nurislam",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Нурислам",
-        "email": "ask****@gmail.com"
-      },
-      "memberCount": 2,
-      "members": [
-        {
-          "name": "Арман",
-          "email": "and****@gmail.com"
-        },
-        {
-          "name": "Нурислам",
-          "email": "ask****@gmail.com"
+      "id": "cmcz19l2u0001bz01y844ntwd",
+      "name": "Алибек Амиров",
+      "email": "a**********k@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@AmirovA_qq",
+      "githubUrl": "https://github.com/StarScreamc",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Cloud24\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-11T16:30:41.142Z",
+      "team": {
+        "id": "cmcvxubh70011as01orezwtmz",
+        "name": "Enigma",
+        "nickname": "Team-enigma",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Angular",
+          "ASP.NET",
+          "PostgreSQL",
+          "MongoDB",
+          "Docker",
+          "AWS",
+          "Vue.js",
+          "Spring",
+          "Django",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "C#",
+          "C++",
+          "Java",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmclm61tu000dd001btqrk9wq",
-      "teamName": "Octopussy",
-      "teamNickname": "OCTP",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Амерлан",
-        "email": "ame****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Амерлан",
-          "email": "ame****@gmail.com"
-        },
-        {
-          "name": "Тимур Кудайбергенов",
-          "email": "man****@gmail.com"
-        },
-        {
-          "name": "Азамат Базарбай",
-          "email": "aza****@gmail.com"
-        },
-        {
-          "name": "Roman Yurchenko",
-          "email": "luc****@gmail.com"
-        }
+      "id": "cmcvxubha0013as01u2u4m7cl",
+      "name": "Раимбек Бекетов",
+      "email": "k****************k@gmail.com",
+      "city": "Дубай",
+      "company": "X-flames",
+      "telegram": "@Joyboy_r",
+      "githubUrl": "https://github.com/aimov6464",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "C++",
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "C#"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:10.920Z",
-          "updatedAt": "2025-08-07T18:00:10.920Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/OCTP",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:21.465Z",
-          "updatedAt": "2025-08-12T16:35:21.465Z"
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "SQLite",
+        "Oracle"
+      ],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-09T12:31:31.487Z",
+      "team": {
+        "id": "cmcvxubh70011as01orezwtmz",
+        "name": "Enigma",
+        "nickname": "Team-enigma",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Angular",
+          "ASP.NET",
+          "PostgreSQL",
+          "MongoDB",
+          "Docker",
+          "AWS",
+          "Vue.js",
+          "Spring",
+          "Django",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "C#",
+          "C++",
+          "Java",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
         }
-      ]
+      }
     },
     {
-      "teamId": "cmd5ia7rc000g7w01wwhjzm9h",
-      "teamName": "OyuTeam",
-      "teamNickname": "oyu",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Alibek Bakdaulet",
-        "email": "ali****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Damir Mertl",
-          "email": "d.d****@aues.kz"
-        },
-        {
-          "name": "Alibek Bakdaulet",
-          "email": "ali****@gmail.com"
-        },
-        {
-          "name": "Глеб Тараканов",
-          "email": "gle****@gmail.com"
-        }
+      "id": "cmde0s8z7002xa601o3j4vpcq",
+      "name": "Bekzat Zharylkassyn",
+      "email": "b********1@gmail.com",
+      "city": "Almaty",
+      "company": "BCC HUB",
+      "telegram": "Https://t.me/bekka811",
+      "githubUrl": "https://github.com/bekonti",
+      "linkedinUrl": "https://www.linkedin.com/in/bekzat-zharylkassyn-940a541bb",
+      "programmingLanguages": [
+        "Java",
+        "Go"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "679971",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:11.910Z",
-          "updatedAt": "2025-08-12T04:35:45.722Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/oyu",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:28.082Z",
-          "updatedAt": "2025-08-12T16:35:28.082Z"
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[\"Всё перечисленное (частично)\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"Oblako.kz\",\"PS Cloud Services\"]",
+      "cloudServices": "[\"Kubernetes as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": "В участие хакатоне интересно решать задачки на хайлоад, а так я обычный преподаватель-студент который ищёт знания",
+      "createdAt": "2025-07-22T04:13:44.947Z",
+      "team": {
+        "id": "cmdcol78g001lc2019ep47pfg",
+        "name": "Gang of Fourth reich",
+        "nickname": "reich-goodfellas",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Spring",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Java"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmd5zxyr400076u0108kh5n3b",
-      "teamName": "Qaskeleng most wanted",
-      "teamNickname": "qaskeleng-most-wanted",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Arystan Bissimbayev",
-        "email": "bis****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Sungkar Daulet",
-          "email": "dau****@gmail.com"
-        },
-        {
-          "name": "Abu Said Manap",
-          "email": "abu****@gmail.com"
-        },
-        {
-          "name": "Arystan Bissimbayev",
-          "email": "bis****@gmail.com"
-        }
+      "id": "cmdcoj0sh001fc2017er29gd7",
+      "name": "Nurqali Yermukhan (Yermukhan)",
+      "email": "e************i@gmail.com",
+      "city": "Almaty",
+      "company": "ACB HUB",
+      "telegram": "@yermukhannn",
+      "githubUrl": "https://github.com/yermukhanJJ",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "Go"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:12.778Z",
-          "updatedAt": "2025-08-07T18:00:12.778Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/qaskeleng-most-wanted",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:34.037Z",
-          "updatedAt": "2025-08-12T16:35:34.037Z"
+      "databases": [
+        "PostgreSQL",
+        "MySQL",
+        "Redis",
+        "Cassandra"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Cloud24\",\"Oblako.kz\",\"SmartCloud\",\"Yandex Cloud\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Monitoring as a Service\",\"Kubernetes as a Service\",\"Backup as a Service\",\"Database as a Service\",\"Infrastructure as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-21T05:42:52.865Z",
+      "team": {
+        "id": "cmdcol78g001lc2019ep47pfg",
+        "name": "Gang of Fourth reich",
+        "nickname": "reich-goodfellas",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Spring",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Java"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmd4ccajz001pb601j0ke7km7",
-      "teamName": "Qoqys",
-      "teamNickname": "qoqys",
-      "teamStatus": "REJECTED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Temirlan",
-        "email": "tem****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Temirlan",
-          "email": "tem****@gmail.com"
-        }
+      "id": "cmdil4blx006wbz01x3mdw2qm",
+      "name": "Yernur Abylkanov",
+      "email": "y********v@gmail.com",
+      "city": "Almaty",
+      "company": "IKOD",
+      "telegram": "@yabylkanov",
+      "githubUrl": "https://github.com/Yernur011",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "MongoDB",
+        "Redis"
+      ],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Monitoring as a Service\",\"Kubernetes as a Service\",\"Backup as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-25T08:54:05.253Z",
+      "team": {
+        "id": "cmdcol78g001lc2019ep47pfg",
+        "name": "Gang of Fourth reich",
+        "nickname": "reich-goodfellas",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Spring",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmcluk5d4000w99017leei4t4",
-      "teamName": "Roaster",
-      "teamNickname": "roaster",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Mashkhurbek Muhamadjonov",
-        "email": "muh****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Mashkhurbek Muhamadjonov",
-          "email": "muh****@gmail.com"
-        }
+      "id": "cmclkutyf000399019diqk3vo",
+      "name": "Адилет",
+      "email": "a***************3@gmail.com",
+      "city": "Алматы",
+      "company": "Phoenix Lab",
+      "telegram": "@adiletkk",
+      "githubUrl": "https://github.com/AdookdEV",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "Python",
+        "JavaScript"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Infrastructure as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T06:30:18.663Z",
+      "team": {
+        "id": "cmdcol78g001lc2019ep47pfg",
+        "name": "Gang of Fourth reich",
+        "nickname": "reich-goodfellas",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Spring",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmdebcvuk003yc201jbsui6w2",
-      "teamName": "Snoonu team",
-      "teamNickname": "snoonu-team",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Sergey Kuzmin",
-        "email": "kuz****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Sergey Kuzmin",
-          "email": "kuz****@gmail.com"
-        },
-        {
-          "name": "Akhmetzhan Kussainov",
-          "email": "kus****@gmail.com"
-        },
-        {
-          "name": "Андрей Суховицкий",
-          "email": "and****@gmail.com"
-        },
-        {
-          "name": "Лена Макарова",
-          "email": "kao****@gmail.com"
+      "id": "cmcoyzxdc0002b0015l28gtlc",
+      "name": "Samal",
+      "email": "e*********6@gmail.com",
+      "city": "Almaty",
+      "company": null,
+      "telegram": "samyerkn",
+      "githubUrl": "https://github.com/Samyerkn",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[\"Oblako.kz\",\"Yandex Cloud\"]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-04T15:29:29.520Z",
+      "team": {
+        "id": "cmd787okj000s6r01fpw80mvw",
+        "name": "Girlgorithm",
+        "nickname": "3G",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746201",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:14.781Z",
-          "updatedAt": "2025-08-12T08:23:22.139Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/snoonu-team",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:41.537Z",
-          "updatedAt": "2025-08-12T16:35:41.537Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcx0fpxq001zas01m37u7fnc",
-      "teamName": "TechAlash",
-      "teamNickname": "TechAlash",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Suienish Mirambekov",
-        "email": "mir****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Suienish Mirambekov",
-          "email": "mir****@gmail.com"
+      "id": "cmcuvcyv50003ay01z7nphyfo",
+      "name": "Амина",
+      "email": "a************5@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "https://github.com/Aminashhh",
+      "githubUrl": "https://github.com/Aminashhh",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Всё перечисленное (частично)\"]",
+      "cloudProviders": "[\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-08T18:34:16.577Z",
+      "team": {
+        "id": "cmd787okj000s6r01fpw80mvw",
+        "name": "Girlgorithm",
+        "nickname": "3G",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcm0qbnp0012d001scd8nr9y",
-      "teamName": "Texas Developer Group",
-      "teamNickname": "teD-G",
-      "teamStatus": "APPROVED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Каныш",
-        "email": "kan****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Ракымжан",
-          "email": "rak****@gmail.com"
-        },
-        {
-          "name": "Каныш",
-          "email": "kan****@gmail.com"
-        },
-        {
-          "name": "Никита",
-          "email": "hor****@gmail.com"
+      "id": "cmd8vaovy003da601yoeq94ln",
+      "name": "Аружан Тлеукулова",
+      "email": "a**************a@gmail.com",
+      "city": "Алматы",
+      "company": "-",
+      "telegram": "@tleukulova",
+      "githubUrl": "https://github.com/tleukulova",
+      "linkedinUrl": "https://www.linkedin.com/in/аружан-тлеукулова-5328a02a8/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-18T13:41:16.798Z",
+      "team": {
+        "id": "cmd787okj000s6r01fpw80mvw",
+        "name": "Girlgorithm",
+        "nickname": "3G",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:17.782Z",
-          "updatedAt": "2025-08-07T18:00:17.782Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/teD-G",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:46.747Z",
-          "updatedAt": "2025-08-12T16:35:46.747Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcud6gs60001as0157cylht8",
-      "teamName": "Tyshkas",
-      "teamNickname": "Tyshkas",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Елтаев Валихан",
-        "email": "val****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Елтаев Валихан",
-          "email": "val****@gmail.com"
-        }
+      "id": "cmdiztxpm000hb501whp3podx",
+      "name": "Alima Kassenkazy",
+      "email": "a***********7@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "@username_zm",
+      "githubUrl": "https://github.com/KassenkazyAlima",
+      "linkedinUrl": "https://www.linkedin.com/in/alimak/",
+      "programmingLanguages": [
+        "Java",
+        "Go",
+        "Swift",
+        "C++",
+        "Python"
       ],
-      "environmentVariables": []
+      "databases": [
+        "MySQL",
+        "Redis",
+        "PostgreSQL",
+        "MongoDB"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\",\"Офисные приложения (ЭДО / почта)\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": "I’m a software engineering student with a passion for creating practical and impactful solutions through code. I enjoy exploring backend development, system architecture, and real-time communication tools. My interests also include cloud computing, automation, and building scalable services that solve real-world problems. I’m always eager to learn, whether through coursework, side projects, or collaboration with others. One of the most valuable experiences in my journey so far has been participating in AITU Hackday CSIA, we have built an app for plants. ",
+      "createdAt": "2025-07-25T15:45:54.922Z",
+      "team": {
+        "id": "cmdabjwrx001e9b01d2doff27",
+        "name": "HKB crew",
+        "nickname": "hkb-crew",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Vue.js",
+          "Kubernetes",
+          "Redis",
+          "Docker",
+          "MongoDB",
+          "MySQL",
+          "PostgreSQL"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "PHP"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmcm2thwd0019d001475eqwu2",
-      "teamName": "WebKiller",
-      "teamNickname": "WeK ",
-      "teamStatus": "NEW",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Bella",
-        "email": "kra****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Bella",
-          "email": "kra****@gmail.com"
-        }
+      "id": "cmda9bjmo00189b01yxhdn4dd",
+      "name": "Amanbek Faizolla",
+      "email": "r******7@gmail.com",
+      "city": "Almaty",
+      "company": "Bereke Bank",
+      "telegram": "@Rahuggg",
+      "githubUrl": "https://github.com/Rahugg",
+      "linkedinUrl": "https://www.linkedin.com/in/amanbek-faizolla",
+      "programmingLanguages": [
+        "Go",
+        "Python",
+        "PHP"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "Firebase",
+        "MongoDB",
+        "MySQL"
+      ],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\",\"SmartCloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": "Я Аманбек, люблю писать бэк приложений, а именно решать бизнес решения и создавать их, чтобы было полезно обществу\nМоя цель: Испытать свои силы в высоконагруженных системах и узнать для себя что-то новое\nИнтересы к хакатону: впервые вижу хакатон для бэкэнда, очень хочу принять участие",
+      "createdAt": "2025-07-19T13:01:37.440Z",
+      "team": {
+        "id": "cmdabjwrx001e9b01d2doff27",
+        "name": "HKB crew",
+        "nickname": "hkb-crew",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Vue.js",
+          "Kubernetes",
+          "Redis",
+          "Docker",
+          "MongoDB",
+          "MySQL",
+          "PostgreSQL"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "PHP"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmdhcrj3k0036e0010lsglclf",
-      "teamName": "Webnetic Systems",
-      "teamNickname": "webnetic-systems",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Mansur",
-        "email": "rom****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Mansur",
-          "email": "rom****@gmail.com"
-        },
-        {
-          "name": "Nurasyl Orazbek",
-          "email": "nur****@gmail.com"
-        },
-        {
-          "name": "Aknur",
-          "email": "whi****@gmail.com"
-        }
+      "id": "cmdad4tbp001m9b01oi7ljdvt",
+      "name": "Bauyrzhan Kilybay",
+      "email": "b******k@gmail.com",
+      "city": "Almaty",
+      "company": "Kaspi Bank",
+      "telegram": "@jusanbank",
+      "githubUrl": "https://github.com/HanidaM",
+      "linkedinUrl": "https://www.linkedin.com/in/bauyrzhan-kilybay-3041421b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      "programmingLanguages": [],
+      "databases": [
+        "PostgreSQL",
+        "Redis"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746263",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:21.526Z",
-          "updatedAt": "2025-08-12T12:05:28.817Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/webnetic-systems",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:53.309Z",
-          "updatedAt": "2025-08-12T16:35:53.309Z"
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Другое\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-19T14:48:21.877Z",
+      "team": {
+        "id": "cmdabjwrx001e9b01d2doff27",
+        "name": "HKB crew",
+        "nickname": "hkb-crew",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Vue.js",
+          "Kubernetes",
+          "Redis",
+          "Docker",
+          "MongoDB",
+          "MySQL",
+          "PostgreSQL"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "PHP"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmcvymsu9001eas0149756ecu",
-      "teamName": "Xattab Team",
-      "teamNickname": "xattab-team",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Diyorbek",
-        "email": "bdv****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Diyorbek",
-          "email": "bdv****@gmail.com"
-        },
-        {
-          "name": "Zikrulloh",
-          "email": "fro****@yandex.com"
-        },
-        {
-          "name": "Жандос",
-          "email": "zha****@gmail.com"
-        },
-        {
-          "name": "Dilshod",
-          "email": "avl****@gmail.com"
-        }
+      "id": "cmda8vxj7001qbe01qu7yogqe",
+      "name": "Nurdaulet Toleugaliyev",
+      "email": "z****g@gmail.com",
+      "city": "Алматы",
+      "company": "Halyk Bank",
+      "telegram": null,
+      "githubUrl": "https://github.com/tlglv-n",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "Python"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:22.430Z",
-          "updatedAt": "2025-08-07T18:00:22.430Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/xattab-team",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:35:59.610Z",
-          "updatedAt": "2025-08-12T16:35:59.610Z"
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "SQL Server",
+        "Firebase"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-19T12:49:28.963Z",
+      "team": {
+        "id": "cmdabjwrx001e9b01d2doff27",
+        "name": "HKB crew",
+        "nickname": "hkb-crew",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Vue.js",
+          "Kubernetes",
+          "Redis",
+          "Docker",
+          "MongoDB",
+          "MySQL",
+          "PostgreSQL"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "PHP"
+        ],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmcx9mgt000048r017h2ax2u0",
-      "teamName": "Yama Coders",
-      "teamNickname": "yama-code",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Almas Nurakhmetov",
-        "email": "nur****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Almas Nurakhmetov",
-          "email": "nur****@gmail.com"
-        }
+      "id": "cmdiuc1g100169u01qgmccubd",
+      "name": "Daniyar K",
+      "email": "d*****n@gmail.com",
+      "city": "Бишкек",
+      "company": null,
+      "telegram": "@pubfnmain",
+      "githubUrl": "https://github.com/pubfnmain",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "C++",
+        "Rust"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "SQLite",
+        "Redis"
+      ],
+      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Hoster.KZ\"]",
+      "cloudServices": "[\"Database as a Service\",\"Kubernetes as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-25T13:12:01.873Z",
+      "team": {
+        "id": "cmdj1jclj001w9u01u34ms1jp",
+        "name": "IPC-3",
+        "nickname": "IPC-3",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Redis",
+          "React",
+          "Flask",
+          "PostgreSQL",
+          "Django"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "TypeScript",
+          "Rust",
+          "C++",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
     },
     {
-      "teamId": "cmdhlmcvw004nbz014flxxwd3",
-      "teamName": "ZeroDowntime",
-      "teamNickname": "zero-downtime",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Temirlan Nurbay",
-        "email": "n.t****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Temirlan Nurbay",
-          "email": "n.t****@gmail.com"
-        },
-        {
-          "name": "Rakhat Meiramov",
-          "email": "mei****@gmail.com"
-        },
-        {
-          "name": "Ердиас Талгатов",
-          "email": "erd****@gmail.com"
+      "id": "cmdj1u4af00249u01oywbj53p",
+      "name": "Suban Ibraimov",
+      "email": "i*********4@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/subannn",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-25T16:42:02.679Z",
+      "team": {
+        "id": "cmdj1jclj001w9u01u34ms1jp",
+        "name": "IPC-3",
+        "nickname": "IPC-3",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Redis",
+          "React",
+          "Flask",
+          "PostgreSQL",
+          "Django"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "TypeScript",
+          "Rust",
+          "C++",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746297",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:23.076Z",
-          "updatedAt": "2025-08-12T16:05:52.217Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/zero-downtime",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:06.655Z",
-          "updatedAt": "2025-08-12T16:36:06.655Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcw4dg3n000may011h8la68q",
-      "teamName": "Zulu",
-      "teamNickname": "zulu ",
-      "teamStatus": "NEW",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Sanzhar",
-        "email": "bis****@gmail.com"
-      },
-      "memberCount": 2,
-      "members": [
-        {
-          "name": "Sanzhar",
-          "email": "bis****@gmail.com"
-        },
-        {
-          "name": "Денис",
-          "email": "den****@gmail.com"
-        }
+      "id": "cmdj24q8t0015b501siinrq93",
+      "name": "Александр",
+      "email": "v**************r@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": "@vanzha_alexander",
+      "githubUrl": "https://github.com/imakiri",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "C++",
+        "Go",
+        "Rust",
+        "Python"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "SQLite"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-25T16:50:17.693Z",
+      "team": {
+        "id": "cmdj1jclj001w9u01u34ms1jp",
+        "name": "IPC-3",
+        "nickname": "IPC-3",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Redis",
+          "React",
+          "Flask",
+          "PostgreSQL",
+          "Django"
+        ],
+        "acceptedLanguages": [
+          "JavaScript",
+          "Python",
+          "TypeScript",
+          "Rust",
+          "C++",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
     },
     {
-      "teamId": "cmdhajr3j0025e001zp02c1sv",
-      "teamName": "donerteam",
-      "teamNickname": "imba-doner-nafastapi",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Abylai Bakytzhan",
-        "email": "aby****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Abylai Bakytzhan",
-          "email": "aby****@gmail.com"
-        },
-        {
-          "name": "Ilyas",
-          "email": "iag****@gmail.com"
-        },
-        {
-          "name": "Alnur Zholdas",
-          "email": "zho****@gmail.com"
+      "id": "cmclos0rn000i99018iavu39e",
+      "name": "Alua",
+      "email": "i**********2@gmail.com",
+      "city": "Astana",
+      "company": "Mn partners",
+      "telegram": "@alua_d",
+      "githubUrl": "https://github.com/infinity4747",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Monitoring as a Service\",\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T08:20:05.987Z",
+      "team": {
+        "id": "cmclll5rn0006d001g5n7knxs",
+        "name": "MN Partners",
+        "nickname": "mnp",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 5
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:24.040Z",
-          "updatedAt": "2025-08-07T18:00:24.040Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/imba-doner-nafastapi",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:12.787Z",
-          "updatedAt": "2025-08-12T16:36:12.787Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcki6w0400007i012vogppai",
-      "teamName": "drim-dev",
-      "teamNickname": "drim-dev",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Дмитрий Мельник",
-        "email": "dmt****@gmail.com"
-      },
-      "memberCount": 2,
-      "members": [
-        {
-          "name": "Stanislav",
-          "email": "bel****@gmail.com"
-        },
-        {
-          "name": "Дмитрий Мельник",
-          "email": "dmt****@gmail.com"
+      "id": "cmcm6r33e00179901vtcd3d9i",
+      "name": "Батыр",
+      "email": "b***********v@gmail.com",
+      "city": "Астана",
+      "company": "MN Partners",
+      "telegram": "@Kenzhaev_B",
+      "githubUrl": "https://github.com/bKenjaev",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"VK Cloud\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T16:43:15.435Z",
+      "team": {
+        "id": "cmclll5rn0006d001g5n7knxs",
+        "name": "MN Partners",
+        "nickname": "mnp",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 5
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmdham77b0026bz01fcz4a3fd",
-      "teamName": "helloalem",
-      "teamNickname": "alem",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Abylaikhan Zulbukharov",
-        "email": "l1p****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Alimukhamed Tlekbai",
-          "email": "ali****@gmail.com"
-        },
-        {
-          "name": "Abylaikhan Zulbukharov",
-          "email": "l1p****@gmail.com"
-        },
-        {
-          "name": "Dias Kappassov",
-          "email": "dia****@gmail.com"
+      "id": "cmcllok1u000a9901hk2054w0",
+      "name": "Дархан",
+      "email": "d***************6@gmail.com",
+      "city": "Астана",
+      "company": "MN Partners",
+      "telegram": "@lcwhitelily",
+      "githubUrl": "https://github.com/WhiteLilyS",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\",\"SmartCloud\",\"Oblako.kz\",\"Cloud24\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T06:53:25.506Z",
+      "team": {
+        "id": "cmclll5rn0006d001g5n7knxs",
+        "name": "MN Partners",
+        "nickname": "mnp",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 5
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "599778",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:25.804Z",
-          "updatedAt": "2025-08-11T18:15:14.883Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/alem",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:18.769Z",
-          "updatedAt": "2025-08-12T16:36:18.769Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcnulnb7001yd001r9sdm47u",
-      "teamName": "kruzenshtern",
-      "teamNickname": "kruzenshtern2",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Zhalgas",
-        "email": "jal****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Zhalgas",
-          "email": "jal****@gmail.com"
+      "id": "cmcllz2gc000bd001tyi66tq6",
+      "name": "Жасулан",
+      "email": "z********1@gmail.com",
+      "city": "Астана",
+      "company": "MN Partners",
+      "telegram": "https://t.me/DAYLOR",
+      "githubUrl": "https://github.com/DAYLOR01",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"PS Cloud Services\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Не используем облачные технологии\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T07:01:35.916Z",
+      "team": {
+        "id": "cmclll5rn0006d001g5n7knxs",
+        "name": "MN Partners",
+        "nickname": "mnp",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 5
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcwdzpr6001pas01v5n4rkhs",
-      "teamName": "kz.cdcvmm",
-      "teamNickname": "cdcvmm",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Константин",
-        "email": "zhi****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Константин",
-          "email": "zhi****@gmail.com"
+      "id": "cmclll5rq0008d0017wo2wdos",
+      "name": "Султанбек",
+      "email": "s****************v@gmail.com",
+      "city": "Астана",
+      "company": "MN Partners",
+      "telegram": "@kh_slt",
+      "githubUrl": "https://github.com/fring02",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Oblako.kz\",\"Cloud24\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Database as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T06:50:47.030Z",
+      "team": {
+        "id": "cmclll5rn0006d001g5n7knxs",
+        "name": "MN Partners",
+        "nickname": "mnp",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 5
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmd7h5skf00015i01a8ls9e60",
-      "teamName": "los-lobos",
-      "teamNickname": "los-lobos",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Sultan Yelikbayev",
-        "email": "sul****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Sultan Yelikbayev",
-          "email": "sul****@gmail.com"
-        },
-        {
-          "name": "Илимбек",
-          "email": "ili****@gmail.com"
-        },
-        {
-          "name": "Adilzhan Mustafin",
-          "email": "adi****@mail.ru"
-        },
-        {
-          "name": "Алихан",
-          "email": "ali****@gmail.com"
-        }
+      "id": "cme8ppkz404qgb6496d8y88vb",
+      "name": "Dauren",
+      "email": "m*******0@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": "https://t.me/GinkoGintoki",
+      "githubUrl": "https://github.com/GinkoGintoki",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "Go"
       ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "746261",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:28.255Z",
-          "updatedAt": "2025-08-12T11:58:03.997Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/los-lobos",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:26.150Z",
-          "updatedAt": "2025-08-12T16:36:26.150Z"
+      "databases": [
+        "PostgreSQL",
+        "MongoDB"
+      ],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\"]",
+      "cloudProviders": "[]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-08-12T15:44:36.208Z",
+      "team": {
+        "id": "cmcnezvgh001h9901o5avkwhc",
+        "name": "MetaLoad",
+        "nickname": "metaload-akbori",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ]
+      }
     },
     {
-      "teamId": "cmdh4avfv000jbz0101mcul2w",
-      "teamName": "nxnames",
-      "teamNickname": "team-nxnames",
-      "teamStatus": "REJECTED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "amiosamu",
-        "email": "dam****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "amiosamu",
-          "email": "dam****@gmail.com"
-        }
+      "id": "cmcnezvgk001j9901ab847b4w",
+      "name": "Баят",
+      "email": "t*******v@gmail.com",
+      "city": "Астана",
+      "company": "ТОО Proper Solutions",
+      "telegram": "@akbori",
+      "githubUrl": "https://github.com/bayat",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "JavaScript",
+        "Java"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "MongoDB",
+        "Oracle",
+        "Redis"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Офисные приложения (ЭДО / почта)\",\"Базы данных\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"KT Cloud Lab\"]",
+      "cloudServices": "[\"Не используем облачные технологии\",\"Затрудняюсь ответить\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-03T13:21:48.548Z",
+      "team": {
+        "id": "cmcnezvgh001h9901o5avkwhc",
+        "name": "MetaLoad",
+        "nickname": "metaload-akbori",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmdiy5033000cb501ydlsyeln",
-      "teamName": "omar and askha prince",
-      "teamNickname": "prince",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Andrey Komarov (sup)",
-        "email": "sup****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Andrey Komarov (sup)",
-          "email": "sup****@gmail.com"
+      "id": "cmcoe81ve001o9901n9r62oue",
+      "name": "Дармен",
+      "email": "d************z@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/darmen-kariboz",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-04T05:47:56.667Z",
+      "team": {
+        "id": "cmcnezvgh001h9901o5avkwhc",
+        "name": "MetaLoad",
+        "nickname": "metaload-akbori",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcvxuxm00015as01fp5qi0hc",
-      "teamName": "psycho-coders",
-      "teamNickname": "psycho-coders",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Din",
-        "email": "dim****@gmail.com"
-      },
-      "memberCount": 2,
-      "members": [
-        {
-          "name": "Din",
-          "email": "dim****@gmail.com"
-        },
-        {
-          "name": "Berdibek",
-          "email": "kbe****@gmail.com"
-        }
+      "id": "cme72jowt00l59k47rodi527d",
+      "name": "Диас",
+      "email": "m******l@gmail.com",
+      "city": "Астана",
+      "company": "ТОО Proper Solutions",
+      "telegram": "@dtes007",
+      "githubUrl": "https://github.com/dtes",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "JavaScript",
+        "Java",
+        "Go"
       ],
-      "environmentVariables": []
+      "databases": [
+        "PostgreSQL",
+        "MongoDB"
+      ],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"PS Cloud Services\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-08-11T12:08:24.030Z",
+      "team": {
+        "id": "cmcnezvgh001h9901o5avkwhc",
+        "name": "MetaLoad",
+        "nickname": "metaload-akbori",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
     },
     {
-      "teamId": "cmd5mtk01001w8d01j8e7rlfv",
-      "teamName": "stfmt.gorilla/net/http",
-      "teamNickname": "copilot-grandmasters",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Kassymkhan Talgatuly",
-        "email": "kas****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Aibek Meirkhanov",
-          "email": "aib****@gmail.com"
-        },
-        {
-          "name": "Нуралы Жоламан",
-          "email": "zol****@gmail.com"
-        },
-        {
-          "name": "Kassymkhan Talgatuly",
-          "email": "kas****@gmail.com"
+      "id": "cmcoyvy4300059s0140rchtxh",
+      "name": "Sabina",
+      "email": "s****************a@gmail.com",
+      "city": "Almaty",
+      "company": null,
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Другое\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Другое\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-04T15:26:23.859Z",
+      "team": {
+        "id": "cmcoyhcgu00009s015kuk9iw6",
+        "name": "Mission: Implausible",
+        "nickname": "Mis-Imp",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:28.799Z",
-          "updatedAt": "2025-08-07T18:00:28.799Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/copilot-grandmasters",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:32.373Z",
-          "updatedAt": "2025-08-12T16:36:32.373Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmd2xdqdm00082501f9ujhiiz",
-      "teamName": "vibe-coders",
-      "teamNickname": "vibe-coders",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Gabdylgaziz Zhagypar",
-        "email": "g_z****@kbtu.kz"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "AIBEK",
-          "email": "pig****@gmail.com"
-        },
-        {
-          "name": "Marif",
-          "email": "mar****@yandex.ru"
-        },
-        {
-          "name": "Gabdylgaziz Zhagypar",
-          "email": "g_z****@kbtu.kz"
+      "id": "cmcoyhci000029s01neg5m0ju",
+      "name": "Амир",
+      "email": "r**********3@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@sunlitdev",
+      "githubUrl": "https://github.com/rmvxmir",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-04T15:15:02.664Z",
+      "team": {
+        "id": "cmcoyhcgu00009s015kuk9iw6",
+        "name": "Mission: Implausible",
+        "nickname": "Mis-Imp",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:29.292Z",
-          "updatedAt": "2025-08-07T18:00:29.292Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/vibe-coders",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:38.853Z",
-          "updatedAt": "2025-08-12T16:36:38.853Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmdecb097004kc201xh4571uz",
-      "teamName": "winterfell",
-      "teamNickname": "winterfell",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Амир",
-        "email": "isl****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Амир",
-          "email": "isl****@gmail.com"
+      "id": "cmcoyzgnb00089s01zsebw74w",
+      "name": "Сымбат",
+      "email": "s*******d@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-04T15:29:07.847Z",
+      "team": {
+        "id": "cmcoyhcgu00009s015kuk9iw6",
+        "name": "Mission: Implausible",
+        "nickname": "Mis-Imp",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcvydsj4001aas01rjw6qb3g",
-      "teamName": "zloi",
-      "teamNickname": "#0000FF",
-      "teamStatus": "NEW",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Manas",
-        "email": "ole****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Manas",
-          "email": "ole****@gmail.com"
+      "id": "cmcn4lrfa001ld0012bu1dsn2",
+      "name": "Afanasii",
+      "email": "a*************n@gmail.com",
+      "city": "Almaty",
+      "company": "Kaspi",
+      "telegram": "@tether757",
+      "githubUrl": "https://github.com/tether757",
+      "linkedinUrl": "https://www.linkedin.com/in/afanasii-ptitsyn-635821229/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Другое\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-03T08:30:53.974Z",
+      "team": {
+        "id": "cmd37je7500019g01woxlwoc7",
+        "name": "NullPointerException",
+        "nickname": "NPE",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmdbuh806000oa601boo94ux5",
-      "teamName": "Булбул",
-      "teamNickname": "Bulbul",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Nurmyshev Serik",
-        "email": "s.n****@gmail.com"
-      },
-      "memberCount": 4,
-      "members": [
-        {
-          "name": "Raimbek",
-          "email": "rai****@gmail.com"
-        },
-        {
-          "name": "Serik Shaikamalov",
-          "email": "ser****@gmail.com"
-        },
-        {
-          "name": "Nurmyshev Serik",
-          "email": "s.n****@gmail.com"
-        },
-        {
-          "name": "Айдос Алибек",
-          "email": "ali****@gmail.com"
+      "id": "cmcm0my3900129901sbw0h0zd",
+      "name": "Sarvar",
+      "email": "m*********8@gmail.com",
+      "city": "Almaty",
+      "company": "AmanIT",
+      "telegram": "@doubletrbl",
+      "githubUrl": "https://github.com/404server",
+      "linkedinUrl": "https://www.linkedin.com/in/sarvar-saidazov/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Database as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T13:52:04.630Z",
+      "team": {
+        "id": "cmd37je7500019g01woxlwoc7",
+        "name": "NullPointerException",
+        "nickname": "NPE",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "494103",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:30.004Z",
-          "updatedAt": "2025-08-11T09:36:41.071Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/Bulbul",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:46.569Z",
-          "updatedAt": "2025-08-12T16:36:46.569Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcnnbfpn001sd001y8f8ocy1",
-      "teamName": "Вайб кодинг",
-      "teamNickname": "VibeCode",
-      "teamStatus": "APPROVED",
-      "teamLevel": "BEGINNER",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Алишер ",
-        "email": "ali****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Jasulan Delegat",
-          "email": "ale****@gmail.com"
-        },
-        {
-          "name": "Алишер ",
-          "email": "ali****@gmail.com"
-        },
-        {
-          "name": "Tair",
-          "email": "tai****@gmail.com"
+      "id": "cmcm13q810017d001qc5flr5d",
+      "name": "Азамат",
+      "email": "a**************v@gmail.com",
+      "city": "Алматы",
+      "company": "Equator ",
+      "telegram": "@azamat_shauyenbekov",
+      "githubUrl": "https://github.com/kitarooo",
+      "linkedinUrl": "https://www.linkedin.com/in/azamat-shauyenbekov",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T14:05:07.585Z",
+      "team": {
+        "id": "cmd37je7500019g01woxlwoc7",
+        "name": "NullPointerException",
+        "nickname": "NPE",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "Заполни меня",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:30.639Z",
-          "updatedAt": "2025-08-07T18:00:30.639Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/VibeCode",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:36:53.687Z",
-          "updatedAt": "2025-08-12T16:36:53.687Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmcm6u9qv001fd0018ri31n4s",
-      "teamName": "Новая команда 4",
-      "teamNickname": "Make",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "MAGZHAN",
-        "email": "ama****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "MAGZHAN",
-          "email": "ama****@gmail.com"
+      "id": "cmclxiq0m00109901tjmnnfq3",
+      "name": "Акмаль",
+      "email": "a*******3@gmail.com",
+      "city": "Шымкент",
+      "company": "Radar payments",
+      "telegram": "@akmal_rakhim",
+      "githubUrl": "https://github.com/Akmal22",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Monitoring as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T12:24:48.694Z",
+      "team": {
+        "id": "cmd37je7500019g01woxlwoc7",
+        "name": "NullPointerException",
+        "nickname": "NPE",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmdh6r5e5000wbz01395splmc",
-      "teamName": "Че там",
-      "teamNickname": "che-tam",
-      "teamStatus": "APPROVED",
-      "teamLevel": "ADVANCED",
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Abzalkhan Ondakanov",
-        "email": "abz****@gmail.com"
-      },
-      "memberCount": 3,
-      "members": [
-        {
-          "name": "Ruslan Bazarbayev",
-          "email": "baz****@gmail.com"
-        },
-        {
-          "name": "Abzalkhan Ondakanov",
-          "email": "abz****@gmail.com"
-        },
-        {
-          "name": "Zanggar Kambekov",
-          "email": "zan****@gmail.com"
+      "id": "cmd5jt1ow000l7w01skukcpcb",
+      "name": "Roman Yurchenko",
+      "email": "l*********r@gmail.com",
+      "city": "Almaty",
+      "company": null,
+      "telegram": "https://t.me/luckytyper_reboot",
+      "githubUrl": "https://github.com/luckytypr",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Cloud24\",\"SmartCloud\",\"Yandex Cloud\",\"Oblako.kz\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-16T05:56:19.280Z",
+      "team": {
+        "id": "cmclm61tu000dd001btqrk9wq",
+        "name": "Octopussy",
+        "nickname": "OCTP",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": [
-        {
-          "key": "PSID",
-          "value": "745673",
-          "description": "ID Платежного аккаунта PS.KZ",
-          "category": "cloud",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-07T18:00:31.857Z",
-          "updatedAt": "2025-08-11T09:01:13.629Z"
-        },
-        {
-          "key": "Repo",
-          "value": "https://github.com/hackload-kz/che-tam",
-          "description": "Репозиторий для хранения кода в рамках хакатона",
-          "category": "development",
-          "isSecure": false,
-          "isEditable": true,
-          "createdAt": "2025-08-12T16:37:00.648Z",
-          "updatedAt": "2025-08-12T16:37:00.648Z"
-        }
-      ]
+      }
     },
     {
-      "teamId": "cmct4v36i0003dw01dkdnicxf",
-      "teamName": "Я только потестировать",
-      "teamNickname": "testing",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "NoGamer",
-        "email": "wel****@mysummit.school"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "NoGamer",
-          "email": "wel****@mysummit.school"
+      "id": "cmclmdgv3000f9901j7y6luo1",
+      "name": "Азамат Базарбай",
+      "email": "a***************7@gmail.com",
+      "city": "Almaty",
+      "company": null,
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T07:12:47.776Z",
+      "team": {
+        "id": "cmclm61tu000dd001btqrk9wq",
+        "name": "Octopussy",
+        "nickname": "OCTP",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
-      ],
-      "environmentVariables": []
+      }
     },
     {
-      "teamId": "cmcp1eyyo00099s01i70l34s1",
-      "teamName": "восьмиклассники ",
-      "teamNickname": "8th-graders",
-      "teamStatus": "REJECTED",
-      "teamLevel": null,
-      "hackathon": "HackLoad 2025",
-      "leader": {
-        "name": "Даурен Баймурза ",
-        "email": "hay****@gmail.com"
-      },
-      "memberCount": 1,
-      "members": [
-        {
-          "name": "Даурен Баймурза ",
-          "email": "hay****@gmail.com"
+      "id": "cmclm61tx000fd0017n7rz4l9",
+      "name": "Амерлан",
+      "email": "a**************v@gmail.com",
+      "city": "Алматы",
+      "company": "Oitech",
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-02T07:07:01.701Z",
+      "team": {
+        "id": "cmclm61tu000dd001btqrk9wq",
+        "name": "Octopussy",
+        "nickname": "OCTP",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
         }
+      }
+    },
+    {
+      "id": "cmclmayec000hd00129iwvm1d",
+      "name": "Тимур Кудайбергенов",
+      "email": "m******a@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "https://t.me/Timadude",
+      "githubUrl": "https://github.com/mndrake95",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Python"
       ],
-      "environmentVariables": []
+      "databases": [
+        "SQLite",
+        "MySQL"
+      ],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T07:10:50.532Z",
+      "team": {
+        "id": "cmclm61tu000dd001btqrk9wq",
+        "name": "Octopussy",
+        "nickname": "OCTP",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmd5i9j7p001k8d01glp1yr8l",
+      "name": "Alibek Bakdaulet",
+      "email": "a*************t@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@auchiha",
+      "githubUrl": "https://github.com/Azilagor",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\"]",
+      "cloudServices": "[\"Infrastructure as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-16T05:13:09.253Z",
+      "team": {
+        "id": "cmd5ia7rc000g7w01wwhjzm9h",
+        "name": "OyuTeam",
+        "nickname": "oyu",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdn0u7yn000a6p01im78m75c",
+      "name": "Damir Mertl",
+      "email": "d**********v@aues.kz",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/k1lst1x",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-28T11:25:12.527Z",
+      "team": {
+        "id": "cmd5ia7rc000g7w01wwhjzm9h",
+        "name": "OyuTeam",
+        "nickname": "oyu",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdfnk2gl004yc2014uwsucf0",
+      "name": "Глеб Тараканов",
+      "email": "g*****d@gmail.com",
+      "city": "Алматы",
+      "company": "Onaidocs",
+      "telegram": "@gleb_tarakanov0",
+      "githubUrl": "https://github.com/itsuldana",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-23T07:39:00.597Z",
+      "team": {
+        "id": "cmd5ia7rc000g7w01wwhjzm9h",
+        "name": "OyuTeam",
+        "nickname": "oyu",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd64usk300036q01q5axh63w",
+      "name": "Abu Said Manap",
+      "email": "a***********p@gmail.com",
+      "city": "Astana",
+      "company": "DAR Tech",
+      "telegram": "@abunyawa",
+      "githubUrl": "https://github.com/Abunyawa",
+      "linkedinUrl": "https://www.linkedin.com/in/abu-said-manap-4289061b1/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Всё перечисленное (частично)\"]",
+      "cloudProviders": "[\"PS Cloud Services\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-16T15:45:32.691Z",
+      "team": {
+        "id": "cmd5zxyr400076u0108kh5n3b",
+        "name": "Qaskeleng most wanted",
+        "nickname": "qaskeleng-most-wanted",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd5zv16k00016u01agm7ye2p",
+      "name": "Arystan Bissimbayev",
+      "email": "b*****************n@gmail.com",
+      "city": "Астана",
+      "company": "Yandex",
+      "telegram": "@aarst",
+      "githubUrl": "https://github.com/wowarys",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "Python"
+      ],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\",\"PS Cloud Services\"]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-16T13:25:45.788Z",
+      "team": {
+        "id": "cmd5zxyr400076u0108kh5n3b",
+        "name": "Qaskeleng most wanted",
+        "nickname": "qaskeleng-most-wanted",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd8fgt52000za601n9xt7yvz",
+      "name": "Sungkar Daulet",
+      "email": "d************r@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/dauletsungkar",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-18T06:18:08.390Z",
+      "team": {
+        "id": "cmd5zxyr400076u0108kh5n3b",
+        "name": "Qaskeleng most wanted",
+        "nickname": "qaskeleng-most-wanted",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhicixz003xbz01s2i70xyf",
+      "name": "Akhmetzhan Kussainov",
+      "email": "k******************n@gmail.com",
+      "city": "Алматы",
+      "company": "Snoonu",
+      "telegram": "@a_kussainov",
+      "githubUrl": "https://github.com/a-kussainov",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "C#",
+        "C++",
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "SQL Server"
+      ],
+      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-24T14:48:42.983Z",
+      "team": {
+        "id": "cmdebcvuk003yc201jbsui6w2",
+        "name": "Snoonu team",
+        "nickname": "snoonu-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "C#"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmdeai48t003rc201pkrb70le",
+      "name": "Sergey Kuzmin",
+      "email": "k********f@gmail.com",
+      "city": "Алматы",
+      "company": "Snoonu",
+      "telegram": "@fortmon",
+      "githubUrl": "https://github.com/kuzminsd",
+      "linkedinUrl": "https://www.linkedin.com/in/sergey-kuzmin-05839b244/",
+      "programmingLanguages": [
+        "C#"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "SQL Server"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Oblako.kz\"]",
+      "cloudServices": "[\"Monitoring as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-22T08:45:48.413Z",
+      "team": {
+        "id": "cmdebcvuk003yc201jbsui6w2",
+        "name": "Snoonu team",
+        "nickname": "snoonu-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "C#"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmdiqfrb6000f9u010aakogiy",
+      "name": "Андрей Суховицкий",
+      "email": "a***********a@gmail.com",
+      "city": "Санкт-Петербург",
+      "company": null,
+      "telegram": "@sukhoa",
+      "githubUrl": "https://github.com/andrsuh",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "Python"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "SQL Server"
+      ],
+      "technologies": "[\"Базы данных\"]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Principal / Staff Engineer / Expert",
+      "description": null,
+      "createdAt": "2025-07-25T11:22:56.898Z",
+      "team": {
+        "id": "cmdebcvuk003yc201jbsui6w2",
+        "name": "Snoonu team",
+        "nickname": "snoonu-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "C#"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmdipq9qs00099u01eg4x9of4",
+      "name": "Лена Макарова",
+      "email": "k*******t@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/Kaorinait",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL"
+      ],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-25T11:03:07.732Z",
+      "team": {
+        "id": "cmdebcvuk003yc201jbsui6w2",
+        "name": "Snoonu team",
+        "nickname": "snoonu-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "C#"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcm0qbnt0014d0013xfkx1rt",
+      "name": "Каныш",
+      "email": "k***********k@gmail.com",
+      "city": "Шымкент",
+      "company": "КБТУ",
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\",\"Cloud24\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Не используем облачные технологии\",\"Database as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T13:54:42.185Z",
+      "team": {
+        "id": "cmcm0qbnp0012d001scd8nr9y",
+        "name": "Texas Developer Group",
+        "nickname": "teD-G",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd4c7gyn001l9g01yhe2dv6r",
+      "name": "Никита",
+      "email": "h******b@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "https://t.me/rar2000q",
+      "githubUrl": "https://github.com/Mikita-ala",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "C++"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "SQLite"
+      ],
+      "technologies": "[\"Базы данных\",\"Web-приложения / Backend\",\"Офисные приложения (ЭДО / почта)\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\",\"Monitoring as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-15T09:35:49.152Z",
+      "team": {
+        "id": "cmcm0qbnp0012d001scd8nr9y",
+        "name": "Texas Developer Group",
+        "nickname": "teD-G",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmcm52ji2001dd001ksxjep4s",
+      "name": "Ракымжан",
+      "email": "r************1@gmail.com",
+      "city": "Алматы",
+      "company": "-",
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Oblako.kz\",\"Cloud24\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Database as a Service\",\"Kubernetes as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-02T15:56:10.683Z",
+      "team": {
+        "id": "cmcm0qbnp0012d001scd8nr9y",
+        "name": "Texas Developer Group",
+        "nickname": "teD-G",
+        "level": null,
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhfenz5003qbz01tckxrx6o",
+      "name": "Aknur",
+      "email": "w************a@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "@whiteeray",
+      "githubUrl": "https://github.com/WhiteeRay",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-24T13:26:23.969Z",
+      "team": {
+        "id": "cmdhcrj3k0036e0010lsglclf",
+        "name": "Webnetic Systems",
+        "nickname": "webnetic-systems",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "TypeScript",
+          "JavaScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhb6c950038bz01ti43en4l",
+      "name": "Mansur",
+      "email": "r**********4@gmail.com",
+      "city": "Нур-Султан",
+      "company": null,
+      "telegram": "@scrameee",
+      "githubUrl": "https://github.com/ItsXomyak",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "TypeScript",
+        "JavaScript"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "MongoDB"
+      ],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-24T11:27:57.065Z",
+      "team": {
+        "id": "cmdhcrj3k0036e0010lsglclf",
+        "name": "Webnetic Systems",
+        "nickname": "webnetic-systems",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "TypeScript",
+          "JavaScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhcvsgw003ae001fvz3grk2",
+      "name": "Nurasyl Orazbek",
+      "email": "n*********1@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "@nurasyl_orazbek",
+      "githubUrl": "https://github.com/nurashi",
+      "linkedinUrl": "https://www.linkedin.com/in/nurasyl-orazbek/",
+      "programmingLanguages": [
+        "Java",
+        "Go",
+        "C++",
+        "Python"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-24T12:15:44.096Z",
+      "team": {
+        "id": "cmdhcrj3k0036e0010lsglclf",
+        "name": "Webnetic Systems",
+        "nickname": "webnetic-systems",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "TypeScript",
+          "JavaScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmcvz902z001has01iuumdp4p",
+      "name": "Dilshod",
+      "email": "a*************d@gmail.com",
+      "city": "Samarqand",
+      "company": "Unicon-Soft LLC",
+      "telegram": "@doinoss",
+      "githubUrl": "https://github.com/dilshodturab",
+      "linkedinUrl": "https://linkedin.com/in/dilshodturab",
+      "programmingLanguages": [
+        "JavaScript",
+        "TypeScript",
+        "Rust"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "MongoDB"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Disaster Recovery as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Не используем облачные технологии\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-09T13:10:56.171Z",
+      "team": {
+        "id": "cmcvymsu9001eas0149756ecu",
+        "name": "Xattab Team",
+        "nickname": "xattab-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmclqbuuw000o9901cmg4xnl6",
+      "name": "Diyorbek",
+      "email": "b*******b@gmail.com",
+      "city": "Tashkent, Uzbekistan",
+      "company": "payme.uz",
+      "telegram": "@Rustamjonov_Diyorbek",
+      "githubUrl": "https://github.com/diyorbekrustamjonov",
+      "linkedinUrl": "https://www.linkedin.com/in/diyorbekrustamjonov/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-02T09:03:31.065Z",
+      "team": {
+        "id": "cmcvymsu9001eas0149756ecu",
+        "name": "Xattab Team",
+        "nickname": "xattab-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcvzov8g000eay01ct34udk6",
+      "name": "Zikrulloh",
+      "email": "f***********h@yandex.com",
+      "city": "Tashkent",
+      "company": "Payme Uz",
+      "telegram": null,
+      "githubUrl": null,
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Офисные приложения (ЭДО / почта)\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-09T13:23:16.384Z",
+      "team": {
+        "id": "cmcvymsu9001eas0149756ecu",
+        "name": "Xattab Team",
+        "nickname": "xattab-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcw6xfv4000tay01r3oblofx",
+      "name": "Жандос",
+      "email": "z******************v@gmail.com",
+      "city": "Astana",
+      "company": "Ikap",
+      "telegram": "@zhandos717",
+      "githubUrl": "https://github.com/zhandos717",
+      "linkedinUrl": "https://www.linkedin.com/in/zhandos-zhandarbek-6b61831b4/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\",\"Всё перечисленное (частично)\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Oblako.kz\",\"Hoster.KZ\",\"SmartCloud\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Database as a Service\",\"Monitoring as a Service\",\"Backup as a Service\",\"Disaster Recovery as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-09T16:45:53.680Z",
+      "team": {
+        "id": "cmcvymsu9001eas0149756ecu",
+        "name": "Xattab Team",
+        "nickname": "xattab-team",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmde5pbex003kc2013hgnatbs",
+      "name": "Rakhat Meiramov",
+      "email": "m*************t@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/RakhatMM",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-22T06:31:26.217Z",
+      "team": {
+        "id": "cmdhlmcvw004nbz014flxxwd3",
+        "name": "ZeroDowntime",
+        "nickname": "zero-downtime",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Spring",
+          "Django",
+          "Angular"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "TypeScript",
+          "Python"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdearwcl003ca601js50hkm3",
+      "name": "Temirlan Nurbay",
+      "email": "n************5@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/nurbay-t",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL"
+      ],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-22T08:53:24.742Z",
+      "team": {
+        "id": "cmdhlmcvw004nbz014flxxwd3",
+        "name": "ZeroDowntime",
+        "nickname": "zero-downtime",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Spring",
+          "Django",
+          "Angular"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "TypeScript",
+          "Python"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhkabt4004hbz01qzvrcvm8",
+      "name": "Ердиас Талгатов",
+      "email": "e*******9@gmail.com",
+      "city": "Астана",
+      "company": "RCEH",
+      "telegram": "@yerdias0356",
+      "githubUrl": "https://github.com/telega555",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL"
+      ],
+      "technologies": "[]",
+      "cloudProviders": "[\"Yandex Cloud\",\"VK Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-24T15:42:59.656Z",
+      "team": {
+        "id": "cmdhlmcvw004nbz014flxxwd3",
+        "name": "ZeroDowntime",
+        "nickname": "zero-downtime",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "Spring",
+          "Django",
+          "Angular"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "TypeScript",
+          "Python"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdert2vl004sc201mzx89wqp",
+      "name": "Abylai Bakytzhan",
+      "email": "a********a@gmail.com",
+      "city": "Almaty",
+      "company": "Yoko",
+      "telegram": "@lubasu",
+      "githubUrl": "http://github.com/lubas1337",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "Java",
+        "TypeScript",
+        "JavaScript"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"PS Cloud Services\",\"NLS Kazakhstan\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-22T16:50:13.329Z",
+      "team": {
+        "id": "cmdhajr3j0025e001zp02c1sv",
+        "name": "donerteam",
+        "nickname": "imba-doner-nafastapi",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhas77z002xe0018ykwywhz",
+      "name": "Alnur Zholdas",
+      "email": "z***********r@gmail.com",
+      "city": "Almaty",
+      "company": null,
+      "telegram": "@bmwyy",
+      "githubUrl": "https://github.com/aS4meone",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Python",
+        "TypeScript",
+        "JavaScript"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Backup as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-24T11:16:57.360Z",
+      "team": {
+        "id": "cmdhajr3j0025e001zp02c1sv",
+        "name": "donerteam",
+        "nickname": "imba-doner-nafastapi",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhanxx3002qbz01of8sv8wn",
+      "name": "Ilyas",
+      "email": "i********1@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "iagadilov",
+      "githubUrl": "https://github.com/l1lgadil1",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "JavaScript",
+        "TypeScript",
+        "Python"
+      ],
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "MongoDB",
+        "SQLite",
+        "SQL Server",
+        "Firebase"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"VK Cloud\",\"Cloud24\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Database as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": "vibe code vibe life ",
+      "createdAt": "2025-07-24T11:13:38.679Z",
+      "team": {
+        "id": "cmdhajr3j0025e001zp02c1sv",
+        "name": "donerteam",
+        "nickname": "imba-doner-nafastapi",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Python",
+          "TypeScript"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhaftu9001mbz01wooc483c",
+      "name": "Abylaikhan Zulbukharov",
+      "email": "l********5@gmail.com",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/zulbukharov",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-24T11:07:20.145Z",
+      "team": {
+        "id": "cmdham77b0026bz01fcz4a3fd",
+        "name": "helloalem",
+        "nickname": "alem",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "React",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhajgph001ubz01ih040olm",
+      "name": "Alimukhamed Tlekbai",
+      "email": "a*********i@gmail.com",
+      "city": "Астана",
+      "company": "Doodocs.kz",
+      "telegram": "@atlekbai",
+      "githubUrl": "https://github.com/atlekbai",
+      "linkedinUrl": "https://www.linkedin.com/in/atlekbai/",
+      "programmingLanguages": [
+        "Go",
+        "Python"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "SQLite",
+        "Redis"
+      ],
+      "technologies": "[\"Офисные приложения (ЭДО / почта)\",\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Database as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-24T11:10:09.749Z",
+      "team": {
+        "id": "cmdham77b0026bz01fcz4a3fd",
+        "name": "helloalem",
+        "nickname": "alem",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "React",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhakcsx0020bz01v07wp60u",
+      "name": "Dias Kappassov",
+      "email": "d***********v@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "@diaskappassov",
+      "githubUrl": "https://github.com/Dias1c",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Go",
+        "TypeScript",
+        "JavaScript"
+      ],
+      "databases": [
+        "PostgreSQL"
+      ],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-24T11:10:51.345Z",
+      "team": {
+        "id": "cmdham77b0026bz01fcz4a3fd",
+        "name": "helloalem",
+        "nickname": "alem",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Docker",
+          "React",
+          "Kubernetes"
+        ],
+        "acceptedLanguages": [
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd4iu0bn00047w016v764gf1",
+      "name": "Adilzhan Mustafin",
+      "email": "a*******4@mail.ru",
+      "city": "Алматы",
+      "company": "S1lk Pay",
+      "telegram": "@m0ku5atsu",
+      "githubUrl": "https://github.com/AdilzhanTheGreat",
+      "linkedinUrl": "https://www.linkedin.com/in/adilzhan-mustafin-3b12552a5/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Hoster.KZ\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\",\"Kubernetes as a Service\",\"Disaster Recovery as a Service\",\"Monitoring as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-15T12:41:18.371Z",
+      "team": {
+        "id": "cmd7h5skf00015i01a8ls9e60",
+        "name": "los-lobos",
+        "nickname": "los-lobos",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcq3yebq000g9s017lyvqn99",
+      "name": "Sultan Yelikbayev",
+      "email": "s**************v@gmail.com",
+      "city": "Almaty",
+      "company": "Airba Group",
+      "telegram": "@yelSul",
+      "githubUrl": "https://github.com/ZakirAvrora",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Cloud24\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Infrastructure as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-05T10:36:02.438Z",
+      "team": {
+        "id": "cmd7h5skf00015i01a8ls9e60",
+        "name": "los-lobos",
+        "nickname": "los-lobos",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcrd16jl0006b001ie37rjmb",
+      "name": "Алихан",
+      "email": "a***************6@gmail.com",
+      "city": "Астана",
+      "company": "Freedom Ticketon (новый Тикетон)",
+      "telegram": "@kubigator",
+      "githubUrl": "https://github.com/asharapat",
+      "linkedinUrl": "https://www.linkedin.com/in/alikhan-sharapat-430b06129/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Cloud24\",\"Yandex Cloud\",\"VK Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-06T07:37:55.042Z",
+      "team": {
+        "id": "cmd7h5skf00015i01a8ls9e60",
+        "name": "los-lobos",
+        "nickname": "los-lobos",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmd7il15l000e5i01pmts2ha8",
+      "name": "Илимбек",
+      "email": "i******************0@gmail.com",
+      "city": "Bishkek",
+      "company": null,
+      "telegram": "@sonaasd",
+      "githubUrl": "https://github.com/g4ex4",
+      "linkedinUrl": "https://www.linkedin.com/in/g4ex",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-17T14:57:38.074Z",
+      "team": {
+        "id": "cmd7h5skf00015i01a8ls9e60",
+        "name": "los-lobos",
+        "nickname": "los-lobos",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmd2xoee0000g83012j67fa0m",
+      "name": "Aibek Meirkhanov",
+      "email": "a************v@gmail.com",
+      "city": "Алматы",
+      "company": "Halyk Bank",
+      "telegram": "mrkhnov",
+      "githubUrl": "https://github.com/mrkhnov",
+      "linkedinUrl": "https://www.linkedin.com/in/aibek-meirkhanov/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Yandex Cloud\",\"Другое\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-14T10:01:18.552Z",
+      "team": {
+        "id": "cmd5mtk01001w8d01j8e7rlfv",
+        "name": "stfmt.gorilla/net/http",
+        "nickname": "copilot-grandmasters",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd5md649001q8d01lt7e47ez",
+      "name": "Kassymkhan Talgatuly",
+      "email": "k************3@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@kassymkhn",
+      "githubUrl": "https://github.com/Kasstal",
+      "linkedinUrl": "https://www.linkedin.com/in/kassymkhan-talgatuly-a84209292/",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"PS Cloud Services\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-16T07:07:57.369Z",
+      "team": {
+        "id": "cmd5mtk01001w8d01j8e7rlfv",
+        "name": "stfmt.gorilla/net/http",
+        "nickname": "copilot-grandmasters",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd75f60100086r01xrs4d8yd",
+      "name": "Нуралы Жоламан",
+      "email": "z**********y@gmail.com",
+      "city": "Уральск",
+      "company": null,
+      "telegram": "https://t.me/qaz1wsx2edc1",
+      "githubUrl": "https://github.com/Nurikkkkkk",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": null,
+      "description": null,
+      "createdAt": "2025-07-17T08:49:09.409Z",
+      "team": {
+        "id": "cmd5mtk01001w8d01j8e7rlfv",
+        "name": "stfmt.gorilla/net/http",
+        "nickname": "copilot-grandmasters",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd2xl7i2000683019dfrzgnb",
+      "name": "AIBEK",
+      "email": "p*******e@gmail.com",
+      "city": "Алмата",
+      "company": "Halykbank",
+      "telegram": "@neo_hk",
+      "githubUrl": "https://github.com/Aibekabdi",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Затрудняюсь ответить\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-14T09:58:49.658Z",
+      "team": {
+        "id": "cmd2xdqdm00082501f9ujhiiz",
+        "name": "vibe-coders",
+        "nickname": "vibe-coders",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd2wthct00022501kshx0gml",
+      "name": "Gabdylgaziz Zhagypar",
+      "email": "g********r@kbtu.kz",
+      "city": "Almaty",
+      "company": "Halyk Bank",
+      "telegram": "@gabdyq",
+      "githubUrl": "https://github.com/gabdylgaziz",
+      "linkedinUrl": "https://www.linkedin.com/in/gabdylgaziz-zhagypar",
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Hoster.KZ\",\"Yandex Cloud\",\"Cloud24\",\"Другое\"]",
+      "cloudServices": "[\"Database as a Service\",\"Infrastructure as a Service\",\"Kubernetes as a Service\",\"Backup as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-14T09:37:16.061Z",
+      "team": {
+        "id": "cmd2xdqdm00082501f9ujhiiz",
+        "name": "vibe-coders",
+        "nickname": "vibe-coders",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd78rhty000f6r01y2dyang6",
+      "name": "Marif",
+      "email": "m******6@yandex.ru",
+      "city": null,
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/Marif226",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"VK Cloud\",\"Cloud24\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Infrastructure as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-17T10:22:43.462Z",
+      "team": {
+        "id": "cmd2xdqdm00082501f9ujhiiz",
+        "name": "vibe-coders",
+        "nickname": "vibe-coders",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdbu8uzx000dc201z04no3o2",
+      "name": "Nurmyshev Serik",
+      "email": "s*********v@gmail.com",
+      "city": "Astana",
+      "company": "Satushi",
+      "telegram": "@fanskiy",
+      "githubUrl": "https://github.com/fanskiy",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java",
+        "Go"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "MongoDB"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"PS Cloud Services\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Monitoring as a Service\"]",
+      "experienceLevel": "Lead / Tech Lead / Team Lead",
+      "description": null,
+      "createdAt": "2025-07-20T15:35:10.317Z",
+      "team": {
+        "id": "cmdbuh806000oa601boo94ux5",
+        "name": "Булбул",
+        "nickname": "Bulbul",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Node.js",
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcxaqqum0002ek018r83nfmt",
+      "name": "Raimbek",
+      "email": "r********7@gmail.com",
+      "city": "Шымкент",
+      "company": null,
+      "telegram": "@skythet",
+      "githubUrl": "https://github.com/raimdev",
+      "linkedinUrl": "https://www.linkedin.com/in/skythet/",
+      "programmingLanguages": [
+        "Go"
+      ],
+      "databases": [
+        "Redis",
+        "MySQL",
+        "PostgreSQL",
+        "MongoDB"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Yandex Cloud\",\"Oblako.kz\",\"Cloud24\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Infrastructure as a Service\",\"Database as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-10T11:20:25.967Z",
+      "team": {
+        "id": "cmdbuh806000oa601boo94ux5",
+        "name": "Булбул",
+        "nickname": "Bulbul",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Node.js",
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmdc42y8s0015a601mdbubahj",
+      "name": "Serik Shaikamalov",
+      "email": "s***************v@gmail.com",
+      "city": "Алматы",
+      "company": "ТОО HajjTravel",
+      "telegram": "@serikshaikamalov",
+      "githubUrl": "https://github.com/serikshaikamalov",
+      "linkedinUrl": "https://www.linkedin.com/in/serik-shaikamalov/",
+      "programmingLanguages": [
+        "JavaScript",
+        "TypeScript",
+        "C#",
+        "Go",
+        "Swift"
+      ],
+      "databases": [
+        "MySQL",
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "SQLite",
+        "Firebase"
+      ],
+      "technologies": "[\"Web-приложения / Backend\",\"Базы данных\"]",
+      "cloudProviders": "[\"PS Cloud Services\",\"Hoster.KZ\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Infrastructure as a Service\",\"Database as a Service\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-20T20:10:30.749Z",
+      "team": {
+        "id": "cmdbuh806000oa601boo94ux5",
+        "name": "Булбул",
+        "nickname": "Bulbul",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Node.js",
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmdihpelb0066e001vzgrbvim",
+      "name": "Айдос Алибек",
+      "email": "a**********1@gmail.com",
+      "city": "астана",
+      "company": null,
+      "telegram": null,
+      "githubUrl": "https://github.com/askbnd",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[]",
+      "cloudProviders": "[]",
+      "cloudServices": "[]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-25T07:18:30.431Z",
+      "team": {
+        "id": "cmdbuh806000oa601boo94ux5",
+        "name": "Булбул",
+        "nickname": "Bulbul",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "Node.js",
+          "React",
+          "Docker"
+        ],
+        "acceptedLanguages": [
+          "Go",
+          "Java"
+        ],
+        "_count": {
+          "members": 4
+        }
+      }
+    },
+    {
+      "id": "cmcnndrsl001wd001tixnsspl",
+      "name": "Jasulan Delegat",
+      "email": "a***************2@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "@zixxxos",
+      "githubUrl": "https://github.com/Jasulan273",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-03T17:16:33.909Z",
+      "team": {
+        "id": "cmcnnbfpn001sd001y8f8ocy1",
+        "name": "Вайб кодинг",
+        "nickname": "VibeCode",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmd8xafs500hq5i01ptdvt92f",
+      "name": "Tair",
+      "email": "t*******7@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": "@tttttairrrrr",
+      "githubUrl": "https://github.com/TairTututu",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Затрудняюсь ответить\"]",
+      "cloudProviders": "[\"Hoster.KZ\",\"VK Cloud\",\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-18T14:37:04.230Z",
+      "team": {
+        "id": "cmcnnbfpn001sd001y8f8ocy1",
+        "name": "Вайб кодинг",
+        "nickname": "VibeCode",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmcnnbfpp001ud0012h1v8yj5",
+      "name": "Алишер ",
+      "email": "a**************n@gmail.com",
+      "city": "Астана ",
+      "company": null,
+      "telegram": "@bushido111",
+      "githubUrl": "https://github.com/terfo1",
+      "linkedinUrl": null,
+      "programmingLanguages": [],
+      "databases": [],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Затрудняюсь ответить\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Junior (младший специалист)",
+      "description": null,
+      "createdAt": "2025-07-03T17:14:44.942Z",
+      "team": {
+        "id": "cmcnnbfpn001sd001y8f8ocy1",
+        "name": "Вайб кодинг",
+        "nickname": "VibeCode",
+        "level": "BEGINNER",
+        "status": "APPROVED",
+        "techStack": [],
+        "acceptedLanguages": [],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdh6hb0o000qbz01slm2bbm5",
+      "name": "Abzalkhan Ondakanov",
+      "email": "a****************v@gmail.com",
+      "city": "Алматы",
+      "company": null,
+      "telegram": "@abzalkhan00",
+      "githubUrl": "https://github.com/abzalkhan00",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
+      ],
+      "databases": [
+        "Redis",
+        "PostgreSQL",
+        "Oracle"
+      ],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Yandex Cloud\"]",
+      "cloudServices": "[\"Kubernetes as a Service\",\"Database as a Service\",\"Infrastructure as a Service\",\"Backup as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-24T09:16:30.600Z",
+      "team": {
+        "id": "cmdh6r5e5000wbz01395splmc",
+        "name": "Че там",
+        "nickname": "che-tam",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "MongoDB",
+          "Docker",
+          "Spring",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhr3l670053e001th8utd2o",
+      "name": "Ruslan Bazarbayev",
+      "email": "b************s@gmail.com",
+      "city": "Astana",
+      "company": null,
+      "telegram": "https://t.me/vossilly",
+      "githubUrl": "https://github.com/bazeeko",
+      "linkedinUrl": "https://www.linkedin.com/in/rbazarbayev",
+      "programmingLanguages": [
+        "Go",
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis",
+        "SQLite"
+      ],
+      "technologies": "[\"Не используем облачные технологии\"]",
+      "cloudProviders": "[\"Hoster.KZ\"]",
+      "cloudServices": "[\"Не используем облачные технологии\"]",
+      "experienceLevel": "Senior (ведущий специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-24T18:53:42.511Z",
+      "team": {
+        "id": "cmdh6r5e5000wbz01395splmc",
+        "name": "Че там",
+        "nickname": "che-tam",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "MongoDB",
+          "Docker",
+          "Spring",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
+    },
+    {
+      "id": "cmdhrjc3l005he001vze17wgy",
+      "name": "Zanggar Kambekov",
+      "email": "z*************v@gmail.com",
+      "city": "Астана",
+      "company": null,
+      "telegram": "@i_am_currently_trippin",
+      "githubUrl": "https://github.com/Code4LW",
+      "linkedinUrl": null,
+      "programmingLanguages": [
+        "Java"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "technologies": "[\"Web-приложения / Backend\"]",
+      "cloudProviders": "[\"Другое\"]",
+      "cloudServices": "[\"Kubernetes as a Service\"]",
+      "experienceLevel": "Middle (специалист / инженер)",
+      "description": null,
+      "createdAt": "2025-07-24T19:05:57.250Z",
+      "team": {
+        "id": "cmdh6r5e5000wbz01395splmc",
+        "name": "Че там",
+        "nickname": "che-tam",
+        "level": "ADVANCED",
+        "status": "APPROVED",
+        "techStack": [
+          "MongoDB",
+          "Docker",
+          "Spring",
+          "MySQL",
+          "Redis",
+          "Kubernetes",
+          "GraphQL"
+        ],
+        "acceptedLanguages": [
+          "Java",
+          "Go"
+        ],
+        "_count": {
+          "members": 3
+        }
+      }
     }
   ]
 }
