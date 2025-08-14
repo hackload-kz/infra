@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { checkK6TestRunStatus, getK6TestRunLogs, mapK6StatusToStepStatus, getK6TestRunStatus, mapK6StageToStatus, getK6TestRunActualStatus } from '@/lib/k6'
+import { getK6TestRunLogs, getK6TestRunStatus, mapK6StageToStatus, getK6TestRunActualStatus } from '@/lib/k6'
 import { logger, LogAction } from '@/lib/logger'
 
 export interface K6TestRunStatus {

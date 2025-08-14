@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { distributedLockManager } from '@/lib/distributed-lock'
 
 // GET /api/dashboard/load-testing/distributed-locks - Get all active locks
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.email) {
