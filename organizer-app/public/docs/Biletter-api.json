@@ -248,6 +248,25 @@
         "operationId": "ListEvents",
         "summary": "Получить список событий",
         "description": "Возвращает список событие при успехе",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "description": "Параметр для полноконтекстного поиска",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "description": "Параметр для фильтрации по дате события",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Список событий успешно получен",
@@ -376,7 +395,7 @@
             "schema": {
               "type": "integer",
               "format": "int32",
-              "minimum": "1"
+              "minimum": 1
             }
           },
           {
@@ -385,8 +404,8 @@
             "schema": {
               "type": "integer",
               "format": "int32",
-              "minimum": "1",
-              "maximum": "20"
+              "minimum": 1,
+              "maximum": 20
             }
           },
           {
@@ -397,6 +416,25 @@
               "format": "int64"
             },
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "row",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FREE", "RESERVED", "SOLD"
+              ]
+            }
           }
         ],
         "operationId": "ListSeats",
@@ -526,7 +564,9 @@
     },
     "/api/payments/notifications": {
       "post": {
-        "tags": ["Payments"],
+        "tags": [
+          "Payments"
+        ],
         "operationId": "OnPaymentUpdates",
         "summary": "Принимать уведомления от платежного шлюза",
         "description": "Принимать уведомления от платежного шлюза",

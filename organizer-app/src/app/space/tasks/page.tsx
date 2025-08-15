@@ -153,7 +153,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDateTime(projectRequirementsInfo.commitDate || projectRequirementsInfo.lastModified)}
+                    {formatDateTime(projectRequirementsInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDateTime(eventLegendInfo.commitDate || eventLegendInfo.lastModified)}
+                    {formatDateTime(eventLegendInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDateTime(paymentGatewayInfo.commitDate || paymentGatewayInfo.lastModified)}
+                    {formatDateTime(paymentGatewayInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDateTime(billetterApiInfo.commitDate || billetterApiInfo.lastModified)}
+                    {formatDateTime(billetterApiInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDateTime(eventProviderInfo.commitDate || eventProviderInfo.lastModified)}
+                    {formatDateTime(eventProviderInfo.lastModified)}
                   </span>
                 </div>
               </div>

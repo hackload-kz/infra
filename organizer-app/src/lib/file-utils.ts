@@ -89,29 +89,20 @@ export function formatDate(date: Date | null): string {
 }
 
 /**
- * Format date and time for display in UI
+ * Format date and time for display in UI (dd.MM.yyyy HH:MM) in GMT+5 timezone
  */
 export function formatDateTime(date: Date | null): string {
   if (!date) return 'Не определено'
   
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
-  const timeString = date.toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-  
-  if (diffDays === 0) return `Сегодня в ${timeString}`
-  if (diffDays === 1) return `Вчера в ${timeString}`
-  if (diffDays < 7) return `${diffDays} дн. назад в ${timeString}`
-  
-  const dateString = date.toLocaleDateString('ru-RU', {
+  // Format directly in GMT+5 timezone using Intl.DateTimeFormat
+  const formatter = new Intl.DateTimeFormat('ru-RU', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric'
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Almaty' // GMT+5 timezone (Kazakhstan)
   })
   
-  return `${dateString} в ${timeString}`
+  return formatter.format(date).replace(',', '')
 }

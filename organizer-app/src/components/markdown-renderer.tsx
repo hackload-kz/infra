@@ -12,13 +12,17 @@ export default function MarkdownRenderer({ content, lastModified }: MarkdownRend
   const [htmlContent, setHtmlContent] = useState('')
 
   const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('ru-RU', {
+    // Format in GMT+5 timezone using Intl.DateTimeFormat
+    const formatter = new Intl.DateTimeFormat('ru-RU', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'Asia/Almaty' // GMT+5 timezone (Kazakhstan)
     })
+    
+    return formatter.format(date)
   }
 
   useEffect(() => {
