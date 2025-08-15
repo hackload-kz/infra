@@ -60,9 +60,27 @@ export async function getFileInfo(filePath: string): Promise<FileInfo> {
 }
 
 /**
- * Get file information for documentation files
+ * Get file information for documentation files from build-time metadata
  */
 export async function getDocsFileInfo(filename: string): Promise<FileInfo> {
+  try {
+    // Try to read from build-time metadata first
+    const metadataPath = path.join(process.cwd(), 'public', 'docs-metadata.json')
+    const metadata = JSON.parse(await fs.promises.readFile(metadataPath, 'utf8'))
+    
+    if (metadata[filename]) {
+      const fileData = metadata[filename]
+      return {
+        path: path.join(process.cwd(), 'public', 'docs', filename),
+        lastModified: new Date(fileData.lastModified),
+        commitDate: fileData.commitDate ? new Date(fileData.commitDate) : null
+      }
+    }
+  } catch (error) {
+    console.warn(`Warning: Could not read docs metadata, falling back to file system:`, error.message)
+  }
+  
+  // Fallback to original method if metadata is not available
   const filePath = path.join(process.cwd(), 'public', 'docs', filename)
   return getFileInfo(filePath)
 }
