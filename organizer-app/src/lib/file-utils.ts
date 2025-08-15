@@ -87,3 +87,31 @@ export function formatDate(date: Date | null): string {
     year: 'numeric'
   })
 }
+
+/**
+ * Format date and time for display in UI
+ */
+export function formatDateTime(date: Date | null): string {
+  if (!date) return 'Не определено'
+  
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  
+  const timeString = date.toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  
+  if (diffDays === 0) return `Сегодня в ${timeString}`
+  if (diffDays === 1) return `Вчера в ${timeString}`
+  if (diffDays < 7) return `${diffDays} дн. назад в ${timeString}`
+  
+  const dateString = date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+  
+  return `${dateString} в ${timeString}`
+}

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
-import { getDocsFileInfo, formatDate } from '@/lib/file-utils'
+import { getDocsFileInfo, formatDateTime } from '@/lib/file-utils'
 import { 
   Settings,
   AlertCircle,
@@ -153,7 +153,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDate(projectRequirementsInfo.commitDate || projectRequirementsInfo.lastModified)}
+                    {formatDateTime(projectRequirementsInfo.commitDate || projectRequirementsInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDate(eventLegendInfo.commitDate || eventLegendInfo.lastModified)}
+                    {formatDateTime(eventLegendInfo.commitDate || eventLegendInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDate(paymentGatewayInfo.commitDate || paymentGatewayInfo.lastModified)}
+                    {formatDateTime(paymentGatewayInfo.commitDate || paymentGatewayInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDate(billetterApiInfo.commitDate || billetterApiInfo.lastModified)}
+                    {formatDateTime(billetterApiInfo.commitDate || billetterApiInfo.lastModified)}
                   </span>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default async function SpaceTasksPage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Clock className="w-3 h-3 text-slate-500" />
                   <span className="text-slate-500 text-xs">
-                    {formatDate(eventProviderInfo.commitDate || eventProviderInfo.lastModified)}
+                    {formatDateTime(eventProviderInfo.commitDate || eventProviderInfo.lastModified)}
                   </span>
                 </div>
               </div>
