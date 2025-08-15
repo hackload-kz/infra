@@ -42,6 +42,15 @@ https://localhost:8081
 
 **Описание**: Возвращает список событий при успехе.
 
+**Параметры запроса**:
+- `query` (опциональный) - Параметр для полноконтекстного поиска
+- `date` (опциональный) - Параметр для фильтрации по дате события (формат: YYYY-MM-DD)
+
+**Пример запроса**:
+```
+GET /api/events?query=концерт&date=2024-12-25
+```
+
 **Ответ `200`**:
 ```json
 [
@@ -135,10 +144,12 @@ https://localhost:8081
 - `event_id` (обязательно): ID события (int64)
 - `page` (опционально): Номер страницы (минимум 1)
 - `pageSize` (опционально): Размер страницы (1-20)
+- `row` (опционально): Фильтр по номеру ряда (минимум 1)
+- `status` (опционально): Фильтр по статусу места (FREE, RESERVED, SOLD)
 
 **Пример запроса**:
 ```
-GET /api/seats?event_id=123&page=1&pageSize=10
+GET /api/seats?event_id=123&page=1&pageSize=10&row=5&status=FREE
 ```
 
 **Ответ `200`**:
@@ -277,7 +288,7 @@ GET /api/payments/fail?orderId=456
 
 ### 1. Получение событий
 ```http
-GET /api/events
+GET /api/events?query=концерт&date=2024-12-25
 ```
 
 ### 2. Создание бронирования
@@ -290,7 +301,7 @@ POST /api/bookings
 
 ### 3. Получение мест
 ```http
-GET /api/seats?event_id=123&page=1&pageSize=20
+GET /api/seats?event_id=123&page=1&pageSize=20&row=5&status=FREE
 ```
 
 ### 4. Выбор мест
