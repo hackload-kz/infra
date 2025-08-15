@@ -94,21 +94,15 @@ export function formatDate(date: Date | null): string {
 export function formatDateTime(date: Date | null): string {
   if (!date) return 'Не определено'
   
-  // Convert to GMT+5 timezone
-  const gmt5Date = new Date(date.getTime() + (5 * 60 * 60 * 1000))
-  
-  const dateString = gmt5Date.toLocaleDateString('ru-RU', {
+  // Format directly in GMT+5 timezone using Intl.DateTimeFormat
+  const formatter = new Intl.DateTimeFormat('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    timeZone: 'UTC' // Use UTC since we already adjusted the time
-  })
-  
-  const timeString = gmt5Date.toLocaleTimeString('ru-RU', {
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'UTC' // Use UTC since we already adjusted the time
+    timeZone: 'Asia/Almaty' // GMT+5 timezone (Kazakhstan)
   })
   
-  return `${dateString} ${timeString}`
+  return formatter.format(date).replace(',', '')
 }
