@@ -77,7 +77,7 @@ export async function getDocsFileInfo(filename: string): Promise<FileInfo> {
       }
     }
   } catch (error) {
-    console.warn(`Warning: Could not read docs metadata, falling back to file system:`, error.message)
+    console.warn(`Warning: Could not read docs metadata, falling back to file system:`, error instanceof Error ? error.message : String(error))
   }
   
   // Fallback to original method if metadata is not available
