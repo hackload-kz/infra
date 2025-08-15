@@ -76,3 +76,59 @@ module "service_provider_3g" {
     }
   }
 }
+
+module "payment_provider" {
+  source = "../../apps/payment-provider"
+
+  # Infrastructure Configuration
+  namespace         = "payment-provider"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  # Payment Provider Configuration
+  payment_provider_image = "ghcr.io/hackload-kz/hackload-paymentgateway"
+  payment_provider_tag   = "sha-d4a9e31"
+  payment_provider_host  = "hub.hackload.kz"
+  payment_provider_path  = "/payment-provider/common"
+
+  # Database Configuration
+  db_name                = "payment_provider"
+  db_pool_size           = 20
+  db_max_retry_count     = 3
+  db_max_retry_delay     = "00:00:30"
+  db_command_timeout     = 60
+
+  # Security Configuration
+  csrf_key    = "hackload-payment-gateway-csrf-key-2025"
+  admin_token = "admin_token_2025_hackload_payment_gateway_secure_key_prod"
+  admin_key   = "admin_token_2025_hackload_payment_gateway_secure_key_prod"
+
+  # API Configuration
+  base_url    = "https://hub.hackload.kz"
+  api_version = "v1"
+
+  # Metrics Configuration
+  metrics_port     = 8081
+  enable_dashboard = true
+
+  # Certificate Management
+  cert_issuer_name = "letsencrypt-prod"
+
+  # Container Registry Credentials
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  # Resource Configuration
+  payment_provider_resources = {
+    requests = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+    limits = {
+      cpu    = "500m"
+      memory = "512Mi"
+    }
+  }
+}
