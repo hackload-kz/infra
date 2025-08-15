@@ -24,16 +24,21 @@ resource "kubernetes_secret" "cnpg-cluster" {
 }
 
 resource "kubernetes_manifest" "cnpg-cluster" {
-  manifest = yamldecode(templatefile("${path.module}/crd/postgres-cluster.yaml", {
-    namespace            = kubernetes_namespace.cnpg-cluster.metadata[0].name,
-    storage_class        = var.storage_class,
-    storage_size         = var.storage_size,
-    instances            = var.instances,
-    backup_destination   = var.backup_destination,
-    backup_retention     = var.backup_retention,
-    username             = var.username,
-    user_password_secret = kubernetes_secret.cnpg-cluster.metadata[0].name,
-  }))
+  manifest = yamldecode(templatefile(
+    var.backup_destination != null && var.backup_destination != "" ? 
+      "${path.module}/crd/postgres-cluster.yaml" : 
+      "${path.module}/crd/postgres-cluster-no-backup.yaml", 
+    {
+      namespace            = kubernetes_namespace.cnpg-cluster.metadata[0].name,
+      storage_class        = var.storage_class,
+      storage_size         = var.storage_size,
+      instances            = var.instances,
+      backup_destination   = var.backup_destination,
+      backup_retention     = var.backup_retention,
+      username             = var.username,
+      user_password_secret = kubernetes_secret.cnpg-cluster.metadata[0].name,
+    }
+  ))
 }
 
 resource "kubernetes_manifest" "cnpg-role" {
@@ -49,6 +54,8 @@ resource "kubernetes_manifest" "cnpg-role-binding" {
 }
 
 resource "kubernetes_manifest" "cnpg-scheduled-backup" {
+  count = var.backup_destination != null && var.backup_destination != "" ? 1 : 0
+  
   manifest = yamldecode(templatefile("${path.module}/crd/scheduled-backup.yaml", {
     namespace       = kubernetes_namespace.cnpg-cluster.metadata[0].name,
     backup_schedule = var.backup_schedule,

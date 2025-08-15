@@ -1,15 +1,9 @@
 resource "random_uuid" "cluster_id" {}
 
-resource "kubernetes_namespace" "kafka" {
-  metadata {
-    name = var.namespace
-  }
-}
-
 resource "kubernetes_service" "kafka_headless" {
   metadata {
     name      = "kafka-headless"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
   }
   spec {
     selector = {
@@ -31,7 +25,7 @@ resource "kubernetes_service" "kafka_headless" {
 resource "kubernetes_service" "kafka_client" {
   metadata {
     name      = "kafka-client"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
   }
   spec {
     selector = {
@@ -49,7 +43,7 @@ resource "kubernetes_service" "kafka_client" {
 resource "kubernetes_stateful_set" "kafka" {
   metadata {
     name      = "kafka"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
   }
 
   spec {
@@ -94,7 +88,7 @@ resource "kubernetes_stateful_set" "kafka" {
           }
           env {
             name  = "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS"
-            value = "0@kafka-0.${kubernetes_service.kafka_headless.metadata[0].name}.${kubernetes_namespace.kafka.metadata[0].name}.svc.cluster.local:9093"
+            value = "0@kafka-0.${kubernetes_service.kafka_headless.metadata[0].name}.${var.namespace}.svc.cluster.local:9093"
           }
           env {
             name  = "KAFKA_CFG_LISTENERS"
@@ -102,7 +96,7 @@ resource "kubernetes_stateful_set" "kafka" {
           }
           env {
             name  = "KAFKA_CFG_ADVERTISED_LISTENERS"
-            value = "BROKER://${kubernetes_service.kafka_client.metadata[0].name}.${kubernetes_namespace.kafka.metadata[0].name}.svc.cluster.local:9092"
+            value = "BROKER://${kubernetes_service.kafka_client.metadata[0].name}.${var.namespace}.svc.cluster.local:9092"
           }
           env {
             name  = "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP"
@@ -193,7 +187,7 @@ resource "kubernetes_service" "kafka_jmx" {
   
   metadata {
     name      = "kafka-jmx"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
     labels = {
       app = "kafka"
     }
@@ -221,7 +215,7 @@ resource "kubernetes_deployment" "kafka_jmx_exporter" {
   
   metadata {
     name      = "kafka-jmx-exporter"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
     labels = {
       app = "kafka-jmx-exporter"
     }
@@ -296,12 +290,12 @@ resource "kubernetes_config_map" "kafka_jmx_config" {
   
   metadata {
     name      = "kafka-jmx-config"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
   }
   
   data = {
     "config.yaml" = <<-EOT
-jmxUrl: service:jmx:rmi:///jndi/rmi://kafka-0.kafka-headless.${kubernetes_namespace.kafka.metadata[0].name}.svc.cluster.local:9999/jmxrmi
+jmxUrl: service:jmx:rmi:///jndi/rmi://kafka-0.kafka-headless.${var.namespace}.svc.cluster.local:9999/jmxrmi
 rules:
   # Kafka broker metrics
   - pattern: kafka.server<type=(.+), name=(.+)><>Value
@@ -347,7 +341,7 @@ resource "kubernetes_service" "kafka_jmx_exporter" {
   
   metadata {
     name      = "kafka-jmx-exporter"
-    namespace = kubernetes_namespace.kafka.metadata[0].name
+    namespace = var.namespace
     labels = {
       app = "kafka-jmx-exporter"
     }
@@ -378,7 +372,7 @@ resource "kubernetes_manifest" "kafka_servicemonitor" {
     kind       = "ServiceMonitor"
     metadata = {
       name      = "kafka-jmx-exporter"
-      namespace = kubernetes_namespace.kafka.metadata[0].name
+      namespace = var.namespace
       labels = {
         app = "kafka-jmx-exporter"
         release = "prometheus"

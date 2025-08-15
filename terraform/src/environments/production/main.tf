@@ -37,3 +37,42 @@ module "hub" {
   enable_metrics                       = true
 
 }
+
+module "service_provider_3g" {
+  source = "../../apps/service-provider"
+
+  # Infrastructure Configuration
+  namespace         = "service-provider-3g"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  # Service Provider Configuration
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-25331a91c6f43a938a17a239f97fbc0a3ab89f88"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event-provider/common"
+
+  # Database Configuration
+  db_connection_pool_size = 32
+
+  # Certificate Management
+  cert_issuer_name = "letsencrypt-prod"
+
+  # Container Registry Credentials
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  # Resource Configuration
+  service_provider_resources = {
+    requests = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+    limits = {
+      cpu    = "500m"
+      memory = "512Mi"
+    }
+  }
+}
