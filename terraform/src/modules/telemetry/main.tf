@@ -4,7 +4,6 @@ resource "kubernetes_namespace" "telemetry" {
   }
 }
 
-
 # Prometheus Stack
 resource "helm_release" "prometheus" {
   count = var.enable_prometheus ? 1 : 0
@@ -19,7 +18,6 @@ resource "helm_release" "prometheus" {
     yamlencode(var.prometheus_helm_values)
   ]
 }
-
 
 # Prometheus Certificate
 resource "kubernetes_manifest" "prometheus_certificate" {

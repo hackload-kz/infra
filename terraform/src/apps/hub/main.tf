@@ -164,6 +164,12 @@ module "telemetry" {
           root_url = "https://${var.hub_host}/grafana"
           serve_from_sub_path = true
         }
+        "auth.anonymous" = {
+          enabled = true
+          org_name = "Main Org."
+          org_role = "Viewer"
+          hide_signin_menu = true
+        }
       }
     }
     kubeStateMetrics = {
