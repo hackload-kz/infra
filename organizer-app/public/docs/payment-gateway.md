@@ -297,6 +297,38 @@ Output: "b8f2f8e5c9d6a4c8f7b5e3a2d1f0e9c8b7a6f5d4e3c2b1a0f9e8d7c6b5a4f3e2"
 | 2429 | Превышение лимита регистраций | 429 | Дождаться и повторить |
 | 9999 | Внутренняя ошибка сервера | 500 | Обратиться в поддержку |
 
+### Ошибки лимитов платежей (3xxx)
+
+| Код | Описание | HTTP Статус | Действие |
+|-----|----------|-------------|----------|
+| 3015 | Исчерпан суточный лимит по количеству платежей | 429 | Дождаться сброса лимита или обратиться к администратору |
+
+#### Управление ошибкой "Daily payment limit exceeded"
+
+**Когда возникает:** Ошибка с кодом 3015 возникает когда сумма текущих платежей за день + новый платеж превышает установленный дневной лимит команды.
+
+**Формула проверки:** `(сегодняшние платежи) + (сумма нового платежа) > DailyPaymentLimit`
+
+**Способы решения:**
+
+1. **Для администраторов:** Обновить дневной лимит через API
+   ```bash
+   curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/{teamSlug}" \
+     -H "X-Admin-Token: {admin-token}" \
+     -H "Content-Type: application/json" \
+     -d '{"dailyPaymentLimit": 999999999999999999.99}'
+   ```
+
+2. **Для мерчантов:** 
+   - Дождаться сброса лимита в 00:00 UTC
+   - Обратиться к администратору системы для повышения лимита
+   - Разбить крупный платеж на несколько меньших (если позволяет бизнес-логика)
+
+**Лимиты по умолчанию:**
+- Если `DailyPaymentLimit = null` - лимит не применяется
+- Максимальный дневной лимит: 999,999,999,999,999,999.99
+- Дневной лимит должен быть ≤ месячного лимита
+
 ---
 
 ## API эндпоинты
@@ -355,6 +387,331 @@ Content-Type: application/json
   }
 }
 ```
+
+### 1.1. Получение полной информации о команде (Администраторы)
+
+**GET** `/api/v1/TeamRegistration/info/{teamSlug}`
+
+Получение полной информации о команде/мерчанте для административных целей. Доступно только администраторам с admin токеном.
+
+**Заголовки:**
+
+```
+X-Admin-Token: {admin-token}
+```
+
+**Параметры URL:**
+- `{teamSlug}` - уникальный идентификатор команды
+
+**Ответ (200 OK):**
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "teamSlug": "my-online-store",
+  "teamName": "My Online Store",
+  "isActive": true,
+  "createdAt": "2025-08-06T10:30:00Z",
+  "updatedAt": "2025-08-16T14:30:00Z",
+  "contactEmail": "merchant@mystore.com",
+  "contactPhone": "+1234567890",
+  "description": "Online store for electronics",
+  "secretKey": "sk_live_abc123...",
+  "lastPasswordChangeAt": "2025-08-01T00:00:00Z",
+  "failedAuthenticationAttempts": 0,
+  "lockedUntil": null,
+  "lastSuccessfulAuthenticationAt": "2025-08-16T09:15:00Z",
+  "lastAuthenticationIpAddress": "192.168.1.100",
+  "notificationUrl": "https://mystore.com/webhook",
+  "successUrl": "https://mystore.com/success",
+  "failUrl": "https://mystore.com/fail",
+  "cancelUrl": "https://mystore.com/cancel",
+  "minPaymentAmount": 1000,
+  "maxPaymentAmount": 1000000,
+  "dailyPaymentLimit": 5000000,
+  "monthlyPaymentLimit": 50000000,
+  "dailyTransactionLimit": 100,
+  "supportedCurrencies": ["RUB", "USD", "EUR"],
+  "supportedPaymentMethods": ["Card"],
+  "canProcessRefunds": true,
+  "legalName": "My Store LLC",
+  "taxId": "1234567890",
+  "address": "123 Business St, City, State 12345",
+  "country": "RU",
+  "timeZone": "Europe/Moscow",
+  "processingFeePercentage": 2.5,
+  "fixedProcessingFee": 10,
+  "feeCurrency": "RUB",
+  "settlementDelayDays": 1,
+  "settlementAccountNumber": "40817810123456789012",
+  "settlementBankCode": "044525225",
+  "enableFraudDetection": true,
+  "maxFraudScore": 75,
+  "requireManualReviewForHighRisk": true,
+  "enableRefunds": true,
+  "enablePartialRefunds": false,
+  "enableReversals": true,
+  "enable3DSecure": true,
+  "enableTokenization": true,
+  "enableRecurringPayments": false,
+  "apiVersion": "v1",
+  "enableWebhooks": true,
+  "webhookRetryAttempts": 3,
+  "webhookTimeoutSeconds": 30,
+  "webhookSecret": "whsec_abc123...",
+  "metadata": {
+    "custom_field_1": "value1",
+    "integration_version": "1.0"
+  },
+  "businessInfo": {
+    "businessType": "ecommerce",
+    "website": "https://mystore.com"
+  },
+  "usageStats": {
+    "totalPayments": 1250,
+    "totalPaymentAmount": 15750000,
+    "paymentsToday": 45,
+    "paymentAmountToday": 450000,
+    "paymentsThisMonth": 892,
+    "paymentAmountThisMonth": 12500000,
+    "totalCustomers": 450,
+    "activePaymentMethods": 2,
+    "lastPaymentAt": "2025-08-16T14:15:00Z",
+    "lastWebhookAt": "2025-08-16T14:16:00Z",
+    "failedWebhooksLast24Hours": 2
+  },
+  "status": {
+    "isLocked": false,
+    "requiresPasswordChange": false,
+    "hasReachedDailyLimit": false,
+    "hasReachedMonthlyLimit": false,
+    "isHealthy": true,
+    "healthIssues": [],
+    "warnings": [
+      "Approaching daily payment limit (80% reached)"
+    ]
+  }
+}
+```
+
+**Ошибки:**
+
+- **401 Unauthorized** - отсутствует или неверный admin токен
+- **403 Forbidden** - admin функциональность не настроена
+- **404 Not Found** - команда не найдена
+- **400 Bad Request** - неверный формат teamSlug
+- **500 Internal Server Error** - внутренняя ошибка сервера
+
+**Информация в ответе:**
+
+- **Базовая информация:** ID, slug, название, статус активности, даты создания/обновления
+- **Контактные данные:** email, телефон, описание команды
+- **Настройки безопасности:** секретный ключ, история аутентификации, попытки входа
+- **Настройки платежей:** лимиты, поддерживаемые валюты и методы
+- **Бизнес-информация:** юридические данные, налоговые реквизиты, адрес
+- **Настройки комиссий:** процент и фиксированная комиссия
+- **Настройки урегулирования:** банковские реквизиты, задержки переводов
+- **Настройки безопасности:** антифрод, лимиты по рискам
+- **Функциональные флаги:** возвраты, 3D Secure, токенизация, регулярные платежи
+- **API и webhook настройки:** версия API, настройки уведомлений
+- **Метаданные:** пользовательские поля и бизнес-информация
+- **Статистика использования:** количество и суммы платежей за различные периоды
+- **Статус здоровья:** индикаторы проблем и предупреждений
+
+**Пример запроса:**
+```bash
+curl -H "X-Admin-Token: admin_token_here" \
+     "https://gateway.hackload.com/api/v1/TeamRegistration/info/my-online-store"
+```
+
+### 1.2. Обновление настроек команды (Администраторы)
+
+**PUT** `/api/v1/TeamRegistration/update/{teamSlug}`
+
+Обновление информации команды/мерчанта и настройка лимитов платежей. Доступно только администраторам с admin токеном.
+
+**Заголовки:**
+
+
+```
+Content-Type: application/json
+X-Admin-Token: {admin-token}
+```
+
+**Параметры URL:**
+- `{teamSlug}` - уникальный идентификатор команды
+
+**Тело запроса (все поля опциональны):**
+```json
+{
+  "teamName": "Updated Store Name",
+  "email": "newemail@mystore.com",
+  "phone": "+1234567891",
+  "successURL": "https://mystore.com/new-success",
+  "failURL": "https://mystore.com/new-fail",
+  "notificationURL": "https://mystore.com/new-webhook",
+  "supportedCurrencies": "RUB,USD,EUR,KZT",
+  "businessInfo": {
+    "businessType": "marketplace",
+    "website": "https://newstore.com"
+  },
+  "minPaymentAmount": 1000,
+  "maxPaymentAmount": 1000000,
+  "dailyPaymentLimit": 5000000,
+  "monthlyPaymentLimit": 50000000,
+  "dailyTransactionLimit": 100
+}
+```
+
+**Ответ (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Team updated successfully",
+  "teamSlug": "my-online-store",
+  "teamId": "123e4567-e89b-12d3-a456-426614174000",
+  "updatedAt": "2025-08-16T14:30:00Z",
+  "updatedFields": [
+    "dailyPaymentLimit",
+    "monthlyPaymentLimit", 
+    "email"
+  ]
+}
+```
+
+**Ошибки:**
+
+- **401 Unauthorized** - отсутствует или неверный admin токен
+- **403 Forbidden** - admin функциональность не настроена
+- **404 Not Found** - команда не найдена
+- **400 Bad Request** - ошибки валидации
+
+**Бизнес-правила для лимитов:**
+- Daily limit ≤ Monthly limit (если оба заданы)
+- Min payment ≤ Max payment (если оба заданы)
+- Все суммы ≥ 0
+
+**Пример настройки дневного лимита:**
+```bash
+curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/my-store" \
+  -H "X-Admin-Token: admin_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dailyPaymentLimit": 500000
+  }'
+```
+
+### 1.3. Очистка базы данных (Администраторы)
+
+**POST** `/api/v1/Admin/clear-database`
+
+Полная очистка всех платежных и транзакционных данных в системе с сохранением конфигураций команд. Доступно только администраторам с admin токеном.
+
+**⚠️ ВАЖНО**: Эта операция необратимо удаляет все платежи и транзакции для ВСЕХ команд.
+
+**Заголовки:**
+
+```
+X-Admin-Token: {admin-token}
+```
+
+**Тело запроса:**
+Пустое тело запроса - все параметры передаются через заголовки аутентификации.
+
+**Ответ (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Database cleared successfully",
+  "statistics": {
+    "deletedPayments": 1250,
+    "deletedTransactions": 3847,
+    "deletedOrders": 892,
+    "operationDurationMs": 2150,
+    "clearTimestamp": "2025-08-16T14:30:00Z"
+  }
+}
+```
+
+**Ошибки:**
+
+- **401 Unauthorized** - отсутствует или неверный admin токен
+- **403 Forbidden** - admin функциональность не настроена
+- **500 Internal Server Error** - ошибка выполнения операции
+
+**Данные, которые удаляются:**
+- **Все платежи**: Записи о платежах всех команд
+- **Все транзакции**: Транзакционная история всех платежей
+- **Все заказы**: Данные заказов (поле OrderId в платежах)
+- **Связанные аудит-логи**: Журналы аудита удаленных записей
+
+**Данные, которые сохраняются:**
+- **Конфигурации команд**: Настройки мерчантов остаются нетронутыми
+- **Информация о клиентах**: Профили покупателей
+- **Системные настройки**: Конфигурация приложения
+
+**Пример запроса:**
+```bash
+curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-database" \
+  -H "X-Admin-Token: admin_token_here"
+```
+
+### 1.4. Очистка данных конкретной команды (Администраторы)
+
+**POST** `/api/v1/Admin/clear-team-data/{teamSlug}`
+
+Очистка платежных и транзакционных данных только для указанной команды с сохранением данных других команд. Доступно только администраторам с admin токеном.
+
+**Заголовки:**
+
+```
+X-Admin-Token: {admin-token}
+```
+
+**Параметры URL:**
+- `{teamSlug}` - уникальный идентификатор команды для очистки
+
+**Тело запроса:**
+Пустое тело запроса - все параметры передаются через URL и заголовки аутентификации.
+
+**Ответ (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Team data cleared successfully for 'my-online-store'",
+  "statistics": {
+    "deletedPayments": 125,
+    "deletedTransactions": 384,
+    "deletedOrders": 89,
+    "operationDurationMs": 450,
+    "clearTimestamp": "2025-08-16T14:30:00Z"
+  }
+}
+```
+
+**Ошибки:**
+
+- **401 Unauthorized** - отсутствует или неверный admin токен
+- **403 Forbidden** - admin функциональность не настроена
+- **404 Not Found** - команда с указанным teamSlug не найдена
+- **500 Internal Server Error** - ошибка выполнения операции
+
+**Данные, которые удаляются (только для указанной команды):**
+- **Платежи команды**: Все платежи принадлежащие команде
+- **Транзакции команды**: Транзакции связанные с платежами команды
+- **Заказы команды**: Заказы команды (уникальные OrderId)
+- **Связанные логи**: Аудит-логи удаленных записей команды
+**Пример запроса:**
+```bash
+curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-team-data/my-online-store" \
+  -H "X-Admin-Token: admin_token_here"
+```
+
+**Пример для очистки данных тестовой команды:**
+```bash
+curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-team-data/test-merchant-2025" \
+  -H "X-Admin-Token: admin_token_here"
+```
+
 
 ### 2. Создание платежа
 
@@ -852,6 +1209,40 @@ curl -X POST https://gateway.hackload.com/api/v1/PaymentCancel/cancel \
 
 Система платежного шлюза автоматически отправляет HTTP-уведомления (webhooks) на указанный URL при изменении статуса платежа. Это позволяет интернет-магазину мгновенно реагировать на события платежей без необходимости постоянного опроса API.
 
+### Настройка webhook для команды
+
+Для корректной работы webhook-уведомлений необходимо настроить следующие параметры команды:
+
+**Основные настройки webhook:**
+- **EnableWebhooks** - включение/отключение webhook-уведомлений (по умолчанию: `true`)
+- **NotificationUrl** - URL эндпоинта для получения уведомлений (обязательный для работы webhook)
+- **WebhookSecret** - секретный ключ для подписи HMAC (опционально, рекомендуется для безопасности)
+
+**Настройки надежности доставки:**
+- **WebhookRetryAttempts** - количество попыток повторной отправки при ошибках (по умолчанию: `3`)
+- **WebhookTimeoutSeconds** - таймаут для каждой попытки отправки в секундах (по умолчанию: `30`)
+
+**Пример настройки webhook через API обновления команды:**
+
+```bash
+curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/my-store" \
+  -H "X-Admin-Token: admin_token_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "notificationURL": "https://mystore.com/payment/webhook",
+    "enableWebhooks": true,
+    "webhookRetryAttempts": 5,
+    "webhookTimeoutSeconds": 45,
+    "webhookSecret": "your-secure-webhook-secret-key"
+  }'
+```
+
+**Рекомендации по настройке:**
+- Используйте HTTPS для `notificationURL`
+- Установите `webhookSecret` для проверки подлинности уведомлений
+- Настройте `webhookRetryAttempts` в зависимости от критичности доставки (3-10 попыток)
+- Увеличьте `webhookTimeoutSeconds` если ваш эндпоинт медленно отвечает (30-60 секунд)
+
 ### Когда отправляются webhook-уведомления
 
 Webhook отправляется при **каждом** изменении статуса платежа в следующих случаях:
@@ -898,8 +1289,14 @@ https://gateway.hackload.com/api/v1/paymentform/render/pmt_abc123?lang=ru
 - **Поддерживаемые карты**: Visa, MasterCard, American Express, Discover, JCB, Diners Club, UnionPay, Mir
 
 **Тестовые номера карт для разработки:**
-- **4111111111111111** (Visa) - успешная обработка
+
+**✅ Валидные карты (проходят алгоритм Луна):**
+- **4532123456789012** (Visa) - успешная обработка
 - **5555555555554444** (MasterCard) - успешная обработка  
+- **378282246310005** (American Express) - успешная обработка
+- **4111111111111111** (Visa) - успешная обработка
+
+**❌ Тестовые сценарии ошибок:**
 - **4000000000000002** - отклонение банком
 - **4000000000000119** - недостаточно средств
 
