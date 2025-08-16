@@ -22,12 +22,15 @@ variable "backup_schedule" {
 }
 
 variable "backup_retention" {
-  type    = string
-  default = "7d"
+  description = "Backup retention policy. Set to null to disable backups."
+  type        = string
+  default     = null
 }
 
 variable "backup_destination" {
-  type = string
+  description = "Backup destination path. Set to null to disable backups."
+  type        = string
+  default     = null
 }
 
 variable "username" {

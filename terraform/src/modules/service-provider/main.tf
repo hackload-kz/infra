@@ -1,13 +1,7 @@
-resource "kubernetes_namespace" "service_provider" {
-  metadata {
-    name = var.namespace
-  }
-}
-
 resource "kubernetes_secret" "registry_credentials" {
   metadata {
     name      = "ghcr-credentials"
-    namespace = kubernetes_namespace.service_provider.metadata[0].name
+    namespace = var.namespace
   }
 
   type = "kubernetes.io/dockerconfigjson"
@@ -29,7 +23,7 @@ resource "kubernetes_secret" "registry_credentials" {
 resource "kubernetes_deployment" "service_provider" {
   metadata {
     name      = "service-provider"
-    namespace = kubernetes_namespace.service_provider.metadata[0].name
+    namespace = var.namespace
     labels = {
       app = "service-provider"
     }
@@ -96,6 +90,26 @@ resource "kubernetes_deployment" "service_provider" {
             value = tostring(var.db_connection_pool_size)
           }
 
+          env {
+            name  = "PROJECTIONS_DB_JDBC_URL"
+            value = var.db_jdbc_url
+          }
+
+          env {
+            name  = "PROJECTIONS_DB_JDBC_USER"
+            value = var.db_jdbc_user
+          }
+
+          env {
+            name  = "PROJECTIONS_DB_JDBC_PASSWORD"
+            value = var.db_jdbc_password
+          }
+
+          env {
+            name  = "PROJECTIONS_DB_CONNECTION_POOL_SIZE"
+            value = tostring(var.db_connection_pool_size)
+          }
+
           # Kafka configuration
           env {
             name  = "KAFKA_BOOTSTRAP_SERVERS"
@@ -105,6 +119,11 @@ resource "kubernetes_deployment" "service_provider" {
           env {
             name  = "KAFKA_CONSUMER_GROUP_ID"
             value = var.kafka_consumer_group_id
+          }
+
+          env {
+            name  = "KAFKA_CONSUMER_OFFSET"
+            value = "latest"
           }
 
           # liveness_probe {
@@ -141,7 +160,7 @@ resource "kubernetes_deployment" "service_provider" {
 resource "kubernetes_service" "service_provider" {
   metadata {
     name      = "service-provider"
-    namespace = kubernetes_namespace.service_provider.metadata[0].name
+    namespace = var.namespace
   }
 
   spec {
@@ -167,7 +186,7 @@ resource "kubernetes_manifest" "service_provider_certificate" {
     kind       = "Certificate"
     metadata = {
       name      = "service-provider-tls"
-      namespace = kubernetes_namespace.service_provider.metadata[0].name
+      namespace = var.namespace
     }
     spec = {
       secretName = "service-provider-tls"
@@ -188,7 +207,7 @@ resource "kubernetes_manifest" "strip_prefix_middleware" {
     kind       = "Middleware"
     metadata = {
       name      = "service-provider-strip-prefix"
-      namespace = kubernetes_namespace.service_provider.metadata[0].name
+      namespace = var.namespace
     }
     spec = {
       stripPrefix = {
@@ -207,7 +226,7 @@ resource "kubernetes_manifest" "service_provider_ingressroute" {
     kind       = "IngressRoute"
     metadata = {
       name      = "service-provider-ingressroute"
-      namespace = kubernetes_namespace.service_provider.metadata[0].name
+      namespace = var.namespace
     }
     spec = {
       entryPoints = ["websecure"]
@@ -224,7 +243,7 @@ resource "kubernetes_manifest" "service_provider_ingressroute" {
           middlewares = [
             {
               name      = kubernetes_manifest.strip_prefix_middleware.manifest.metadata.name
-              namespace = kubernetes_namespace.service_provider.metadata[0].name
+              namespace = var.namespace
             }
           ]
         }
@@ -245,7 +264,7 @@ resource "kubernetes_manifest" "service_provider_redirect" {
     kind       = "IngressRoute"
     metadata = {
       name      = "service-provider-redirect"
-      namespace = kubernetes_namespace.service_provider.metadata[0].name
+      namespace = var.namespace
     }
     spec = {
       entryPoints = ["web"]
@@ -262,7 +281,7 @@ resource "kubernetes_manifest" "service_provider_redirect" {
           middlewares = [
             {
               name      = kubernetes_manifest.redirect_middleware[0].manifest.metadata.name
-              namespace = kubernetes_namespace.service_provider.metadata[0].name
+              namespace = var.namespace
             }
           ]
         }
@@ -279,7 +298,7 @@ resource "kubernetes_manifest" "redirect_middleware" {
     kind       = "Middleware"
     metadata = {
       name      = "redirect-to-https"
-      namespace = kubernetes_namespace.service_provider.metadata[0].name
+      namespace = var.namespace
     }
     spec = {
       redirectScheme = {
@@ -287,5 +306,154 @@ resource "kubernetes_manifest" "redirect_middleware" {
         permanent = true
       }
     }
+  }
+}
+
+# OpenTelemetry Collector ConfigMap
+resource "kubernetes_config_map" "otel_collector_config" {
+  metadata {
+    name      = "otel-collector-config"
+    namespace = var.namespace
+  }
+
+  data = {
+    "otel-collector-config.yaml" = <<-EOT
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: error
+    sampling_initial: 0
+    sampling_thereafter: 0
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]
+EOT
+  }
+}
+
+# OpenTelemetry Collector Deployment
+resource "kubernetes_deployment" "otel_collector" {
+  metadata {
+    name      = "otel-collector"
+    namespace = var.namespace
+    labels = {
+      app = "otel-collector"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "otel-collector"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "otel-collector"
+        }
+      }
+
+      spec {
+        container {
+          name  = "otel-collector"
+          image = "otel/opentelemetry-collector-contrib:0.91.0"
+
+          args = ["--config=/etc/otel-collector-config.yaml"]
+
+          port {
+            name           = "otlp-grpc"
+            container_port = 4317
+          }
+
+          port {
+            name           = "otlp-http"
+            container_port = 4318
+          }
+
+          volume_mount {
+            name       = "otel-collector-config-vol"
+            mount_path = "/etc/otel-collector-config.yaml"
+            sub_path   = "otel-collector-config.yaml"
+          }
+
+          resources {
+            requests = {
+              cpu    = "50m"
+              memory = "64Mi"
+            }
+            limits = {
+              cpu    = "100m"
+              memory = "128Mi"
+            }
+          }
+        }
+
+        volume {
+          name = "otel-collector-config-vol"
+          config_map {
+            name = kubernetes_config_map.otel_collector_config.metadata[0].name
+          }
+        }
+      }
+    }
+  }
+}
+
+# OpenTelemetry Collector Service
+resource "kubernetes_service" "otel_collector" {
+  metadata {
+    name      = "otel-collector"
+    namespace = var.namespace
+    labels = {
+      app = "otel-collector"
+    }
+  }
+
+  spec {
+    selector = {
+      app = "otel-collector"
+    }
+
+    port {
+      name        = "otlp-grpc"
+      port        = 4317
+      target_port = 4317
+      protocol    = "TCP"
+    }
+
+    port {
+      name        = "otlp-http"
+      port        = 4318
+      target_port = 4318
+      protocol    = "TCP"
+    }
+
+    type = "ClusterIP"
   }
 }

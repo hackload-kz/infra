@@ -1,0 +1,19 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cluster
+  namespace: ${namespace}
+spec:
+  instances: ${instances}
+  storage:
+    storageClass: ${storage_class}
+    size: ${storage_size}
+  managed:
+    roles:
+      - name: ${username}
+        ensure: present
+        login: true
+        createdb: true
+        replication: true
+        passwordSecret:
+          name: ${user_password_secret}

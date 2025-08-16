@@ -1,6 +1,6 @@
 output "namespace" {
   description = "The namespace where service-provider was deployed"
-  value       = kubernetes_namespace.service_provider.metadata[0].name
+  value       = var.namespace
 }
 
 output "service_name" {
@@ -10,7 +10,7 @@ output "service_name" {
 
 output "service_url" {
   description = "The internal service URL for service-provider"
-  value       = "http://${kubernetes_service.service_provider.metadata[0].name}.${kubernetes_namespace.service_provider.metadata[0].name}.svc.cluster.local:${var.service_port}"
+  value       = "http://${kubernetes_service.service_provider.metadata[0].name}.${var.namespace}.svc.cluster.local:${var.service_port}"
 }
 
 output "external_url" {

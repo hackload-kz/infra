@@ -174,7 +174,6 @@ module "telemetry" {
   depends_on = [module.traefik, module.cert_manager]
 }
 
-
 module "hub" {
   source = "../../modules/hub"
 
@@ -220,52 +219,3 @@ module "hub" {
   depends_on = [module.traefik, module.cert_manager]
 }
 
-module "kafka" {
-  source = "../../modules/kafka"
-
-  namespace      = "kafka"
-  storage_class  = var.storage_class
-  enable_metrics = var.enable_metrics
-}
-
-module "service_provider" {
-  source = "../../modules/service-provider"
-
-  namespace = "service-provider"
-  image     = "ghcr.io/hackload-kz/service-provider"
-  tag       = "pkg-3aafdaddce7b10ab0e6165527dddbfa3be5752f9"
-  host      = var.hub_host
-  
-  enable_tls        = true
-  cert_issuer_name  = module.cert_manager.cluster_issuer_name
-
-  # Database configuration - create a separate database for service-provider
-  db_jdbc_url              = "jdbc:postgresql://${module.cnpg_cluster.host}:${module.cnpg_cluster.port}/service_provider"
-  db_jdbc_user             = module.cnpg_cluster.username
-  db_jdbc_password         = module.cnpg_cluster.password
-  db_connection_pool_size  = 16
-
-  # Kafka configuration
-  kafka_bootstrap_servers = module.kafka.kafka_bootstrap_server_internal
-  kafka_consumer_group_id = "service-provider"
-
-  registry_credentials = {
-    server   = "ghcr.io"
-    username = var.ghcr_username
-    password = var.ghcr_token
-    email    = var.ghcr_email
-  }
-
-  resources = {
-    limits = {
-      cpu    = "500m"
-      memory = "512Mi"
-    }
-    requests = {
-      cpu    = "200m"
-      memory = "256Mi"
-    }
-  }
-
-  depends_on = [module.traefik, module.cert_manager, module.cnpg_cluster, module.kafka]
-}
