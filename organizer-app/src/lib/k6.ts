@@ -578,11 +578,11 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
           })
           const responseBody = podSearchResponse
           podsResponse = responseBody
-        } catch (_podError) {
+        } catch {
           // Continue to next strategy
         }
       }
-    } catch (_error) {
+    } catch {
       // Continue to next strategy
     }
 
@@ -595,7 +595,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
         })
         const responseBody = podSearchResponse
         podsResponse = responseBody
-      } catch (_error) {
+      } catch {
         // Continue to next strategy
       }
     }
@@ -617,7 +617,7 @@ export async function checkK6TestRunPodStatuses(testRunName: string): Promise<{
             podsResponse = { items: matchingPods } as { items: Array<{ metadata?: { name?: string }; status?: { phase?: string } }> }
           }
         }
-      } catch (_error) {
+      } catch {
         // No pods found
       }
     }

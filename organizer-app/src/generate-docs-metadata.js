@@ -5,8 +5,11 @@
  * Captures Git commit dates for each documentation file
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { execSync } = require('child_process');
 
 // Configuration
@@ -105,7 +108,7 @@ function isGitAvailable() {
   try {
     execSync('git rev-parse --git-dir', { stdio: 'ignore' });
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

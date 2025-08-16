@@ -1,10 +1,10 @@
 import { auth } from '@/auth'
 import { isOrganizer } from '@/lib/admin'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { runK6StatusSync } from '@/lib/k6-status-sync'
 
 // POST /api/dashboard/load-testing/sync-status - Синхронизировать статусы K6 тестов
-export async function POST(_request: NextRequest) {
+export async function POST() {
   try {
     const session = await auth()
     if (!session?.user?.email) {
@@ -31,7 +31,7 @@ export async function POST(_request: NextRequest) {
 }
 
 // GET /api/dashboard/load-testing/sync-status - Получить информацию о синхронизации
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
     if (!session?.user?.email) {
