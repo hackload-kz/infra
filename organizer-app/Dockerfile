@@ -44,7 +44,6 @@ RUN npx prisma generate
 # Копируем исходный код
 COPY src ./src/
 COPY public ./public/
-COPY scripts ./scripts/
 
 # Оптимизации сборки
 ENV NEXT_TELEMETRY_DISABLED=1
