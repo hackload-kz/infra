@@ -17,6 +17,11 @@ const OUTPUT_FILE = path.join(process.cwd(), 'public', 'docs-metadata.json');
  * Get Git commit date for a specific file
  */
 function getFileCommitDate(filePath) {
+  // Skip Git operations if Git is not available
+  if (!isGitAvailable()) {
+    return null;
+  }
+  
   try {
     // Get relative path from project root
     const relativePath = path.relative(process.cwd(), filePath);
@@ -94,6 +99,18 @@ function generateDocsMetadata() {
 }
 
 /**
+ * Check if Git is available
+ */
+function isGitAvailable() {
+  try {
+    execSync('git rev-parse --git-dir', { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
  * Main execution
  */
 function main() {
@@ -101,11 +118,11 @@ function main() {
   console.log('=====================================');
   
   // Check if we're in a Git repository
-  try {
-    execSync('git rev-parse --git-dir', { stdio: 'ignore' });
-  } catch (error) {
-    console.error('Error: Not in a Git repository');
-    process.exit(1);
+  const gitAvailable = isGitAvailable();
+  if (!gitAvailable) {
+    console.warn('⚠️ Warning: Git not available - will only use file modification dates');
+  } else {
+    console.log('✅ Git available - will include commit dates');
   }
   
   generateDocsMetadata();
