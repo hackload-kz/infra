@@ -137,7 +137,7 @@ def set_payment_endpoint_urls(teams: List[Dict], api: TeamEnvAPI, base_url: str 
         success = api.set_team_env_var(
             team_nickname,
             "PAYMENT_ENDPOINT",
-            payment_endpoint_url,
+            "https://hub.hackload.kz/payment-provider/common",#payment_endpoint_url,
             "API Платежного шлюза",
             "api",  # category
             False,  # not secure

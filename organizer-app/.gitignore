@@ -20,6 +20,9 @@
 # production
 /build
 
+# build artifacts
+/public/docs-metadata.json
+
 # misc
 .DS_Store
 *.pem
