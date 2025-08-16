@@ -101,7 +101,7 @@ module "payment_provider" {
 
   # Security Configuration
   csrf_key    = "hackload-payment-gateway-csrf-key-2025"
-  admin_token = "admin_token_2025_hackload_payment_gateway_secure_key_prod"
+  admin_token = "this-is-a-rand0m-token"
   admin_key   = "admin_token_2025_hackload_payment_gateway_secure_key_prod"
 
   # API Configuration
@@ -122,6 +122,42 @@ module "payment_provider" {
 
   # Resource Configuration
   payment_provider_resources = {
+    requests = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+    limits = {
+      cpu    = "500m"
+      memory = "512Mi"
+    }
+  }
+}
+
+module "biletter" {
+  source = "../../apps/biletter"
+
+  # Infrastructure Configuration
+  namespace         = "biletter"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  # Biletter Configuration
+  biletter_image = "ghcr.io/hackload-kz/biletter"
+  biletter_tag   = "pkg-12fa4a9b7b455ebb786dc07471d0d9604991cc01"
+  biletter_host  = "hub.hackload.kz"
+  biletter_path  = "/biletter"
+
+  # Certificate Management
+  cert_issuer_name = "letsencrypt-prod"
+
+  # Container Registry Credentials
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  # Resource Configuration
+  biletter_resources = {
     requests = {
       cpu    = "200m"
       memory = "256Mi"
