@@ -1,38 +1,62 @@
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { isOrganizer } from '@/lib/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { logger, LogAction } from '@/lib/logger'
 
-// GET /api/dashboard/load-testing/teams/[teamId]/test-runs - Получить запуски тестов команды
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ teamId: string }> }
-) {
+// GET /api/space/teams/test-runs - Получить запуски тестов участника (только его собственные)
+export async function GET(request: NextRequest) {
   try {
-    const { teamId } = await params
     const session = await auth()
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
 
-    const organizer = await isOrganizer(session.user.email)
-    if (!organizer) {
-      return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
-    }
-
-    // Проверить существование команды
-    const team = await db.team.findUnique({
-      where: { id: teamId },
-      select: { id: true, name: true, nickname: true, k6EnvironmentVars: true }
+    // Найти участника
+    const participant = await db.participant.findFirst({
+      where: { 
+        user: { email: session.user.email } 
+      },
+      include: {
+        team: {
+          select: {
+            id: true,
+            name: true,
+            nickname: true,
+            k6EnvironmentVars: true
+          }
+        },
+        ledTeam: {
+          select: {
+            id: true,
+            name: true,
+            nickname: true,
+            k6EnvironmentVars: true
+          }
+        }
+      }
     })
 
-    if (!team) {
-      return NextResponse.json({ error: 'Команда не найдена' }, { status: 404 })
+    if (!participant) {
+      return NextResponse.json({ error: 'Участник не найден' }, { status: 404 })
     }
 
+    // Участник должен состоять в команде
+    const team = participant.team || participant.ledTeam
+    if (!team) {
+      return NextResponse.json({ 
+        team: null,
+        testRuns: []
+      })
+    }
+
+    // Получить запуски тестов, созданные участниками команды (исключая тесты организаторов)
     const testRuns = await db.testRun.findMany({
-      where: { teamId },
+      where: { 
+        teamId: team.id,
+        createdBy: {
+          not: null // Исключить тесты организаторов (где createdBy = null)
+        }
+      },
       include: {
         scenario: {
           select: {
@@ -75,9 +99,9 @@ export async function GET(
       })
     )
 
-    await logger.info(LogAction.READ, 'TestRun', `Получен список запусков тестов для команды ${team.name} (${testRuns.length})`, {
+    await logger.info(LogAction.READ, 'TestRun', `Участник получил список запусков тестов команды (${testRuns.length}, только участники)`, {
       userEmail: session.user.email,
-      entityId: teamId
+      entityId: participant.id
     })
 
     return NextResponse.json({
@@ -85,7 +109,7 @@ export async function GET(
       testRuns: testRunsWithCreators
     })
   } catch (error) {
-    console.error('Error fetching team test runs:', error)
+    console.error('Error fetching participant test runs:', error)
     return NextResponse.json(
       { error: 'Ошибка при получении запусков тестов' },
       { status: 500 }
@@ -93,36 +117,47 @@ export async function GET(
   }
 }
 
-// POST /api/dashboard/load-testing/teams/[teamId]/test-runs - Создать новый запуск теста
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ teamId: string }> }
-) {
+// POST /api/space/teams/test-runs - Создать новый запуск теста участником
+export async function POST(request: NextRequest) {
   try {
-    const { teamId } = await params
     const session = await auth()
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
 
-    const organizer = await isOrganizer(session.user.email)
-    if (!organizer) {
-      return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
-    }
-
-    // Проверить существование команды
-    const team = await db.team.findUnique({
-      where: { id: teamId },
-      select: {
-        id: true,
-        name: true,
-        nickname: true,
-        k6EnvironmentVars: true
+    // Найти участника
+    const participant = await db.participant.findFirst({
+      where: { 
+        user: { email: session.user.email } 
+      },
+      include: {
+        team: {
+          select: {
+            id: true,
+            name: true,
+            nickname: true,
+            k6EnvironmentVars: true
+          }
+        },
+        ledTeam: {
+          select: {
+            id: true,
+            name: true,
+            nickname: true,
+            k6EnvironmentVars: true
+          }
+        }
       }
     })
 
+    if (!participant) {
+      return NextResponse.json({ error: 'Участник не найден' }, { status: 404 })
+    }
+
+    // Участник должен состоять в команде
+    const team = participant.team || participant.ledTeam
     if (!team) {
-      return NextResponse.json({ error: 'Команда не найдена' }, { status: 404 })
+      return NextResponse.json({ error: 'Вы должны состоять в команде для создания тестов' }, { status: 400 })
     }
 
     const body = await request.json()
@@ -137,9 +172,9 @@ export async function POST(
 
     // Validate parallelism parameter
     const parsedParallelism = parallelism ? parseInt(parallelism, 10) : 1
-    if (parallelism && (isNaN(parsedParallelism) || parsedParallelism < 1 || parsedParallelism > 10)) {
+    if (parallelism && (isNaN(parsedParallelism) || parsedParallelism < 1 || parsedParallelism > 5)) {
       return NextResponse.json(
-        { error: 'Parallelism должно быть числом от 1 до 10' },
+        { error: 'Parallelism должно быть числом от 1 до 5' },
         { status: 400 }
       )
     }
@@ -170,11 +205,11 @@ export async function POST(
     const testRun = await db.testRun.create({
       data: {
         scenarioId,
-        teamId,
+        teamId: team.id,
         runNumber,
         comment,
         status: 'PENDING',
-        createdBy: null // Организатор создает тесты без привязки к participant
+        createdBy: participant.id // Участник создает тесты с привязкой к себе
       },
       include: {
         scenario: {
@@ -258,7 +293,7 @@ export default function() {
       try {
         // Создать K6 TestRun для этого шага
         const k6TestName = await createK6TestRun({
-          teamId,
+          teamId: team.id,
           teamNickname: testRun.team.nickname,
           scenarioId,
           scenarioIdentifier: testRun.scenario.identifier,
@@ -331,7 +366,7 @@ export default function() {
         }
       })
 
-      await logger.info(LogAction.CREATE, 'TestRun', `Запущено ${k6TestNames.length} K6 тестов: ${scenario.name} для команды ${team.name} (запуск #${runNumber})`, {
+      await logger.info(LogAction.CREATE, 'TestRun', `Участник запустил ${k6TestNames.length} K6 тестов: ${scenario.name} для команды ${team.name} (запуск #${runNumber})`, {
         userEmail: session.user.email,
         entityId: testRun.id
       })

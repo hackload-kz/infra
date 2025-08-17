@@ -21,8 +21,11 @@ import {
   ChevronUp,
   Calendar,
   Timer,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3,
+  ExternalLink
 } from 'lucide-react'
+import { generateGrafanaLink, isGrafanaLinkAvailable } from '@/lib/grafana'
 
 interface TestRunStep {
   id: string
@@ -501,6 +504,26 @@ export default function TestRunDetailsPage({
                       </div>
                       
                       <div className="flex items-center gap-2">
+                        {isGrafanaLinkAvailable(step.k6TestName, step.status) && (
+                          <Button
+                            onClick={() => {
+                              const grafanaUrl = generateGrafanaLink({
+                                testId: step.k6TestName!,
+                                startedAt: step.startedAt,
+                                completedAt: step.completedAt
+                              })
+                              window.open(grafanaUrl, '_blank')
+                            }}
+                            size="sm"
+                            variant="ghost"
+                            className="text-green-400 hover:text-green-300 hover:bg-green-400/10"
+                            title="Открыть метрики в Grafana"
+                          >
+                            <BarChart3 size={14} />
+                            <ExternalLink size={10} className="ml-1" />
+                            Grafana
+                          </Button>
+                        )}
                         {step.hasLogs && (
                           <Button
                             onClick={() => toggleStepExpansion(step.id)}

@@ -24,9 +24,9 @@ interface PersonalCabinetLayoutProps {
   children: React.ReactNode
   user: {
     name: string
-    email: string
+    email?: string
     image?: string
-  }
+  } | null
   hasTeam?: boolean
 }
 
@@ -103,8 +103,8 @@ export default function PersonalCabinetLayout({ children, user, hasTeam = false 
                 <User className="w-6 h-6 text-slate-900" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                <p className="text-sm font-medium text-white truncate">{user?.name || 'Загрузка...'}</p>
+                <p className="text-xs text-slate-400 truncate">{user?.email || ''}</p>
               </div>
             </div>
           </div>
