@@ -457,3 +457,37 @@ resource "kubernetes_service" "otel_collector" {
     type = "ClusterIP"
   }
 }
+
+# ServiceMonitor for OpenTelemetry metrics
+resource "kubernetes_manifest" "otel_collector_servicemonitor" {
+  count = var.enable_metrics ? 1 : 0
+
+  manifest = {
+    apiVersion = "monitoring.coreos.com/v1"
+    kind       = "ServiceMonitor"
+    metadata = {
+      name      = "otel_collector-prometheus"
+      namespace = var.namespace
+      labels = {
+        app = "otel_collector"
+        release = "prometheus"
+      }
+    }
+    spec = {
+      selector = {
+        matchLabels = {
+          app = "otel_collector"
+        }
+      }
+      endpoints = [
+        {
+          port = "metrics"
+          path = "/metrics"
+          interval = "30s"
+        }
+      ]
+    }
+  }
+
+  depends_on = [kubernetes_service.kafka_jmx_exporter]
+}
