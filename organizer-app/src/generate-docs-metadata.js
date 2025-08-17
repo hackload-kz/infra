@@ -108,7 +108,7 @@ function isGitAvailable() {
   try {
     execSync('git rev-parse --git-dir', { stdio: 'ignore' });
     return true;
-  } catch {
+  } catch (error) {
     return false;
   }
 }

@@ -28,12 +28,12 @@ graph TD
 ```
 
 ### 1. Регистрация мерчанта (Команда организаторов это делает. Реквизиты доступны в https://hub.hackload.kz)
-- **Эндпоинт**: `POST /api/v1/TeamRegistration/register`
+- **Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/TeamRegistration/register`
 - **Назначение**: Регистрация нового мерчанта для приема платежей
 - **Результат**: Получение учетных данных для API
 
 ### 2. Создание платежа
-- **Эндпоинт**: `POST /api/v1/PaymentInit/init`
+- **Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init`
 - **Назначение**: Создание нового платежного намерения
 - **Статус**: `NEW`
 - **Результат**: URL для оплаты покупателем
@@ -44,17 +44,17 @@ graph TD
 - **Безопасность**: PCI DSS compliant обработка карточных данных
 
 ### 4. Подтверждение платежа
-- **Эндпоинт**: `POST /api/v1/PaymentConfirm/confirm`
+- **Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentConfirm/confirm`
 - **Назначение**: Подтверждение авторизованного платежа для списания средств
 - **Статус**: `AUTHORIZED` → `CONFIRMED`
 
 ### 5. Проверка статуса
-- **Эндпоинт**: `POST /api/v1/PaymentCheck/check`
+- **Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCheck/check`
 - **Назначение**: Получение текущего статуса платежа
 - **Поддержка**: Поиск по PaymentId или OrderId
 
 ### 6. Отмена платежа
-- **Эндпоинт**: `POST /api/v1/PaymentCancel/cancel`
+- **Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCancel/cancel`
 - **Назначение**: Отмена, реверс или возврат платежа
 - **Типы**: Отмена (NEW), Реверс (AUTHORIZED), Возврат (CONFIRMED)
 
@@ -90,7 +90,7 @@ graph TD
 
 ### 🔐 СПЕЦИАЛЬНАЯ АУТЕНТИФИКАЦИЯ ДЛЯ PaymentCheck
 
-**Эндпоинт**: `POST /api/v1/PaymentCheck/check`
+**Эндпоинт**: `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCheck/check`
 
 **⚠️ ВАЖНО**: PaymentCheck использует **ОТЛИЧНУЮ** от других эндпоинтов формулу аутентификации.
 
@@ -141,7 +141,7 @@ echo "Сгенерированный токен: $token"
 
 # ВАЖНО: Даже если запрос содержит дополнительные поля, 
 # они НЕ участвуют в генерации токена:
-curl -X POST /api/v1/PaymentInit/init \
+curl -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$teamSlug\",
@@ -313,7 +313,7 @@ Output: "b8f2f8e5c9d6a4c8f7b5e3a2d1f0e9c8b7a6f5d4e3c2b1a0f9e8d7c6b5a4f3e2"
 
 1. **Для администраторов:** Обновить дневной лимит через API
    ```bash
-   curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/{teamSlug}" \
+   curl -X PUT "https://hub.hackload.kz/payment-provider/common/api/v1/TeamRegistration/update/{teamSlug}" \
      -H "X-Admin-Token: {admin-token}" \
      -H "Content-Type: application/json" \
      -d '{"dailyPaymentLimit": 999999999999999999.99}'
@@ -374,7 +374,7 @@ Content-Type: application/json
   "passwordHashPreview": "d3ad9315...",
   "createdAt": "2025-08-06T10:30:00Z",
   "status": "ACTIVE",
-  "apiEndpoint": "https://gateway.hackload.com/api/v1",
+  "apiEndpoint": "https://hub.hackload.kz/payment-provider/common/api/v1",
   "details": {
     "teamName": "My Online Store",
     "email": "merchant@mystore.com",
@@ -520,7 +520,7 @@ X-Admin-Token: {admin-token}
 **Пример запроса:**
 ```bash
 curl -H "X-Admin-Token: admin_token_here" \
-     "https://gateway.hackload.com/api/v1/TeamRegistration/info/my-online-store"
+     "https://hub.hackload.kz/payment-provider/common/api/v1/TeamRegistration/info/my-online-store"
 ```
 
 ### 1.2. Обновление настроек команды (Администраторы)
@@ -592,7 +592,7 @@ X-Admin-Token: {admin-token}
 
 **Пример настройки дневного лимита:**
 ```bash
-curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/my-store" \
+curl -X PUT "https://hub.hackload.kz/payment-provider/common/api/v1/TeamRegistration/update/my-store" \
   -H "X-Admin-Token: admin_token_here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -651,7 +651,7 @@ X-Admin-Token: {admin-token}
 
 **Пример запроса:**
 ```bash
-curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-database" \
+curl -X POST "https://hub.hackload.kz/payment-provider/common/api/v1/Admin/clear-database" \
   -H "X-Admin-Token: admin_token_here"
 ```
 
@@ -702,14 +702,147 @@ X-Admin-Token: {admin-token}
 - **Связанные логи**: Аудит-логи удаленных записей команды
 **Пример запроса:**
 ```bash
-curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-team-data/my-online-store" \
+curl -X POST "https://hub.hackload.kz/payment-provider/common/api/v1/Admin/clear-team-data/my-online-store" \
   -H "X-Admin-Token: admin_token_here"
 ```
 
 **Пример для очистки данных тестовой команды:**
 ```bash
-curl -X POST "https://gateway.hackload.com/api/v1/Admin/clear-team-data/test-merchant-2025" \
+curl -X POST "https://hub.hackload.kz/payment-provider/common/api/v1/Admin/clear-team-data/test-merchant-2025" \
   -H "X-Admin-Token: admin_token_here"
+```
+
+### 1.5. Самостоятельное управление командой (Web-интерфейс)
+
+**Веб-панель управления командой** - удобный интерфейс для самостоятельного управления настройками команды без необходимости работы с API.
+
+**🌐 URL для доступа:** `https://hub.hackload.com/payment-provider/common/team`
+
+**🔐 Аутентификация:** Basic Auth с использованием учетных данных команды
+- **Логин**: TeamSlug (идентификатор команды)
+- **Пароль**: Password команды
+
+#### Возможности веб-панели
+
+**📊 Просмотр информации о команде:**
+- Название команды, контактная информация
+- Статус активности и даты создания/обновления
+- Настройки URL для уведомлений и перенаправлений
+- Текущие лимиты платежей и ограничения
+- Поддерживаемые валюты и методы оплаты
+
+**📈 Статистика использования (в реальном времени):**
+- Общее количество платежей и сумма
+- Платежи за сегодня и текущий месяц
+- Количество клиентов и активных методов оплаты
+- Время последнего платежа
+- Статистика webhook-уведомлений
+
+**⚙️ Редактирование настроек:**
+- **Основная информация**: Название, email, телефон, описание, часовой пояс
+- **Лимиты платежей**: Минимальная/максимальная сумма, дневные/месячные лимиты, лимит транзакций
+- **URL конфигурация**: Success URL, Fail URL, Notification URL, Cancel URL
+- **Настройки webhook**: Включение/отключение, количество попыток, таймауты
+
+#### API эндпоинты для самоуправления
+
+**GET** `/api/v1/TeamManagement/profile`
+
+Получение полной информации о команде включая статистику использования.
+
+**Заголовки:**
+```
+Authorization: Basic {base64(teamSlug:password)}
+Content-Type: application/json
+```
+
+**Ответ (200 OK):**
+```json
+{
+  "teamSlug": "my-store",
+  "teamName": "My Online Store",
+  "isActive": true,
+  "contactEmail": "merchant@mystore.com",
+  "contactPhone": "+1234567890",
+  "description": "Online electronics store",
+  "timeZone": "Europe/Moscow",
+  "minPaymentAmount": 1000,
+  "maxPaymentAmount": 500000000000,
+  "dailyPaymentLimit": 8990000000000,
+  "monthlyPaymentLimit": 50000000000000,
+  "dailyTransactionLimit": 1000,
+  "supportedCurrencies": ["RUB", "USD", "EUR"],
+  "successUrl": "https://mystore.com/success",
+  "failUrl": "https://mystore.com/fail",
+  "notificationUrl": "https://mystore.com/webhook",
+  "cancelUrl": "https://mystore.com/cancel",
+  "usageStats": {
+    "totalPayments": 8,
+    "totalPaymentAmount": 48145000.00,
+    "paymentsToday": 5,
+    "paymentAmountToday": 48100000.00,
+    "paymentsThisMonth": 8,
+    "paymentAmountThisMonth": 48145000.00,
+    "totalCustomers": 127,
+    "activePaymentMethods": 3,
+    "lastPaymentAt": "2025-08-17T08:55:14.152654Z",
+    "lastWebhookAt": "2025-08-17T08:55:15.240000Z",
+    "failedWebhooksLast24Hours": 0
+  }
+}
+```
+
+**PUT** `/api/v1/TeamManagement/profile`
+
+Обновление настроек команды (только разрешенные для самостоятельного изменения поля).
+
+**Заголовки:**
+```
+Authorization: Basic {base64(teamSlug:password)}
+Content-Type: application/json
+```
+
+**Тело запроса (все поля опциональны):**
+```json
+{
+  "teamName": "Updated Store Name",
+  "contactEmail": "newemail@mystore.com",
+  "contactPhone": "+1234567891",
+  "description": "Updated store description",
+  "timeZone": "Europe/London",
+  "successUrl": "https://mystore.com/new-success",
+  "failUrl": "https://mystore.com/new-fail",
+  "notificationUrl": "https://mystore.com/new-webhook",
+  "cancelUrl": "https://mystore.com/new-cancel",
+  "minPaymentAmount": 500,
+  "maxPaymentAmount": 1000000000000,
+  "dailyPaymentLimit": 10000000000000,
+  "monthlyPaymentLimit": 100000000000000,
+  "dailyTransactionLimit": 2000,
+  "enableWebhooks": true,
+  "webhookRetryAttempts": 5,
+  "webhookTimeoutSeconds": 45,
+  "metadata": {
+    "custom_field": "value",
+    "integration_version": "2.0"
+  }
+}
+```
+
+**Ответ (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Team profile updated successfully",
+  "teamSlug": "my-store",
+  "updatedAt": "2025-08-17T14:30:00Z",
+  "updatedFields": [
+    "teamName",
+    "contactEmail", 
+    "dailyPaymentLimit",
+    "notificationUrl"
+  ]
+}
 ```
 
 
@@ -751,7 +884,7 @@ Content-Type: application/json
   "status": "NEW",
   "amount": 150000,
   "currency": "RUB",
-  "paymentURL": "https://gateway.hackload.com/payment/pay_123456789",
+  "paymentURL": "https://hub.hackload.kz/payment-provider/common/payment/pay_123456789",
   "expiresAt": "2025-01-30T12:30:00Z",
   "createdAt": "2025-01-30T12:00:00Z"
 }
@@ -1054,7 +1187,7 @@ token=$(echo -n "$token_params" | sha256sum | cut -d' ' -f1)
 echo "Создание платежа..."
 
 # Создание платежа
-response=$(curl -s -X POST https://gateway.hackload.com/api/v1/PaymentInit/init \
+response=$(curl -s -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$team_slug\",
@@ -1108,7 +1241,7 @@ token_params="${amount}${currency}${description}${email}${fail_url}${order_id}${
 token=$(echo -n "$token_params" | sha256sum | cut -d' ' -f1)
 
 # Создание платежа
-curl -X POST https://gateway.hackload.com/api/v1/PaymentInit/init \
+curl -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$team_slug\",
@@ -1140,7 +1273,7 @@ token_params="${payment_id}${password}${team_slug}"
 token=$(echo -n "$token_params" | sha256sum | cut -d' ' -f1)
 
 # Проверка статуса
-curl -X POST https://gateway.hackload.com/api/v1/PaymentCheck/check \
+curl -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCheck/check \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$team_slug\",
@@ -1168,7 +1301,7 @@ token_params="${amount}${payment_id}${team_slug}${password}"
 token=$(echo -n "$token_params" | sha256sum | cut -d' ' -f1)
 
 # Подтверждение платежа
-curl -X POST https://gateway.hackload.com/api/v1/PaymentConfirm/confirm \
+curl -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentConfirm/confirm \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$team_slug\",
@@ -1195,7 +1328,7 @@ token_params="${payment_id}${team_slug}${password}"
 token=$(echo -n "$token_params" | sha256sum | cut -d' ' -f1)
 
 # Отмена платежа
-curl -X POST https://gateway.hackload.com/api/v1/PaymentCancel/cancel \
+curl -X POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCancel/cancel \
   -H "Content-Type: application/json" \
   -d "{
     \"teamSlug\": \"$team_slug\",
@@ -1225,7 +1358,7 @@ curl -X POST https://gateway.hackload.com/api/v1/PaymentCancel/cancel \
 **Пример настройки webhook через API обновления команды:**
 
 ```bash
-curl -X PUT "https://gateway.hackload.com/api/v1/TeamRegistration/update/my-store" \
+curl -X PUT "https://hub.hackload.kz/payment-provider/common/api/v1/TeamRegistration/update/my-store" \
   -H "X-Admin-Token: admin_token_here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1249,7 +1382,7 @@ Webhook отправляется при **каждом** изменении ст
 
 #### Сценарий полного жизненного цикла платежа
 
-**1. Создание платежа** - `POST /api/v1/PaymentInit/init`
+**1. Создание платежа** - `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init`
 ```json
 {
   "teamSlug": "my-store",
@@ -1277,10 +1410,10 @@ Webhook отправляется при **каждом** изменении ст
 
 После создания платежа покупатель переходит по ссылке `paymentURL` из ответа, например:
 ```
-https://gateway.hackload.com/api/v1/paymentform/render/pmt_abc123?lang=ru
+https://hub.hackload.kz/payment-provider/common/api/v1/paymentform/render/pmt_abc123?lang=ru
 ```
 
-**Платежная форма** - `GET /api/v1/paymentform/render/{paymentId}`
+**Платежная форма** - `GET https://hub.hackload.kz/payment-provider/common/api/v1/paymentform/render/{paymentId}`
 - **Назначение**: Отображение безопасной формы ввода данных карты
 - **Параметры URL**: 
   - `{paymentId}` - ID платежа из ответа PaymentInit
@@ -1300,7 +1433,7 @@ https://gateway.hackload.com/api/v1/paymentform/render/pmt_abc123?lang=ru
 - **4000000000000002** - отклонение банком
 - **4000000000000119** - недостаточно средств
 
-**3. Покупатель отправляет данные карты** - `POST /api/v1/paymentform/submit`
+**3. Покупатель отправляет данные карты** - `POST https://hub.hackload.kz/payment-provider/common/api/v1/paymentform/submit`
 
 Форма автоматически отправляет данные при заполнении:
 ```json
@@ -1361,7 +1494,7 @@ https://gateway.hackload.com/api/v1/paymentform/render/pmt_abc123?lang=ru
 }
 ```
 
-**3. Подтверждение платежа** - `POST /api/v1/PaymentConfirm/confirm`
+**3. Подтверждение платежа** - `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentConfirm/confirm`
 **Webhook:** Переход `AUTHORIZED` → `CONFIRMED` (ОСОБЫЙ случай - уведомление о завершении)
 ```json
 {
@@ -1401,7 +1534,7 @@ Content-Type: application/json
 }
 ```
 
-**Отмена платежа** - `POST /api/v1/PaymentCancel/cancel`
+**Отмена платежа** - `POST https://hub.hackload.kz/payment-provider/common/api/v1/PaymentCancel/cancel`
 **Webhook:** Переход к `CANCELLED`
 ```json
 {
@@ -1596,7 +1729,7 @@ import json
 from datetime import datetime
 
 class PaymentGatewayClient:
-    def __init__(self, team_slug, password, base_url="https://gateway.hackload.com/api/v1"):
+    def __init__(self, team_slug, password, base_url="https://hub.hackload.kz/payment-provider/common/api/v1"):
         self.team_slug = team_slug
         self.password = password
         self.base_url = base_url
@@ -1774,7 +1907,7 @@ if __name__ == "__main__":
      notificationURL: "https://mystore.com/webhook"
    };
    
-   const response = await fetch('https://gateway.hackload.com/api/v1/PaymentInit/init', {
+   const response = await fetch('https://hub.hackload.kz/payment-provider/common/api/v1/PaymentInit/init', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify(paymentData)
