@@ -1,0 +1,20 @@
+import { ApiClientConfig, CriteriaListResponse, BulkCriteriaUpdateResponse, SingleCriteriaUpdateRequest, SingleCriteriaUpdateResponse } from '../types/api';
+import { CriteriaType, CriteriaUpdate, Team } from '../types/criteria';
+export declare class HubApiClient {
+    private readonly config;
+    constructor(config: ApiClientConfig);
+    getTeams(): Promise<Team[]>;
+    getCriteria(params?: {
+        teamSlug?: string;
+        criteriaType?: CriteriaType;
+    }): Promise<CriteriaListResponse>;
+    bulkUpdateCriteria(updates: CriteriaUpdate[]): Promise<BulkCriteriaUpdateResponse>;
+    updateSingleCriteria(teamSlug: string, criteriaType: CriteriaType, update: SingleCriteriaUpdateRequest): Promise<SingleCriteriaUpdateResponse>;
+    getTeamEnvironmentData(teamId: string, hackathonId: string): Promise<Record<string, string>>;
+    private request;
+    private fetchWithTimeout;
+    private createHttpError;
+    private isRetryableError;
+    private log;
+}
+//# sourceMappingURL=api-client.d.ts.map

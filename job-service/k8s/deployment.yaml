@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hackload-job-service
+  namespace: hub
+  labels:
+    app: hackload-job-service
+    component: background-jobs
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: hackload-job-service
+  template:
+    metadata:
+      labels:
+        app: hackload-job-service
+        component: background-jobs
+    spec:
+      containers:
+      - name: job-service
+        image: ghcr.io/hackload-kz/infra/job-service:latest
+        imagePullPolicy: Always
+        ports:
+        - name: health
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        # Load configuration from ConfigMap
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: job-service-config
+              key: NODE_ENV
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: job-service-config
+              key: LOG_LEVEL
+        - name: API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: job-service-config
+              key: API_BASE_URL
+        - name: API_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: job-service-config
+              key: API_TIMEOUT
+        - name: API_RETRIES
+          valueFrom:
+            configMapKeyRef:
+              name: job-service-config
+              key: API_RETRIES
+        # Load secrets
+        - name: SERVICE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: job-service-secrets
+              key: SERVICE_API_KEY
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: job-service-secrets
+              key: GITHUB_TOKEN
+              optional: true
+        # Load all other config from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: job-service-config
+        - secretRef:
+            name: job-service-secrets
+            optional: true
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: health
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: health
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health/live
+            port: health
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+          readOnly: false
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      restartPolicy: Always

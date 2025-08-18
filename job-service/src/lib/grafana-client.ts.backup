@@ -1,0 +1,361 @@
+/**
+ * Grafana API Client for K6 Performance Metrics
+ * 
+ * Provides integration with Grafana API to fetch K6 performance test results
+ * and metrics for team application monitoring.
+ */
+
+import { Logger } from './logger';
+import { config } from '../config';
+
+export interface GrafanaMetric {
+  metric: Record<string, string>;
+  value: [number, string]; // [timestamp, value]
+  values?: [number, string][]; // for range queries
+}
+
+export interface GrafanaQueryResult {
+  resultType: 'matrix' | 'vector' | 'scalar' | 'string';
+  result: GrafanaMetric[];
+}
+
+export interface GrafanaResponse {
+  status: 'success' | 'error';
+  data: GrafanaQueryResult;
+  errorType?: string;
+  error?: string;
+}
+
+export interface K6PerformanceMetrics {
+  p95Latency: number; // P95 response time in milliseconds
+  successRate: number; // Success rate percentage (0-100)
+  requestRate: number; // Requests per second
+  errorRate: number; // Error rate percentage (0-100)
+  avgLatency: number; // Average response time in milliseconds
+  maxLatency: number; // Maximum response time in milliseconds
+  dataReceived: number; // Bytes received
+  dataSent: number; // Bytes sent
+}
+
+export interface K6TestResult {
+  testId: string;
+  teamId: number;
+  url: string;
+  timestamp: Date;
+  duration: number; // Test duration in seconds
+  metrics: K6PerformanceMetrics;
+  status: 'completed' | 'failed' | 'running';
+  thresholds: {
+    p95LatencyThreshold: number;
+    successRateThreshold: number;
+  };
+}
+
+export class GrafanaClient {
+  private readonly baseUrl: string;
+  private readonly apiKey: string;
+  private readonly username?: string;
+  private readonly logger: Logger;
+  private readonly timeout: number;
+
+  constructor() {
+    this.logger = new Logger('GrafanaClient');
+    
+    this.baseUrl = config.grafana?.apiUrl || '';
+    this.apiKey = config.grafana?.token || '';
+    this.username = config.grafana?.username;
+    this.timeout = config.api.timeout;
+
+    if (!this.baseUrl) {
+      this.logger.warn('Grafana API URL not configured');
+    }
+  }
+
+  /**
+   * Check if Grafana client is properly configured
+   */
+  isConfigured(): boolean {
+    return !!(this.baseUrl && (this.apiKey || this.username));
+  }
+
+  /**
+   * Execute Prometheus query via Grafana API
+   */
+  async query(query: string, time?: Date): Promise<GrafanaResponse> {
+    if (!this.isConfigured()) {
+      throw new Error('Grafana client not properly configured');
+    }
+
+    const url = new URL('/api/v1/query', this.baseUrl);
+    url.searchParams.set('query', query);
+    
+    if (time) {
+      url.searchParams.set('time', (time.getTime() / 1000).toString());
+    }
+
+    this.logger.debug(`Executing Grafana query: ${query}`);
+
+    try {
+      const response = await this.makeRequest(url.toString());
+      const data = await response.json() as GrafanaResponse;
+      
+      if (data.status === 'error') {
+        throw new Error(`Grafana query error: ${data.error}`);
+      }
+      
+      return data;
+    } catch (error) {
+      this.logger.error('Grafana query failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Execute Prometheus range query via Grafana API
+   */
+  async queryRange(
+    query: string, 
+    start: Date, 
+    end: Date, 
+    step?: string
+  ): Promise<GrafanaResponse> {
+    if (!this.isConfigured()) {
+      throw new Error('Grafana client not properly configured');
+    }
+
+    const url = new URL('/api/v1/query_range', this.baseUrl);
+    url.searchParams.set('query', query);
+    url.searchParams.set('start', (start.getTime() / 1000).toString());
+    url.searchParams.set('end', (end.getTime() / 1000).toString());
+    
+    if (step) {
+      url.searchParams.set('step', step);
+    }
+
+    this.logger.debug(`Executing Grafana range query: ${query}`);
+
+    try {
+      const response = await this.makeRequest(url.toString());
+      const data = await response.json() as GrafanaResponse;
+      
+      if (data.status === 'error') {
+        throw new Error(`Grafana range query error: ${data.error}`);
+      }
+      
+      return data;
+    } catch (error) {
+      this.logger.error('Grafana range query failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get K6 performance metrics for a specific team application
+   */
+  async getK6Metrics(
+    teamId: number, 
+    url: string, 
+    _timeRange: { start: Date; end: Date }
+  ): Promise<K6PerformanceMetrics | null> {
+    try {
+      this.logger.info(`Fetching K6 metrics for team ${teamId}, URL: ${url}`);
+
+      // Build base selector for K6 metrics
+      const selector = `{job="k6",url="${url}",team_id="${teamId}"}`;
+
+      // Fetch various K6 metrics in parallel
+      const [
+        p95Response,
+        successRateResponse,
+        requestRateResponse,
+        avgLatencyResponse,
+        maxLatencyResponse,
+        dataReceivedResponse,
+        dataSentResponse
+      ] = await Promise.all([
+        // P95 response time
+        this.query(`histogram_quantile(0.95, http_req_duration${selector})`),
+        
+        // Success rate (percentage of non-error responses)
+        this.query(`(rate(http_reqs{status!~"4..|5..",${selector.slice(1, -1)}}[5m]) / rate(http_reqs${selector}[5m])) * 100`),
+        
+        // Request rate (requests per second)
+        this.query(`rate(http_reqs${selector}[5m])`),
+        
+        // Average response time
+        this.query(`rate(http_req_duration_sum${selector}[5m]) / rate(http_req_duration_count${selector}[5m])`),
+        
+        // Max response time
+        this.query(`max_over_time(http_req_duration${selector}[5m])`),
+        
+        // Data received
+        this.query(`rate(data_received${selector}[5m])`),
+        
+        // Data sent
+        this.query(`rate(data_sent${selector}[5m])`)
+      ]);
+
+      // Extract values from responses
+      const p95Latency = this.extractValue(p95Response) || 0;
+      const successRate = this.extractValue(successRateResponse) || 0;
+      const requestRate = this.extractValue(requestRateResponse) || 0;
+      const avgLatency = this.extractValue(avgLatencyResponse) || 0;
+      const maxLatency = this.extractValue(maxLatencyResponse) || 0;
+      const dataReceived = this.extractValue(dataReceivedResponse) || 0;
+      const dataSent = this.extractValue(dataSentResponse) || 0;
+
+      const metrics: K6PerformanceMetrics = {
+        p95Latency: p95Latency * 1000, // Convert to milliseconds
+        successRate,
+        requestRate,
+        errorRate: Math.max(0, 100 - successRate),
+        avgLatency: avgLatency * 1000, // Convert to milliseconds
+        maxLatency: maxLatency * 1000, // Convert to milliseconds
+        dataReceived,
+        dataSent
+      };
+
+      this.logger.info(`K6 metrics retrieved for team ${teamId}:`, {
+        p95Latency: metrics.p95Latency,
+        successRate: metrics.successRate,
+        requestRate: metrics.requestRate
+      });
+
+      return metrics;
+    } catch (error) {
+      this.logger.error(`Failed to get K6 metrics for team ${teamId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get recent K6 test results for a team
+   */
+  async getRecentTestResults(
+    teamId: number, 
+    limit: number = 10
+  ): Promise<K6TestResult[]> {
+    try {
+      this.logger.info(`Fetching recent K6 test results for team ${teamId}`);
+
+      // Query for test metadata (this would depend on your K6 setup)
+      const query = `k6_test_info{team_id="${teamId}"}`;
+      const response = await this.query(query);
+
+      const results: K6TestResult[] = [];
+      
+      if (response.data.result.length === 0) {
+        this.logger.info(`No K6 test results found for team ${teamId}`);
+        return results;
+      }
+
+      // Process each test result
+      for (const metric of response.data.result.slice(0, limit)) {
+        const testId = metric.metric.test_id || `test-${Date.now()}`;
+        const url = metric.metric.url || '';
+        
+        if (url) {
+          const metricsTimeRange = {
+            start: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+            end: new Date()
+          };
+          
+          const performanceMetrics = await this.getK6Metrics(teamId, url, metricsTimeRange);
+          
+          if (performanceMetrics) {
+            results.push({
+              testId,
+              teamId,
+              url,
+              timestamp: new Date(parseFloat(metric.value[0]) * 1000),
+              duration: 300, // Default 5 minutes, should come from test metadata
+              metrics: performanceMetrics,
+              status: 'completed',
+              thresholds: {
+                p95LatencyThreshold: 2000, // 2 seconds
+                successRateThreshold: 95   // 95%
+              }
+            });
+          }
+        }
+      }
+
+      this.logger.info(`Retrieved ${results.length} K6 test results for team ${teamId}`);
+      return results;
+    } catch (error) {
+      this.logger.error(`Failed to get recent test results for team ${teamId}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Check Grafana API health
+   */
+  async healthCheck(): Promise<boolean> {
+    if (!this.isConfigured()) {
+      return false;
+    }
+
+    try {
+      const url = new URL('/api/health', this.baseUrl);
+      const response = await this.makeRequest(url.toString());
+      return response.ok;
+    } catch (error) {
+      this.logger.error('Grafana health check failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Extract numeric value from Grafana response
+   */
+  private extractValue(response: GrafanaResponse): number | null {
+    if (response.data.result.length === 0) {
+      return null;
+    }
+
+    const value = response.data.result[0].value[1];
+    const numValue = parseFloat(value);
+    
+    return isNaN(numValue) ? null : numValue;
+  }
+
+  /**
+   * Make HTTP request to Grafana API
+   */
+  private async makeRequest(url: string): Promise<Response> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'User-Agent': config.http.userAgent
+    };
+
+    // Add authentication
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    } else if (this.username) {
+      headers['X-Grafana-User'] = this.username;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  }
+}

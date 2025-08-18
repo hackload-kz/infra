@@ -134,7 +134,7 @@ async function runSyncWithErrorHandling() {
   try {
     const startTime = Date.now()
     const timestamp = new Date().toISOString()
-    console.info(`⏰ [${timestamp}] [${instanceId}] Attempting to acquire sync lock...`)
+    console.debug(`⏰ [${timestamp}] [${instanceId}] Attempting to acquire sync lock...`)
     
     // Execute sync within distributed lock
     const result = await withLock(
@@ -142,7 +142,7 @@ async function runSyncWithErrorHandling() {
       async () => {
         const syncStartTime = Date.now()
         const syncTimestamp = new Date().toISOString()
-        console.info(`🔒 [${syncTimestamp}] [${instanceId}] Lock acquired, starting K6 steps sync...`)
+        console.debug(`🔒 [${syncTimestamp}] [${instanceId}] Lock acquired, starting K6 steps sync...`)
         
         const syncResult = await syncK6TestRunSteps()
         
@@ -156,7 +156,7 @@ async function runSyncWithErrorHandling() {
           instance: instanceId
         }
         
-        console.info(`✅ [${new Date().toISOString()}] [${instanceId}] K6 steps sync completed:`, summary)
+        console.debug(`✅ [${new Date().toISOString()}] [${instanceId}] K6 steps sync completed:`, summary)
         
         // Логировать ошибки, если есть
         if (syncResult.errorSteps > 0) {

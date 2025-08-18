@@ -1,0 +1,247 @@
+name: Build and Deploy Job Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'job-service/**'
+      - '.github/workflows/job-service.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'job-service/**'
+      - '.github/workflows/job-service.yml'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: false
+        default: ''
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/job-service
+
+jobs:
+  lint-and-test:
+    runs-on: [self-hosted]
+    defaults:
+      run:
+        working-directory: job-service
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: job-service/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint
+
+    - name: Run TypeScript type check
+      run: npm run type-check
+
+    - name: Build project
+      run: npm run build
+
+    - name: Run tests
+      run: npm test
+      continue-on-error: true  # Tests are optional for now
+
+  build-and-push:
+    runs-on: [self-hosted]
+    needs: lint-and-test
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver-opts: |
+          network=host
+          env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
+          env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
+        config-inline: |
+          [worker.oci]
+            max-parallelism = 4
+          [worker.containerd]
+            max-parallelism = 4
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix=sha-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: job-service
+        file: job-service/Dockerfile
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Generate deployment artifact
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+      run: |
+        echo "IMAGE_TAG=sha-${GITHUB_SHA::7}" >> deployment.env
+        echo "IMAGE_URL=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${GITHUB_SHA::7}" >> deployment.env
+
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: job-service-deployment-info
+        path: deployment.env
+
+    - name: Build Summary
+      run: |
+        echo "### 🚀 Job Service Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "- **Context**: job-service/" >> $GITHUB_STEP_SUMMARY
+        echo "- **Platform**: linux/amd64" >> $GITHUB_STEP_SUMMARY
+        echo "- **Tags**: ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    runs-on: [self-hosted]
+    needs: [build-and-push]
+    if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download deployment artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: job-service-deployment-info
+
+    - name: Load deployment info
+      run: |
+        source deployment.env
+        echo "IMAGE_TAG_FROM_BUILD=$IMAGE_TAG" >> $GITHUB_ENV
+
+    - name: Determine image tag
+      id: image_tag
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.image_tag }}" ]]; then
+          echo "tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=$IMAGE_TAG_FROM_BUILD" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
+
+    - name: Verify kubectl connection
+      run: |
+        kubectl cluster-info
+        kubectl get nodes
+
+    - name: Apply Kubernetes manifests
+      run: |
+        # Apply ConfigMap and Service (they don't change often)
+        kubectl apply -f job-service/k8s/configmap.yaml
+        kubectl apply -f job-service/k8s/service.yaml
+        
+        # Apply deployment with new image
+        kubectl set image deployment/hackload-job-service \
+          job-service=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }} \
+          -n hub
+        
+        echo "Updated deployment with image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }}"
+
+    - name: Wait for rollout
+      run: |
+        kubectl rollout status deployment/hackload-job-service -n hub --timeout=300s
+
+    - name: Verify deployment
+      run: |
+        kubectl get pods -n hub -l app=hackload-job-service
+        kubectl get deployment hackload-job-service -n hub -o wide
+        echo "Job Service deployment successful!"
+
+    - name: Test health endpoint
+      run: |
+        # Wait for pod to be ready
+        kubectl wait --for=condition=ready pod -l app=hackload-job-service -n hub --timeout=120s
+        
+        # Port forward and test health endpoint
+        kubectl port-forward -n hub service/hackload-job-service 8080:8080 &
+        PF_PID=$!
+        sleep 5
+        
+        # Test health endpoint
+        if curl -f http://localhost:8080/health/live; then
+          echo "✅ Health check passed"
+        else
+          echo "❌ Health check failed"
+          exit 1
+        fi
+        
+        # Cleanup port forward
+        kill $PF_PID
+
+    - name: Get deployment info
+      run: |
+        echo "### Job Service Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Namespace**: hub" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployment**: hackload-job-service" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status**: $(kubectl get deployment hackload-job-service -n hub -o jsonpath='{.status.conditions[?(@.type=="Available")].status}')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Ready Replicas**: $(kubectl get deployment hackload-job-service -n hub -o jsonpath='{.status.readyReplicas}')/$(kubectl get deployment hackload-job-service -n hub -o jsonpath='{.spec.replicas}')" >> $GITHUB_STEP_SUMMARY
+
+  notify-failure:
+    runs-on: [self-hosted]
+    if: failure()
+    needs: [lint-and-test, build-and-push, deploy]
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "### ❌ Job Service Build and Deploy Workflow Failed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
