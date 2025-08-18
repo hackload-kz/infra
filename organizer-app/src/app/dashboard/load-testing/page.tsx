@@ -38,6 +38,25 @@ interface Team {
     id: string
     name: string
   }
+  recentTestRuns?: TestRun[]
+}
+
+interface TestRun {
+  id: string
+  runNumber: number
+  status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED'
+  comment: string | null
+  createdAt: string
+  completedAt: string | null
+  scenario: {
+    name: string
+    identifier: string
+  }
+  team: {
+    id: string
+    name: string
+    nickname: string
+  }
 }
 
 export default function LoadTestingPage() {
@@ -45,10 +64,13 @@ export default function LoadTestingPage() {
   const router = useRouter()
   const [teams, setTeams] = useState<Team[]>([])
   const [filteredTeams, setFilteredTeams] = useState<Team[]>([])
+  const [recentTestRuns, setRecentTestRuns] = useState<TestRun[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingTestRuns, setLoadingTestRuns] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
+  const [view, setView] = useState<'teams' | 'testRuns'>('teams')
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -79,6 +101,7 @@ export default function LoadTestingPage() {
   useEffect(() => {
     if (isAdmin) {
       fetchTeams()
+      fetchRecentTestRuns()
     }
   }, [isAdmin])
 
@@ -103,6 +126,48 @@ export default function LoadTestingPage() {
       console.error('Error fetching teams:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchRecentTestRuns = async () => {
+    try {
+      setLoadingTestRuns(true)
+      // We'll fetch recent test runs from all teams
+      const response = await fetch('/api/dashboard/load-testing/teams')
+      if (response.ok) {
+        const teams = await response.json()
+        const allTestRuns: TestRun[] = []
+        
+        // Get recent test runs from each team
+        for (const team of teams) {
+          try {
+            const testRunsResponse = await fetch(`/api/dashboard/load-testing/teams/${team.id}/test-runs`)
+            if (testRunsResponse.ok) {
+              const teamData = await testRunsResponse.json()
+              // Add team info to each test run and take only recent ones
+              const teamTestRuns = teamData.testRuns.slice(0, 3).map((run: { id: string; runNumber: number; k6TestName: string; status: string; createdAt: string; scenario: { name: string; id: string } }) => ({
+                ...run,
+                team: {
+                  id: team.id,
+                  name: team.name,
+                  nickname: team.nickname
+                }
+              }))
+              allTestRuns.push(...teamTestRuns)
+            }
+          } catch (error) {
+            console.error(`Error fetching test runs for team ${team.id}:`, error)
+          }
+        }
+        
+        // Sort by creation date and take the most recent 20
+        allTestRuns.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        setRecentTestRuns(allTestRuns.slice(0, 20))
+      }
+    } catch (error) {
+      console.error('Error fetching recent test runs:', error)
+    } finally {
+      setLoadingTestRuns(false)
     }
   }
 
@@ -172,16 +237,36 @@ export default function LoadTestingPage() {
         </p>
       </div>
 
-      {/* Поиск */}
+      {/* Поиск и переключение вида */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
           <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
-            placeholder="Поиск команд..."
+            placeholder={view === 'teams' ? "Поиск команд..." : "Поиск тестов..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
           />
+        </div>
+        <div className="flex rounded-lg border border-gray-300 bg-white">
+          <Button
+            onClick={() => setView('teams')}
+            variant={view === 'teams' ? 'default' : 'ghost'}
+            size="sm"
+            className={view === 'teams' ? 'bg-blue-600 text-white' : 'text-gray-600'}
+          >
+            <Users size={16} className="mr-2" />
+            Команды
+          </Button>
+          <Button
+            onClick={() => setView('testRuns')}
+            variant={view === 'testRuns' ? 'default' : 'ghost'}
+            size="sm"
+            className={view === 'testRuns' ? 'bg-blue-600 text-white' : 'text-gray-600'}
+          >
+            <Activity size={16} className="mr-2" />
+            Запуски тестов
+          </Button>
         </div>
       </div>
 
@@ -239,81 +324,175 @@ export default function LoadTestingPage() {
         </Card>
       </div>
 
-      {/* Список команд */}
-      <div className="space-y-3">
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="text-gray-600">Загрузка команд...</div>
-          </div>
-        ) : filteredTeams.length === 0 ? (
-          <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
-            <Users size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? 'Команды не найдены' : 'Нет команд'}
-            </h3>
-            <p className="text-gray-600">
-              {searchTerm ? 'Попробуйте изменить параметры поиска' : 'Команды появятся здесь после регистрации участников'}
-            </p>
-          </Card>
-        ) : (
-          filteredTeams.map((team) => (
-            <Card key={team.id} className="bg-white border-gray-300 shadow-sm p-6 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-medium text-gray-900">{team.name}</h3>
-                    <span className="text-sm text-gray-600">@{team.nickname}</span>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(team.status)}`}>
-                      {getStatusIcon(team.status)}
-                      {team.status}
-                    </div>
-                    {team.level && (
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
-                        team.level === 'BEGINNER' 
-                          ? 'bg-green-100 text-green-800 border-green-300'
-                          : 'bg-blue-100 text-blue-800 border-blue-300'
-                      }`}>
-                        {team.level === 'BEGINNER' ? 'Начинающие' : 'Продвинутые'}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {team.description && (
-                    <p className="text-sm text-gray-600 mb-3">{team.description}</p>
-                  )}
-                  
-                  <div className="flex items-center gap-6 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Users size={14} />
-                      <span>{team._count.members} участников</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Play size={14} />
-                      <span>{team._count.testRuns} тестов</span>
-                    </div>
-                    {team.leader && (
-                      <div>
-                        <span>Лидер: {team.leader.name}</span>
-                      </div>
-                    )}
-                    <div>
-                      <span>Хакатон: {team.hackathon.name}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button
-                  onClick={() => router.push(`/dashboard/load-testing/teams/${team.id}`)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
-                >
-                  Управление тестами
-                  <ArrowRight size={16} />
-                </Button>
-              </div>
+      {/* Условное отображение */}
+      {view === 'teams' ? (
+        /* Список команд */
+        <div className="space-y-3">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-600">Загрузка команд...</div>
+            </div>
+          ) : filteredTeams.length === 0 ? (
+            <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
+              <Users size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm ? 'Команды не найдены' : 'Нет команд'}
+              </h3>
+              <p className="text-gray-600">
+                {searchTerm ? 'Попробуйте изменить параметры поиска' : 'Команды появятся здесь после регистрации участников'}
+              </p>
             </Card>
-          ))
-        )}
-      </div>
+          ) : (
+            filteredTeams.map((team) => (
+              <Card key={team.id} className="bg-white border-gray-300 shadow-sm p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-medium text-gray-900">{team.name}</h3>
+                      <span className="text-sm text-gray-600">@{team.nickname}</span>
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${getStatusColor(team.status)}`}>
+                        {getStatusIcon(team.status)}
+                        {team.status}
+                      </div>
+                      {team.level && (
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                          team.level === 'BEGINNER' 
+                            ? 'bg-green-100 text-green-800 border-green-300'
+                            : 'bg-blue-100 text-blue-800 border-blue-300'
+                        }`}>
+                          {team.level === 'BEGINNER' ? 'Начинающие' : 'Продвинутые'}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {team.description && (
+                      <p className="text-sm text-gray-600 mb-3">{team.description}</p>
+                    )}
+                    
+                    <div className="flex items-center gap-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Users size={14} />
+                        <span>{team._count.members} участников</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Play size={14} />
+                        <span>{team._count.testRuns} тестов</span>
+                      </div>
+                      {team.leader && (
+                        <div>
+                          <span>Лидер: {team.leader.name}</span>
+                        </div>
+                      )}
+                      <div>
+                        <span>Хакатон: {team.hackathon.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={() => router.push(`/dashboard/load-testing/teams/${team.id}`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
+                  >
+                    Управление тестами
+                    <ArrowRight size={16} />
+                  </Button>
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      ) : (
+        /* Список запусков тестов */
+        <div className="space-y-3">
+          {loadingTestRuns ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-600">Загрузка запусков тестов...</div>
+            </div>
+          ) : recentTestRuns.filter(run =>
+              run.scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              run.scenario.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              run.team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              (run.comment && run.comment.toLowerCase().includes(searchTerm.toLowerCase()))
+            ).length === 0 ? (
+            <Card className="bg-white border-gray-300 shadow-sm p-8 text-center">
+              <Activity size={48} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm ? 'Запуски тестов не найдены' : 'Нет запусков тестов'}
+              </h3>
+              <p className="text-gray-600">
+                {searchTerm ? 'Попробуйте изменить параметры поиска' : 'Запуски тестов появятся здесь после создания тестов командами'}
+              </p>
+            </Card>
+          ) : (
+            recentTestRuns.filter(run =>
+              run.scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              run.scenario.identifier.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              run.team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              (run.comment && run.comment.toLowerCase().includes(searchTerm.toLowerCase()))
+            ).map((run) => (
+              <Card key={run.id} className="bg-white border-gray-300 shadow-sm p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="px-2 py-1 rounded-md text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-300">
+                        #{run.runNumber}
+                      </span>
+                      <h3 className="text-lg font-medium text-gray-900">{run.scenario.name}</h3>
+                      <span className="text-sm text-gray-600">({run.scenario.identifier})</span>
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 ${
+                        run.status === 'SUCCEEDED' ? 'bg-green-100 text-green-800 border-green-300' :
+                        run.status === 'RUNNING' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                        run.status === 'FAILED' ? 'bg-red-100 text-red-800 border-red-300' :
+                        run.status === 'CANCELLED' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                        'bg-gray-100 text-gray-800 border-gray-300'
+                      }`}>
+                        {run.status === 'RUNNING' && <Play size={14} />}
+                        {run.status === 'SUCCEEDED' && <CheckCircle size={14} />}
+                        {run.status === 'FAILED' && <XCircle size={14} />}
+                        {run.status === 'PENDING' && <Clock size={14} />}
+                        {run.status === 'SUCCEEDED' ? 'Завершен' :
+                         run.status === 'RUNNING' ? 'Выполняется' :
+                         run.status === 'FAILED' ? 'Ошибка' :
+                         run.status === 'PENDING' ? 'Ожидание' :
+                         run.status}
+                      </div>
+                    </div>
+                    
+                    {run.comment && (
+                      <p className="text-sm text-gray-600 mb-3">{run.comment}</p>
+                    )}
+                    
+                    <div className="flex items-center gap-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Users size={14} />
+                        <span>Команда: {run.team.name} (@{run.team.nickname})</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock size={14} />
+                        <span>Создан: {new Date(run.createdAt).toLocaleDateString('ru-RU')}</span>
+                      </div>
+                      {run.completedAt && (
+                        <div className="flex items-center gap-1">
+                          <CheckCircle size={14} />
+                          <span>Завершен: {new Date(run.completedAt).toLocaleDateString('ru-RU')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={() => router.push(`/dashboard/load-testing/teams/${run.team.id}/test-runs/${run.id}`)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
+                  >
+                    Подробности
+                    <ArrowRight size={16} />
+                  </Button>
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { isOrganizer } from '@/lib/admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { logger, LogAction } from '@/lib/logger'
 
-// GET /api/dashboard/test-scenarios/[id]/steps - Получить все шаги сценария
+// GET /api/dashboard/test-scenarios/[id]/steps - Получить шаги сценария
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,23 +16,27 @@ export async function GET(
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
 
-    const organizer = await isOrganizer(session.user.email)
-    if (!organizer) {
-      return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
-    }
-
-    // Проверить существование сценария
-    const scenario = await db.testScenario.findUnique({
-      where: { id: scenarioId }
+    // Получить шаги сценария (доступно всем авторизованным пользователям для просмотра скриптов)
+    const steps = await db.testScenarioStep.findMany({
+      where: {
+        scenarioId,
+        isActive: true
+      },
+      orderBy: { stepOrder: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        stepOrder: true,
+        stepType: true,
+        config: true,
+        description: true,
+        isActive: true
+      }
     })
 
-    if (!scenario) {
-      return NextResponse.json({ error: 'Сценарий не найден' }, { status: 404 })
-    }
-
-    const steps = await db.testScenarioStep.findMany({
-      where: { scenarioId },
-      orderBy: { stepOrder: 'asc' }
+    await logger.info(LogAction.READ, 'TestScenarioStep', `Получены шаги сценария (${steps.length} шагов)`, {
+      userEmail: session.user.email,
+      entityId: scenarioId
     })
 
     return NextResponse.json(steps)

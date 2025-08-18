@@ -24,7 +24,8 @@ import {
   Eye,
   Settings,
   Save,
-  X
+  X,
+  User
 } from 'lucide-react'
 import TestRunForm from '@/components/test-run-form'
 
@@ -55,6 +56,13 @@ interface TestRun {
   updatedAt: string
   scenario: TestScenario
   team: Team
+  creator: {
+    id: string
+    name: string
+    user: {
+      email: string
+    }
+  } | null
 }
 
 interface TeamTestRunsData {
@@ -358,6 +366,8 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
         teamId={teamId}
         onSuccess={handleRunCreated}
         onCancel={() => setShowForm(false)}
+        initialEnvironmentVars={data?.team.k6EnvironmentVars}
+        isParticipant={false}
       />
     )
   }
@@ -638,6 +648,12 @@ export default function () {
                       )}
                       
                       <div className="flex items-center gap-6 text-sm text-gray-600">
+                        {run.creator && (
+                          <div className="flex items-center gap-1">
+                            <User size={14} />
+                            <span>Автор: {run.creator.name}</span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-1">
                           <Calendar size={14} />
                           <span>Создан: {formatDateTime(run.createdAt)}</span>

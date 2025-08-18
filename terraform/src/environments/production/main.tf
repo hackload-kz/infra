@@ -87,8 +87,8 @@ module "payment_provider" {
   enable_metrics    = true
 
   # Payment Provider Configuration
-  payment_provider_image = "ghcr.io/hackload-kz/hackload-paymentgateway"
-  payment_provider_tag   = "sha-d4a9e31"
+  payment_provider_image = "ghcr.io/hackload-kz/paymentgateway"
+  payment_provider_tag   = "efdf5b3"
   payment_provider_host  = "hub.hackload.kz"
   payment_provider_path  = "/payment-provider/common"
 
@@ -164,6 +164,88 @@ module "biletter" {
     }
     limits = {
       cpu    = "500m"
+      memory = "512Mi"
+    }
+  }
+}
+
+# alem
+
+module "event_provider_alem" {
+  source = "../../apps/service-provider"
+
+  # Infrastructure Configuration
+  namespace         = "event-provider-alem"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  # Service Provider Configuration
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-25331a91c6f43a938a17a239f97fbc0a3ab89f88"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/alem/event-provider"
+
+  # Database Configuration
+  db_connection_pool_size = 32
+
+  # Certificate Management
+  cert_issuer_name = "letsencrypt-prod"
+
+  # Container Registry Credentials
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  # Resource Configuration
+  service_provider_resources = {
+    requests = {
+      cpu    = "500m"
+      memory = "256Mi"
+    }
+    limits = {
+      cpu    = "1"
+      memory = "512Mi"
+    }
+  }
+}
+
+# metaload-akbori
+
+module "event_provider_metaload_akbori" {
+  source = "../../apps/service-provider"
+
+  # Infrastructure Configuration
+  namespace         = "event-provider-metaload-akbori"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  # Service Provider Configuration
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-25331a91c6f43a938a17a239f97fbc0a3ab89f88"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/metaload-akbori/event-provider"
+
+  # Database Configuration
+  db_connection_pool_size = 32
+
+  # Certificate Management
+  cert_issuer_name = "letsencrypt-prod"
+
+  # Container Registry Credentials
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  # Resource Configuration
+  service_provider_resources = {
+    requests = {
+      cpu    = "500m"
+      memory = "256Mi"
+    }
+    limits = {
+      cpu    = "1"
       memory = "512Mi"
     }
   }
