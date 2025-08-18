@@ -124,7 +124,7 @@ export abstract class BaseJobService implements BaseJobServiceInterface {
     }
     
     try {
-      return await this.apiClient.getTeamEnvironmentData(team.id, team.hackathonId);
+      return await this.apiClient.getTeamEnvironmentDataByNickname(team.nickname);
     } catch (error) {
       this.log('error', `Failed to fetch environment data for team ${team.nickname}:`, error);
       throw error;

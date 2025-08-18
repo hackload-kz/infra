@@ -20,7 +20,7 @@ export class DeploymentMonitorService extends BaseJobService {
   async collectMetrics(team: Team): Promise<DeploymentMetrics> {
     try {
       const envData = await this.getTeamEnvironmentData(team);
-      const endpointUrl = envData['APPLICATION_URL'];
+      const endpointUrl = envData['ENDPOINT_URL'];
       
       if (!endpointUrl) {
         this.log('debug', `No application URL found for team ${team.nickname}`);
@@ -248,7 +248,7 @@ export class DeploymentMonitorService extends BaseJobService {
   async getEndpointUrl(team: Team): Promise<string | null> {
     try {
       const envData = await this.getTeamEnvironmentData(team);
-      return envData['APPLICATION_URL'] || null;
+      return envData['ENDPOINT_URL'] || null;
     } catch (error) {
       this.log('error', `Failed to get endpoint URL for team ${team.nickname}:`, error);
       return null;

@@ -2,7 +2,7 @@ import {
   ApiClientConfig, 
   RequestOptions, 
   HttpError, 
-  TeamsListResponse, 
+ 
   CriteriaListResponse,
   BulkCriteriaUpdateRequest,
   BulkCriteriaUpdateResponse,
@@ -21,19 +21,29 @@ export class HubApiClient {
   
   async getTeams(): Promise<Team[]> {
     try {
-      // Fetch only APPROVED teams by default
-      const response = await this.request<TeamsListResponse>('/api/service/teams?status=APPROVED');
-      
-      if (!response.success || !response.data) {
-        throw new Error(`Failed to fetch teams: ${response.error || response.message}`);
+      // Try the service-specific teams endpoint first
+      let response: any;
+      try {
+        response = await this.request<{ teams: any[] }>('/api/service/teams');
+      } catch (serviceError) {
+        // Fallback to regular teams endpoint if service endpoint doesn't exist
+        this.log('warn', 'Service teams endpoint not found, falling back to regular teams endpoint');
+        response = await this.request<{ teams: any[] }>('/api/teams');
       }
       
-      return response.data.teams.map(team => ({
-        id: team.id,
-        nickname: team.nickname,
-        hackathonId: team.hackathonId,
-        name: team.name
-      }));
+      if (!response || !response.teams) {
+        throw new Error(`Failed to fetch teams: Invalid response format`);
+      }
+      
+      // Filter to only APPROVED teams and map to our Team interface
+      return response.teams
+        .filter((team: any) => team.status === 'APPROVED')
+        .map((team: any) => ({
+          id: team.id,
+          nickname: team.nickname,
+          hackathonId: team.hackathonId,
+          name: team.name
+        }));
     } catch (error) {
       this.log('error', 'Failed to fetch teams:', error);
       throw error;
@@ -110,30 +120,48 @@ export class HubApiClient {
     }
   }
   
-  async getTeamEnvironmentData(teamId: string, hackathonId: string): Promise<Record<string, string>> {
+  async getTeamEnvironmentData(): Promise<Record<string, string>> {
+    // Deprecated: Use getTeamEnvironmentDataByNickname instead
+    throw new Error('getTeamEnvironmentData is deprecated. Use getTeamEnvironmentDataByNickname with team nickname.');
+  }
+  
+  async getTeamEnvironmentDataByNickname(teamNickname: string): Promise<Record<string, string>> {
     const searchParams = new URLSearchParams({
-      teamId,
-      hackathonId
+      team: teamNickname
     });
     
-    const url = `/api/service/team-environment?${searchParams.toString()}`;
+    const url = `/api/service/teams/environment?${searchParams.toString()}`;
     
     try {
       const response = await this.request<TeamEnvironmentResponse>(url);
       
       if (!response.success || !response.data) {
-        this.log('warn', `No environment data found for team ${teamId}`);
+        this.log('warn', `No environment data found for team ${teamNickname}`);
         return {};
       }
       
+      // The response format is: { teams: [...], team: {...} }
+      // We want the single team's environment data
+      const responseData = response.data as unknown as {
+        teams: Array<{ environment: Array<{key: string, value: string}> }>;
+        team?: { environment: Array<{key: string, value: string}> };
+      };
+      
+      const teamData = responseData.team || (responseData.teams && responseData.teams[0]);
+      if (!teamData || !teamData.environment) {
+        this.log('warn', `No environment data found for team ${teamNickname}`);
+        return {};
+      }
+      
+      // Convert array of environment data to a key-value map
       const envData: Record<string, string> = {};
-      response.data.forEach(item => {
+      teamData.environment.forEach(item => {
         envData[item.key] = item.value;
       });
       
       return envData;
     } catch (error) {
-      this.log('error', `Failed to fetch environment data for team ${teamId}:`, error);
+      this.log('error', `Failed to fetch environment data for team ${teamNickname}:`, error);
       throw error;
     }
   }

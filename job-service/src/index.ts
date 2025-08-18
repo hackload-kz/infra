@@ -1,3 +1,11 @@
+// Load environment variables from .env files
+import * as dotenv from 'dotenv';
+
+// Load .env.local first (highest priority)
+dotenv.config({ path: '.env.local' });
+// Load .env as fallback
+dotenv.config({ path: '.env' });
+
 import { loadConfig } from './config';
 import { JobScheduler } from './scheduler';
 import { HubApiClient } from './lib/api-client';

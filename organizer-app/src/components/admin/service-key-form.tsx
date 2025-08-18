@@ -31,8 +31,9 @@ interface ServiceKeyFormProps {
 }
 
 const AVAILABLE_PERMISSIONS = [
-  { id: 'environment:write', label: 'Управление данными окружения', description: 'Создание, обновление и удаление переменных окружения команд' },
+  { id: 'teams:read', label: 'Чтение данных команд', description: 'Просмотр списка команд и их базовой информации' },
   { id: 'environment:read', label: 'Чтение данных окружения', description: 'Просмотр переменных окружения команд' },
+  { id: 'environment:write', label: 'Управление данными окружения', description: 'Создание, обновление и удаление переменных окружения команд' },
   { id: '*', label: 'Полный доступ', description: 'Все доступные операции (используйте осторожно)' }
 ]
 
@@ -40,7 +41,7 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
   const [formData, setFormData] = useState({
     name: existingKey?.name || '',
     description: existingKey?.description || '',
-    permissions: existingKey?.permissions || ['environment:write'],
+    permissions: existingKey?.permissions || ['teams:read', 'environment:read', 'environment:write'],
     expiresAt: existingKey?.expiresAt ? new Date(existingKey.expiresAt).toISOString().slice(0, 16) : '',
     isActive: existingKey?.isActive ?? true
   })
@@ -133,7 +134,7 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
           {/* Basic Information */}
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name" className="text-gray-900 font-medium">Название ключа</Label>
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">Название ключа</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -144,7 +145,7 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
             </div>
 
             <div>
-              <Label htmlFor="description" className="text-gray-900 font-medium">Описание (опционально)</Label>
+              <Label htmlFor="description" className="text-sm font-medium text-gray-700">Описание (опционально)</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -155,14 +156,14 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
             </div>
 
             <div>
-              <Label htmlFor="expiresAt" className="text-gray-900 font-medium">Дата истечения (опционально)</Label>
+              <Label htmlFor="expiresAt" className="text-sm font-medium text-gray-700">Дата истечения (опционально)</Label>
               <Input
                 id="expiresAt"
                 type="datetime-local"
                 value={formData.expiresAt}
                 onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
               />
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-gray-500 mt-1">
                 Оставьте пустым для ключа без срока истечения
               </p>
             </div>
@@ -170,7 +171,7 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
 
           {/* Permissions */}
           <div>
-            <Label className="text-gray-900 font-medium">Права доступа</Label>
+            <Label className="text-sm font-medium text-gray-700">Права доступа</Label>
             <div className="mt-2 space-y-3">
               {AVAILABLE_PERMISSIONS.map((permission) => (
                 <div key={permission.id} className="flex items-start space-x-3">
@@ -180,16 +181,16 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
                     onCheckedChange={(checked) => handlePermissionChange(permission.id, checked as boolean)}
                   />
                   <div className="flex-1">
-                    <Label htmlFor={permission.id} className="text-gray-900 font-medium">
+                    <Label htmlFor={permission.id} className="text-sm font-medium text-gray-700">
                       {permission.label}
                     </Label>
-                    <p className="text-xs text-gray-600">{permission.description}</p>
+                    <p className="text-xs text-gray-500">{permission.description}</p>
                   </div>
                 </div>
               ))}
             </div>
             {formData.permissions.length === 0 && (
-              <p className="text-xs text-red-600 mt-1">
+              <p className="text-xs text-red-500 mt-1">
                 Выберите хотя бы одно право доступа
               </p>
             )}
@@ -203,14 +204,14 @@ export function ServiceKeyForm({ existingKey, onSuccess, onCancel }: ServiceKeyF
                 checked={formData.isActive}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked as boolean }))}
               />
-              <Label htmlFor="isActive" className="text-gray-900 font-medium">Ключ активен</Label>
+              <Label htmlFor="isActive" className="text-sm font-medium text-gray-700">Ключ активен</Label>
             </div>
           )}
 
           {/* Selected Permissions Preview */}
           {formData.permissions.length > 0 && (
             <div>
-              <Label className="text-gray-900 font-medium">Выбранные права доступа:</Label>
+              <Label className="text-sm font-medium text-gray-700">Выбранные права доступа:</Label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {formData.permissions.map(permission => (
                   <Badge key={permission} variant="outline">

@@ -8,11 +8,20 @@ class HubApiClient {
     }
     async getTeams() {
         try {
-            const response = await this.request('/api/service/teams?status=APPROVED');
-            if (!response.success || !response.data) {
-                throw new Error(`Failed to fetch teams: ${response.error || response.message}`);
+            let response;
+            try {
+                response = await this.request('/api/service/teams');
             }
-            return response.data.teams.map(team => ({
+            catch (serviceError) {
+                this.log('warn', 'Service teams endpoint not found, falling back to regular teams endpoint');
+                response = await this.request('/api/teams');
+            }
+            if (!response || !response.teams) {
+                throw new Error(`Failed to fetch teams: Invalid response format`);
+            }
+            return response.teams
+                .filter((team) => team.status === 'APPROVED')
+                .map((team) => ({
                 id: team.id,
                 nickname: team.nickname,
                 hackathonId: team.hackathonId,
@@ -78,26 +87,34 @@ class HubApiClient {
             throw error;
         }
     }
-    async getTeamEnvironmentData(teamId, hackathonId) {
+    async getTeamEnvironmentData() {
+        throw new Error('getTeamEnvironmentData is deprecated. Use getTeamEnvironmentDataByNickname with team nickname.');
+    }
+    async getTeamEnvironmentDataByNickname(teamNickname) {
         const searchParams = new URLSearchParams({
-            teamId,
-            hackathonId
+            team: teamNickname
         });
-        const url = `/api/service/team-environment?${searchParams.toString()}`;
+        const url = `/api/service/teams/environment?${searchParams.toString()}`;
         try {
             const response = await this.request(url);
             if (!response.success || !response.data) {
-                this.log('warn', `No environment data found for team ${teamId}`);
+                this.log('warn', `No environment data found for team ${teamNickname}`);
+                return {};
+            }
+            const responseData = response.data;
+            const teamData = responseData.team || (responseData.teams && responseData.teams[0]);
+            if (!teamData || !teamData.environment) {
+                this.log('warn', `No environment data found for team ${teamNickname}`);
                 return {};
             }
             const envData = {};
-            response.data.forEach(item => {
+            teamData.environment.forEach(item => {
                 envData[item.key] = item.value;
             });
             return envData;
         }
         catch (error) {
-            this.log('error', `Failed to fetch environment data for team ${teamId}:`, error);
+            this.log('error', `Failed to fetch environment data for team ${teamNickname}:`, error);
             throw error;
         }
     }

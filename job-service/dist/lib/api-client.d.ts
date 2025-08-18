@@ -10,7 +10,8 @@ export declare class HubApiClient {
     }): Promise<CriteriaListResponse>;
     bulkUpdateCriteria(updates: CriteriaUpdate[]): Promise<BulkCriteriaUpdateResponse>;
     updateSingleCriteria(teamSlug: string, criteriaType: CriteriaType, update: SingleCriteriaUpdateRequest): Promise<SingleCriteriaUpdateResponse>;
-    getTeamEnvironmentData(teamId: string, hackathonId: string): Promise<Record<string, string>>;
+    getTeamEnvironmentData(): Promise<Record<string, string>>;
+    getTeamEnvironmentDataByNickname(teamNickname: string): Promise<Record<string, string>>;
     private request;
     private fetchWithTimeout;
     private createHttpError;

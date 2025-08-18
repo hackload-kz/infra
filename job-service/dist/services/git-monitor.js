@@ -15,7 +15,7 @@ class GitMonitorService extends base_service_1.BaseJobService {
     async collectMetrics(team) {
         try {
             const envData = await this.getTeamEnvironmentData(team);
-            const repoUrl = envData['GITHUB_REPOSITORY_URL'];
+            const repoUrl = envData['Repo'];
             if (!repoUrl) {
                 this.log('debug', `No repository URL found for team ${team.nickname}`);
                 return {
@@ -126,7 +126,7 @@ class GitMonitorService extends base_service_1.BaseJobService {
     async getRepositoryUrl(team) {
         try {
             const envData = await this.getTeamEnvironmentData(team);
-            return envData['GITHUB_REPOSITORY_URL'] || null;
+            return envData['Repo'] || null;
         }
         catch (error) {
             this.log('error', `Failed to get repository URL for team ${team.nickname}:`, error);

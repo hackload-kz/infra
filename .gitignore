@@ -37,6 +37,9 @@ override.tf.json
 terraform.rc
 node_modules/
 
+.env.local
+.env
+
 /.cursor
 
 __pycache__/
