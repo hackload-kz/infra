@@ -100,6 +100,22 @@ export async function authenticateServiceAccount(
 // Log API key usage
 export async function logApiKeyUsage(usage: ServiceApiKeyUsageLog): Promise<void> {
   try {
+    // Don't log to database if keyId is 'unknown' (invalid key)
+    // Just log to system logs for security monitoring
+    if (usage.keyId === 'unknown') {
+      await logger.warn(LogAction.READ, 'ServiceApiKeyUsage', 
+        `Failed API key authentication attempt`, {
+          metadata: {
+            endpoint: usage.endpoint,
+            method: usage.method,
+            userAgent: usage.userAgent,
+            ipAddress: usage.ipAddress,
+            success: usage.success
+          }
+        })
+      return
+    }
+
     await db.serviceApiKeyUsage.create({
       data: {
         keyId: usage.keyId,

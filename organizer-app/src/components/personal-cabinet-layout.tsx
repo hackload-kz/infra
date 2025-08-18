@@ -15,7 +15,8 @@ import {
   FileText,
   MessageSquare,
   HelpCircle,
-  Search
+  Search,
+  BarChart3
 } from 'lucide-react'
 import { LogoutButton } from './logout-button'
 import { JournalNotificationBell } from './journal-notification-bell'
@@ -28,6 +29,7 @@ interface PersonalCabinetLayoutProps {
     image?: string
   } | null
   hasTeam?: boolean
+  isAdmin?: boolean
 }
 
 interface SidebarItem {
@@ -35,6 +37,7 @@ interface SidebarItem {
   label: string
   href: string
   badge?: string
+  adminOnly?: boolean
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -44,12 +47,13 @@ const sidebarItems: SidebarItem[] = [
   { icon: Search, label: 'Поиск команд', href: '/space/teams' },
   { icon: Calendar, label: 'Календарь', href: '/space/calendar' },
   { icon: FileText, label: 'Задание', href: '/space/tasks' },
+  { icon: BarChart3, label: 'Результаты', href: '/space/results', adminOnly: true },
   { icon: Trophy, label: 'Журнал', href: '/space/journal' },
   { icon: MessageSquare, label: 'Сообщения', href: '/space/messages' },
   { icon: HelpCircle, label: 'FAQ', href: '/space/faq' },
 ]
 
-export default function PersonalCabinetLayout({ children, user, hasTeam = false }: PersonalCabinetLayoutProps) {
+export default function PersonalCabinetLayout({ children, user, hasTeam = false, isAdmin = false }: PersonalCabinetLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
 
@@ -115,6 +119,12 @@ export default function PersonalCabinetLayout({ children, user, hasTeam = false 
               const Icon = item.icon
               const isActive = pathname === item.href
               const isTasksDisabled = item.href === '/space/tasks' && !hasTeam
+              const isAdminOnlyDisabled = item.adminOnly && !isAdmin
+              
+              // Don't render admin-only items for non-admins
+              if (isAdminOnlyDisabled) {
+                return null
+              }
               
               if (isTasksDisabled) {
                 return (

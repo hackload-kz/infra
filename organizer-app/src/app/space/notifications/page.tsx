@@ -47,7 +47,7 @@ export default async function SpaceNotificationsPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       <div className="text-center py-16">
         <div className="w-24 h-24 bg-slate-800/50 rounded-full mx-auto mb-6 flex items-center justify-center">
           <Bell className="w-12 h-12 text-slate-400" />

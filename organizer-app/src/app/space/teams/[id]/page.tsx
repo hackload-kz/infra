@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect, notFound } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import { getCurrentHackathon } from '@/lib/hackathon'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { CopyTeamLink } from '@/components/copy-team-link'
@@ -42,6 +43,9 @@ export default async function TeamDetailPage({ params }: Props) {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   const [participant, team, hackathon] = await Promise.all([
     db.participant.findFirst({
@@ -167,7 +171,7 @@ export default async function TeamDetailPage({ params }: Props) {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       {/* Back Navigation */}
       <div className="mb-6">
         <Link

@@ -81,7 +81,7 @@ export default async function MessagePage({ params }: MessagePageProps) {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       <div className="max-w-4xl mx-auto">
         <MessageDetail 
           message={message}

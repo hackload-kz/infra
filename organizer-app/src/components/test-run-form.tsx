@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { 
-  ArrowLeft, 
   Save, 
   X, 
   AlertCircle,
@@ -265,41 +263,25 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
 
   return (
     <div className="space-y-6">
-      {/* Заголовок */}
-      <div className="flex items-center gap-4">
-        <Button
-          onClick={onCancel}
-          variant="ghost"
-          className="text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft size={20} />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Новый запуск теста</h1>
-          <p className="mt-2 text-gray-600">
-            Создание нового запуска нагрузочного тестирования
-          </p>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card className="bg-white border-gray-300 shadow-sm p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="space-y-6">
+          <h2 className="text-lg font-medium text-white mb-4">
             Параметры теста
           </h2>
 
           <div className="space-y-4">
             {/* Выбор сценария */}
             <div>
-              <Label htmlFor="scenario" className="text-gray-700 font-medium">
+              <Label htmlFor="scenario" className="text-slate-300 font-medium">
                 Сценарий тестирования *
               </Label>
               {loadingScenarios ? (
-                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
+                <div className="mt-1 p-3 bg-slate-700/30 border border-slate-600 rounded-md text-slate-300">
                   Загрузка сценариев...
                 </div>
               ) : scenarios.length === 0 ? (
-                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
+                <div className="mt-1 p-3 bg-slate-700/30 border border-slate-600 rounded-md text-slate-300">
                   Нет доступных сценариев. Создайте сценарий в разделе &quot;Сценарии тестирования&quot;.
                 </div>
               ) : (
@@ -314,7 +296,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
                       setSelectedScenarioSteps([])
                     }
                   }}
-                  className="mt-1 block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                   disabled={loading}
                 >
                   <option value="">Выберите сценарий...</option>
@@ -326,7 +308,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
                 </select>
               )}
               {errors.scenario && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-red-400 flex items-center gap-1">
                   <AlertCircle size={14} />
                   {errors.scenario}
                 </p>
@@ -335,16 +317,16 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
 
             {/* Детали выбранного сценария */}
             {selectedScenario && (
-              <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+              <div className="bg-slate-700/30 p-4 rounded-md border border-slate-600">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-gray-900">Детали сценария</h3>
+                  <h3 className="text-sm font-medium text-white">Детали сценария</h3>
                   {selectedScenarioSteps.length > 0 && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowScripts(!showScripts)}
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-amber-400 hover:text-amber-300"
                     >
                       <Code2 size={14} className="mr-1" />
                       {showScripts ? 'Скрыть скрипты' : 'Показать K6 скрипты'}
@@ -354,23 +336,23 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
                 {(() => {
                   const scenario = getSelectedScenarioDetails()
                   return scenario ? (
-                    <div className="space-y-2 text-sm text-gray-600">
+                    <div className="space-y-2 text-sm text-slate-300">
                       <div>
-                        <span className="font-medium text-gray-900">Название:</span> {scenario.name}
+                        <span className="font-medium text-white">Название:</span> {scenario.name}
                       </div>
                       <div>
-                        <span className="font-medium text-gray-900">Идентификатор:</span> {scenario.identifier}
+                        <span className="font-medium text-white">Идентификатор:</span> {scenario.identifier}
                       </div>
                       {scenario.description && (
                         <div>
-                          <span className="font-medium text-gray-900">Описание:</span> {scenario.description}
+                          <span className="font-medium text-white">Описание:</span> {scenario.description}
                         </div>
                       )}
                       <div>
-                        <span className="font-medium text-gray-900">Количество шагов:</span> {scenario._count.steps}
+                        <span className="font-medium text-white">Количество шагов:</span> {scenario._count.steps}
                       </div>
                       <div>
-                        <span className="font-medium text-gray-900">Создан:</span> {new Date(scenario.createdAt).toLocaleString('ru-RU')}
+                        <span className="font-medium text-white">Создан:</span> {new Date(scenario.createdAt).toLocaleString('ru-RU')}
                       </div>
                     </div>
                   ) : null
@@ -379,7 +361,7 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
                 {/* K6 Скрипты шагов */}
                 {showScripts && selectedScenarioSteps.length > 0 && (
                   <div className="mt-4 space-y-3">
-                    <h4 className="text-sm font-medium text-gray-900">K6 Скрипты шагов</h4>
+                    <h4 className="text-sm font-medium text-white">K6 Скрипты шагов</h4>
                     {selectedScenarioSteps.map((step) => {
                       const stepConfig = step.config as Record<string, unknown>
                       let script = ''
@@ -409,14 +391,14 @@ export default function() {
                       }
                       
                       return script ? (
-                        <div key={step.id} className="bg-white border border-gray-200 rounded p-3">
+                        <div key={step.id} className="bg-slate-800 border border-slate-600 rounded p-3">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                 Шаг #{step.stepOrder}
                               </span>
-                              <span className="text-sm font-medium text-gray-900">{step.name}</span>
-                              <span className="text-xs text-gray-500">({step.stepType})</span>
+                              <span className="text-sm font-medium text-white">{step.name}</span>
+                              <span className="text-xs text-slate-500">({step.stepType})</span>
                             </div>
                             <Button
                               type="button"
@@ -425,7 +407,7 @@ export default function() {
                               onClick={() => {
                                 navigator.clipboard.writeText(script)
                               }}
-                              className="text-gray-600 hover:text-gray-800 text-xs"
+                              className="text-slate-400 hover:text-slate-200 text-xs"
                               title="Скопировать скрипт"
                             >
                               <Copy size={12} />
@@ -437,19 +419,19 @@ export default function() {
                             </pre>
                           </div>
                           {step.description && (
-                            <p className="text-xs text-gray-600 mt-2">{step.description}</p>
+                            <p className="text-xs text-slate-400 mt-2">{step.description}</p>
                           )}
                         </div>
                       ) : (
-                        <div key={step.id} className="bg-gray-100 border border-gray-200 rounded p-3">
+                        <div key={step.id} className="bg-slate-700/50 border border-slate-600 rounded p-3">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                            <span className="text-xs font-medium bg-gray-200 text-slate-300 px-2 py-1 rounded">
                               Шаг #{step.stepOrder}
                             </span>
-                            <span className="text-sm font-medium text-gray-700">{step.name}</span>
-                            <span className="text-xs text-gray-500">({step.stepType})</span>
+                            <span className="text-sm font-medium text-white">{step.name}</span>
+                            <span className="text-xs text-slate-500">({step.stepType})</span>
                           </div>
-                          <p className="text-xs text-gray-600">
+                          <p className="text-xs text-slate-400">
                             К6 скрипт недоступен для этого типа шага
                           </p>
                         </div>
@@ -462,7 +444,7 @@ export default function() {
 
             {/* Комментарий */}
             <div>
-              <Label htmlFor="comment" className="text-gray-700 font-medium">
+              <Label htmlFor="comment" className="text-slate-300 font-medium">
                 Комментарий
               </Label>
               <Textarea
@@ -470,11 +452,11 @@ export default function() {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Описание цели теста, ожидаемых результатов или особых условий..."
-                className="mt-1 bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="mt-1 bg-slate-800 border-slate-600 text-white placeholder-slate-400 focus:ring-amber-400 focus:border-transparent resize-none"
                 rows={3}
                 disabled={loading}
               />
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-slate-400">
                 Необязательное поле для дополнительной информации о запуске
               </p>
             </div>
@@ -482,7 +464,7 @@ export default function() {
             {/* Переменные окружения */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-gray-700 font-medium">
+                <Label className="text-slate-300 font-medium">
                   Переменные окружения
                 </Label>
                 <Button
@@ -490,18 +472,18 @@ export default function() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowEnvVars(!showEnvVars)}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-amber-400 hover:text-amber-300"
                 >
                   {showEnvVars ? 'Скрыть' : 'Настроить'}
                 </Button>
               </div>
               
               {showEnvVars && (
-                <div className="bg-gray-50 border border-gray-200 rounded-md p-4 space-y-4">
+                <div className="bg-slate-700/30 border border-slate-600 rounded-md p-4 space-y-4">
                   {/* Добавление новой переменной */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <Label htmlFor="envKey" className="text-sm text-gray-600">
+                      <Label htmlFor="envKey" className="text-sm text-slate-400">
                         Ключ
                       </Label>
                       <input
@@ -510,12 +492,12 @@ export default function() {
                         value={envVarKey}
                         onChange={(e) => setEnvVarKey(e.target.value)}
                         placeholder="API_URL"
-                        className="mt-1 block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="mt-1 block w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                         disabled={loading}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="envValue" className="text-sm text-gray-600">
+                      <Label htmlFor="envValue" className="text-sm text-slate-400">
                         Значение
                       </Label>
                       <input
@@ -524,7 +506,7 @@ export default function() {
                         value={envVarValue}
                         onChange={(e) => setEnvVarValue(e.target.value)}
                         placeholder="https://api.example.com"
-                        className="mt-1 block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="mt-1 block w-full bg-slate-800 border border-slate-600 rounded-md px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
                         disabled={loading}
                       />
                     </div>
@@ -551,7 +533,7 @@ export default function() {
                   {/* Список текущих переменных */}
                   {Object.keys(environmentVars).length > 0 && (
                     <div>
-                      <Label className="text-sm text-gray-600 mb-2 block">
+                      <Label className="text-sm text-slate-400 mb-2 block">
                         Текущие переменные ({Object.keys(environmentVars).length})
                       </Label>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -561,10 +543,10 @@ export default function() {
                           const isEditing = editingVar === key
                           
                           return (
-                            <div key={key} className={`flex items-center justify-between bg-white border rounded p-2 ${isProtected ? 'border-amber-200 bg-amber-50' : 'border-gray-200'}`}>
+                            <div key={key} className={`flex items-center justify-between bg-slate-800 border rounded p-2 ${isProtected ? 'border-amber-200 bg-amber-50' : 'border-slate-600'}`}>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <code className={`text-sm font-medium px-2 py-1 rounded ${isProtected ? 'text-amber-900 bg-amber-100' : 'text-gray-900 bg-gray-100'}`}>
+                                  <code className={`text-sm font-medium px-2 py-1 rounded ${isProtected ? 'text-amber-900 bg-amber-100' : 'text-white bg-slate-700/50'}`}>
                                     {key}
                                   </code>
                                   {isEditing ? (
@@ -572,7 +554,7 @@ export default function() {
                                       type="text"
                                       value={editingValue}
                                       onChange={(e) => setEditingValue(e.target.value)}
-                                      className="flex-1 text-sm bg-white border border-blue-300 rounded px-2 py-1 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                      className="flex-1 text-sm bg-slate-800 border border-amber-400 rounded px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-amber-400"
                                       autoFocus
                                       onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
@@ -584,7 +566,7 @@ export default function() {
                                     />
                                   ) : (
                                     <span 
-                                      className="text-sm text-gray-600 truncate cursor-pointer hover:text-gray-800 flex-1"
+                                      className="text-sm text-slate-400 truncate cursor-pointer hover:text-slate-200 flex-1"
                                       onClick={() => !isProtected && handleStartEdit(key, value)}
                                       title={isProtected ? 'Переменная защищена от редактирования' : 'Нажмите для редактирования'}
                                     >
@@ -616,7 +598,7 @@ export default function() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={handleCancelEdit}
-                                      className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                      className="text-slate-400 hover:text-slate-300 hover:bg-slate-700/30"
                                       title="Отменить редактирование"
                                     >
                                       <X size={14} />
@@ -656,7 +638,7 @@ export default function() {
                     </div>
                   )}
 
-                  <div className="text-xs text-gray-500 space-y-1">
+                  <div className="text-xs text-slate-500 space-y-1">
                     <p>
                       Переменные будут доступны в K6 скриптах через <code>__ENV.VARIABLE_NAME</code>
                     </p>
@@ -677,12 +659,12 @@ export default function() {
             </div>
 
             {/* Информация о времени выполнения */}
-            <div className="bg-blue-50 border border-blue-300 p-4 rounded-md">
+            <div className="bg-amber-500/10 border border-amber-400/30 p-4 rounded-md">
               <div className="flex items-start gap-2">
-                <AlertCircle size={16} className="text-blue-600 mt-0.5" />
+                <AlertCircle size={16} className="text-amber-400 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-medium text-blue-900 mb-1">Информация о выполнении</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                  <h4 className="text-sm font-medium text-white mb-1">Информация о выполнении</h4>
+                  <ul className="text-sm text-slate-300 space-y-1">
                     <li>• Тест будет создан в статусе &quot;PENDING&quot; (ожидание)</li>
                     <li>• Запуск можно будет начать вручную из списка тестов</li>
                     <li>• Время создания будет зафиксировано автоматически</li>
@@ -694,7 +676,7 @@ export default function() {
 
             {/* Ошибки формы */}
             {errors.submit && (
-              <div className="p-4 rounded-md border bg-red-100 text-red-800 border-red-300">
+              <div className="p-4 rounded-md border bg-red-500/20 text-red-300 border-red-500/30">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={16} />
                   <span>{errors.submit}</span>
@@ -702,18 +684,18 @@ export default function() {
               </div>
             )}
           </div>
-        </Card>
+        </div>
 
         {/* Действия */}
         <div className="flex items-center gap-3">
           <Button
             type="submit"
             disabled={loading || loadingScenarios || scenarios.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2"
+            className="bg-amber-400 hover:bg-amber-500 text-slate-900 font-medium flex items-center gap-2"
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
                 Создание...
               </>
             ) : (
@@ -728,7 +710,7 @@ export default function() {
             onClick={onCancel}
             variant="ghost"
             disabled={loading}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-slate-400 hover:text-white"
           >
             <X size={16} className="mr-2" />
             Отмена
