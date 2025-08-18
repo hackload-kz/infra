@@ -31,7 +31,28 @@ export class DeploymentMonitorService extends BaseJobService {
         };
       }
       
-      this.log('debug', `Checking deployment for team ${team.nickname} at ${endpointUrl}`);
+      // Check the specific API endpoint for events
+      const apiEndpoint = `${endpointUrl}/api/events?page=1&pageSize=20`;
+      this.log('debug', `Checking API deployment for team ${team.nickname} at ${apiEndpoint}`);
+      
+      // First, check DNS resolution
+      const dnsResolution = await this.checkDnsResolution(endpointUrl);
+      if (!dnsResolution.resolved) {
+        this.log('warn', `DNS resolution failed for team ${team.nickname} at ${endpointUrl}: ${dnsResolution.error}`);
+        return {
+          isDeployed: true,
+          endpointUrl: apiEndpoint,
+          responseTime: 0,
+          statusCode: 0,
+          lastChecked: new Date().toISOString(),
+          isAccessible: false,
+          error: dnsResolution.error,
+          isDnsResolved: false,
+          confirmationUrl: apiEndpoint,
+          confirmationTitle: 'API Endpoints',
+          confirmationDescription: 'DNS не найден (домен не разрешается)'
+        };
+      }
       
       const startTime = Date.now();
       
@@ -39,81 +60,64 @@ export class DeploymentMonitorService extends BaseJobService {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.config.httpTimeout);
         
-        const response = await fetch(endpointUrl, {
+        const response = await fetch(apiEndpoint, {
           method: 'GET',
           headers: {
             'User-Agent': this.config.userAgent,
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept': 'application/json',
             'Cache-Control': 'no-cache'
           },
           signal: controller.signal,
-          // Don't follow too many redirects
+          // Don't follow redirects for API endpoints
           redirect: 'manual'
         });
         
         clearTimeout(timeoutId);
         const responseTime = Date.now() - startTime;
         
-        // Handle redirects manually to get more control
-        let finalResponse = response;
-        let redirectCount = 0;
-        const maxRedirects = 5;
-        
-        while ((finalResponse.status === 301 || finalResponse.status === 302 || finalResponse.status === 307 || finalResponse.status === 308) && redirectCount < maxRedirects) {
-          const location = finalResponse.headers.get('location');
-          if (!location) break;
-          
-          redirectCount++;
-          this.log('debug', `Following redirect ${redirectCount} to: ${location}`);
-          
-          const redirectController = new AbortController();
-          const redirectTimeoutId = setTimeout(() => redirectController.abort(), this.config.httpTimeout);
-          
-          finalResponse = await fetch(location, {
-            method: 'GET',
-            headers: {
-              'User-Agent': this.config.userAgent,
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              'Cache-Control': 'no-cache'
-            },
-            signal: redirectController.signal,
-            redirect: 'manual'
-          });
-          
-          clearTimeout(redirectTimeoutId);
-        }
-        
-        const isAccessible = finalResponse.ok || (finalResponse.status >= 200 && finalResponse.status < 400);
+        // For API endpoints, we only accept HTTP 200 as success
+        const isAccessible = response.status === 200;
         
         const metrics: DeploymentMetrics = {
           isDeployed: true,
-          endpointUrl,
+          endpointUrl: apiEndpoint,
           responseTime,
-          statusCode: finalResponse.status,
+          statusCode: response.status,
           lastChecked: new Date().toISOString(),
           isAccessible,
-          confirmationUrl: endpointUrl,
-          confirmationTitle: 'Демо',
-          confirmationDescription: 'Развернутое решение команды'
+          isDnsResolved: true,
+          confirmationUrl: apiEndpoint,
+          confirmationTitle: 'API Endpoints',
+          confirmationDescription: 'API работает и отвечает на запросы'
         };
         
         // Add additional response information
         const extendedMetrics = metrics as DeploymentMetrics & Record<string, unknown>;
-        extendedMetrics['statusText'] = finalResponse.statusText;
-        extendedMetrics['redirectCount'] = redirectCount;
+        extendedMetrics['statusText'] = response.statusText;
+        extendedMetrics['baseEndpoint'] = endpointUrl;
         
-        // Try to get some basic content information
+        // Try to get API response information
         if (isAccessible) {
           try {
-            const contentType = finalResponse.headers.get('content-type');
+            const contentType = response.headers.get('content-type');
             extendedMetrics['contentType'] = contentType;
             
-            // If it's HTML, we could check for basic indicators
-            if (contentType?.includes('text/html')) {
-              const text = await finalResponse.text();
-              extendedMetrics['hasTitle'] = text.includes('<title>');
-              extendedMetrics['contentLength'] = text.length;
-              extendedMetrics['hasBody'] = text.includes('<body>') || text.includes('<body ');
+            // If it's JSON, try to parse and validate the response
+            if (contentType?.includes('application/json')) {
+              const responseText = await response.text();
+              extendedMetrics['contentLength'] = responseText.length;
+              
+              try {
+                const jsonData = JSON.parse(responseText);
+                extendedMetrics['hasValidJson'] = true;
+                extendedMetrics['responseStructure'] = typeof jsonData === 'object' ? Object.keys(jsonData) : 'primitive';
+              } catch (jsonError) {
+                extendedMetrics['hasValidJson'] = false;
+                extendedMetrics['jsonError'] = 'Invalid JSON response';
+              }
+            } else {
+              extendedMetrics['hasValidJson'] = false;
+              extendedMetrics['unexpectedContentType'] = true;
             }
           } catch (contentError) {
             // Don't fail the entire check if content reading fails
@@ -121,11 +125,11 @@ export class DeploymentMonitorService extends BaseJobService {
           }
         }
         
-        this.log('debug', `Deployment check for team ${team.nickname} completed:`, {
-          statusCode: finalResponse.status,
+        this.log('debug', `API endpoint check for team ${team.nickname} completed:`, {
+          statusCode: response.status,
           responseTime,
           isAccessible,
-          redirectCount
+          endpoint: apiEndpoint
         });
         
         return metrics;
@@ -146,19 +150,20 @@ export class DeploymentMonitorService extends BaseJobService {
           }
         }
         
-        this.log('warn', `Deployment check failed for team ${team.nickname} at ${endpointUrl}: ${errorMessage}`);
+        this.log('warn', `API endpoint check failed for team ${team.nickname} at ${apiEndpoint}: ${errorMessage}`);
         
         return {
           isDeployed: true,
-          endpointUrl,
+          endpointUrl: apiEndpoint,
           responseTime,
           statusCode,
           lastChecked: new Date().toISOString(),
           isAccessible: false,
+          isDnsResolved: true, // DNS was resolved, but request failed
           error: errorMessage,
-          confirmationUrl: endpointUrl,
-          confirmationTitle: 'Демо',
-          confirmationDescription: 'Развернутое решение команды (недоступно)'
+          confirmationUrl: apiEndpoint,
+          confirmationTitle: 'API Endpoints',
+          confirmationDescription: 'API недоступен или не отвечает'
         };
       }
       
@@ -168,8 +173,8 @@ export class DeploymentMonitorService extends BaseJobService {
       return {
         isDeployed: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        confirmationTitle: 'Демо',
-        confirmationDescription: 'Развернутое решение команды (ошибка при проверке)'
+        confirmationTitle: 'API Endpoints',
+        confirmationDescription: 'API недоступен (ошибка при проверке)'
       };
     }
   }
@@ -177,6 +182,12 @@ export class DeploymentMonitorService extends BaseJobService {
   override evaluateStatus(metrics: DeploymentMetrics): CriteriaStatus {
     if (!metrics.isDeployed) {
       return CriteriaStatus.NO_DATA;
+    }
+    
+    // Check for DNS resolution failure
+    const metricsWithDns = metrics as DeploymentMetrics & Record<string, unknown>;
+    if (metricsWithDns['isDnsResolved'] === false) {
+      return CriteriaStatus.NO_DATA; // DNS unresolved = 0 points
     }
     
     // If we have an error at the metrics level, consider it as failed
@@ -252,6 +263,39 @@ export class DeploymentMonitorService extends BaseJobService {
     } catch (error) {
       this.log('error', `Failed to get endpoint URL for team ${team.nickname}:`, error);
       return null;
+    }
+  }
+  
+  private async checkDnsResolution(url: string): Promise<{ resolved: boolean; error?: string }> {
+    try {
+      // Extract hostname from URL
+      const hostname = new URL(url).hostname;
+      
+      // Use Node.js dns module to check resolution
+      const dns = await import('dns');
+      const { promisify } = await import('util');
+      const lookup = promisify(dns.lookup);
+      
+      try {
+        await lookup(hostname);
+        return { resolved: true };
+      } catch (dnsError) {
+        const errorMessage = dnsError instanceof Error ? dnsError.message : 'DNS resolution failed';
+        
+        // Check for specific DNS error types
+        if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('NXDOMAIN')) {
+          return { resolved: false, error: 'DNS_PROBE_FINISHED_NXDOMAIN' };
+        } else if (errorMessage.includes('ECONNREFUSED')) {
+          return { resolved: true }; // DNS resolved but connection refused
+        } else if (errorMessage.includes('ETIMEDOUT')) {
+          return { resolved: false, error: 'DNS_TIMEOUT' };
+        }
+        
+        return { resolved: false, error: errorMessage };
+      }
+    } catch (error) {
+      this.log('warn', `DNS resolution check failed: ${error}`);
+      return { resolved: false, error: 'DNS_CHECK_ERROR' };
     }
   }
 }

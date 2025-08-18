@@ -47,6 +47,7 @@ export interface DeploymentMetrics extends MetricsData {
     statusCode?: number;
     lastChecked?: string;
     isAccessible?: boolean;
+    isDnsResolved?: boolean;
     error?: string;
     confirmationUrl?: string;
     confirmationTitle?: string;

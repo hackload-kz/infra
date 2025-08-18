@@ -201,7 +201,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                   onClick={() => handleSort('totalScore')}
                   className="flex items-center space-x-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
                 >
-                  <span>Баллы</span>
+                  <span>Pts</span>
                   <SortIcon field="totalScore" />
                 </button>
               </th>
@@ -239,13 +239,64 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                   
                   return (
                     <td key={criteriaType} className="px-3 py-4 text-center">
-                      <div className="flex flex-col items-center space-y-1">
+                      <div 
+                        className="flex flex-col items-center space-y-1 relative group cursor-help"
+                        title={`${criteriaLabels[criteriaType]}: ${status === 'PASSED' ? 'Пройдено' : status === 'FAILED' ? 'Не пройдено' : 'Нет данных'}${criteria?.score !== undefined ? ` (${criteria.score} pts)` : ''}`}
+                      >
                         <StatusDot status={status} />
                         {criteria?.score !== undefined && (
                           <div className="text-xs text-slate-400">
-                            {criteria.score} балл{criteria.score === 1 ? '' : 'а'}
+                            {criteria.score} pts
                           </div>
                         )}
+                        
+                        {/* Hover tooltip */}
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                          <div className="font-semibold">{criteriaLabels[criteriaType]}</div>
+                          <div className="text-slate-300">
+                            Статус: {status === 'PASSED' ? '✅ Пройдено' : status === 'FAILED' ? '❌ Не пройдено' : '⚪ Нет данных'}
+                          </div>
+                          {criteria?.score !== undefined && (
+                            <div className="text-slate-300">Баллы: {criteria.score} pts</div>
+                          )}
+                          {criteria?.lastUpdated && (
+                            <div className="text-slate-400 text-xs">
+                              Обновлено: {formatDistanceToNow(criteria.lastUpdated, { locale: ru, addSuffix: true })}
+                            </div>
+                          )}
+                          {/* Show specific metrics in tooltip */}
+                          {criteriaType === 'CODE_REPO' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              {criteria.metrics.commitsCount ? `Коммитов: ${criteria.metrics.commitsCount}` : 'Коммитов: 0'}
+                              {criteria.metrics.hasRecentActivity && <div>🔥 Недавняя активность</div>}
+                            </div>
+                          )}
+                          {criteriaType === 'DEPLOYED_SOLUTION' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              {criteria.metrics.responseTime ? `Время ответа: ${criteria.metrics.responseTime}ms` : 'Нет ответа'}
+                              {criteria.metrics.statusCode && <div>HTTP: {criteria.metrics.statusCode}</div>}
+                            </div>
+                          )}
+                          {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH' || criteriaType === 'AUTH_PERFORMANCE') && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              P95 латентность: {criteria.metrics.p95 || 'N/A'}s
+                              {criteria.metrics.successRate && <div>Успешность: {criteria.metrics.successRate}%</div>}
+                            </div>
+                          )}
+                          {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              Забронировано: {criteria.metrics.bookedTickets || 0} билетов
+                            </div>
+                          )}
+                          {criteriaType === 'BUDGET_TRACKING' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              Потрачено: ${criteria.metrics.totalSpent || 0}
+                              {criteria.metrics.currency && criteria.metrics.currency !== 'USD' && ` ${criteria.metrics.currency}`}
+                            </div>
+                          )}
+                          {/* Arrow pointing down */}
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
+                        </div>
                         {/* Show specific metrics based on criteria type */}
                         {criteriaType === 'CODE_REPO' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
