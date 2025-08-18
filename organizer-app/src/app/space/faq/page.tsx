@@ -142,7 +142,7 @@ export default async function SpaceFaqPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       {/* Page Title */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">

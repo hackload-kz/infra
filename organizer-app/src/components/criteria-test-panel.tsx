@@ -25,7 +25,10 @@ export function CriteriaTestPanel({ teams }: CriteriaTestPanelProps) {
         commitsCount: 15,
         lastCommitTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         repositoryUrl: 'https://github.com/team/repo',
-        hasRecentActivity: true
+        hasRecentActivity: true,
+        confirmationUrl: 'https://github.com/hackload-team/solution',
+        confirmationTitle: 'Репозиторий',
+        confirmationDescription: 'Исходный код решения'
       }
     },
     DEPLOYED_SOLUTION: {
@@ -36,42 +39,54 @@ export function CriteriaTestPanel({ teams }: CriteriaTestPanelProps) {
         responseTime: 245,
         statusCode: 200,
         lastChecked: new Date().toISOString(),
-        isAccessible: true
+        isAccessible: true,
+        confirmationUrl: 'https://demo.hackload.app',
+        confirmationTitle: 'Демо',
+        confirmationDescription: 'Развернутое решение'
       }
     },
     EVENT_SEARCH: {
       status: 'PASSED' as CriteriaStatus,
       score: 3,
       metrics: {
-        p95ResponseTime: 1.8,
+        p95: 1.8,
         successRate: 0.97,
         testDuration: 600,
         userLoads: {
           '5000': { p95: 1.2, successRate: 0.98 },
           '25000': { p95: 1.8, successRate: 0.97 },
           '50000': { p95: 1.9, successRate: 0.95 }
-        }
+        },
+        confirmationUrl: 'https://grafana.hackload.kz/d/search-performance',
+        confirmationTitle: 'Метрики',
+        confirmationDescription: 'Результаты тестирования поиска'
       }
     },
     ARCHIVE_SEARCH: {
       status: 'PASSED' as CriteriaStatus,
       score: 1,
       metrics: {
-        p95ResponseTime: 0.8,
+        p95: 0.8,
         successRate: 0.995,
         testDuration: 600,
-        userLoad: 5000
+        userLoad: 5000,
+        confirmationUrl: 'https://grafana.hackload.kz/d/archive-performance',
+        confirmationTitle: 'Отчет',
+        confirmationDescription: 'Метрики архивного поиска'
       }
     },
     AUTH_PERFORMANCE: {
       status: 'PASSED' as CriteriaStatus,
       score: 1,
       metrics: {
-        p95ResponseTime: 0.9,
+        p95: 0.9,
         successRate: 0.996,
         testDuration: 600,
         userLoad: 50000,
-        authenticationsPerformed: 49800
+        authenticationsPerformed: 49800,
+        confirmationUrl: 'https://grafana.hackload.kz/d/auth-performance',
+        confirmationTitle: 'Аутентификация',
+        confirmationDescription: 'Результаты нагрузочного тестирования'
       }
     },
     TICKET_BOOKING: {
@@ -81,7 +96,10 @@ export function CriteriaTestPanel({ teams }: CriteriaTestPanelProps) {
         p95ResponseTime: 2.5,
         successRate: 0.994,
         bookedTickets: 100000,
-        testDuration: 900
+        testDuration: 900,
+        confirmationUrl: 'https://grafana.hackload.kz/d/booking-stats',
+        confirmationTitle: 'Бронирования',
+        confirmationDescription: 'Статистика бронирований'
       }
     },
     TICKET_CANCELLATION: {
@@ -92,7 +110,10 @@ export function CriteriaTestPanel({ teams }: CriteriaTestPanelProps) {
         successRate: 0.997,
         bookedTickets: 90000,
         cancelledTickets: 10000,
-        testDuration: 600
+        testDuration: 600,
+        confirmationUrl: 'https://grafana.hackload.kz/d/cancellation-stats',
+        confirmationTitle: 'Отмены',
+        confirmationDescription: 'Статистика отмен билетов'
       }
     },
     BUDGET_TRACKING: {
@@ -106,7 +127,10 @@ export function CriteriaTestPanel({ teams }: CriteriaTestPanelProps) {
           storage: 23.12,
           networking: 15.67,
           apis: 28.54
-        }
+        },
+        confirmationUrl: 'https://billing.hackload.kz/team-expenses',
+        confirmationTitle: 'Расходы',
+        confirmationDescription: 'Детализация расходов команды'
       }
     }
   }

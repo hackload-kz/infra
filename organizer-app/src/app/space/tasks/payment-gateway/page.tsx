@@ -65,7 +65,7 @@ export default async function PaymentGatewayDocPage() {
   }
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       {/* Navigation */}
       <div className="mb-6">
         <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white">

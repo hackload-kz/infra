@@ -24,12 +24,30 @@ export default async function ResultsPage() {
     redirect('/space')
   }
 
+  // Get user participant data to determine team status
+  const participant = await db.participant.findFirst({
+    where: { 
+      user: { email: session.user.email } 
+    },
+    include: {
+      team: true,
+      ledTeam: true
+    }
+  })
+
   // Create user object for layout
-  const user = {
+  const user = participant ? {
+    name: participant.name,
+    email: participant.email,
+    image: session.user?.image || undefined
+  } : {
     name: session.user.name || 'Организатор',
     email: session.user.email,
     image: session.user?.image || undefined
   }
+
+  // Determine if user has team
+  const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   // Fetch team results data
   const teamResults = await getTeamResults()
@@ -43,7 +61,7 @@ export default async function ResultsPage() {
   })
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={false} isAdmin={true}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={true}>
       {/* Page Title */}
       <div className="text-center mb-12">
         <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">
@@ -106,8 +124,10 @@ export default async function ResultsPage() {
         </div>
       </div>
 
-      {/* Test Panel for Admins */}
-      <CriteriaTestPanel teams={approvedTeams} />
+      {/* Test Panel for Admins (Development Only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <CriteriaTestPanel teams={approvedTeams} />
+      )}
 
       {/* Results Table */}
       <div className="space-y-6">

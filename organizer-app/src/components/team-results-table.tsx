@@ -6,7 +6,8 @@ import {
   ChevronUp, 
   ChevronDown, 
   Clock, 
-  AlertCircle
+  AlertCircle,
+  ExternalLink
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
@@ -46,6 +47,11 @@ interface TeamCriteriaData {
     totalSpent?: number
     currency?: string
     breakdown?: Record<string, number>
+    
+    // Confirmation metadata
+    confirmationUrl?: string
+    confirmationTitle?: string
+    confirmationDescription?: string
     
     [key: string]: unknown
   }
@@ -284,6 +290,26 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         {criteria?.lastUpdated && criteria.lastUpdated.getTime() > 0 && (
                           <div className="text-xs text-slate-500">
                             {formatDistanceToNow(criteria.lastUpdated, { locale: ru, addSuffix: true })}
+                          </div>
+                        )}
+                        {/* Confirmation link */}
+                        {criteria?.metrics?.confirmationUrl && (
+                          <div className="mt-1">
+                            <a
+                              href={criteria.metrics.confirmationUrl as string}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                              title={(criteria.metrics.confirmationTitle as string) || 'Ссылка подтверждения'}
+                            >
+                              <ExternalLink size={10} />
+                              {(criteria.metrics.confirmationTitle as string) || 'Подтвердить'}
+                            </a>
+                            {criteria.metrics.confirmationDescription && (
+                              <div className="text-xs text-slate-500 mt-0.5 max-w-20 truncate" title={criteria.metrics.confirmationDescription as string}>
+                                {criteria.metrics.confirmationDescription as string}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

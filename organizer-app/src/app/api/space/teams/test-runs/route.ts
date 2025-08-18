@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { logger, LogAction } from '@/lib/logger'
 
 // GET /api/space/teams/test-runs - Получить запуски тестов участника (только его собственные)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()

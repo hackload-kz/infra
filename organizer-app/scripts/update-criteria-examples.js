@@ -57,7 +57,10 @@ async function updateCodeRepositoryCheck() {
         commitsCount: 15,
         lastCommitTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
         repositoryUrl: 'https://github.com/team-alpha/project',
-        hasRecentActivity: true
+        hasRecentActivity: true,
+        confirmationUrl: 'https://github.com/team-alpha/hackload-solution',
+        confirmationTitle: 'Репозиторий',
+        confirmationDescription: 'Исходный код решения команды'
       },
       updatedBy: 'git-monitor-service'
     },
@@ -71,7 +74,10 @@ async function updateCodeRepositoryCheck() {
         commitsCount: 3,
         lastCommitTime: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(), // 30 hours ago
         repositoryUrl: 'https://github.com/team-beta/project',
-        hasRecentActivity: false
+        hasRecentActivity: false,
+        confirmationUrl: 'https://github.com/team-beta/hackload-solution',
+        confirmationTitle: 'Репозиторий',
+        confirmationDescription: 'Исходный код решения команды'
       },
       updatedBy: 'git-monitor-service'
     }
@@ -98,7 +104,10 @@ async function updateDeployedSolutionCheck() {
         responseTime: 245,
         statusCode: 200,
         lastChecked: new Date().toISOString(),
-        isAccessible: true
+        isAccessible: true,
+        confirmationUrl: 'https://team-alpha.hackload.app',
+        confirmationTitle: 'Демо',
+        confirmationDescription: 'Развернутое решение команды'
       },
       updatedBy: 'deployment-monitor-service'
     })
@@ -117,7 +126,7 @@ async function updateEventSearchPerformance() {
       status: 'PASSED',
       score: 3,
       metrics: {
-        p95ResponseTime: 1.8,
+        p95: 1.8,
         successRate: 0.97,
         testDuration: 600, // 10 minutes
         userLoads: {
@@ -128,7 +137,10 @@ async function updateEventSearchPerformance() {
         passedCriteria: {
           p95UnderTwoSeconds: true,
           successRateAbove95Percent: true
-        }
+        },
+        confirmationUrl: 'https://grafana.hackload.kz/d/search-performance/team-alpha',
+        confirmationTitle: 'Метрики',
+        confirmationDescription: 'Результаты тестирования поиска событий'
       },
       updatedBy: 'k6-load-testing-service'
     })
@@ -159,7 +171,10 @@ async function updateBudgetTracking() {
           apis: 28.54
         },
         lastUpdated: new Date().toISOString(),
-        hackathonStartDate: '2025-08-01T00:00:00Z'
+        hackathonStartDate: '2025-08-01T00:00:00Z',
+        confirmationUrl: 'https://billing.hackload.kz/team-expenses/team-alpha',
+        confirmationTitle: 'Расходы',
+        confirmationDescription: 'Детализация расходов команды'
       },
       updatedBy: 'cost-tracking-service'
     }
@@ -170,6 +185,82 @@ async function updateBudgetTracking() {
     console.log('✅ Budget tracking updated:', result)
   } catch (error) {
     console.error('❌ Failed to update budget tracking:', error.message)
+  }
+}
+
+// Example 5: Authentication Performance (Criteria 5)
+async function updateAuthPerformance() {
+  console.log('🔐 Updating Authentication Performance...')
+  
+  try {
+    const result = await updateTeamCriteria('team-alpha', 'AUTH_PERFORMANCE', {
+      status: 'PASSED',
+      score: 1,
+      metrics: {
+        p95: 0.9,
+        successRate: 0.996,
+        testDuration: 600,
+        userLoad: 50000,
+        authenticationsPerformed: 49800,
+        confirmationUrl: 'https://grafana.hackload.kz/d/auth-performance/team-alpha',
+        confirmationTitle: 'Аутентификация',
+        confirmationDescription: 'Результаты нагрузочного тестирования аутентификации'
+      },
+      updatedBy: 'k6-auth-testing-service'
+    })
+    console.log('✅ Authentication performance updated:', result)
+  } catch (error) {
+    console.error('❌ Failed to update authentication performance:', error.message)
+  }
+}
+
+// Example 6: Ticket Booking Performance (Criteria 6)
+async function updateTicketBookingPerformance() {
+  console.log('🎫 Updating Ticket Booking Performance...')
+  
+  try {
+    const result = await updateTeamCriteria('team-alpha', 'TICKET_BOOKING', {
+      status: 'PASSED',
+      score: 3,
+      metrics: {
+        p95: 2.5,
+        successRate: 0.994,
+        bookedTickets: 100000,
+        testDuration: 900,
+        confirmationUrl: 'https://grafana.hackload.kz/d/booking-stats/team-alpha',
+        confirmationTitle: 'Бронирования',
+        confirmationDescription: 'Статистика и метрики бронирования билетов'
+      },
+      updatedBy: 'k6-booking-testing-service'
+    })
+    console.log('✅ Ticket booking performance updated:', result)
+  } catch (error) {
+    console.error('❌ Failed to update ticket booking performance:', error.message)
+  }
+}
+
+// Example 7: Archive Search Performance (Criteria 4)  
+async function updateArchiveSearchPerformance() {
+  console.log('📚 Updating Archive Search Performance...')
+  
+  try {
+    const result = await updateTeamCriteria('team-alpha', 'ARCHIVE_SEARCH', {
+      status: 'PASSED',
+      score: 1,
+      metrics: {
+        p95: 0.8,
+        successRate: 0.995,
+        testDuration: 600,
+        userLoad: 5000,
+        confirmationUrl: 'https://grafana.hackload.kz/d/archive-performance/team-alpha',
+        confirmationTitle: 'Архивный поиск',
+        confirmationDescription: 'Метрики производительности архивного поиска'
+      },
+      updatedBy: 'k6-archive-testing-service'
+    })
+    console.log('✅ Archive search performance updated:', result)
+  } catch (error) {
+    console.error('❌ Failed to update archive search performance:', error.message)
   }
 }
 
@@ -184,6 +275,15 @@ async function runExamples() {
   console.log()
   
   await updateEventSearchPerformance()
+  console.log()
+  
+  await updateArchiveSearchPerformance()
+  console.log()
+  
+  await updateAuthPerformance()
+  console.log()
+  
+  await updateTicketBookingPerformance()
   console.log()
   
   await updateBudgetTracking()
@@ -203,5 +303,8 @@ module.exports = {
   updateCodeRepositoryCheck,
   updateDeployedSolutionCheck,
   updateEventSearchPerformance,
+  updateArchiveSearchPerformance,
+  updateAuthPerformance,
+  updateTicketBookingPerformance,
   updateBudgetTracking
 }

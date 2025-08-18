@@ -7,7 +7,43 @@ export interface TeamCriteriaData {
   status: 'PASSED' | 'FAILED' | 'NO_DATA'
   score?: number
   lastUpdated: Date
-  metrics?: Record<string, unknown>
+  metrics?: {
+    // Common fields
+    p95?: number
+    successRate?: number
+    
+    // CODE_REPO specific
+    commitsCount?: number
+    lastCommitTime?: string
+    repositoryUrl?: string
+    hasRecentActivity?: boolean
+    
+    // DEPLOYED_SOLUTION specific
+    endpointUrl?: string
+    responseTime?: number
+    statusCode?: number
+    isAccessible?: boolean
+    
+    // Performance test specific
+    testDuration?: number
+    userLoad?: number
+    
+    // TICKET_BOOKING/CANCELLATION specific
+    bookedTickets?: number
+    cancelledTickets?: number
+    
+    // BUDGET_TRACKING specific
+    totalSpent?: number
+    currency?: string
+    breakdown?: Record<string, number>
+    
+    // Confirmation metadata
+    confirmationUrl?: string
+    confirmationTitle?: string
+    confirmationDescription?: string
+    
+    [key: string]: unknown
+  }
 }
 
 export interface TeamResultsData {

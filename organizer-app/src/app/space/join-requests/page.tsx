@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
+import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { JoinRequestsPageClient } from '@/components/join-requests-page-client'
 
@@ -12,6 +13,9 @@ export default async function JoinRequestsPage() {
   if (!session?.user?.email) {
     redirect('/login')
   }
+
+  // Check if user is an organizer
+  const userIsOrganizer = isOrganizer(session.user.email)
 
   const participant = await db.participant.findFirst({
     where: { 
@@ -50,7 +54,7 @@ export default async function JoinRequestsPage() {
   const hasTeam = !!(participant?.team || participant?.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       <JoinRequestsPageClient initialRequests={participant.joinRequests} />
     </PersonalCabinetLayout>
   )
