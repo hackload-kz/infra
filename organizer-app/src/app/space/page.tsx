@@ -77,7 +77,7 @@ export default async function PersonalCabinetPage() {
   // If user is an organizer without participant data, show organizer view
   if (userIsOrganizer && !participant) {
     return (
-      <PersonalCabinetLayout user={user} hasTeam={false}>
+      <PersonalCabinetLayout user={user} hasTeam={false} isAdmin={true}>
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">
@@ -181,7 +181,7 @@ export default async function PersonalCabinetPage() {
   const hasTeam = !!(participant.team || participant.ledTeam)
 
   return (
-    <PersonalCabinetLayout user={user} hasTeam={hasTeam}>
+    <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
       {/* Page Title */}
       <div className="text-center mb-12">
         <h1 className="text-4xl lg:text-5xl font-extrabold mb-4">

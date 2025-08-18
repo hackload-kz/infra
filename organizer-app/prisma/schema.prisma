@@ -38,6 +38,7 @@ model Hackathon {
   journalEntries          JournalEntry[]
   messages                Message[]
   teams                   Team[]
+  teamCriteria            TeamCriteria[]
 
   @@map("hackathons")
 }
@@ -80,6 +81,7 @@ model Team {
   environmentData   TeamEnvironmentData[]
   hackathon         Hackathon             @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   testRuns          TestRun[]
+  criteria          TeamCriteria[]
 
   @@map("teams")
 }
@@ -500,4 +502,55 @@ enum TestRunStepStatus {
   FAILED
   CANCELLED
   DELETED
+}
+
+enum CriteriaType {
+  CODE_REPO
+  DEPLOYED_SOLUTION
+  EVENT_SEARCH
+  ARCHIVE_SEARCH
+  AUTH_PERFORMANCE
+  TICKET_BOOKING
+  TICKET_CANCELLATION
+  BUDGET_TRACKING
+}
+
+enum CriteriaStatus {
+  PASSED
+  FAILED
+  NO_DATA
+}
+
+model TeamCriteria {
+  id            String          @id @default(cuid())
+  teamId        String
+  hackathonId   String
+  criteriaType  CriteriaType
+  status        CriteriaStatus  @default(NO_DATA)
+  score         Int?
+  metrics       Json?           // Performance metrics and additional data
+  lastUpdated   DateTime        @default(now())
+  updatedBy     String          // Service identifier that updated this criteria
+  createdAt     DateTime        @default(now())
+  
+  team          Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  hackathon     Hackathon       @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  history       TeamCriteriaHistory[]
+
+  @@unique([teamId, hackathonId, criteriaType])
+  @@map("team_criteria")
+}
+
+model TeamCriteriaHistory {
+  id              String          @id @default(cuid())
+  teamCriteriaId  String
+  status          CriteriaStatus
+  score           Int?
+  metrics         Json?
+  updatedBy       String
+  createdAt       DateTime        @default(now())
+  
+  teamCriteria    TeamCriteria    @relation(fields: [teamCriteriaId], references: [id], onDelete: Cascade)
+
+  @@map("team_criteria_history")
 }
