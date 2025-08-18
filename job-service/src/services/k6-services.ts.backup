@@ -1,0 +1,518 @@
+/**
+ * K6 Performance Testing Services
+ * 
+ * Monitors application performance through K6 load testing metrics
+ * retrieved from Grafana API. Evaluates P95 latency and success rates
+ * against defined thresholds for hackathon team applications.
+ */
+
+import { BaseJobService } from './base-service';
+import { GrafanaClient, K6PerformanceMetrics, K6TestResult } from '../lib/grafana-client';
+import { CriteriaUpdate, ServiceConfig, ServiceStatus } from '../types';
+import { config } from '../config';
+
+export interface K6ServiceMetrics {
+  teamsEvaluated: number;
+  performanceTestsFound: number;
+  thresholdViolations: number;
+  avgP95Latency: number;
+  avgSuccessRate: number;
+  lastEvaluationDuration: number;
+}
+
+export interface PerformanceThresholds {
+  p95LatencyMs: number;    // Maximum P95 latency in milliseconds
+  successRatePercent: number; // Minimum success rate percentage
+  requestRateMin: number;  // Minimum requests per second
+}
+
+export interface TeamPerformanceData {
+  teamId: number;
+  teamName: string;
+  applicationUrl?: string;
+  latestMetrics?: K6PerformanceMetrics;
+  testResults: K6TestResult[];
+  thresholdViolations: string[];
+  lastTestTime?: Date;
+}
+
+/**
+ * P95 Latency Monitoring Service
+ */
+export class P95LatencyService extends BaseJobService {
+  private grafana: GrafanaClient;
+  private metrics: K6ServiceMetrics;
+  private readonly thresholds: PerformanceThresholds;
+
+  constructor() {
+    const serviceConfig: ServiceConfig = {
+      name: 'P95LatencyService',
+      enabled: config.services.k6ServicesEnabled,
+      interval: config.scheduling.k6Services.interval,
+      timeout: config.scheduling.k6Services.timeout,
+      retries: config.scheduling.k6Services.retries
+    };
+
+    super(serviceConfig);
+    
+    this.grafana = new GrafanaClient();
+    this.metrics = {
+      teamsEvaluated: 0,
+      performanceTestsFound: 0,
+      thresholdViolations: 0,
+      avgP95Latency: 0,
+      avgSuccessRate: 0,
+      lastEvaluationDuration: 0
+    };
+
+    // Default thresholds - can be made configurable
+    this.thresholds = {
+      p95LatencyMs: 2000,      // 2 seconds P95 latency
+      successRatePercent: 95,   // 95% success rate
+      requestRateMin: 1         // At least 1 RPS
+    };
+
+    this.logger.info('P95 Latency Service initialized', {
+      enabled: this.config.enabled,
+      thresholds: this.thresholds
+    });
+  }
+
+  async collectMetrics(): Promise<CriteriaUpdate[]> {
+    const startTime = Date.now();
+    this.logger.info('Starting P95 latency monitoring');
+
+    if (!this.grafana.isConfigured()) {
+      this.logger.warn('Grafana not configured, skipping P95 latency monitoring');
+      return [];
+    }
+
+    try {
+      // Check Grafana health
+      const isHealthy = await this.grafana.healthCheck();
+      if (!isHealthy) {
+        throw new Error('Grafana API health check failed');
+      }
+
+      // Get teams from Hub API
+      const teams = await this.apiClient.getTeams();
+      this.logger.info(`Evaluating P95 latency for ${teams.length} teams`);
+
+      const updates: CriteriaUpdate[] = [];
+      const teamData: TeamPerformanceData[] = [];
+      
+      let totalP95 = 0;
+      let totalSuccess = 0;
+      let validMetricsCount = 0;
+
+      // Process each team
+      for (const team of teams) {
+        try {
+          const data = await this.evaluateTeamPerformance(team);
+          teamData.push(data);
+          
+          if (data.latestMetrics) {
+            totalP95 += data.latestMetrics.p95Latency;
+            totalSuccess += data.latestMetrics.successRate;
+            validMetricsCount++;
+          }
+
+          // Create criteria update
+          const update = this.createP95LatencyUpdate(data);
+          if (update) {
+            updates.push(update);
+          }
+        } catch (error) {
+          this.logger.error(`Failed to evaluate P95 latency for team ${team.id}:`, error);
+          
+          // Create error update
+          updates.push({
+            teamId: team.id,
+            criteriaType: 'P95_LATENCY',
+            status: 'ERROR',
+            score: 0,
+            metadata: {
+              error: error instanceof Error ? error.message : 'Unknown error',
+              timestamp: new Date().toISOString(),
+              service: 'P95LatencyService'
+            }
+          });
+        }
+      }
+
+      // Update service metrics
+      this.metrics = {
+        teamsEvaluated: teams.length,
+        performanceTestsFound: teamData.filter(d => d.testResults.length > 0).length,
+        thresholdViolations: teamData.reduce((sum, d) => sum + d.thresholdViolations.length, 0),
+        avgP95Latency: validMetricsCount > 0 ? totalP95 / validMetricsCount : 0,
+        avgSuccessRate: validMetricsCount > 0 ? totalSuccess / validMetricsCount : 0,
+        lastEvaluationDuration: Date.now() - startTime
+      };
+
+      this.logger.info('P95 latency monitoring completed', {
+        teamsEvaluated: this.metrics.teamsEvaluated,
+        updatesGenerated: updates.length,
+        thresholdViolations: this.metrics.thresholdViolations,
+        avgP95Latency: this.metrics.avgP95Latency,
+        duration: this.metrics.lastEvaluationDuration
+      });
+
+      return updates;
+    } catch (error) {
+      this.logger.error('P95 latency monitoring failed:', error);
+      throw error;
+    }
+  }
+
+  private async evaluateTeamPerformance(team: { id: number; name: string; applicationUrl?: string }): Promise<TeamPerformanceData> {
+    const teamData: TeamPerformanceData = {
+      teamId: team.id,
+      teamName: team.name,
+      applicationUrl: team.applicationUrl,
+      testResults: [],
+      thresholdViolations: []
+    };
+
+    if (!team.applicationUrl) {
+      this.logger.debug(`Team ${team.id} has no application URL, skipping performance evaluation`);
+      return teamData;
+    }
+
+    try {
+      // Get recent test results
+      const testResults = await this.grafana.getRecentTestResults(team.id, 5);
+      teamData.testResults = testResults;
+
+      if (testResults.length === 0) {
+        this.logger.debug(`No K6 test results found for team ${team.id}`);
+        return teamData;
+      }
+
+      // Get latest metrics
+      const latestResult = testResults[0];
+      teamData.latestMetrics = latestResult.metrics;
+      teamData.lastTestTime = latestResult.timestamp;
+
+      // Check thresholds
+      this.checkPerformanceThresholds(teamData);
+
+      return teamData;
+    } catch (error) {
+      this.logger.error(`Error evaluating team ${team.id} performance:`, error);
+      teamData.thresholdViolations.push(`Evaluation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      return teamData;
+    }
+  }
+
+  private checkPerformanceThresholds(teamData: TeamPerformanceData): void {
+    if (!teamData.latestMetrics) return;
+
+    const metrics = teamData.latestMetrics;
+    const violations: string[] = [];
+
+    // Check P95 latency threshold
+    if (metrics.p95Latency > this.thresholds.p95LatencyMs) {
+      violations.push(
+        `P95 latency ${Math.round(metrics.p95Latency)}ms exceeds threshold ${this.thresholds.p95LatencyMs}ms`
+      );
+    }
+
+    // Check success rate threshold
+    if (metrics.successRate < this.thresholds.successRatePercent) {
+      violations.push(
+        `Success rate ${metrics.successRate.toFixed(1)}% below threshold ${this.thresholds.successRatePercent}%`
+      );
+    }
+
+    // Check minimum request rate
+    if (metrics.requestRate < this.thresholds.requestRateMin) {
+      violations.push(
+        `Request rate ${metrics.requestRate.toFixed(2)} RPS below minimum ${this.thresholds.requestRateMin} RPS`
+      );
+    }
+
+    teamData.thresholdViolations = violations;
+  }
+
+  private createP95LatencyUpdate(teamData: TeamPerformanceData): CriteriaUpdate | null {
+    if (!teamData.latestMetrics) {
+      return {
+        teamId: teamData.teamId,
+        criteriaType: 'P95_LATENCY',
+        status: 'NOT_TESTED',
+        score: 0,
+        metadata: {
+          reason: 'No performance test data available',
+          applicationUrl: teamData.applicationUrl,
+          timestamp: new Date().toISOString(),
+          service: 'P95LatencyService'
+        }
+      };
+    }
+
+    const metrics = teamData.latestMetrics;
+    const hasViolations = teamData.thresholdViolations.length > 0;
+    
+    // Calculate score based on P95 latency performance
+    let score = 100;
+    
+    // Deduct points for P95 latency violations
+    if (metrics.p95Latency > this.thresholds.p95LatencyMs) {
+      const excessRatio = metrics.p95Latency / this.thresholds.p95LatencyMs;
+      score -= Math.min(50, (excessRatio - 1) * 100); // Up to 50 point deduction
+    }
+    
+    // Deduct points for success rate issues
+    if (metrics.successRate < this.thresholds.successRatePercent) {
+      const deficitRatio = (this.thresholds.successRatePercent - metrics.successRate) / this.thresholds.successRatePercent;
+      score -= Math.min(50, deficitRatio * 100); // Up to 50 point deduction
+    }
+    
+    score = Math.max(0, Math.round(score));
+
+    return {
+      teamId: teamData.teamId,
+      criteriaType: 'P95_LATENCY',
+      status: hasViolations ? 'NEEDS_IMPROVEMENT' : 'GOOD',
+      score,
+      metadata: {
+        p95Latency: metrics.p95Latency,
+        successRate: metrics.successRate,
+        requestRate: metrics.requestRate,
+        thresholdViolations: teamData.thresholdViolations,
+        lastTestTime: teamData.lastTestTime?.toISOString(),
+        applicationUrl: teamData.applicationUrl,
+        thresholds: this.thresholds,
+        timestamp: new Date().toISOString(),
+        service: 'P95LatencyService'
+      }
+    };
+  }
+
+  evaluateStatus(): ServiceStatus {
+    if (!this.grafana.isConfigured()) {
+      return {
+        healthy: false,
+        message: 'Grafana not configured',
+        details: {
+          configured: false,
+          lastRun: this.lastSuccessfulRun?.toISOString(),
+          ...this.metrics
+        }
+      };
+    }
+
+    const isHealthy = this.metrics.teamsEvaluated > 0 || 
+                     (Date.now() - (this.lastSuccessfulRun?.getTime() || 0)) < 24 * 60 * 60 * 1000;
+
+    return {
+      healthy: isHealthy,
+      message: isHealthy ? 
+        `Monitoring ${this.metrics.teamsEvaluated} teams, ${this.metrics.performanceTestsFound} with test data` :
+        'No recent performance evaluations',
+      details: {
+        configured: true,
+        lastRun: this.lastSuccessfulRun?.toISOString(),
+        ...this.metrics
+      }
+    };
+  }
+}
+
+/**
+ * Success Rate Monitoring Service
+ */
+export class SuccessRateService extends BaseJobService {
+  private grafana: GrafanaClient;
+  private metrics: K6ServiceMetrics;
+  private readonly thresholds: PerformanceThresholds;
+
+  constructor() {
+    const serviceConfig: ServiceConfig = {
+      name: 'SuccessRateService',
+      enabled: config.services.k6ServicesEnabled,
+      interval: config.scheduling.k6Services.interval,
+      timeout: config.scheduling.k6Services.timeout,
+      retries: config.scheduling.k6Services.retries
+    };
+
+    super(serviceConfig);
+    
+    this.grafana = new GrafanaClient();
+    this.metrics = {
+      teamsEvaluated: 0,
+      performanceTestsFound: 0,
+      thresholdViolations: 0,
+      avgP95Latency: 0,
+      avgSuccessRate: 0,
+      lastEvaluationDuration: 0
+    };
+
+    this.thresholds = {
+      p95LatencyMs: 2000,
+      successRatePercent: 95,
+      requestRateMin: 1
+    };
+
+    this.logger.info('Success Rate Service initialized', {
+      enabled: this.config.enabled,
+      thresholds: this.thresholds
+    });
+  }
+
+  async collectMetrics(): Promise<CriteriaUpdate[]> {
+    const startTime = Date.now();
+    this.logger.info('Starting success rate monitoring');
+
+    if (!this.grafana.isConfigured()) {
+      this.logger.warn('Grafana not configured, skipping success rate monitoring');
+      return [];
+    }
+
+    try {
+      const isHealthy = await this.grafana.healthCheck();
+      if (!isHealthy) {
+        throw new Error('Grafana API health check failed');
+      }
+
+      const teams = await this.apiClient.getTeams();
+      this.logger.info(`Evaluating success rate for ${teams.length} teams`);
+
+      const updates: CriteriaUpdate[] = [];
+      let totalSuccess = 0;
+      let validMetricsCount = 0;
+
+      for (const team of teams) {
+        try {
+          if (!team.applicationUrl) {
+            updates.push({
+              teamId: team.id,
+              criteriaType: 'SUCCESS_RATE',
+              status: 'NOT_TESTED',
+              score: 0,
+              metadata: {
+                reason: 'No application URL configured',
+                timestamp: new Date().toISOString(),
+                service: 'SuccessRateService'
+              }
+            });
+            continue;
+          }
+
+          const timeRange = {
+            start: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            end: new Date()
+          };
+
+          const metrics = await this.grafana.getK6Metrics(team.id, team.applicationUrl, timeRange);
+          
+          if (!metrics) {
+            updates.push({
+              teamId: team.id,
+              criteriaType: 'SUCCESS_RATE',
+              status: 'NOT_TESTED',
+              score: 0,
+              metadata: {
+                reason: 'No performance test data available',
+                applicationUrl: team.applicationUrl,
+                timestamp: new Date().toISOString(),
+                service: 'SuccessRateService'
+              }
+            });
+            continue;
+          }
+
+          totalSuccess += metrics.successRate;
+          validMetricsCount++;
+
+          // Calculate score and status
+          const meetsThreshold = metrics.successRate >= this.thresholds.successRatePercent;
+          const score = Math.round(Math.min(100, (metrics.successRate / this.thresholds.successRatePercent) * 100));
+
+          updates.push({
+            teamId: team.id,
+            criteriaType: 'SUCCESS_RATE',
+            status: meetsThreshold ? 'GOOD' : 'NEEDS_IMPROVEMENT',
+            score,
+            metadata: {
+              successRate: metrics.successRate,
+              errorRate: metrics.errorRate,
+              requestRate: metrics.requestRate,
+              threshold: this.thresholds.successRatePercent,
+              meetsThreshold,
+              applicationUrl: team.applicationUrl,
+              timestamp: new Date().toISOString(),
+              service: 'SuccessRateService'
+            }
+          });
+
+        } catch (error) {
+          this.logger.error(`Failed to evaluate success rate for team ${team.id}:`, error);
+          
+          updates.push({
+            teamId: team.id,
+            criteriaType: 'SUCCESS_RATE',
+            status: 'ERROR',
+            score: 0,
+            metadata: {
+              error: error instanceof Error ? error.message : 'Unknown error',
+              timestamp: new Date().toISOString(),
+              service: 'SuccessRateService'
+            }
+          });
+        }
+      }
+
+      this.metrics = {
+        teamsEvaluated: teams.length,
+        performanceTestsFound: updates.filter(u => u.status !== 'NOT_TESTED' && u.status !== 'ERROR').length,
+        thresholdViolations: updates.filter(u => u.status === 'NEEDS_IMPROVEMENT').length,
+        avgP95Latency: 0,
+        avgSuccessRate: validMetricsCount > 0 ? totalSuccess / validMetricsCount : 0,
+        lastEvaluationDuration: Date.now() - startTime
+      };
+
+      this.logger.info('Success rate monitoring completed', {
+        teamsEvaluated: this.metrics.teamsEvaluated,
+        updatesGenerated: updates.length,
+        avgSuccessRate: this.metrics.avgSuccessRate,
+        duration: this.metrics.lastEvaluationDuration
+      });
+
+      return updates;
+    } catch (error) {
+      this.logger.error('Success rate monitoring failed:', error);
+      throw error;
+    }
+  }
+
+  evaluateStatus(): ServiceStatus {
+    if (!this.grafana.isConfigured()) {
+      return {
+        healthy: false,
+        message: 'Grafana not configured',
+        details: {
+          configured: false,
+          lastRun: this.lastSuccessfulRun?.toISOString(),
+          ...this.metrics
+        }
+      };
+    }
+
+    const isHealthy = this.metrics.teamsEvaluated > 0 || 
+                     (Date.now() - (this.lastSuccessfulRun?.getTime() || 0)) < 24 * 60 * 60 * 1000;
+
+    return {
+      healthy: isHealthy,
+      message: isHealthy ? 
+        `Monitoring ${this.metrics.teamsEvaluated} teams, avg success rate: ${this.metrics.avgSuccessRate.toFixed(1)}%` :
+        'No recent success rate evaluations',
+      details: {
+        configured: true,
+        lastRun: this.lastSuccessfulRun?.toISOString(),
+        ...this.metrics
+      }
+    };
+  }
+}

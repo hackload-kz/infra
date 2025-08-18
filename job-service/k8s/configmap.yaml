@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-service-config
+  namespace: hub
+data:
+  # Service Configuration
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  
+  # Hub API Configuration
+  API_BASE_URL: "https://hub.hackload.kz"
+  API_TIMEOUT: "30000"
+  API_RETRIES: "3"
+  
+  # Job Scheduling Configuration
+  GIT_MONITOR_ENABLED: "true"
+  GIT_MONITOR_INTERVAL: "*/30 * * * *"
+  GIT_MONITOR_TIMEOUT: "300000"
+  GIT_MONITOR_RETRIES: "3"
+  
+  DEPLOYMENT_MONITOR_ENABLED: "true"
+  DEPLOYMENT_MONITOR_INTERVAL: "*/15 * * * *"
+  DEPLOYMENT_MONITOR_TIMEOUT: "30000"
+  DEPLOYMENT_MONITOR_RETRIES: "2"
+  
+  K6_SERVICES_ENABLED: "false"
+  K6_SERVICES_INTERVAL: "0 */6 * * *"
+  K6_SERVICES_TIMEOUT: "1200000"
+  K6_SERVICES_RETRIES: "1"
+  
+  COST_TRACKING_ENABLED: "false"
+  COST_TRACKING_INTERVAL: "0 */6 * * *"
+  COST_TRACKING_TIMEOUT: "600000"
+  COST_TRACKING_RETRIES: "2"
+  
+  # External API URLs
+  GITHUB_API_URL: "https://api.github.com"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_PORT: "8080"
+  METRICS_PORT: "9090"
+  
+  # HTTP Configuration
+  HTTP_TIMEOUT: "10000"
+  USER_AGENT: "HackLoad-Monitor/1.0"
+  
+  # Performance & Resource Limits
+  MAX_CONCURRENT_JOBS: "5"
+  MEMORY_LIMIT_MB: "512"
+  CPU_LIMIT_CORES: "0.5"
+  RATE_LIMIT_PER_MINUTE: "60"
+  
+  # Monitoring & Observability
+  METRICS_ENABLED: "true"
+  TRACING_ENABLED: "false"
