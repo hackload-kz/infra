@@ -51,32 +51,72 @@ class HubApiClient {
             throw error;
         }
     }
-    async bulkUpdateCriteria(updates) {
-        const requestBody = { updates };
+    async updateIndividualCriteria(update) {
+        const requestBody = {
+            status: update.status,
+            score: update.score,
+            metrics: update.metrics,
+            updatedBy: update.updatedBy
+        };
         try {
-            const response = await this.request('/api/service/team-criteria', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+            const response = await this.request(`/api/service/team-criteria/${update.teamSlug}/${update.criteriaType}`, {
+                method: 'PUT',
                 body: JSON.stringify(requestBody)
             });
-            this.log('info', `Bulk updated ${updates.length} criteria. Response:`, response);
+            this.log('debug', `Updated criteria for ${update.teamSlug}/${update.criteriaType}:`, response);
             return response;
         }
         catch (error) {
-            this.log('error', 'Failed to bulk update criteria:', error);
+            this.log('error', `Failed to update criteria for ${update.teamSlug}/${update.criteriaType}:`, error);
             throw error;
         }
+    }
+    async bulkUpdateCriteria(updates) {
+        this.log('debug', `Sending ${updates.length} individual criteria updates...`);
+        let updatedEntries = 0;
+        let createdEntries = 0;
+        const errors = [];
+        const processedTeams = [];
+        for (const update of updates) {
+            try {
+                const response = await this.updateIndividualCriteria(update);
+                if (response.action === 'created') {
+                    createdEntries++;
+                }
+                else {
+                    updatedEntries++;
+                }
+                if (!processedTeams.includes(update.teamSlug)) {
+                    processedTeams.push(update.teamSlug);
+                }
+                this.log('debug', `Successfully processed ${update.teamSlug}/${update.criteriaType}`);
+            }
+            catch (error) {
+                errors.push({
+                    teamSlug: update.teamSlug,
+                    criteriaType: update.criteriaType,
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+                this.log('warn', `Failed to process ${update.teamSlug}/${update.criteriaType}:`, error);
+            }
+        }
+        const result = {
+            success: errors.length === 0,
+            data: {
+                processed: updatedEntries + createdEntries,
+                failed: errors.length,
+                ...(errors.length > 0 && { errors: errors.map(e => `${e.teamSlug}/${e.criteriaType}: ${e.error}`) })
+            },
+            ...(errors.length > 0 && { message: `Completed with ${errors.length} errors` })
+        };
+        this.log('info', `Individual updates completed: ${updatedEntries} updated, ${createdEntries} created, ${errors.length} errors`);
+        return result;
     }
     async updateSingleCriteria(teamSlug, criteriaType, update) {
         const url = `/api/service/team-criteria/${teamSlug}/${criteriaType}`;
         try {
             const response = await this.request(url, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(update)
             });
             this.log('info', `Updated criteria ${criteriaType} for team ${teamSlug}:`, response);
@@ -97,13 +137,8 @@ class HubApiClient {
         const url = `/api/service/teams/environment?${searchParams.toString()}`;
         try {
             const response = await this.request(url);
-            if (!response.success || !response.data) {
-                this.log('warn', `No environment data found for team ${teamNickname}`);
-                return {};
-            }
-            const responseData = response.data;
-            const teamData = responseData.team || (responseData.teams && responseData.teams[0]);
-            if (!teamData || !teamData.environment) {
+            const teamData = response.team || (response.teams && response.teams[0]);
+            if (!teamData || !teamData.environment || teamData.environment.length === 0) {
                 this.log('warn', `No environment data found for team ${teamNickname}`);
                 return {};
             }
@@ -111,6 +146,7 @@ class HubApiClient {
             teamData.environment.forEach(item => {
                 envData[item.key] = item.value;
             });
+            this.log('debug', `Found ${teamData.environment.length} environment variables for team ${teamNickname}:`, Object.keys(envData));
             return envData;
         }
         catch (error) {
@@ -120,16 +156,27 @@ class HubApiClient {
     }
     async request(path, options = {}) {
         const url = `${this.config.baseUrl}${path}`;
+        const defaultHeaders = {
+            'X-API-Key': this.config.apiKey,
+            'User-Agent': 'HackLoad-JobService/1.0'
+        };
+        if (options.body) {
+            defaultHeaders['Content-Type'] = 'application/json';
+        }
         const requestOptions = {
             method: 'GET',
             headers: {
-                'X-API-Key': this.config.apiKey,
-                'User-Agent': 'HackLoad-JobService/1.0',
+                ...defaultHeaders,
                 ...options.headers
             },
             timeout: options.timeout || this.config.timeout,
             ...options
         };
+        this.log('debug', `Request details: ${requestOptions.method} ${url}`);
+        this.log('debug', `Headers:`, requestOptions.headers);
+        if (requestOptions.body) {
+            this.log('debug', `Body:`, requestOptions.body);
+        }
         let lastError = null;
         for (let attempt = 0; attempt <= this.config.retries; attempt++) {
             try {

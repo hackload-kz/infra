@@ -4,11 +4,9 @@ import {
   HttpError, 
  
   CriteriaListResponse,
-  BulkCriteriaUpdateRequest,
   BulkCriteriaUpdateResponse,
   SingleCriteriaUpdateRequest,
   SingleCriteriaUpdateResponse,
-  TeamEnvironmentResponse
 } from '../types/api';
 import { CriteriaType, CriteriaUpdate, Team } from '../types/criteria';
 
@@ -70,27 +68,78 @@ export class HubApiClient {
     }
   }
   
-  async bulkUpdateCriteria(updates: CriteriaUpdate[]): Promise<BulkCriteriaUpdateResponse> {
-    const requestBody: BulkCriteriaUpdateRequest = { updates };
+  async updateIndividualCriteria(update: CriteriaUpdate): Promise<any> {
+    const requestBody = {
+      status: update.status,
+      score: update.score,
+      metrics: update.metrics,
+      updatedBy: update.updatedBy
+    };
     
     try {
-      const response = await this.request<BulkCriteriaUpdateResponse>(
-        '/api/service/team-criteria',
+      const response = await this.request<any>(
+        `/api/service/team-criteria/${update.teamSlug}/${update.criteriaType}`,
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          method: 'PUT',
           body: JSON.stringify(requestBody)
         }
       );
       
-      this.log('info', `Bulk updated ${updates.length} criteria. Response:`, response);
+      this.log('debug', `Updated criteria for ${update.teamSlug}/${update.criteriaType}:`, response);
       return response;
     } catch (error) {
-      this.log('error', 'Failed to bulk update criteria:', error);
+      this.log('error', `Failed to update criteria for ${update.teamSlug}/${update.criteriaType}:`, error);
       throw error;
     }
+  }
+
+  async bulkUpdateCriteria(updates: CriteriaUpdate[]): Promise<BulkCriteriaUpdateResponse> {
+    this.log('debug', `Sending ${updates.length} individual criteria updates...`);
+    
+    let updatedEntries = 0;
+    let createdEntries = 0;
+    const errors: Array<{ teamSlug: string; criteriaType: string; error: string }> = [];
+    const processedTeams: string[] = [];
+
+    // Process each update individually
+    for (const update of updates) {
+      try {
+        const response = await this.updateIndividualCriteria(update);
+        
+        if (response.action === 'created') {
+          createdEntries++;
+        } else {
+          updatedEntries++;
+        }
+        
+        if (!processedTeams.includes(update.teamSlug)) {
+          processedTeams.push(update.teamSlug);
+        }
+        
+        this.log('debug', `Successfully processed ${update.teamSlug}/${update.criteriaType}`);
+        
+      } catch (error) {
+        errors.push({
+          teamSlug: update.teamSlug,
+          criteriaType: update.criteriaType,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        this.log('warn', `Failed to process ${update.teamSlug}/${update.criteriaType}:`, error);
+      }
+    }
+
+    const result: BulkCriteriaUpdateResponse = {
+      success: errors.length === 0,
+      data: {
+        processed: updatedEntries + createdEntries,
+        failed: errors.length,
+        ...(errors.length > 0 && { errors: errors.map(e => `${e.teamSlug}/${e.criteriaType}: ${e.error}`) })
+      },
+      ...(errors.length > 0 && { message: `Completed with ${errors.length} errors` })
+    };
+
+    this.log('info', `Individual updates completed: ${updatedEntries} updated, ${createdEntries} created, ${errors.length} errors`);
+    return result;
   }
   
   async updateSingleCriteria(
@@ -105,9 +154,6 @@ export class HubApiClient {
         url,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify(update)
         }
       );
@@ -133,22 +179,25 @@ export class HubApiClient {
     const url = `/api/service/teams/environment?${searchParams.toString()}`;
     
     try {
-      const response = await this.request<TeamEnvironmentResponse>(url);
+      // The API returns direct JSON without success/data wrapper
+      const response = await this.request<{
+        teams: Array<{ 
+          teamId: string;
+          teamSlug: string;
+          teamName: string;
+          environment: Array<{key: string, value: string}>;
+        }>;
+        team?: { 
+          teamId: string;
+          teamSlug: string;
+          teamName: string;
+          environment: Array<{key: string, value: string}>;
+        };
+      }>(url);
       
-      if (!response.success || !response.data) {
-        this.log('warn', `No environment data found for team ${teamNickname}`);
-        return {};
-      }
-      
-      // The response format is: { teams: [...], team: {...} }
-      // We want the single team's environment data
-      const responseData = response.data as unknown as {
-        teams: Array<{ environment: Array<{key: string, value: string}> }>;
-        team?: { environment: Array<{key: string, value: string}> };
-      };
-      
-      const teamData = responseData.team || (responseData.teams && responseData.teams[0]);
-      if (!teamData || !teamData.environment) {
+      // Get the team data from the response
+      const teamData = response.team || (response.teams && response.teams[0]);
+      if (!teamData || !teamData.environment || teamData.environment.length === 0) {
         this.log('warn', `No environment data found for team ${teamNickname}`);
         return {};
       }
@@ -159,6 +208,8 @@ export class HubApiClient {
         envData[item.key] = item.value;
       });
       
+      this.log('debug', `Found ${teamData.environment.length} environment variables for team ${teamNickname}:`, Object.keys(envData));
+      
       return envData;
     } catch (error) {
       this.log('error', `Failed to fetch environment data for team ${teamNickname}:`, error);
@@ -168,16 +219,33 @@ export class HubApiClient {
   
   private async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const url = `${this.config.baseUrl}${path}`;
+    
+    // Auto-add Content-Type for requests with body
+    const defaultHeaders: Record<string, string> = {
+      'X-API-Key': this.config.apiKey,
+      'User-Agent': 'HackLoad-JobService/1.0'
+    };
+    
+    if (options.body) {
+      defaultHeaders['Content-Type'] = 'application/json';
+    }
+    
     const requestOptions: RequestOptions = {
       method: 'GET',
       headers: {
-        'X-API-Key': this.config.apiKey,
-        'User-Agent': 'HackLoad-JobService/1.0',
+        ...defaultHeaders,
         ...options.headers
       },
       timeout: options.timeout || this.config.timeout,
       ...options
     };
+    
+    // Debug log the exact request being made
+    this.log('debug', `Request details: ${requestOptions.method} ${url}`);
+    this.log('debug', `Headers:`, requestOptions.headers);
+    if (requestOptions.body) {
+      this.log('debug', `Body:`, requestOptions.body);
+    }
     
     let lastError: Error | null = null;
     

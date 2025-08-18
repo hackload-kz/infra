@@ -38,18 +38,17 @@ class GitMonitorService extends base_service_1.BaseJobService {
                 };
             }
             const repoInfo = await this.githubClient.getRepositoryInfo(repoUrl);
-            const oneDayAgo = new Date();
-            oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+            const hackathonStart = new Date('2025-08-15T00:00:00Z');
             const commits = await this.githubClient.getCommits(repoUrl, {
-                since: oneDayAgo.toISOString(),
+                since: hackathonStart.toISOString(),
                 per_page: 100
             });
             const lastCommit = commits.length > 0 ? commits[0] : null;
             const lastCommitTime = lastCommit?.author.date;
-            const twoDaysAgo = new Date();
-            twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+            const oneDayAgo = new Date();
+            oneDayAgo.setDate(oneDayAgo.getDate() - 1);
             const hasRecentActivity = lastCommitTime ?
-                new Date(lastCommitTime) > twoDaysAgo : false;
+                new Date(lastCommitTime) > oneDayAgo : false;
             const metrics = {
                 hasRepository: true,
                 commitsCount: commits.length,

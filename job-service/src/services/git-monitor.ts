@@ -45,23 +45,22 @@ export class GitMonitorService extends BaseJobService {
       // Get repository info
       const repoInfo = await this.githubClient.getRepositoryInfo(repoUrl);
       
-      // Get commits from the last 1 days
-      const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      // Get commits from August 15th, 2025
+      const hackathonStart = new Date('2025-08-15T00:00:00Z');
 
       const commits = await this.githubClient.getCommits(repoUrl, {
-        since: oneDayAgo.toISOString(),
+        since: hackathonStart.toISOString(),
         per_page: 100
       });
       
       const lastCommit = commits.length > 0 ? commits[0] : null;
       const lastCommitTime = lastCommit?.author.date;
       
-      // Check for recent activity (within last 2 days)
-      const twoDaysAgo = new Date();
-      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      // Check for recent activity (within last 1 days)
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
       const hasRecentActivity = lastCommitTime ?
-        new Date(lastCommitTime) > twoDaysAgo : false;
+        new Date(lastCommitTime) > oneDayAgo : false;
 
       const metrics: GitMetrics = {
         hasRepository: true,

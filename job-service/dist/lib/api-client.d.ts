@@ -8,6 +8,7 @@ export declare class HubApiClient {
         teamSlug?: string;
         criteriaType?: CriteriaType;
     }): Promise<CriteriaListResponse>;
+    updateIndividualCriteria(update: CriteriaUpdate): Promise<any>;
     bulkUpdateCriteria(updates: CriteriaUpdate[]): Promise<BulkCriteriaUpdateResponse>;
     updateSingleCriteria(teamSlug: string, criteriaType: CriteriaType, update: SingleCriteriaUpdateRequest): Promise<SingleCriteriaUpdateResponse>;
     getTeamEnvironmentData(): Promise<Record<string, string>>;
