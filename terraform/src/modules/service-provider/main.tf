@@ -335,7 +335,7 @@ exporters:
     sampling_initial: 0
     sampling_thereafter: 0
   prometheus:
-    endpoint: "1.2.3.4:8888"
+    endpoint: "0.0.0.0:8888"
     namespace: service-provider
 
 service:
