@@ -334,6 +334,9 @@ exporters:
     loglevel: error
     sampling_initial: 0
     sampling_thereafter: 0
+  prometheus:
+    endpoint: "0.0.0.0:8888"
+    namespace: service-provider
 
 service:
   pipelines:
@@ -344,7 +347,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
+      exporters: [logging, prometheus]
     logs:
       receivers: [otlp]
       processors: [batch]
@@ -394,6 +397,11 @@ resource "kubernetes_deployment" "otel_collector" {
           port {
             name           = "otlp-http"
             container_port = 4318
+          }
+
+          port {
+            name           = "metrics"
+            container_port = 8888
           }
 
           volume_mount {
@@ -451,6 +459,13 @@ resource "kubernetes_service" "otel_collector" {
       name        = "otlp-http"
       port        = 4318
       target_port = 4318
+      protocol    = "TCP"
+    }
+
+    port {
+      name        = "metrics"
+      port        = 8888
+      target_port = 8888
       protocol    = "TCP"
     }
 
