@@ -76,18 +76,46 @@ export class HubApiClient {
       updatedBy: update.updatedBy
     };
     
+    const url = `/api/service/team-criteria/${update.teamSlug}/${update.criteriaType}`;
+    
+    console.log(`[${new Date().toISOString()}] [JOB_SERVICE_API] Sending individual criteria update:`, {
+      teamSlug: update.teamSlug,
+      criteriaType: update.criteriaType,
+      url: url,
+      status: update.status,
+      score: update.score,
+      metricsSize: JSON.stringify(update.metrics).length,
+      requestBodySize: JSON.stringify(requestBody).length
+    });
+    
     try {
-      const response = await this.request<any>(
-        `/api/service/team-criteria/${update.teamSlug}/${update.criteriaType}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify(requestBody)
-        }
-      );
+      const response = await this.request<any>(url, {
+        method: 'PUT',
+        body: JSON.stringify(requestBody)
+      });
+      
+      console.log(`[${new Date().toISOString()}] [JOB_SERVICE_API] Individual criteria update successful:`, {
+        teamSlug: update.teamSlug,
+        criteriaType: update.criteriaType,
+        responseStatus: response ? 'success' : 'no response',
+        responseData: response ? {
+          action: response.action,
+          teamId: response.teamId,
+          finalStatus: response.criteria?.status,
+          finalScore: response.criteria?.score
+        } : null
+      });
       
       this.log('debug', `Updated criteria for ${update.teamSlug}/${update.criteriaType}:`, response);
       return response;
     } catch (error) {
+      console.log(`[${new Date().toISOString()}] [JOB_SERVICE_API] Individual criteria update FAILED:`, {
+        teamSlug: update.teamSlug,
+        criteriaType: update.criteriaType,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : error
+      });
+      
       this.log('error', `Failed to update criteria for ${update.teamSlug}/${update.criteriaType}:`, error);
       throw error;
     }
@@ -240,6 +268,19 @@ export class HubApiClient {
       ...options
     };
     
+    // Detailed console logging for HTTP requests
+    console.log(`[${new Date().toISOString()}] [HTTP_REQUEST] Making request:`, {
+      method: requestOptions.method,
+      url: url,
+      baseUrl: this.config.baseUrl,
+      path: path,
+      hasBody: !!requestOptions.body,
+      bodyLength: requestOptions.body ? requestOptions.body.length : 0,
+      timeout: requestOptions.timeout,
+      userAgent: requestOptions.headers?.['User-Agent'],
+      hasApiKey: !!requestOptions.headers?.['X-API-Key']
+    });
+    
     // Debug log the exact request being made
     this.log('debug', `Request details: ${requestOptions.method} ${url}`);
     this.log('debug', `Headers:`, requestOptions.headers);
@@ -255,7 +296,24 @@ export class HubApiClient {
         
         const response = await this.fetchWithTimeout(url, requestOptions);
         
+        console.log(`[${new Date().toISOString()}] [HTTP_RESPONSE] Received response:`, {
+          url: url,
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries()),
+          attempt: attempt + 1
+        });
+        
         if (!response.ok) {
+          const errorText = await response.text();
+          console.log(`[${new Date().toISOString()}] [HTTP_ERROR] Response error:`, {
+            url: url,
+            status: response.status,
+            statusText: response.statusText,
+            errorBody: errorText
+          });
+          
           const error = await this.createHttpError(response, url);
           
           // Don't retry on 4xx errors (client errors)
@@ -275,6 +333,13 @@ export class HubApiClient {
         }
         
         const data = await response.json() as T;
+        
+        console.log(`[${new Date().toISOString()}] [HTTP_SUCCESS] Request completed successfully:`, {
+          url: url,
+          status: response.status,
+          responseDataKeys: Object.keys(data || {})
+        });
+        
         this.log('debug', `Request successful: ${requestOptions.method} ${url}`);
         return data;
         

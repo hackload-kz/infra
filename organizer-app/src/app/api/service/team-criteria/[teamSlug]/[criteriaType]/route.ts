@@ -201,6 +201,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Validate request body
     const body = await request.json()
+    console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] Received update for ${teamSlug}/${criteriaType}:`, JSON.stringify(body, null, 2))
     const validatedData = singleCriteriaUpdateSchema.parse(body)
 
     // Find team by slug
@@ -261,6 +262,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           }
         })
 
+        console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] Updated existing criteria for ${teamSlug}/${criteriaType}:`, {
+          oldStatus: existingCriteria.status,
+          oldScore: existingCriteria.score,
+          newStatus: validatedData.status,
+          newScore: validatedData.score
+        })
+
         return updated
       })
     } else {
@@ -287,6 +295,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             metrics: validatedData.metrics,
             updatedBy: validatedData.updatedBy
           }
+        })
+
+        console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] Created new criteria for ${teamSlug}/${criteriaType}:`, {
+          status: validatedData.status,
+          score: validatedData.score
         })
 
         return newCriteria
@@ -328,6 +341,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       action: existingCriteria ? 'updated' : 'created'
     }
 
+    console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] Sending response for ${teamSlug}/${criteriaType} with status 200:`, {
+      action: response.action,
+      finalStatus: updatedCriteria.status,
+      finalScore: updatedCriteria.score,
+      responseSize: JSON.stringify(response).length
+    })
+
     return NextResponse.json(response)
 
   } catch (error) {
@@ -343,6 +363,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       })
     }
 
+    console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] ERROR in ${teamSlug}/${criteriaType} update:`, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : error
+    })
+
     await logger.error(LogAction.UPDATE, 'TeamCriteria', 
       `Error in individual team criteria update: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         metadata: { 
@@ -352,6 +377,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           serviceKeyId: authResult?.keyId
         }
       })
+    
+    console.log(`[${new Date().toISOString()}] [TEAM_CRITERIA_API] Sending error response for ${teamSlug}/${criteriaType} with status 500`)
     
     return NextResponse.json(
       { error: 'Internal server error' },

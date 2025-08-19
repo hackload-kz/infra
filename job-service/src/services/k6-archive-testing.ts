@@ -73,60 +73,72 @@ export class K6ArchiveTestingService extends BaseJobService {
   }
 
   async collectMetrics(team: Team): Promise<MetricsData> {
-    this.log('info', `Generating K6 archive testing dashboard links for team ${team.nickname}`);
+    this.log('info', `Collecting K6 archive testing metrics for team ${team.nickname}`);
+
+    if (!this.grafana.isConfigured()) {
+      this.log('warn', 'Grafana not configured, skipping K6 archive testing evaluation');
+      return {};
+    }
 
     try {
-      // Generate team slug for dashboard links
+      // Generate team slug and get archive test results
       const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
+      const summary = await this.grafana.generateArchiveTeamSummary(parseInt(team.id), teamSlug, team.name);
       
-      // Generate dashboard URLs using the actual Prometheus test pattern
-      // Pattern: <teamSlug>-archive-<userSize>-<testid> (similar to events)
-      const dashboardLinks = this.taskConfig.userSizes.map(userSize => {
-        const testIdPattern = `${teamSlug}-archive-${userSize}-*`;
-        return {
-          userSize,
-          testPattern: testIdPattern,
-          dashboardUrl: this.grafana.generateGrafanaDashboardUrl(testIdPattern),
-          maxScore: this.taskConfig.scoreWeights[userSize] || 0,
-          description: `K6 Archive Testing - ${userSize} пользователей`
-        };
-      });
+      this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} archive tests passed`);
 
-      this.log('info', `Generated ${dashboardLinks.length} archive dashboard links for team ${team.name} (${teamSlug})`);
-
-      // Return dashboard links for teams to check their archive test results
+      // Return metrics data for BaseJobService
       return {
-        teamSlug,
-        dashboardLinks,
+        totalScore: summary.totalScore,
+        passedTests: summary.passedTests,
+        totalTests: summary.totalTests,
+        lastTestTime: summary.lastTestTime?.toISOString(),
+        testResults: summary.testResults.map(result => ({
+          userSize: result.userSize,
+          testPassed: result.testPassed,
+          score: result.score,
+          successRate: result.successRate,
+          totalRequests: result.totalRequests,
+          errorCount: result.errorCount,
+          peakRps: result.peakRps,
+          grafanaDashboardUrl: result.grafanaDashboardUrl,
+          testId: result.testId
+        })),
         maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
         successRateThreshold: this.taskConfig.successRateThreshold,
-        testDescription: 'K6 Load Testing - Archive Search API',
-        taskType: 'archive',
-        instructions: 'Команды могут просматривать результаты своих архивных тестов через Grafana dashboard. Формат test ID: ' + `${teamSlug}-archive-<userSize>-<testid>`
+        teamSlug,
+        taskType: 'archive'
       };
     } catch (error) {
-      this.log('error', `Failed to generate K6 archive dashboard links for team ${team.id}:`, error);
+      this.log('error', `Failed to collect K6 archive testing metrics for team ${team.id}:`, error);
       throw error;
     }
   }
 
   override evaluateStatus(metrics: MetricsData): CriteriaStatus {
-    // For K6 archive dashboard link generation, we always return NO_DATA
-    // since we're not actually collecting test results, just providing links
-    const dashboardLinks = metrics['dashboardLinks'] as Array<{userSize: number; testPattern: string; dashboardUrl: string; maxScore: number; description: string}>;
+    const totalTests = (metrics['totalTests'] as number) || 0;
+    const passedTests = (metrics['passedTests'] as number) || 0;
+    const totalScore = (metrics['totalScore'] as number) || 0;
     
-    if (dashboardLinks && dashboardLinks.length > 0) {
-      // Links are available for teams to check their results
+    if (totalTests === 0) {
       return CriteriaStatus.NO_DATA;
+    } else if (passedTests > 0 && totalScore > 0) {
+      return CriteriaStatus.PASSED;
+    } else {
+      return CriteriaStatus.FAILED;
     }
-    
-    return CriteriaStatus.NO_DATA;
   }
 
-  override calculateScore(_status: CriteriaStatus, _metrics: MetricsData): number {
-    // For dashboard link generation, no automatic scoring
-    // Teams need to check their results manually through Grafana
-    return 0;
+  override calculateScore(status: CriteriaStatus, metrics: MetricsData): number {
+    // Return the calculated score from metrics, or use default scoring
+    const totalScore = (metrics['totalScore'] as number) || 0;
+    
+    if (totalScore > 0) {
+      return totalScore;
+    }
+    
+    // Fallback to default scoring
+    return super.calculateScore(status, metrics);
   }
 
   /**

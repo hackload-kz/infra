@@ -10,6 +10,7 @@ import { BarChart3, Users, Trophy, TrendingUp, ChevronDown, ChevronUp, GitBranch
 import { db } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function ResultsPage() {
   const session = await auth()

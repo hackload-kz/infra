@@ -37,43 +37,61 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
         });
     }
     async collectMetrics(team) {
-        this.log('info', `Generating K6 load testing dashboard links for team ${team.nickname}`);
+        this.log('info', `[K6LoadTestingService] Starting metrics collection for team: ${team.name} (${team.nickname})`);
+        if (!this.grafana.isConfigured()) {
+            this.log('error', 'Grafana not configured, skipping K6 load testing evaluation - check dashboardBaseUrl in config');
+            return {};
+        }
         try {
             const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
-            const dashboardLinks = this.taskConfig.userSizes.map(userSize => {
-                const testIdPattern = `${teamSlug}-events-${userSize}-events-*`;
-                return {
-                    userSize,
-                    testPattern: testIdPattern,
-                    dashboardUrl: this.grafana.generateGrafanaDashboardUrl(testIdPattern),
-                    maxScore: this.taskConfig.scoreWeights[userSize] || 0,
-                    description: `K6 Load Testing - ${userSize} пользователей`
-                };
-            });
-            this.log('info', `Generated ${dashboardLinks.length} dashboard links for team ${team.name} (${teamSlug})`);
+            const summary = await this.grafana.generateTeamSummary(parseInt(team.id), teamSlug, team.name);
+            this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} tests passed`);
             return {
-                teamSlug,
-                dashboardLinks,
+                totalScore: summary.totalScore,
+                passedTests: summary.passedTests,
+                totalTests: summary.totalTests,
+                lastTestTime: summary.lastTestTime?.toISOString(),
+                testResults: summary.testResults.map(result => ({
+                    userSize: result.userSize,
+                    testPassed: result.testPassed,
+                    score: result.score,
+                    successRate: result.successRate,
+                    totalRequests: result.totalRequests,
+                    errorCount: result.errorCount,
+                    peakRps: result.peakRps,
+                    grafanaDashboardUrl: result.grafanaDashboardUrl,
+                    testId: result.testId
+                })),
                 maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
                 successRateThreshold: this.taskConfig.successRateThreshold,
-                testDescription: 'K6 Load Testing - Events API',
-                instructions: 'Команды могут просматривать результаты своих тестов через Grafana dashboard. Формат test ID: ' + `${teamSlug}-events-<userSize>-events-<testid>`
+                teamSlug
             };
         }
         catch (error) {
-            this.log('error', `Failed to generate K6 dashboard links for team ${team.id}:`, error);
+            this.log('error', `Failed to collect K6 load testing metrics for team ${team.id}:`, error);
             throw error;
         }
     }
     evaluateStatus(metrics) {
-        const dashboardLinks = metrics['dashboardLinks'];
-        if (dashboardLinks && dashboardLinks.length > 0) {
+        const totalTests = metrics['totalTests'] || 0;
+        const passedTests = metrics['passedTests'] || 0;
+        const totalScore = metrics['totalScore'] || 0;
+        if (totalTests === 0) {
             return criteria_1.CriteriaStatus.NO_DATA;
         }
-        return criteria_1.CriteriaStatus.NO_DATA;
+        else if (passedTests > 0 && totalScore > 0) {
+            return criteria_1.CriteriaStatus.PASSED;
+        }
+        else {
+            return criteria_1.CriteriaStatus.FAILED;
+        }
     }
-    calculateScore(_status, _metrics) {
-        return 0;
+    calculateScore(status, metrics) {
+        const totalScore = metrics['totalScore'] || 0;
+        if (totalScore > 0) {
+            return totalScore;
+        }
+        return super.calculateScore(status, metrics);
     }
     generateTeamSlug(teamName, teamId) {
         const slug = teamName
