@@ -68,6 +68,17 @@ export function isHackathonStarted(hackathon: Hackathon): boolean {
   return now >= hackathon.startDate
 }
 
+// Check if hackathon is completed
+export function isHackathonCompleted(hackathon: Hackathon): boolean {
+  const now = new Date()
+  return now > hackathon.endDate
+}
+
+// Check if hackathon is currently active (started but not completed)
+export function isHackathonActive(hackathon: Hackathon): boolean {
+  return isHackathonStarted(hackathon) && !isHackathonCompleted(hackathon)
+}
+
 // Register participant for hackathon
 export async function registerParticipantForHackathon(
   participantId: string,

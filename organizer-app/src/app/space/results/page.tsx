@@ -113,7 +113,7 @@ export default async function ResultsPage() {
               <Trophy className="w-6 h-6 text-green-400" />
             </div>
             <div>
-              <p className="text-slate-400 text-sm">Средний pts</p>
+              <p className="text-slate-400 text-sm">Средний балл</p>
               <p className="text-2xl font-bold text-white">{stats.averageScore.toFixed(1)}</p>
             </div>
           </div>
@@ -265,7 +265,7 @@ export default async function ResultsPage() {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-white">Таблица результатов</h2>
           <div className="text-sm text-slate-400">
-            Данные обновляются в реальном времени через API
+            Данные обновляются каждый час
           </div>
         </div>
         

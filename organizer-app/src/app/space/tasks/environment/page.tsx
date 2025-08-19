@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { isOrganizer } from '@/lib/admin'
 import { redirect } from 'next/navigation'
 import { TeamEnvironmentView } from '@/components/team-environment-view'
+import { TeamK6EnvironmentView } from '@/components/team-k6-environment-view'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 
 export const dynamic = 'force-dynamic'
@@ -68,10 +69,19 @@ export default async function EnvironmentPage() {
         </p>
       </div>
 
-      <TeamEnvironmentView
-        participant={participant!}
-        isOrganizer={userIsOrganizer}
-      />
+      <div className="space-y-8">
+        {/* Team Environment Data */}
+        <TeamEnvironmentView
+          participant={participant!}
+          isOrganizer={userIsOrganizer}
+        />
+        
+        {/* K6 Environment Variables */}
+        <TeamK6EnvironmentView
+          participant={participant! as never}
+          isOrganizer={userIsOrganizer}
+        />
+      </div>
     </PersonalCabinetLayout>
   )
 }

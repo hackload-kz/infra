@@ -5,8 +5,6 @@ import { isOrganizer } from '@/lib/admin'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { getDocsFileInfo, formatDateTime } from '@/lib/file-utils'
 import { 
-  Settings,
-  AlertCircle,
   CreditCard,
   Ticket,
   CalendarDays,
@@ -14,10 +12,7 @@ import {
   FileText,
   Clock,
   Scroll,
-  ClipboardList,
-  Zap,
-  Play,
-  Activity
+  ClipboardList
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -40,42 +35,8 @@ export default async function SpaceTasksPage() {
     },
     include: {
       user: true,
-      team: {
-        include: {
-          environmentData: true,
-          testRuns: {
-            where: {
-              // Показывать только запуски, созданные участниками команды (не организаторами)
-              createdBy: {
-                not: null
-              }
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            include: {
-              scenario: true
-            }
-          }
-        }
-      },
-      ledTeam: {
-        include: {
-          environmentData: true,
-          testRuns: {
-            where: {
-              // Показывать только запуски, созданные участниками команды (не организаторами)
-              createdBy: {
-                not: null
-              }
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            include: {
-              scenario: true
-            }
-          }
-        }
-      },
+      team: true,
+      ledTeam: true
     },
   })
 
@@ -105,10 +66,6 @@ export default async function SpaceTasksPage() {
   ])
   
   const hasTeam = !!(participant?.team || participant?.ledTeam)
-  const currentTeam = participant?.team || participant?.ledTeam
-  const environmentDataCount = currentTeam?.environmentData?.length || 0
-  const recentTestRuns = currentTeam?.testRuns || []
-  const totalTestRuns = currentTeam?.testRuns?.length || 0
 
   return (
     <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={userIsOrganizer}>
@@ -120,156 +77,6 @@ export default async function SpaceTasksPage() {
         <div className="w-16 h-1 bg-amber-400 rounded-full"></div>
       </div>
 
-      {/* Environment Data Quick Access */}
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-amber-400/20 rounded-lg flex items-center justify-center">
-              <Settings className="w-6 h-6 text-amber-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white">Окружение команды</h3>
-              <p className="text-slate-400 text-sm">
-                Данные для разработки и развертывания проекта
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            {hasTeam ? (
-              <div className="space-y-2">
-                <div className="text-sm text-slate-300">
-                  Команда: <span className="font-medium text-white">{participant.team?.name}</span>
-                </div>
-                <div className="text-sm text-slate-300">
-                  Параметров: <span className="text-amber-400 font-medium">{environmentDataCount}</span>
-                </div>
-                <Button asChild size="sm">
-                  <Link href="/space/tasks/environment">
-                    Перейти к данным
-                  </Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-amber-500">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Нет команды</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/space/teams">Найти</Link>
-                  </Button>
-                  <Button size="sm" asChild>
-                    <Link href="/space/team">Создать</Link>
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Load Testing Section */}
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 p-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-blue-400/20 rounded-lg flex items-center justify-center">
-              <Zap className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white">Нагрузочное тестирование</h3>
-              <p className="text-slate-400 text-sm">
-                Создание и управление тестами производительности
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            {hasTeam ? (
-              <div className="space-y-2">
-                <div className="text-sm text-slate-300">
-                  Команда: <span className="font-medium text-white">{currentTeam?.name}</span>
-                </div>
-                <div className="text-sm text-slate-300">
-                  Запусков тестов: <span className="text-blue-400 font-medium">{totalTestRuns}</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/space/load-testing">
-                      Все тесты
-                    </Link>
-                  </Button>
-                  <Button size="sm" asChild>
-                    <Link href="/space/load-testing">
-                      <Play className="w-4 h-4 mr-1" />
-                      Новый тест
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-amber-500">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Нет команды</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href="/space/teams">Найти</Link>
-                  </Button>
-                  <Button size="sm" asChild>
-                    <Link href="/space/team">Создать</Link>
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Recent Test Runs */}
-        {hasTeam && recentTestRuns.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-slate-700/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Activity className="w-4 h-4 text-slate-400" />
-              <h4 className="text-sm font-medium text-slate-300">Последние запуски</h4>
-            </div>
-            <div className="space-y-2">
-              {recentTestRuns.slice(0, 3).map((testRun) => (
-                <div key={testRun.id} className="flex items-center justify-between bg-slate-700/30 rounded p-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      testRun.status === 'SUCCEEDED' ? 'bg-green-400' :
-                      testRun.status === 'RUNNING' ? 'bg-blue-400' :
-                      testRun.status === 'FAILED' ? 'bg-red-400' :
-                      'bg-slate-400'
-                    }`} />
-                    <div>
-                      <div className="text-sm font-medium text-white">{testRun.scenario.name}</div>
-                      <div className="text-xs text-slate-400">#{testRun.runNumber}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-slate-400">
-                      {new Date(testRun.createdAt).toLocaleDateString('ru-RU')}
-                    </div>
-                    <div className={`text-xs font-medium ${
-                      testRun.status === 'SUCCEEDED' ? 'text-green-400' :
-                      testRun.status === 'RUNNING' ? 'text-blue-400' :
-                      testRun.status === 'FAILED' ? 'text-red-400' :
-                      'text-slate-400'
-                    }`}>
-                      {testRun.status === 'SUCCEEDED' ? 'Завершен' :
-                       testRun.status === 'RUNNING' ? 'Выполняется' :
-                       testRun.status === 'FAILED' ? 'Ошибка' :
-                       testRun.status === 'PENDING' ? 'Ожидание' :
-                       testRun.status}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Requirements Section */}
       <div className="space-y-6 mb-12">

@@ -21,7 +21,9 @@ import {
   Calendar,
   MessageSquare,
   Zap,
-  User
+  User,
+  TrendingUp,
+  BarChart3
 } from 'lucide-react'
 import TestRunForm from '@/components/test-run-form'
 
@@ -182,6 +184,20 @@ export function LoadTestingPageClient({ user, hasTeam, isAdmin }: LoadTestingPag
     return new Date(dateString).toLocaleString('ru-RU')
   }
 
+  const getStatistics = () => {
+    if (!data?.testRuns) {
+      return { totalRuns: 0, successfulRuns: 0, failedRuns: 0, runningRuns: 0, successRate: 0 }
+    }
+
+    const totalRuns = data.testRuns.length
+    const successfulRuns = data.testRuns.filter(run => run.status === 'SUCCEEDED').length
+    const failedRuns = data.testRuns.filter(run => run.status === 'FAILED').length
+    const runningRuns = data.testRuns.filter(run => run.status === 'RUNNING').length
+    const successRate = totalRuns > 0 ? Math.round((successfulRuns / totalRuns) * 100) : 0
+
+    return { totalRuns, successfulRuns, failedRuns, runningRuns, successRate }
+  }
+
   if (loading) {
     return (
       <PersonalCabinetLayout user={user} hasTeam={hasTeam} isAdmin={isAdmin}>
@@ -303,6 +319,66 @@ export function LoadTestingPageClient({ user, hasTeam, isAdmin }: LoadTestingPag
                 </Button>
               </div>
             </Card>
+
+            {/* Статистика */}
+            {(() => {
+              const stats = getStatistics()
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Всего запусков */}
+                  <Card className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/30 p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-blue-400/20 p-2 rounded-lg">
+                        <BarChart3 className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-slate-400 text-sm">Всего запусков</p>
+                        <p className="text-xl font-bold text-white">{stats.totalRuns}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Успешные */}
+                  <Card className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/30 p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-green-400/20 p-2 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                      </div>
+                      <div>
+                        <p className="text-slate-400 text-sm">Успешно</p>
+                        <p className="text-xl font-bold text-white">{stats.successfulRuns}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* С ошибками */}
+                  <Card className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/30 p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-red-400/20 p-2 rounded-lg">
+                        <XCircle className="w-5 h-5 text-red-400" />
+                      </div>
+                      <div>
+                        <p className="text-slate-400 text-sm">С ошибками</p>
+                        <p className="text-xl font-bold text-white">{stats.failedRuns}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Процент успешности */}
+                  <Card className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/30 p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-amber-400/20 p-2 rounded-lg">
+                        <TrendingUp className="w-5 h-5 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-slate-400 text-sm">Успешность</p>
+                        <p className="text-xl font-bold text-white">{stats.successRate}%</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )
+            })()}
 
             {/* Поиск */}
             <div className="flex items-center space-x-4">
