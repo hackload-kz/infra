@@ -41,6 +41,8 @@ const scheduler_1 = require("./scheduler");
 const api_client_1 = require("./lib/api-client");
 const git_monitor_1 = require("./services/git-monitor");
 const deployment_monitor_1 = require("./services/deployment-monitor");
+const k6_load_testing_1 = require("./services/k6-load-testing");
+const k6_archive_testing_1 = require("./services/k6-archive-testing");
 const server_1 = require("./health/server");
 const logger_1 = require("./lib/logger");
 async function main() {
@@ -87,7 +89,18 @@ async function main() {
             logger.info('Deployment Monitor Service disabled');
         }
         if (config.k6Services.enabled) {
-            logger.warn('K6 Services implemented but require architectural refactoring to match BaseJobService pattern');
+            logger.info('Registering K6 Load Testing Services...');
+            const k6LoadTestingService = new k6_load_testing_1.K6LoadTestingService();
+            k6LoadTestingService.setApiClient(apiClient);
+            scheduler.registerService(k6LoadTestingService, config.k6Services);
+            logger.info(`K6 Load Testing Service (EVENT_SEARCH) registered with interval: ${config.k6Services.interval}`);
+            const k6ArchiveTestingService = new k6_archive_testing_1.K6ArchiveTestingService();
+            k6ArchiveTestingService.setApiClient(apiClient);
+            scheduler.registerService(k6ArchiveTestingService, config.k6Services);
+            logger.info(`K6 Archive Testing Service (ARCHIVE_SEARCH) registered with interval: ${config.k6Services.interval}`);
+        }
+        else {
+            logger.info('K6 Services disabled');
         }
         if (config.costTracking.enabled) {
             logger.warn('Cost Tracking Service implemented but requires architectural refactoring to match BaseJobService pattern');

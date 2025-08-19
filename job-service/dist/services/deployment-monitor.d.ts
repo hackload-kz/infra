@@ -13,6 +13,7 @@ export declare class DeploymentMonitorService extends BaseJobService {
     evaluateStatus(metrics: DeploymentMetrics): CriteriaStatus;
     calculateScore(status: CriteriaStatus, metrics: DeploymentMetrics): number;
     getEndpointUrl(team: Team): Promise<string | null>;
+    private testEndpoint;
     private checkDnsResolution;
 }
 //# sourceMappingURL=deployment-monitor.d.ts.map

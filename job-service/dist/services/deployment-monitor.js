@@ -56,119 +56,69 @@ class DeploymentMonitorService extends base_service_1.BaseJobService {
                     confirmationDescription: 'Развернутое решение команды'
                 };
             }
-            const apiEndpoint = `${endpointUrl}/api/events?page=1&pageSize=20`;
-            this.log('debug', `Checking API deployment for team ${team.nickname} at ${apiEndpoint}`);
+            const urlObject = new URL(endpointUrl);
+            const baseUrl = `${urlObject.hostname}${urlObject.port ? ':' + urlObject.port : ''}${urlObject.pathname}`;
+            const httpEndpoint = `http://${baseUrl}/api/events?page=1&pageSize=20`.replace(/\/+/g, '/').replace(':/', '://');
+            const httpsEndpoint = `https://${baseUrl}/api/events?page=1&pageSize=20`.replace(/\/+/g, '/').replace(':/', '://');
+            this.log('debug', `Testing both HTTP and HTTPS for team ${team.nickname}`);
+            this.log('debug', `HTTP endpoint: ${httpEndpoint}`);
+            this.log('debug', `HTTPS endpoint: ${httpsEndpoint}`);
             const dnsResolution = await this.checkDnsResolution(endpointUrl);
             if (!dnsResolution.resolved) {
                 this.log('warn', `DNS resolution failed for team ${team.nickname} at ${endpointUrl}: ${dnsResolution.error}`);
                 return {
                     isDeployed: true,
-                    endpointUrl: apiEndpoint,
+                    endpointUrl: httpEndpoint,
                     responseTime: 0,
                     statusCode: 0,
                     lastChecked: new Date().toISOString(),
                     isAccessible: false,
                     error: dnsResolution.error,
                     isDnsResolved: false,
-                    confirmationUrl: apiEndpoint,
+                    confirmationUrl: httpEndpoint,
                     confirmationTitle: 'API Endpoints',
                     confirmationDescription: 'DNS не найден (домен не разрешается)'
                 };
             }
-            const startTime = Date.now();
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), this.config.httpTimeout);
-                const response = await fetch(apiEndpoint, {
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': this.config.userAgent,
-                        'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
-                    },
-                    signal: controller.signal,
-                    redirect: 'manual'
-                });
-                clearTimeout(timeoutId);
-                const responseTime = Date.now() - startTime;
-                const isAccessible = response.status === 200;
-                const metrics = {
-                    isDeployed: true,
-                    endpointUrl: apiEndpoint,
-                    responseTime,
-                    statusCode: response.status,
-                    lastChecked: new Date().toISOString(),
-                    isAccessible,
-                    isDnsResolved: true,
-                    confirmationUrl: apiEndpoint,
-                    confirmationTitle: 'API Endpoints',
-                    confirmationDescription: 'API работает и отвечает на запросы'
-                };
-                const extendedMetrics = metrics;
-                extendedMetrics['statusText'] = response.statusText;
-                extendedMetrics['baseEndpoint'] = endpointUrl;
-                if (isAccessible) {
-                    try {
-                        const contentType = response.headers.get('content-type');
-                        extendedMetrics['contentType'] = contentType;
-                        if (contentType?.includes('application/json')) {
-                            const responseText = await response.text();
-                            extendedMetrics['contentLength'] = responseText.length;
-                            try {
-                                const jsonData = JSON.parse(responseText);
-                                extendedMetrics['hasValidJson'] = true;
-                                extendedMetrics['responseStructure'] = typeof jsonData === 'object' ? Object.keys(jsonData) : 'primitive';
-                            }
-                            catch (jsonError) {
-                                extendedMetrics['hasValidJson'] = false;
-                                extendedMetrics['jsonError'] = 'Invalid JSON response';
-                            }
-                        }
-                        else {
-                            extendedMetrics['hasValidJson'] = false;
-                            extendedMetrics['unexpectedContentType'] = true;
-                        }
-                    }
-                    catch (contentError) {
-                        this.log('debug', `Could not read response content for team ${team.nickname}:`, contentError);
-                    }
-                }
-                this.log('debug', `API endpoint check for team ${team.nickname} completed:`, {
-                    statusCode: response.status,
-                    responseTime,
-                    isAccessible,
-                    endpoint: apiEndpoint
-                });
-                return metrics;
+            const httpResult = await this.testEndpoint(httpEndpoint, team.nickname, false);
+            const httpsResult = await this.testEndpoint(httpsEndpoint, team.nickname, true);
+            let finalResult;
+            let protocolStatus = '';
+            if (httpResult.isAccessible && httpsResult.isAccessible) {
+                finalResult = httpsResult;
+                protocolStatus = 'Оба HTTP и HTTPS работают (предпочтение HTTPS)';
             }
-            catch (error) {
-                const responseTime = Date.now() - startTime;
-                let errorMessage = 'Unknown error';
-                let statusCode = 0;
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                    if (error.name === 'AbortError') {
-                        errorMessage = 'Request timeout';
-                    }
-                    else if (error.message.includes('network') || error.message.includes('fetch')) {
-                        errorMessage = 'Network error';
-                    }
-                }
-                this.log('warn', `API endpoint check failed for team ${team.nickname} at ${apiEndpoint}: ${errorMessage}`);
-                return {
-                    isDeployed: true,
-                    endpointUrl: apiEndpoint,
-                    responseTime,
-                    statusCode,
-                    lastChecked: new Date().toISOString(),
-                    isAccessible: false,
-                    isDnsResolved: true,
-                    error: errorMessage,
-                    confirmationUrl: apiEndpoint,
-                    confirmationTitle: 'API Endpoints',
-                    confirmationDescription: 'API недоступен или не отвечает'
-                };
+            else if (httpResult.isAccessible && !httpsResult.isAccessible) {
+                finalResult = httpResult;
+                protocolStatus = 'Только HTTP работает (нет HTTPS)';
+                const extendedMetrics = finalResult;
+                extendedMetrics['httpsAvailable'] = false;
+                extendedMetrics['httpsError'] = httpsResult.error || 'HTTPS недоступен';
+                extendedMetrics['httpsStatusCode'] = httpsResult.statusCode;
             }
+            else if (!httpResult.isAccessible && httpsResult.isAccessible) {
+                finalResult = httpsResult;
+                protocolStatus = 'Только HTTPS работает';
+            }
+            else {
+                finalResult = (httpResult.statusCode || 0) > 0 ? httpResult : httpsResult;
+                protocolStatus = 'Ни HTTP, ни HTTPS не работают';
+                const extendedMetrics = finalResult;
+                extendedMetrics['httpStatusCode'] = httpResult.statusCode;
+                extendedMetrics['httpsStatusCode'] = httpsResult.statusCode;
+                extendedMetrics['httpError'] = httpResult.error;
+                extendedMetrics['httpsError'] = httpsResult.error;
+            }
+            finalResult.confirmationDescription = finalResult.isAccessible
+                ? `API работает: ${protocolStatus}`
+                : `API не работает: ${protocolStatus}`;
+            this.log('info', `Deployment check for team ${team.nickname} completed:`, {
+                httpAccessible: httpResult.isAccessible,
+                httpsAccessible: httpsResult.isAccessible,
+                finalStatus: protocolStatus,
+                selectedProtocol: finalResult.endpointUrl?.startsWith('https') ? 'HTTPS' : 'HTTP'
+            });
+            return finalResult;
         }
         catch (error) {
             this.log('error', `Failed to collect deployment metrics for team ${team.nickname}:`, error);
@@ -206,8 +156,17 @@ class DeploymentMonitorService extends base_service_1.BaseJobService {
         }
         if (status === criteria_1.CriteriaStatus.PASSED) {
             let score = 100;
-            if (metrics.responseTime && metrics.responseTime < 2000) {
+            const extendedMetrics = metrics;
+            const isHttps = metrics.endpointUrl?.startsWith('https://') || false;
+            const httpsAvailable = extendedMetrics['httpsAvailable'] !== false;
+            if (isHttps && httpsAvailable) {
+                score += 10;
+            }
+            else if (!isHttps && httpsAvailable !== false) {
                 score = 100;
+            }
+            else if (!isHttps && extendedMetrics['httpsAvailable'] === false) {
+                score = 90;
             }
             return score;
         }
@@ -237,6 +196,116 @@ class DeploymentMonitorService extends base_service_1.BaseJobService {
         catch (error) {
             this.log('error', `Failed to get endpoint URL for team ${team.nickname}:`, error);
             return null;
+        }
+    }
+    async testEndpoint(endpoint, teamNickname, isHttps) {
+        const startTime = Date.now();
+        const protocol = isHttps ? 'HTTPS' : 'HTTP';
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), this.config.httpTimeout);
+            this.log('debug', `Testing ${protocol} endpoint for team ${teamNickname}: ${endpoint}`);
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'User-Agent': this.config.userAgent,
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                signal: controller.signal,
+                redirect: 'manual'
+            });
+            clearTimeout(timeoutId);
+            const responseTime = Date.now() - startTime;
+            const isAccessible = response.status === 200;
+            const metrics = {
+                isDeployed: true,
+                endpointUrl: endpoint,
+                responseTime,
+                statusCode: response.status,
+                lastChecked: new Date().toISOString(),
+                isAccessible,
+                isDnsResolved: true,
+                confirmationUrl: endpoint,
+                confirmationTitle: 'API Endpoints',
+                confirmationDescription: isAccessible
+                    ? `${protocol} API работает и отвечает на запросы`
+                    : `${protocol} API не отвечает со статусом 200 (статус: ${response.status})`
+            };
+            const extendedMetrics = metrics;
+            extendedMetrics['statusText'] = response.statusText;
+            extendedMetrics['isHttps'] = isHttps;
+            extendedMetrics['protocol'] = protocol;
+            if (isAccessible) {
+                try {
+                    const contentType = response.headers.get('content-type');
+                    extendedMetrics['contentType'] = contentType;
+                    if (contentType?.includes('application/json')) {
+                        const responseText = await response.text();
+                        extendedMetrics['contentLength'] = responseText.length;
+                        try {
+                            const jsonData = JSON.parse(responseText);
+                            extendedMetrics['hasValidJson'] = true;
+                            extendedMetrics['responseStructure'] = typeof jsonData === 'object' ? Object.keys(jsonData) : 'primitive';
+                        }
+                        catch (jsonError) {
+                            extendedMetrics['hasValidJson'] = false;
+                            extendedMetrics['jsonError'] = 'Invalid JSON response';
+                        }
+                    }
+                    else {
+                        extendedMetrics['hasValidJson'] = false;
+                        extendedMetrics['unexpectedContentType'] = true;
+                    }
+                }
+                catch (contentError) {
+                    this.log('debug', `Could not read ${protocol} response content for team ${teamNickname}:`, contentError);
+                }
+            }
+            this.log('debug', `${protocol} endpoint check for team ${teamNickname} completed:`, {
+                statusCode: response.status,
+                responseTime,
+                isAccessible,
+                endpoint
+            });
+            return metrics;
+        }
+        catch (error) {
+            const responseTime = Date.now() - startTime;
+            let errorMessage = 'Unknown error';
+            let statusCode = 0;
+            if (error instanceof Error) {
+                errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Request timeout';
+                }
+                else if (error.message.includes('network') || error.message.includes('fetch')) {
+                    errorMessage = 'Network error';
+                }
+                else if (error.message.includes('ECONNREFUSED')) {
+                    errorMessage = 'Connection refused';
+                }
+                else if (error.message.includes('ENOTFOUND')) {
+                    errorMessage = 'Host not found';
+                }
+                else if (isHttps && (error.message.includes('certificate') || error.message.includes('SSL') || error.message.includes('TLS'))) {
+                    errorMessage = 'SSL/TLS certificate error';
+                }
+            }
+            this.log('debug', `${protocol} endpoint check failed for team ${teamNickname} at ${endpoint}: ${errorMessage}`);
+            return {
+                isDeployed: true,
+                endpointUrl: endpoint,
+                responseTime,
+                statusCode,
+                lastChecked: new Date().toISOString(),
+                isAccessible: false,
+                isDnsResolved: true,
+                error: errorMessage,
+                confirmationUrl: endpoint,
+                confirmationTitle: 'API Endpoints',
+                confirmationDescription: `${protocol} API недоступен: ${errorMessage}`
+            };
         }
     }
     async checkDnsResolution(url) {

@@ -1,0 +1,1 @@
+{"version":3,"file":"grafana-client.d.ts","sourceRoot":"","sources":["../../src/lib/grafana-client.ts"],"names":[],"mappings":"AAaA,qBAAa,aAAa;IACxB,OAAO,CAAC,QAAQ,CAAC,gBAAgB,CAAS;IAC1C,OAAO,CAAC,QAAQ,CAAC,MAAM,CAAS;;IAgBhC,YAAY,IAAI,OAAO;IAOvB,2BAA2B,CAAC,MAAM,EAAE,MAAM,GAAG,MAAM;CAepD"}

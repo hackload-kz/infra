@@ -17,12 +17,7 @@ export interface DeploymentMonitorConfig extends ServiceConfig {
     userAgent: string;
 }
 export interface K6ServicesConfig extends ServiceConfig {
-    grafana: {
-        apiUrl?: string;
-        token?: string;
-        username?: string;
-    };
-    resultsRetention: number;
+    dashboardBaseUrl: string;
 }
 export interface CostTrackingConfig extends ServiceConfig {
     aws?: {

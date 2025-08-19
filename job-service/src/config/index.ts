@@ -46,12 +46,7 @@ export function loadConfig(): AppConfig {
       interval: getOptionalEnvVar('K6_SERVICES_INTERVAL', '0 */6 * * *') as string,
       timeout: getNumberEnvVar('K6_SERVICES_TIMEOUT', 1200000),
       retries: getNumberEnvVar('K6_SERVICES_RETRIES', 1),
-      grafana: {
-        apiUrl: getOptionalEnvVar('GRAFANA_API_URL'),
-        token: getOptionalEnvVar('GRAFANA_TOKEN'),
-        username: getOptionalEnvVar('GRAFANA_USERNAME'),
-      },
-      resultsRetention: getNumberEnvVar('K6_RESULTS_RETENTION', 30),
+      dashboardBaseUrl: getOptionalEnvVar('GRAFANA_DASHBOARD_BASE_URL', 'https://hub.hackload.kz/grafana') as string,
     },
     
     costTracking: {

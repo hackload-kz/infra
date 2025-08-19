@@ -6,7 +6,7 @@ import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { TeamResultsTable } from '@/components/team-results-table'
 import { CriteriaTestPanel } from '@/components/criteria-test-panel'
 import { getTeamResults, getTeamResultsCount } from '@/lib/team-results'
-import { BarChart3, Users, Trophy, TrendingUp, ChevronDown, ChevronUp, GitBranch, Globe } from 'lucide-react'
+import { BarChart3, Users, Trophy, TrendingUp, ChevronDown, ChevronUp, GitBranch, Globe, Zap } from 'lucide-react'
 import { db } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
@@ -133,7 +133,7 @@ export default async function ResultsPage() {
       </div>
 
       {/* Scoring Criteria Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Repository Scoring Criteria */}
         <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
           <details className="group">
@@ -215,7 +215,7 @@ export default async function ResultsPage() {
                 <h4 className="text-amber-400 font-medium">Статусы оценки:</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-green-400">✓ PASSED (100 баллов)</span>
+                    <span className="text-green-400">✓ PASSED (90-110 баллов)</span>
                     <span className="text-slate-400">API отвечает статусом 200</span>
                   </div>
                   <div className="flex justify-between">
@@ -230,7 +230,18 @@ export default async function ResultsPage() {
               </div>
               
               <div className="space-y-3">
-                <h4 className="text-amber-400 font-medium">Расчет баллов для FAILED:</h4>
+                <h4 className="text-amber-400 font-medium">Логика тестирования:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• <strong>Проверяются оба протокола:</strong> HTTP и HTTPS</div>
+                  <div>• <strong>Если HTTP работает, HTTPS не работает:</strong> 90 баллов (-10 за отсутствие HTTPS)</div>
+                  <div>• <strong>Если HTTPS работает:</strong> 110 баллов (+10 бонус)</div>
+                  <div>• <strong>Если оба работают:</strong> 110 баллов (предпочтение HTTPS)</div>
+                  <div>• <strong>Если только HTTPS работает:</strong> 110 баллов</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Частичные баллы для FAILED:</h4>
                 <div className="text-sm text-slate-300 space-y-1">
                   <div>• <strong>+30 баллов</strong> за указанный endpoint</div>
                   <div>• <strong>+20 баллов</strong> за получение ответа (любого статуса)</div>
@@ -248,6 +259,88 @@ export default async function ResultsPage() {
                   <div>• Время ответа и статус код</div>
                   <div>• Валидность JSON ответа</div>
                   <div>• Структура данных ответа</div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        {/* Load Testing Scoring Criteria */}
+        <div className="bg-slate-800/50 backdrop-blur-sm p-6 rounded-lg border border-slate-700/30">
+          <details className="group">
+            <summary className="flex items-center justify-between cursor-pointer list-none">
+              <div className="flex items-center space-x-3">
+                <div className="bg-amber-400/20 p-3 rounded-lg">
+                  <Zap className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Критерии нагрузочного тестирования</h3>
+                  <p className="text-slate-400 text-sm">Оценка производительности "Get Events"</p>
+                </div>
+              </div>
+              <ChevronDown className="w-5 h-5 text-slate-400 group-open:hidden" />
+              <ChevronUp className="w-5 h-5 text-slate-400 hidden group-open:block" />
+            </summary>
+            
+            <div className="mt-4 pt-4 border-t border-slate-700/30 space-y-4">
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Статусы оценки:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-green-400">✓ PASSED</span>
+                    <span className="text-slate-400">≥95% успешных запросов</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-red-400">✗ FAILED</span>
+                    <span className="text-slate-400">&lt;95% успешных запросов</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">- NO_DATA</span>
+                    <span className="text-slate-400">Тесты не найдены</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Уровни нагрузки и баллы:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• <strong>1,000 пользователей</strong> = 10 баллов при прохождении</div>
+                  <div>• <strong>5,000 пользователей</strong> = 20 баллов при прохождении</div>
+                  <div>• <strong>25,000 пользователей</strong> = 30 баллов при прохождении</div>
+                  <div>• <strong>50,000 пользователей</strong> = 40 баллов при прохождении</div>
+                  <div>• <strong>100,000 пользователей</strong> = 50 баллов при прохождении</div>
+                  <div className="mt-2 pt-2 border-t border-slate-600/30">
+                    <strong>Максимум: 150 баллов</strong> (все тесты пройдены)
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Формат тестов:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• <strong>Test ID:</strong> {`<teamSlug>-events-<userSize>-events-<number>`}</div>
+                  <div>• <strong>Endpoint:</strong> /api/events</div>
+                  <div>• <strong>Критерий прохождения:</strong> 95% успешных запросов</div>
+                  <div>• <strong>Мониторинг:</strong> <a href="https://hub.hackload.kz/grafana/d/a3b2aaa8-bb66-4008-a1d8-16c49afedbf0/k6-prometheus-native-histograms" target="_blank" className="text-amber-400 hover:text-amber-300 underline">Grafana Dashboard</a></div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Prometheus метрики:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• <strong>Всего запросов:</strong> sum(k6_http_reqs_total{`{testid=~"$testid"}`})</div>
+                  <div>• <strong>Неудачные запросы:</strong> sum(k6_http_reqs_total{`{testid=~"$testid", expected_response="false"}`})</div>
+                  <div>• <strong>Пиковый RPS:</strong> max(sum(irate(k6_http_reqs_total{`{testid=~"$testid"}`}[1m])))</div>
+                  <div>• <strong>Успешность:</strong> (всего - неудачные) / всего * 100%</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Примеры Test ID:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• drim-dev-events-1000-events-53</div>
+                  <div>• bulbul-events-5000-events-56-1</div>
+                  <div>• rorobotics-events-25000-events-61-1</div>
                 </div>
               </div>
             </div>

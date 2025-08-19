@@ -51,12 +51,7 @@ function loadConfig() {
             interval: (0, validation_1.getOptionalEnvVar)('K6_SERVICES_INTERVAL', '0 */6 * * *'),
             timeout: (0, validation_1.getNumberEnvVar)('K6_SERVICES_TIMEOUT', 1200000),
             retries: (0, validation_1.getNumberEnvVar)('K6_SERVICES_RETRIES', 1),
-            grafana: {
-                apiUrl: (0, validation_1.getOptionalEnvVar)('GRAFANA_API_URL'),
-                token: (0, validation_1.getOptionalEnvVar)('GRAFANA_TOKEN'),
-                username: (0, validation_1.getOptionalEnvVar)('GRAFANA_USERNAME'),
-            },
-            resultsRetention: (0, validation_1.getNumberEnvVar)('K6_RESULTS_RETENTION', 30),
+            dashboardBaseUrl: (0, validation_1.getOptionalEnvVar)('GRAFANA_DASHBOARD_BASE_URL', 'https://hub.hackload.kz/grafana'),
         },
         costTracking: {
             enabled: (0, validation_1.getBooleanEnvVar)('COST_TRACKING_ENABLED', true),

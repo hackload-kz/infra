@@ -56,14 +56,8 @@ export function validateConfig(config: AppConfig): void {
 
   // K6 services validation
   if (config.k6Services.enabled) {
-    if (!config.k6Services.grafana.apiUrl) {
-      throw new ConfigValidationError('GRAFANA_API_URL is required when K6 services are enabled');
-    }
-
-    if (!config.k6Services.grafana.token && !config.k6Services.grafana.username) {
-      throw new ConfigValidationError(
-        'GRAFANA_TOKEN or GRAFANA_USERNAME is required when K6 services are enabled'
-      );
+    if (!config.k6Services.dashboardBaseUrl) {
+      throw new ConfigValidationError('GRAFANA_DASHBOARD_BASE_URL is required when K6 services are enabled');
     }
   }
 
