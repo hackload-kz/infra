@@ -12,6 +12,19 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
 
+interface TestResult {
+  userSize: number
+  testPassed: boolean
+  score: number
+  successRate: number
+  totalRequests: number
+  errorCount: number
+  peakRps: number
+  p95Latency?: number
+  grafanaDashboardUrl: string
+  testId: string
+}
+
 interface TeamCriteriaData {
   id: string
   criteriaType: string
@@ -22,6 +35,11 @@ interface TeamCriteriaData {
     // Common fields
     p95?: number
     successRate?: number
+    
+    // Load testing specific
+    testResults?: TestResult[]
+    totalTests?: number
+    passedTests?: number
     
     // CODE_REPO specific
     commitsCount?: number
@@ -284,22 +302,25 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                               {criteriaType === 'EVENT_SEARCH' && criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
                                 <div className="mt-1">
                                   <div className="font-medium text-amber-300">Результаты тестов:</div>
-                                  {criteria.metrics.testResults.map((test: any, idx: number) => (
-                                    test.testPassed && (
-                                      <div key={idx} className="text-xs">
-                                        ✅ {test.userSize} пользователей ({test.score} pts)
-                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
-                                      </div>
-                                    )
-                                  ))}
+                                  {criteria.metrics.testResults
+                                    .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test && 'userSize' in test)
+                                    .map((test, idx) => (
+                                      test.testPassed && (
+                                        <div key={idx} className="text-xs">
+                                          ✅ {test.userSize} пользователей ({test.score} pts)
+                                          {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
+                                        </div>
+                                      )
+                                    ))}
                                   {(() => {
-                                    const passedTests = criteria.metrics.testResults.filter((t: any) => t.testPassed);
-                                    const highestUserSize = passedTests.length > 0 ? Math.max(...passedTests.map((t: any) => t.userSize)) : 0;
-                                    return highestUserSize > 0 && (
+                                    const testResults = criteria.metrics.testResults as TestResult[]
+                                    const passedTests = testResults.filter(t => t.testPassed)
+                                    const highestUserSize = passedTests.length > 0 ? Math.max(...passedTests.map(t => t.userSize)) : 0
+                                    return highestUserSize > 0 ? (
                                       <div className="text-amber-300 text-xs font-medium mt-1">
                                         Максимальная нагрузка: {highestUserSize.toLocaleString()} пользователей
                                       </div>
-                                    );
+                                    ) : null
                                   })()}
                                 </div>
                               )}

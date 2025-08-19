@@ -301,7 +301,7 @@ export class HubApiClient {
           status: response.status,
           statusText: response.statusText,
           ok: response.ok,
-          headers: Object.fromEntries(response.headers.entries()),
+          headers: Object.fromEntries(Array.from(response.headers.entries())),
           attempt: attempt + 1
         });
         
