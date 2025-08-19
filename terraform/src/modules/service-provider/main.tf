@@ -489,5 +489,5 @@ resource "kubernetes_manifest" "otel_collector_servicemonitor" {
     }
   }
 
-  depends_on = [kubernetes_service.kafka_jmx_exporter]
+  #depends_on = [kubernetes_service.kafka_jmx_exporter]
 }

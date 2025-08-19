@@ -125,3 +125,8 @@ variable "cert_issuer_name" {
   description = "The name of the cert-manager ClusterIssuer to use for TLS certificates"
   type        = string
 }
+
+variable "enable_metrics" {
+  type    = bool
+  default = false
+}
