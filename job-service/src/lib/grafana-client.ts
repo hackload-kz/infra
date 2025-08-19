@@ -35,6 +35,7 @@ export interface GetEventsTestResult {
   successRate: number;
   errorCount: number;
   peakRps: number; // Peak requests per second during the test
+  p95Latency: number; // P95 response time in seconds
   testPassed: boolean; // true if >= 95% success rate
   score: number; // Points based on userSize and success
   grafanaDashboardUrl: string;
@@ -265,6 +266,11 @@ export class GrafanaClient {
       const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
       const peakRps = this.extractMaxValue(peakRpsResponse) || 0;
 
+      // Query for P95 latency using histogram_quantile
+      const p95LatencyQuery = `histogram_quantile(0.95, sum by(le, name, method, status) (rate(k6_http_req_duration_seconds{testid=~"${testIdPattern}"}[5m])))`;
+      const p95Response = await this.prometheusRangeQuery(p95LatencyQuery);
+      const p95Latency = this.extractMaxValue(p95Response) || 0;
+
       // Calculate success rate
       const successfulRequests = totalRequests - failedRequests;
       const successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
@@ -300,6 +306,7 @@ export class GrafanaClient {
         successRate,
         errorCount,
         peakRps: Math.round(peakRps * 100) / 100, // Round to 2 decimal places
+        p95Latency: Math.round(p95Latency * 1000 * 100) / 100, // Convert to milliseconds and round to 2 decimal places
         testPassed,
         score,
         grafanaDashboardUrl: this.generateGrafanaDashboardUrl(testIdFromMetrics),
@@ -311,6 +318,7 @@ export class GrafanaClient {
         totalRequests,
         successRate: successRate.toFixed(2),
         peakRps: peakRps.toFixed(2),
+        p95Latency: p95Latency.toFixed(3),
         testPassed,
         score
       });

@@ -100,6 +100,7 @@ export class K6LoadTestingService extends BaseJobService {
           totalRequests: result.totalRequests,
           errorCount: result.errorCount,
           peakRps: result.peakRps,
+          p95Latency: result.p95Latency,
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),

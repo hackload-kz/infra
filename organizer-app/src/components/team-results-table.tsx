@@ -279,8 +279,30 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH' || criteriaType === 'AUTH_PERFORMANCE') && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
-                              P95 латентность: {criteria.metrics.p95 || 'N/A'}s
+                              {criteria.metrics.p95 && <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>}
                               {criteria.metrics.successRate && <div>Успешность: {criteria.metrics.successRate}%</div>}
+                              {criteriaType === 'EVENT_SEARCH' && criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
+                                <div className="mt-1">
+                                  <div className="font-medium text-amber-300">Результаты тестов:</div>
+                                  {criteria.metrics.testResults.map((test: any, idx: number) => (
+                                    test.testPassed && (
+                                      <div key={idx} className="text-xs">
+                                        ✅ {test.userSize} пользователей ({test.score} pts)
+                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
+                                      </div>
+                                    )
+                                  ))}
+                                  {(() => {
+                                    const passedTests = criteria.metrics.testResults.filter((t: any) => t.testPassed);
+                                    const highestUserSize = passedTests.length > 0 ? Math.max(...passedTests.map((t: any) => t.userSize)) : 0;
+                                    return highestUserSize > 0 && (
+                                      <div className="text-amber-300 text-xs font-medium mt-1">
+                                        Максимальная нагрузка: {highestUserSize.toLocaleString()} пользователей
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              )}
                             </div>
                           )}
                           {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
@@ -310,17 +332,17 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         )}
                         {criteriaType === 'EVENT_SEARCH' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            P95: {criteria.metrics.p95 || 'N/A'}s
+                            {criteria.metrics.p95 ? `P95: ${typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}` : 'P95: N/A'}
                           </div>
                         )}
                         {criteriaType === 'ARCHIVE_SEARCH' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            P95: {criteria.metrics.p95 || 'N/A'}s
+                            {criteria.metrics.p95 ? `P95: ${typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}` : 'P95: N/A'}
                           </div>
                         )}
                         {criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            P95: {criteria.metrics.p95 || 'N/A'}s
+                            {criteria.metrics.p95 ? `P95: ${typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}` : 'P95: N/A'}
                           </div>
                         )}
                         {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
