@@ -11,13 +11,14 @@ import {
 } from '@/lib/service-keys'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     teamSlug: string
     criteriaType: string
-  }
+  }>
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const { teamSlug, criteriaType } = await params
   let authResult: { keyId: string; permissions: string[] } | null = null
   
   try {
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!authResult) {
       await logApiKeyUsage({
         keyId: 'unknown',
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'GET',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!hasPermission(authResult.permissions, 'environment:read')) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'GET',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -53,20 +54,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Validate criteria type
-    if (!Object.values(CriteriaType).includes(params.criteriaType as CriteriaType)) {
+    if (!Object.values(CriteriaType).includes(criteriaType as CriteriaType)) {
       return NextResponse.json({ error: 'Invalid criteria type' }, { status: 400 })
     }
 
     // Find team by slug
     const team = await db.team.findUnique({
-      where: { nickname: params.teamSlug },
+      where: { nickname: teamSlug },
       include: { hackathon: true }
     })
 
     if (!team) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'GET',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         teamId_hackathonId_criteriaType: {
           teamId: team.id,
           hackathonId: team.hackathonId,
-          criteriaType: params.criteriaType as CriteriaType
+          criteriaType: criteriaType as CriteriaType
         }
       },
       include: {
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Log successful usage
     await logApiKeyUsage({
       keyId: authResult.keyId,
-      endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+      endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
       method: 'GET',
       userAgent: request.headers.get('User-Agent') || undefined,
       ipAddress: getClientIP(request.headers) || undefined,
@@ -109,8 +110,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       `Individual team criteria accessed via service API`, {
         metadata: { 
           teamId: team.id,
-          teamSlug: params.teamSlug,
-          criteriaType: params.criteriaType,
+          teamSlug: teamSlug,
+          criteriaType: criteriaType,
           found: !!criteria,
           serviceKeyId: authResult.keyId
         }
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       teamSlug: team.nickname,
       teamName: team.name,
       hackathonId: team.hackathonId,
-      criteriaType: params.criteriaType,
+      criteriaType: criteriaType,
       criteria: criteria || null
     }
 
@@ -132,7 +133,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (authResult) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'GET',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -143,8 +144,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     await logger.error(LogAction.READ, 'TeamCriteria', 
       `Error in individual team criteria read: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         metadata: { 
-          teamSlug: params.teamSlug,
-          criteriaType: params.criteriaType,
+          teamSlug: teamSlug,
+          criteriaType: criteriaType,
           error: error instanceof Error ? error.stack : error,
           serviceKeyId: authResult?.keyId
         }
@@ -158,6 +159,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const { teamSlug, criteriaType } = await params
   let authResult: { keyId: string; permissions: string[] } | null = null
   
   try {
@@ -168,7 +170,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!authResult) {
       await logApiKeyUsage({
         keyId: 'unknown',
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'PUT',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -182,7 +184,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!hasPermission(authResult.permissions, 'environment:write')) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'PUT',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -193,7 +195,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // Validate criteria type
-    if (!Object.values(CriteriaType).includes(params.criteriaType as CriteriaType)) {
+    if (!Object.values(CriteriaType).includes(criteriaType as CriteriaType)) {
       return NextResponse.json({ error: 'Invalid criteria type' }, { status: 400 })
     }
 
@@ -203,14 +205,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Find team by slug
     const team = await db.team.findUnique({
-      where: { nickname: params.teamSlug },
+      where: { nickname: teamSlug },
       include: { hackathon: true }
     })
 
     if (!team) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'PUT',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -226,7 +228,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         teamId_hackathonId_criteriaType: {
           teamId: team.id,
           hackathonId: team.hackathonId,
-          criteriaType: params.criteriaType as CriteriaType
+          criteriaType: criteriaType as CriteriaType
         }
       }
     })
@@ -268,7 +270,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
           data: {
             teamId: team.id,
             hackathonId: team.hackathonId,
-            criteriaType: params.criteriaType as CriteriaType,
+            criteriaType: criteriaType as CriteriaType,
             status: validatedData.status,
             score: validatedData.score,
             metrics: validatedData.metrics,
@@ -294,7 +296,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     // Log successful usage
     await logApiKeyUsage({
       keyId: authResult.keyId,
-      endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+      endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
       method: 'PUT',
       userAgent: request.headers.get('User-Agent') || undefined,
       ipAddress: getClientIP(request.headers) || undefined,
@@ -307,8 +309,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       `Individual team criteria updated via service API`, {
         metadata: { 
           teamId: team.id,
-          teamSlug: params.teamSlug,
-          criteriaType: params.criteriaType,
+          teamSlug: teamSlug,
+          criteriaType: criteriaType,
           status: validatedData.status,
           score: validatedData.score,
           wasCreated: !existingCriteria,
@@ -321,7 +323,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       teamSlug: team.nickname,
       teamName: team.name,
       hackathonId: team.hackathonId,
-      criteriaType: params.criteriaType,
+      criteriaType: criteriaType,
       criteria: updatedCriteria,
       action: existingCriteria ? 'updated' : 'created'
     }
@@ -333,7 +335,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (authResult) {
       await logApiKeyUsage({
         keyId: authResult.keyId,
-        endpoint: `/api/service/team-criteria/${params.teamSlug}/${params.criteriaType}`,
+        endpoint: `/api/service/team-criteria/${teamSlug}/${criteriaType}`,
         method: 'PUT',
         userAgent: request.headers.get('User-Agent') || undefined,
         ipAddress: getClientIP(request.headers) || undefined,
@@ -344,8 +346,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     await logger.error(LogAction.UPDATE, 'TeamCriteria', 
       `Error in individual team criteria update: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         metadata: { 
-          teamSlug: params.teamSlug,
-          criteriaType: params.criteriaType,
+          teamSlug: teamSlug,
+          criteriaType: criteriaType,
           error: error instanceof Error ? error.stack : error,
           serviceKeyId: authResult?.keyId
         }

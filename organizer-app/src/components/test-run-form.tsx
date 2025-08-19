@@ -81,10 +81,16 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
   const fetchScenarios = async () => {
     try {
       setLoadingScenarios(true)
-      const response = await fetch('/api/dashboard/test-scenarios')
+      // Use team-specific API for participants, admin API for organizers
+      const apiUrl = isParticipant 
+        ? '/api/space/teams/test-scenarios'
+        : '/api/dashboard/test-scenarios'
+        
+      const response = await fetch(apiUrl)
       if (response.ok) {
         const data = await response.json()
-        setScenarios(data.filter((scenario: TestScenario) => scenario.isActive))
+        // Filter for active scenarios (team API already returns only active ones)
+        setScenarios(isParticipant ? data : data.filter((scenario: TestScenario) => scenario.isActive))
       }
     } catch (error) {
       console.error('Error fetching scenarios:', error)
@@ -95,7 +101,12 @@ export default function TestRunForm({ teamId, onSuccess, onCancel, initialEnviro
 
   const fetchScenarioSteps = async (scenarioId: string) => {
     try {
-      const response = await fetch(`/api/dashboard/test-scenarios/${scenarioId}/steps`)
+      // Use team-specific API for participants, admin API for organizers
+      const apiUrl = isParticipant 
+        ? `/api/space/teams/test-scenarios/${scenarioId}/steps`
+        : `/api/dashboard/test-scenarios/${scenarioId}/steps`
+        
+      const response = await fetch(apiUrl)
       if (response.ok) {
         const steps = await response.json()
         setSelectedScenarioSteps(steps)

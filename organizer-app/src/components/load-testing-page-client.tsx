@@ -372,7 +372,7 @@ export function LoadTestingPageClient({ user, hasTeam, isAdmin }: LoadTestingPag
                       </div>
                       <div className="flex space-x-2">
                         <Link href={`/space/load-testing/test-runs/${run.id}`}>
-                          <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                          <Button variant="ghost" size="sm" className="bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white border border-slate-600">
                             <Eye className="mr-2 h-4 w-4" />
                             Подробнее
                           </Button>
