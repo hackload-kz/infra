@@ -24,11 +24,6 @@ export default async function LoadTestingPage() {
   const userIsOrganizer = isOrganizer(session.user.email)
   const hackathonIsActive = isHackathonActive(hackathon)
   
-  // Allow access for organizers/admins anytime, or for teams during active hackathon
-  if (!userIsOrganizer && !hackathonIsActive) {
-    redirect('/space')
-  }
-
   // Get user participant data to determine team status
   const participant = await db.participant.findFirst({
     where: { 
@@ -40,9 +35,17 @@ export default async function LoadTestingPage() {
     }
   })
 
-  // For non-organizers, require team membership if no participant found
-  if (!participant && !userIsOrganizer) {
-    redirect('/login')
+  // Allow access for organizers/admins anytime, and for team members
+  if (!userIsOrganizer) {
+    // Require participant with team membership
+    if (!participant) {
+      redirect('/login')
+    }
+    
+    const hasTeam = !!(participant.team || participant.ledTeam)
+    if (!hasTeam) {
+      redirect('/space')
+    }
   }
 
   // Create user object for layout
