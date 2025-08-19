@@ -47,7 +47,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Search, label: 'Поиск команд', href: '/space/teams' },
   { icon: Calendar, label: 'Календарь', href: '/space/calendar' },
   { icon: FileText, label: 'Задание', href: '/space/tasks' },
-  { icon: BarChart3, label: 'Результаты', href: '/space/results', adminOnly: true },
+  { icon: BarChart3, label: 'Результаты', href: '/space/results' },
   { icon: Trophy, label: 'Журнал', href: '/space/journal' },
   { icon: MessageSquare, label: 'Сообщения', href: '/space/messages' },
   { icon: HelpCircle, label: 'FAQ', href: '/space/faq' },

@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { isOrganizer } from '@/lib/admin'
+import { getCurrentHackathon, isHackathonStarted } from '@/lib/hackathon'
 import PersonalCabinetLayout from '@/components/personal-cabinet-layout'
 import { TeamResultsTable } from '@/components/team-results-table'
 import { CriteriaTestPanel } from '@/components/criteria-test-panel'
@@ -17,10 +18,17 @@ export default async function ResultsPage() {
     redirect('/login')
   }
 
-  // Check if user is an organizer - only organizers can access results
+  // Get current hackathon to check if it has started
+  const hackathon = await getCurrentHackathon()
+  if (!hackathon) {
+    redirect('/space')
+  }
+
+  // Check access permissions: allow organizers always, or registered users after hackathon starts
   const userIsOrganizer = isOrganizer(session.user.email)
+  const hackathonStarted = isHackathonStarted(hackathon)
   
-  if (!userIsOrganizer) {
+  if (!userIsOrganizer && !hackathonStarted) {
     redirect('/space')
   }
 
