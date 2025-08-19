@@ -79,14 +79,16 @@ export class K6ArchiveTestingService extends BaseJobService {
       // Generate team slug for dashboard links
       const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
       
-      // Generate dashboard URLs for each archive test level
+      // Generate dashboard URLs using the actual Prometheus test pattern
+      // Pattern: <teamSlug>-archive-<userSize>-<testid> (similar to events)
       const dashboardLinks = this.taskConfig.userSizes.map(userSize => {
-        const testIdPattern = `${teamSlug}-archive-${userSize}`;
+        const testIdPattern = `${teamSlug}-archive-${userSize}-*`;
         return {
           userSize,
           testPattern: testIdPattern,
           dashboardUrl: this.grafana.generateGrafanaDashboardUrl(testIdPattern),
-          maxScore: this.taskConfig.scoreWeights[userSize] || 0
+          maxScore: this.taskConfig.scoreWeights[userSize] || 0,
+          description: `K6 Archive Testing - ${userSize} пользователей`
         };
       });
 
@@ -100,7 +102,7 @@ export class K6ArchiveTestingService extends BaseJobService {
         successRateThreshold: this.taskConfig.successRateThreshold,
         testDescription: 'K6 Load Testing - Archive Search API',
         taskType: 'archive',
-        instructions: 'Teams can view their archive test results using the provided Grafana dashboard links. Tests must achieve ≥95% success rate to earn points.'
+        instructions: 'Команды могут просматривать результаты своих архивных тестов через Grafana dashboard. Формат test ID: ' + `${teamSlug}-archive-<userSize>-<testid>`
       };
     } catch (error) {
       this.log('error', `Failed to generate K6 archive dashboard links for team ${team.id}:`, error);
@@ -111,7 +113,7 @@ export class K6ArchiveTestingService extends BaseJobService {
   override evaluateStatus(metrics: MetricsData): CriteriaStatus {
     // For K6 archive dashboard link generation, we always return NO_DATA
     // since we're not actually collecting test results, just providing links
-    const dashboardLinks = metrics['dashboardLinks'] as Array<{userSize: number; testPattern: string; dashboardUrl: string; maxScore: number}>;
+    const dashboardLinks = metrics['dashboardLinks'] as Array<{userSize: number; testPattern: string; dashboardUrl: string; maxScore: number; description: string}>;
     
     if (dashboardLinks && dashboardLinks.length > 0) {
       // Links are available for teams to check their results

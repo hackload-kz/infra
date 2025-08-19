@@ -39,16 +39,17 @@ export class GrafanaClient {
   generateGrafanaDashboardUrl(testId: string): string {
     const dashboardId = 'a3b2aaa8-bb66-4008-a1d8-16c49afedbf0';
     
-    // Calculate time range (assuming test ran within last 24 hours)
+    // Extended time range to cover the entire hackathon period
+    // From August 15, 2025 (hackathon start) to now
     const now = Date.now();
-    const dayAgo = now - (24 * 60 * 60 * 1000);
+    const hackathonStart = new Date('2025-08-15T00:00:00Z').getTime();
     
     return `${this.dashboardBaseUrl}/d/${dashboardId}/k6-prometheus-native-histograms?` +
            `orgId=1&` +
            `var-DS_PROMETHEUS=Prometheus&` +
            `var-testid=${encodeURIComponent(testId)}&` +
            `var-quantile=0.99&` +
-           `from=${dayAgo}&` +
+           `from=${hackathonStart}&` +
            `to=${now}`;
   }
 }

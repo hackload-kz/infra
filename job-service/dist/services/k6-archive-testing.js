@@ -41,12 +41,13 @@ class K6ArchiveTestingService extends base_service_1.BaseJobService {
         try {
             const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
             const dashboardLinks = this.taskConfig.userSizes.map(userSize => {
-                const testIdPattern = `${teamSlug}-archive-${userSize}`;
+                const testIdPattern = `${teamSlug}-archive-${userSize}-*`;
                 return {
                     userSize,
                     testPattern: testIdPattern,
                     dashboardUrl: this.grafana.generateGrafanaDashboardUrl(testIdPattern),
-                    maxScore: this.taskConfig.scoreWeights[userSize] || 0
+                    maxScore: this.taskConfig.scoreWeights[userSize] || 0,
+                    description: `K6 Archive Testing - ${userSize} пользователей`
                 };
             });
             this.log('info', `Generated ${dashboardLinks.length} archive dashboard links for team ${team.name} (${teamSlug})`);
@@ -57,7 +58,7 @@ class K6ArchiveTestingService extends base_service_1.BaseJobService {
                 successRateThreshold: this.taskConfig.successRateThreshold,
                 testDescription: 'K6 Load Testing - Archive Search API',
                 taskType: 'archive',
-                instructions: 'Teams can view their archive test results using the provided Grafana dashboard links. Tests must achieve ≥95% success rate to earn points.'
+                instructions: 'Команды могут просматривать результаты своих архивных тестов через Grafana dashboard. Формат test ID: ' + `${teamSlug}-archive-<userSize>-<testid>`
             };
         }
         catch (error) {

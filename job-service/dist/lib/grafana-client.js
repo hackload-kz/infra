@@ -20,13 +20,13 @@ class GrafanaClient {
     generateGrafanaDashboardUrl(testId) {
         const dashboardId = 'a3b2aaa8-bb66-4008-a1d8-16c49afedbf0';
         const now = Date.now();
-        const dayAgo = now - (24 * 60 * 60 * 1000);
+        const hackathonStart = new Date('2025-08-15T00:00:00Z').getTime();
         return `${this.dashboardBaseUrl}/d/${dashboardId}/k6-prometheus-native-histograms?` +
             `orgId=1&` +
             `var-DS_PROMETHEUS=Prometheus&` +
             `var-testid=${encodeURIComponent(testId)}&` +
             `var-quantile=0.99&` +
-            `from=${dayAgo}&` +
+            `from=${hackathonStart}&` +
             `to=${now}`;
     }
 }

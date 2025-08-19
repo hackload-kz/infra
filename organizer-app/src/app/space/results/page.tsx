@@ -333,7 +333,7 @@ export default async function ResultsPage() {
               <div className="space-y-3">
                 <h4 className="text-amber-400 font-medium">Формат тестов:</h4>
                 <div className="text-sm text-slate-300 space-y-1">
-                  <div>• <strong>Test ID:</strong> {`<teamSlug>-events-<userSize>-events-<number>`}</div>
+                  <div>• <strong>Test ID:</strong> {`<teamSlug>-events-<userSize>-events-<testid>`}</div>
                   <div>• <strong>Endpoint:</strong> /api/events</div>
                   <div>• <strong>Критерий прохождения:</strong> 95% успешных запросов</div>
                   <div>• <strong>Мониторинг:</strong> <a href="https://hub.hackload.kz/grafana/d/a3b2aaa8-bb66-4008-a1d8-16c49afedbf0/k6-prometheus-native-histograms" target="_blank" className="text-amber-400 hover:text-amber-300 underline">Grafana Dashboard</a></div>
@@ -354,9 +354,10 @@ export default async function ResultsPage() {
               <div className="space-y-3">
                 <h4 className="text-amber-400 font-medium">Примеры Test ID:</h4>
                 <div className="text-sm text-slate-300 space-y-1">
-                  <div>• drim-dev-events-1000-events-53</div>
-                  <div>• bulbul-events-5000-events-56-1</div>
-                  <div>• rorobotics-events-25000-events-61-1</div>
+                  <div>• rorobotics-events-5000-events-62</div>
+                  <div>• drim-dev-events-1000-events-25 (если 1000 пользователей)</div>
+                  <div>• metaload-akbori-events-10000-events-45 (если 10000 пользователей)</div>
+                  <div>• {`<teamSlug>-events-<userSize>-events-<testid>`} - общий формат</div>
                 </div>
               </div>
             </div>

@@ -41,12 +41,13 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
         try {
             const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
             const dashboardLinks = this.taskConfig.userSizes.map(userSize => {
-                const testIdPattern = `${teamSlug}-events-${userSize}`;
+                const testIdPattern = `${teamSlug}-events-${userSize}-events-*`;
                 return {
                     userSize,
                     testPattern: testIdPattern,
                     dashboardUrl: this.grafana.generateGrafanaDashboardUrl(testIdPattern),
-                    maxScore: this.taskConfig.scoreWeights[userSize] || 0
+                    maxScore: this.taskConfig.scoreWeights[userSize] || 0,
+                    description: `K6 Load Testing - ${userSize} пользователей`
                 };
             });
             this.log('info', `Generated ${dashboardLinks.length} dashboard links for team ${team.name} (${teamSlug})`);
@@ -56,7 +57,7 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
                 maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
                 successRateThreshold: this.taskConfig.successRateThreshold,
                 testDescription: 'K6 Load Testing - Events API',
-                instructions: 'Teams can view their test results using the provided Grafana dashboard links. Tests must achieve ≥95% success rate to earn points.'
+                instructions: 'Команды могут просматривать результаты своих тестов через Grafana dashboard. Формат test ID: ' + `${teamSlug}-events-<userSize>-events-<testid>`
             };
         }
         catch (error) {
