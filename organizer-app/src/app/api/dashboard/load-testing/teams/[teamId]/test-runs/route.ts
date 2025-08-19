@@ -256,6 +256,10 @@ export default function() {
       })
 
       try {
+        // Get parallelism from step config, fallback to global parallelism, then default to 1
+        const stepConfig = step.config as Record<string, unknown>
+        const stepParallelism = (stepConfig.parallelism as number) || parsedParallelism || 1
+        
         // Создать K6 TestRun для этого шага
         const k6TestName = await createK6TestRun({
           teamId,
@@ -266,7 +270,7 @@ export default function() {
           stepOrder: step.stepOrder,
           runNumber,
           k6Script,
-          parallelism: parsedParallelism,
+          parallelism: stepParallelism,
           environmentVars: team.k6EnvironmentVars ? team.k6EnvironmentVars as Record<string, string> : undefined
         })
 

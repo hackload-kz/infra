@@ -64,7 +64,8 @@ export default function TestStepForm({
     isActive: true,
     config: {
       curl: '',
-      script: ''
+      script: '',
+      parallelism: 1
     }
   })
   const [loading, setLoading] = useState(false)
@@ -81,7 +82,8 @@ export default function TestStepForm({
         isActive: step.isActive,
         config: {
           curl: (step.config?.curl as string) || '',
-          script: (step.config?.script as string) || ''
+          script: (step.config?.script as string) || '',
+          parallelism: (step.config?.parallelism as number) || 1
         }
       })
     }
@@ -106,6 +108,10 @@ export default function TestStepForm({
       newErrors.stepOrder = 'Порядок должен быть положительным числом'
     }
 
+    if (formData.config.parallelism < 1 || formData.config.parallelism > 10) {
+      newErrors.parallelism = 'Параллелизм должен быть от 1 до 10'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -121,8 +127,8 @@ export default function TestStepForm({
 
     try {
       const config = formData.stepType === 'http_request' 
-        ? { curl: formData.config.curl }
-        : { script: formData.config.script }
+        ? { curl: formData.config.curl, parallelism: formData.config.parallelism }
+        : { script: formData.config.script, parallelism: formData.config.parallelism }
 
       const url = step 
         ? `/api/dashboard/test-scenarios/${scenario.id}/steps/${step.id}`
@@ -333,6 +339,28 @@ export default function () {
                 </div>
               </Card>
             </div>
+          </div>
+
+          {/* Parallelism Configuration */}
+          <div className="space-y-2">
+            <Label htmlFor="parallelism" className="text-slate-300">
+              Параллелизм *
+            </Label>
+            <Input
+              id="parallelism"
+              type="number"
+              min="1"
+              max="10"
+              value={formData.config.parallelism}
+              onChange={(e) => handleInputChange('config.parallelism', parseInt(e.target.value) || 1)}
+              className={errors.parallelism ? 'border-red-500' : ''}
+            />
+            {errors.parallelism && (
+              <p className="text-sm text-red-400">{errors.parallelism}</p>
+            )}
+            <p className="text-xs text-slate-500">
+              Количество параллельных K6 контейнеров для выполнения теста (1-10)
+            </p>
           </div>
 
           {/* Configuration Fields */}
