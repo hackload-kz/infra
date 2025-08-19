@@ -43,23 +43,23 @@ resource "kubernetes_manifest" "prometheus_certificate" {
 }
 
 # Prometheus StripPrefix Middleware
-resource "kubernetes_manifest" "prometheus_stripprefix" {
-  count = var.enable_prometheus && var.enable_ingress ? 1 : 0
+# resource "kubernetes_manifest" "prometheus_stripprefix" {
+#   count = var.enable_prometheus && var.enable_ingress ? 1 : 0
 
-  manifest = {
-    apiVersion = "traefik.containo.us/v1alpha1"
-    kind       = "Middleware"
-    metadata = {
-      name      = "prometheus-stripprefix"
-      namespace = kubernetes_namespace.telemetry.metadata[0].name
-    }
-    spec = {
-      stripPrefix = {
-        prefixes = [var.prometheus_path]
-      }
-    }
-  }
-}
+#   manifest = {
+#     apiVersion = "traefik.containo.us/v1alpha1"
+#     kind       = "Middleware"
+#     metadata = {
+#       name      = "prometheus-stripprefix"
+#       namespace = kubernetes_namespace.telemetry.metadata[0].name
+#     }
+#     spec = {
+#       stripPrefix = {
+#         prefixes = [var.prometheus_path]
+#       }
+#     }
+#   }
+# }
 
 # Prometheus IngressRoute
 resource "kubernetes_manifest" "prometheus_ingressroute" {
@@ -80,15 +80,15 @@ resource "kubernetes_manifest" "prometheus_ingressroute" {
           kind  = "Rule"
           services = [
             {
-              name = "${var.prometheus_release_name}-kube-prometheus-stack-prometheus"
+              name = "${var.prometheus_release_name}-kube-prometheus-prometheus"
               port = 9090
             }
           ]
-          middlewares = [
-            {
-              name = kubernetes_manifest.prometheus_stripprefix[0].manifest.metadata.name
-            }
-          ]
+          # middlewares = [
+          #   {
+          #     name = kubernetes_manifest.prometheus_stripprefix[0].manifest.metadata.name
+          #   }
+          # ]
         }
       ]
       tls = {
@@ -140,7 +140,7 @@ resource "kubernetes_manifest" "alertmanager_ingressroute" {
           kind  = "Rule"
           services = [
             {
-              name = "${var.prometheus_release_name}-kube-prometheus-stack-alertmanager"
+              name = "${var.prometheus_release_name}-kube-prometheus-alertmanager"
               port = 9093
             }
           ]
