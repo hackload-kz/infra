@@ -216,7 +216,11 @@ export default async function ResultsPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-green-400">✓ PASSED (90-110 баллов)</span>
-                    <span className="text-slate-400">API отвечает статусом 200</span>
+                    <span className="text-slate-400">HTTP/HTTPS отвечают статусом 200</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-amber-400">✓ PARTIAL (90 баллов)</span>
+                    <span className="text-slate-400">Только HTTP работает (-10 штраф)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-red-400">✗ FAILED (0-80 баллов)</span>
@@ -230,13 +234,14 @@ export default async function ResultsPage() {
               </div>
               
               <div className="space-y-3">
-                <h4 className="text-amber-400 font-medium">Логика тестирования:</h4>
+                <h4 className="text-amber-400 font-medium">Логика тестирования протоколов:</h4>
                 <div className="text-sm text-slate-300 space-y-1">
-                  <div>• <strong>Проверяются оба протокола:</strong> HTTP и HTTPS</div>
-                  <div>• <strong>Если HTTP работает, HTTPS не работает:</strong> 90 баллов (-10 за отсутствие HTTPS)</div>
-                  <div>• <strong>Если HTTPS работает:</strong> 110 баллов (+10 бонус)</div>
-                  <div>• <strong>Если оба работают:</strong> 110 баллов (предпочтение HTTPS)</div>
-                  <div>• <strong>Если только HTTPS работает:</strong> 110 баллов</div>
+                  <div>• <strong>Проверяются оба протокола:</strong> HTTP и HTTPS автоматически</div>
+                  <div>• <strong>Если HTTP и HTTPS работают:</strong> 110 баллов (предпочтение HTTPS + бонус)</div>
+                  <div>• <strong>Если только HTTP работает:</strong> 90 баллов (тест проходит, но штраф -10 за отсутствие HTTPS)</div>
+                  <div>• <strong>Если только HTTPS работает:</strong> 110 баллов (идеальный результат + бонус)</div>
+                  <div>• <strong>Если ни один не работает:</strong> проверяется HTTPS для остальной логики</div>
+                  <div>• <strong>Статус в результатах:</strong> отображает какие протоколы доступны</div>
                 </div>
               </div>
               
@@ -261,6 +266,16 @@ export default async function ResultsPage() {
                   <div>• Структура данных ответа</div>
                 </div>
               </div>
+              
+              <div className="space-y-3">
+                <h4 className="text-amber-400 font-medium">Отображение статуса протокола:</h4>
+                <div className="text-sm text-slate-300 space-y-1">
+                  <div>• <strong>&ldquo;Оба HTTP и HTTPS работают (предпочтение HTTPS)&rdquo;</strong> - идеальное состояние</div>
+                  <div>• <strong>&ldquo;Только HTTP работает (нет HTTPS)&rdquo;</strong> - работает, но есть штраф</div>
+                  <div>• <strong>&ldquo;Только HTTPS работает&rdquo;</strong> - рекомендуемое состояние</div>
+                  <div>• <strong>&ldquo;Не доступен&rdquo;</strong> - ни один протокол не работает</div>
+                </div>
+              </div>
             </div>
           </details>
         </div>
@@ -275,7 +290,7 @@ export default async function ResultsPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">Критерии нагрузочного тестирования</h3>
-                  <p className="text-slate-400 text-sm">Оценка производительности "Get Events"</p>
+                  <p className="text-slate-400 text-sm">Оценка производительности &ldquo;Get Events&rdquo;</p>
                 </div>
               </div>
               <ChevronDown className="w-5 h-5 text-slate-400 group-open:hidden" />
@@ -322,6 +337,7 @@ export default async function ResultsPage() {
                   <div>• <strong>Endpoint:</strong> /api/events</div>
                   <div>• <strong>Критерий прохождения:</strong> 95% успешных запросов</div>
                   <div>• <strong>Мониторинг:</strong> <a href="https://hub.hackload.kz/grafana/d/a3b2aaa8-bb66-4008-a1d8-16c49afedbf0/k6-prometheus-native-histograms" target="_blank" className="text-amber-400 hover:text-amber-300 underline">Grafana Dashboard</a></div>
+                  <div>• <strong>Период данных:</strong> с 15 августа 2025 (начало хакатона) по настоящее время</div>
                 </div>
               </div>
               
