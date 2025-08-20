@@ -336,7 +336,7 @@ processors:
 
 exporters:
   debug:
-    verbosity: detailed
+    verbosity: basic
   logging:
     loglevel: error
     sampling_initial: 0
