@@ -336,8 +336,6 @@ processors:
 
 exporters:
   debug:
-    verbosity: detailed
-  nowhere:
     verbosity: none
   logging:
     loglevel: error
@@ -358,15 +356,15 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [nowhere]
+      exporters: [debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug, prometheus]
+      exporters: [prometheus]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [nowhere]
+      exporters: [debug]
 EOT
   }
 }
