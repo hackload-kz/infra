@@ -126,6 +126,11 @@ resource "kubernetes_deployment" "service_provider" {
             value = "latest"
           }
 
+          env {
+            name = "OTEL_EXPORTER_OTLP_ENDPOINT"
+            value = "http://otel-collector:4317"
+          }
+
           # liveness_probe {
           #   http_get {
           #     path = "/health"
