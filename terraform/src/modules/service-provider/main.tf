@@ -336,7 +336,13 @@ exporters:
     sampling_thereafter: 0
   prometheus:
     endpoint: "0.0.0.0:8889"
-    namespace: service-provider
+    namespace: event-provider
+    const_labels:
+      test_label: event-provider-test-label
+    send_timestamps: true
+    metric_expiration: 180m
+    resource_to_telemetry_conversion:
+      enabled: true
 
 service:
   pipelines:
