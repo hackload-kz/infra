@@ -1,6 +1,6 @@
 # Optimized Dockerfile using pre-built base image
 ARG BASE_IMAGE_TAG=latest
-FROM ghcr.io/hackload-kz/infra-base:${BASE_IMAGE_TAG} AS base
+FROM docker.io/hackloadkz/infra-base:${BASE_IMAGE_TAG} AS base
 
 # Build stage - use the pre-built base image
 FROM base AS builder

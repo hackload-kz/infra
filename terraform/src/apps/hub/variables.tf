@@ -93,23 +93,18 @@ variable "hub_db_connection_string" {
   sensitive = true
 }
 
-variable "ghcr_username" {
-  description = "GitHub Container Registry username"
+variable "dockerhub_username" {
+  description = "Docker Hub username"
   type        = string
   sensitive   = true
 }
 
-variable "ghcr_token" {
-  description = "GitHub Container Registry token/password"
+variable "dockerhub_token" {
+  description = "Docker Hub access token"
   type        = string
   sensitive   = true
 }
 
-variable "ghcr_email" {
-  description = "Email for GitHub Container Registry"
-  type        = string
-  default     = ""
-}
 
 variable "hub_nextauth_url" {
   description = "NextAuth URL for the hub application"

@@ -184,7 +184,7 @@ module "hub" {
   source = "../../modules/hub"
 
   namespace             = "hub"
-  image                 = "ghcr.io/hackload-kz/infra"
+  image                 = "docker.io/drimdev/organizer-app"
   tag                   = var.hub_image_tag
   host                  = var.hub_host
   replicas              = var.hub_replicas
@@ -202,10 +202,9 @@ module "hub" {
   admin_users           = var.hub_admin_users
 
   registry_credentials = {
-    server   = "ghcr.io"
-    username = var.ghcr_username
-    password = var.ghcr_token
-    email    = var.ghcr_email
+    server   = "docker.io"
+    username = var.dockerhub_username
+    password = var.dockerhub_token
   }
 
   container_port = 8080

@@ -22,9 +22,8 @@ module "hub" {
   hub_github_client_secret = var.hub_github_client_secret
   hub_admin_users          = var.hub_admin_users
 
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Telemetry configuration
   telemetry_enabled                    = true
@@ -60,9 +59,8 @@ module "service_provider_3g" {
   cert_issuer_name = "letsencrypt-prod"
 
   # Container Registry Credentials
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Resource Configuration
   service_provider_resources = {
@@ -116,9 +114,8 @@ module "payment_provider" {
   cert_issuer_name = "letsencrypt-prod"
 
   # Container Registry Credentials
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Resource Configuration
   payment_provider_resources = {
@@ -152,9 +149,8 @@ module "biletter" {
   cert_issuer_name = "letsencrypt-prod"
 
   # Container Registry Credentials
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Resource Configuration
   biletter_resources = {
@@ -193,9 +189,8 @@ module "event_provider_alem" {
   cert_issuer_name = "letsencrypt-prod"
 
   # Container Registry Credentials
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Resource Configuration
   service_provider_resources = {
@@ -234,9 +229,8 @@ module "event_provider_metaload_akbori" {
   cert_issuer_name = "letsencrypt-prod"
 
   # Container Registry Credentials
-  ghcr_username = var.ghcr_username
-  ghcr_token    = var.ghcr_token
-  ghcr_email    = var.ghcr_email
+  dockerhub_username = var.dockerhub_username
+  dockerhub_token    = var.dockerhub_token
 
   # Resource Configuration
   service_provider_resources = {

@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REGISTRY="${DOCKER_REGISTRY:-ghcr.io}"
-NAMESPACE="${DOCKER_NAMESPACE:-hackload-kz}"
-IMAGE_NAME="${DOCKER_IMAGE_NAME:-infra}"
+REGISTRY="${DOCKER_REGISTRY:-docker.io}"
+NAMESPACE="${DOCKER_NAMESPACE:-hackloadkz}"
+IMAGE_NAME="${DOCKER_IMAGE_NAME:-organizer-app}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 
 # Print colored output
@@ -189,7 +189,7 @@ main() {
                 echo "Options:"
                 echo "  --push              Push image to registry after building"
                 echo "  --verbose, -v       Enable verbose output"
-                echo "  --registry REG      Docker registry (default: ghcr.io)"
+                echo "  --registry REG      Docker registry (default: docker.io)"
                 echo "  --namespace NS      Registry namespace (default: hackload-infra)"
                 echo "  --image-name NAME   Image name (default: infra)"
                 echo "  --dockerfile FILE   Dockerfile to use (default: Dockerfile)"

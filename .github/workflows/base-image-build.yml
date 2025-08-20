@@ -24,12 +24,39 @@ on:
         type: boolean
 
 env:
-  REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: ${{ vars.BASE_IMAGE_NAME || github.repository }}-base
+  REGISTRY: docker.io
+  BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || github.repository_owner }}/infra-base
 
 jobs:
+  docker-auth-check:
+    runs-on: [self-hosted]
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Test Docker Hub authentication
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Verify Docker Hub access
+      run: |
+        echo "✅ Successfully authenticated to Docker Hub for base image build"
+        echo "🔍 Testing registry access..."
+        
+        # Test basic registry access
+        if docker info | grep -q "Registry:"; then
+          echo "✅ Docker registry access confirmed"
+        else
+          echo "❌ Docker registry access failed"
+          exit 1
+        fi
+
   build-base-image:
     runs-on: [self-hosted]
+    needs: [docker-auth-check]
     permissions:
       contents: read
       packages: write
@@ -46,12 +73,12 @@ jobs:
           env.BUILDKIT_STEP_LOG_MAX_SIZE=50000000
           env.BUILDKIT_STEP_LOG_MAX_SPEED=10000000
 
-    - name: Log in to Container Registry
+    - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Generate base image metadata
       id: base-meta
@@ -143,7 +170,7 @@ jobs:
   notify-failure:
     runs-on: [self-hosted]
     if: failure()
-    needs: [build-base-image]
+    needs: [docker-auth-check, build-base-image]
     steps:
     - name: Notify on failure
       run: |

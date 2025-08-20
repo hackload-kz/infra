@@ -75,7 +75,7 @@ This is a monorepo containing two main components:
 - **Database**: PostgreSQL with CloudNative-PG operator
 - **SSL/TLS**: cert-manager with Let's Encrypt
 - **Ingress**: Traefik
-- **Container Registry**: GitHub Container Registry (ghcr.io)
+- **Container Registry**: Docker Hub (docker.io)
 - **Cloud Provider**: OpenStack-based cloud
 
 ### Infrastructure Architecture
@@ -108,7 +108,7 @@ terraform/src/
 ### Application Deployment Flow
 
 1. **Build**: GitHub Actions builds Docker images for organizer app
-2. **Registry**: Images pushed to ghcr.io with both `latest` and commit SHA tags
+2. **Registry**: Images pushed to Docker Hub with both `latest` and commit SHA tags
 3. **Deploy**: GitHub Actions uses kubectl to update the deployment image
 4. **DNS**: Traefik routes traffic from `hub.hackload.kz` to the application
 5. **SSL**: cert-manager automatically provisions Let's Encrypt certificates
@@ -169,10 +169,9 @@ openstack_tenant_name = "your-tenant-name"
 openstack_user_name   = "your-username"
 openstack_password    = "your-password"
 
-# GitHub Container Registry
-ghcr_username = "your-github-username"
-ghcr_token    = "your-github-personal-access-token"
-ghcr_email    = "your-email@example.com"
+# Docker Hub Registry
+dockerhub_username = "your-dockerhub-username"
+dockerhub_token    = "your-dockerhub-access-token"
 
 # Application Configuration
 hub_db_connection_string = "postgresql://username:password@host:5432/database"
@@ -225,14 +224,16 @@ This is a **monorepo** with two main components. Always work in the correct dire
 1. **Code push** to main triggers GitHub Actions
 2. **Quality checks** run first (ESLint, TypeScript)
 3. **Docker build** with multi-stage optimization  
-4. **Registry push** to ghcr.io with commit SHA tags
+4. **Registry push** to Docker Hub with commit SHA tags
 5. **Kubernetes deploy** updates running containers
 6. **Health verification** ensures successful deployment
 
 ## GitHub Actions Secrets Required
 
-For the kubectl deployment to work, ensure these secrets are configured in your GitHub repository:
+For the Docker Hub CI/CD and kubectl deployment to work, ensure these secrets are configured in your GitHub repository:
 
+- `DOCKERHUB_USERNAME`: Docker Hub username for registry authentication
+- `DOCKERHUB_TOKEN`: Docker Hub access token (Personal Access Token)
 - `KUBE_CONFIG`: Base64-encoded kubeconfig file for cluster access
 
 To set up the kubeconfig secret:

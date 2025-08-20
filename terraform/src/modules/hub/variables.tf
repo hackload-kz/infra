@@ -7,7 +7,7 @@ variable "namespace" {
 variable "image" {
   description = "Docker image for the hub application"
   type        = string
-  default     = "ghcr.io/hackload-kz/infra"
+  default     = "docker.io/hackloadkz/organizer-app"
 }
 
 variable "tag" {
@@ -87,7 +87,7 @@ variable "registry_credentials" {
     server   = string
     username = string
     password = string
-    email    = string
+    email    = optional(string, "")
   })
   default   = null
   sensitive = true
