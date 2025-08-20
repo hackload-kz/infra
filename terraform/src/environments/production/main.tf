@@ -58,9 +58,9 @@ module "service_provider_3g" {
   # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
-  # Container Registry Credentials
-  dockerhub_username = var.dockerhub_username
-  dockerhub_token    = var.dockerhub_token
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
 
   # Resource Configuration
   service_provider_resources = {
@@ -113,9 +113,9 @@ module "payment_provider" {
   # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
-  # Container Registry Credentials
-  dockerhub_username = var.dockerhub_username
-  dockerhub_token    = var.dockerhub_token
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
 
   # Resource Configuration
   payment_provider_resources = {
@@ -148,9 +148,9 @@ module "biletter" {
   # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
-  # Container Registry Credentials
-  dockerhub_username = var.dockerhub_username
-  dockerhub_token    = var.dockerhub_token
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
 
   # Resource Configuration
   biletter_resources = {
@@ -188,9 +188,9 @@ module "event_provider_alem" {
   # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
-  # Container Registry Credentials
-  dockerhub_username = var.dockerhub_username
-  dockerhub_token    = var.dockerhub_token
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
 
   # Resource Configuration
   service_provider_resources = {
@@ -228,9 +228,9 @@ module "event_provider_metaload_akbori" {
   # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
-  # Container Registry Credentials
-  dockerhub_username = var.dockerhub_username
-  dockerhub_token    = var.dockerhub_token
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
 
   # Resource Configuration
   service_provider_resources = {
