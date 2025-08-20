@@ -25,7 +25,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || github.repository_owner }}/infra-base
+  BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || 'drimdev' }}/infra-base
 
 jobs:
   build-base-image:

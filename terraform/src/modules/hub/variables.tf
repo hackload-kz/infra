@@ -7,7 +7,7 @@ variable "namespace" {
 variable "image" {
   description = "Docker image for the hub application"
   type        = string
-  default     = "docker.io/hackloadkz/organizer-app"
+  default     = "docker.io/drimdev/organizer-app"
 }
 
 variable "tag" {

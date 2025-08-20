@@ -16,5 +16,5 @@ echo "=================================================="
 
 echo ""
 echo "✅ Done! Image pushed with tags:"
-echo "   - docker.io/hackloadkz/organizer-app:${COMMIT_SHA}"
-echo "   - docker.io/hackloadkz/organizer-app:latest"
+echo "   - docker.io/drimdev/organizer-app:${COMMIT_SHA}"
+echo "   - docker.io/drimdev/organizer-app:latest"

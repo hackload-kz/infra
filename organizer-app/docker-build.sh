@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 REGISTRY="${DOCKER_REGISTRY:-docker.io}"
-NAMESPACE="${DOCKER_NAMESPACE:-hackloadkz}"
+NAMESPACE="${DOCKER_NAMESPACE:-drimdev}"
 IMAGE_NAME="${DOCKER_IMAGE_NAME:-organizer-app}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile}"
 

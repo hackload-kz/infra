@@ -6,7 +6,7 @@
 set -e
 
 REGISTRY="docker.io"
-REPO_NAME="hackloadkz/infra-base"
+REPO_NAME="drimdev/infra-base"
 BASE_IMAGE_NAME="${REGISTRY}/${REPO_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(dirname "$SCRIPT_DIR")"
