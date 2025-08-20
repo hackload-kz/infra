@@ -28,35 +28,8 @@ env:
   BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || github.repository_owner }}/infra-base
 
 jobs:
-  docker-auth-check:
-    runs-on: [self-hosted]
-    permissions:
-      contents: read
-    
-    steps:
-    - name: Test Docker Hub authentication
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name: Verify Docker Hub access
-      run: |
-        echo "✅ Successfully authenticated to Docker Hub for base image build"
-        echo "🔍 Testing registry access..."
-        
-        # Test basic registry access
-        if docker info | grep -q "Registry:"; then
-          echo "✅ Docker registry access confirmed"
-        else
-          echo "❌ Docker registry access failed"
-          exit 1
-        fi
-
   build-base-image:
     runs-on: [self-hosted]
-    needs: [docker-auth-check]
     permissions:
       contents: read
       packages: write
@@ -170,7 +143,7 @@ jobs:
   notify-failure:
     runs-on: [self-hosted]
     if: failure()
-    needs: [docker-auth-check, build-base-image]
+    needs: [build-base-image]
     steps:
     - name: Notify on failure
       run: |

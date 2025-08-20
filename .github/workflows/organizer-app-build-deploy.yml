@@ -33,35 +33,6 @@ env:
   BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || github.repository_owner }}/infra-base
 
 jobs:
-  docker-auth-check:
-    runs-on: [self-hosted]
-    permissions:
-      contents: read
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Test Docker Hub authentication
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name: Verify Docker Hub access
-      run: |
-        echo "✅ Successfully authenticated to Docker Hub"
-        echo "🔍 Testing registry access..."
-        
-        # Test basic registry access
-        if docker info | grep -q "Registry:"; then
-          echo "✅ Docker registry access confirmed"
-        else
-          echo "❌ Docker registry access failed"
-          exit 1
-        fi
-
   quality-gate:
     uses: ./.github/workflows/code-quality.yml
     permissions:
@@ -70,7 +41,7 @@ jobs:
 
   build-and-push:
     runs-on: [self-hosted]
-    needs: [docker-auth-check, quality-gate]
+    needs: [quality-gate]
     permissions:
       contents: read
       packages: write
@@ -519,7 +490,7 @@ jobs:
   notify-failure:
     runs-on: [self-hosted]
     if: failure()
-    needs: [docker-auth-check, quality-gate, build-and-push, deploy]
+    needs: [quality-gate, build-and-push, deploy]
     steps:
     - name: Notify on failure
       run: |
