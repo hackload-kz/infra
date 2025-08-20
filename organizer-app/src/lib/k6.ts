@@ -92,6 +92,38 @@ export interface K6TestRunConfig {
   environmentVars?: Record<string, string> // Team environment variables for K6
 }
 
+interface ResourceConfig {
+  requests: {
+    cpu: string
+    memory: string
+  }
+  limits: {
+    cpu: string
+    memory: string
+  }
+}
+
+// Get K6 TestRun resource configuration from environment variables
+function getK6ResourceConfig(): ResourceConfig {
+  const defaultCpu = '500m'
+  const defaultMemory = '512Mi'
+  
+  const cpu = process.env.K6_RESOURCE_CPU || defaultCpu
+  const memory = process.env.K6_RESOURCE_MEMORY || defaultMemory
+  
+  // Ensure requests and limits are equal as required
+  return {
+    requests: {
+      cpu: cpu,
+      memory: memory
+    },
+    limits: {
+      cpu: cpu,
+      memory: memory
+    }
+  }
+}
+
 // Legacy function for backward compatibility
 export async function createK6Test(config: LoadTestConfig): Promise<string> {
   await initK8sClient();
@@ -182,6 +214,9 @@ export async function createK6TestRun(config: K6TestRunConfig): Promise<string> 
   const sanitizedStepName = config.stepName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
   const testRunName = `${config.teamNickname}-${config.scenarioIdentifier}-${sanitizedStepName}-${config.runNumber}`
   const configMapName = `${testRunName}-config`
+  
+  // Get resource configuration
+  const resources = getK6ResourceConfig()
 
   // Create ConfigMap with the K6 script
   const configMapResource = {
@@ -231,6 +266,7 @@ export async function createK6TestRun(config: K6TestRunConfig): Promise<string> 
       arguments: `--out experimental-prometheus-rw --tag team=${config.teamNickname} --tag test_scenario=${config.scenarioIdentifier} --tag step=${sanitizedStepName} --tag step_order=${config.stepOrder} --tag testid=${testRunName} --tag run_number=${config.runNumber}`,
       runner: {
         image: 'grafana/k6:latest',
+        resources: resources,
         env: [
           {
             name: 'K6_PROMETHEUS_RW_SERVER_URL',

@@ -458,4 +458,37 @@ This color schema ensures visual consistency, accessibility compliance, and main
 
 ## Architecture Overview
 
+### K6 Load Testing Configuration
+
+#### Resource Management
+K6 TestRuns can be configured with resource requests and limits through environment variables:
+
+- **`K6_RESOURCE_CPU`**: CPU resource limit (default: `500m`)
+  - Sets both requests and limits to the same value
+  - Example values: `500m`, `1000m`, `2`
+  
+- **`K6_RESOURCE_MEMORY`**: Memory resource limit (default: `512Mi`)
+  - Sets both requests and limits to the same value
+  - Example values: `512Mi`, `1Gi`, `2Gi`
+
+#### Usage Examples
+```bash
+# Default resources (500m CPU, 512Mi memory)
+# No environment variables needed
+
+# Custom resources for higher loads
+export K6_RESOURCE_CPU="1000m"
+export K6_RESOURCE_MEMORY="1Gi"
+
+# For development/testing with lower resources
+export K6_RESOURCE_CPU="250m" 
+export K6_RESOURCE_MEMORY="256Mi"
+```
+
+#### Implementation Notes
+- Resources are applied to all K6 TestRun pods
+- Requests and limits are always equal (guaranteed QoS)
+- Changes take effect on new test runs
+- Each test scenario step can have different parallelism levels but uses the same resource allocation per container
+
 [... rest of the existing content remains unchanged ...]
