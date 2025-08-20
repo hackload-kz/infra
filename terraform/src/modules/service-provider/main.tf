@@ -335,7 +335,7 @@ exporters:
     sampling_initial: 0
     sampling_thereafter: 0
   prometheus:
-    endpoint: "0.0.0.0:8888"
+    endpoint: "0.0.0.0:8889"
     namespace: service-provider
 
 service:
@@ -401,7 +401,7 @@ resource "kubernetes_deployment" "otel_collector" {
 
           port {
             name           = "metrics"
-            container_port = 8888
+            container_port = 8889
           }
 
           volume_mount {
@@ -464,8 +464,8 @@ resource "kubernetes_service" "otel_collector" {
 
     port {
       name        = "metrics"
-      port        = 8888
-      target_port = 8888
+      port        = 8889
+      target_port = 8889
       protocol    = "TCP"
     }
 
