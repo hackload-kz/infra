@@ -353,18 +353,10 @@ exporters:
 
 service:
   pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
       exporters: [debug, prometheus]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [debug]
 EOT
   }
 }
