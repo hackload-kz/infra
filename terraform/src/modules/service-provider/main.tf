@@ -330,6 +330,8 @@ processors:
   batch:
 
 exporters:
+  debug:
+    verbosity: detailed
   logging:
     loglevel: error
     sampling_initial: 0
@@ -349,15 +351,15 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
+      exporters: [debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [debug, prometheus]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
+      exporters: [debug]
 EOT
   }
 }
