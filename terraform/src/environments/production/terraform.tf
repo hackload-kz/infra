@@ -6,5 +6,6 @@ terraform {
     storage_account_name = "hackloadprodtf"
     container_name       = "terraformstate"
     key                  = "terraform.tfstate"
+    use_azuread_auth     = true
   }
 }
