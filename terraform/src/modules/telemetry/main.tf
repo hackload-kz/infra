@@ -20,9 +20,25 @@ resource "helm_release" "prometheus" {
       {
         prometheus = {
           prometheusSpec = {
+            retention = "30d"
+            enableRemoteWriteReceiver = true
             resources = var.prometheus_resources
             externalUrl = "https://${var.prometheus_host}${var.prometheus_path}"
             routePrefix = var.prometheus_path
+            serviceMonitorNamespaceSelector = {}
+            serviceMonitorSelector = {
+              matchLabels = {
+                release = "prometheus"
+              }
+            }
+            podMonitorNamespaceSelector = {}
+            podMonitorSelector = {}
+            additionalArgs = [
+              {
+                name  = "enable-feature"
+                value = "native-histograms"
+              }
+            ]
             containers = [
               {
                 name = "prometheus"
@@ -48,6 +64,47 @@ resource "helm_release" "prometheus" {
               }
             }
           }
+        }
+        alertmanager = {
+          alertmanagerSpec = {
+            storage = {
+              volumeClaimTemplate = {
+                spec = {
+                  storageClassName = var.storage_class
+                  accessModes      = ["ReadWriteOnce"]
+                  resources = {
+                    requests = {
+                      storage = var.alertmanager_storage_size
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        grafana = {
+          enabled = true
+          adminPassword = var.grafana_admin_password
+          persistence = {
+            enabled = true
+            storageClassName = var.storage_class
+            size = var.grafana_storage_size
+          }
+          "grafana.ini" = {
+            server = {
+              root_url = "https://${var.grafana_host}/grafana"
+              serve_from_sub_path = true
+            }
+            "auth.anonymous" = {
+              enabled = true
+              org_name = "Main Org."
+              org_role = "Viewer"
+              hide_signin_menu = true
+            }
+          }
+        }
+        kubeStateMetrics = {
+          enabled = false
         }
       }
     ))

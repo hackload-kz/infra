@@ -98,85 +98,84 @@ module "telemetry" {
   alertmanager_host         = var.hub_host
   alertmanager_storage_size = var.telemetry_alertmanager_storage_size
 
-  prometheus_helm_values = {
-    prometheus = {
-      prometheusSpec = {
-        retention = "30d"
-        externalUrl = "https://${var.hub_host}/prometheus"
-        routePrefix = "/prometheus"
-        enableRemoteWriteReceiver = true
-        # Enable ServiceMonitor discovery across all namespaces
-        serviceMonitorNamespaceSelector = {}
-        serviceMonitorSelector = {
-          matchLabels = {
-            release = "prometheus"
-          }
-        }
-        podMonitorNamespaceSelector = {}
-        podMonitorSelector = {}
-        additionalArgs = [
-          {
-            name  = "enable-feature"
-            value = "native-histograms"
-          }
-        ]
-        storageSpec = {
-          volumeClaimTemplate = {
-            spec = {
-              storageClassName = var.storage_class
-              accessModes      = ["ReadWriteOnce"]
-              resources = {
-                requests = {
-                  storage = var.telemetry_prometheus_storage_size
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    alertmanager = {
-      alertmanagerSpec = {
-        storage = {
-          volumeClaimTemplate = {
-            spec = {
-              storageClassName = var.storage_class
-              accessModes      = ["ReadWriteOnce"]
-              resources = {
-                requests = {
-                  storage = var.telemetry_alertmanager_storage_size
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    grafana = {
-      enabled = true
-      adminPassword = var.telemetry_grafana_admin_password
-      persistence = {
-        enabled = true
-        storageClassName = var.storage_class
-        size = var.telemetry_grafana_storage_size
-      }
-      "grafana.ini" = {
-        server = {
-          root_url = "https://${var.hub_host}/grafana"
-          serve_from_sub_path = true
-        }
-        "auth.anonymous" = {
-          enabled = true
-          org_name = "Main Org."
-          org_role = "Viewer"
-          hide_signin_menu = true
-        }
-      }
-    }
-    kubeStateMetrics = {
-      enabled = false
-    }
-  }
+  prometheus_helm_values = {}
+  # prometheus_helm_values = {
+  #   prometheus = {
+  #     prometheusSpec = {
+  #       retention = "30d"
+  #       enableRemoteWriteReceiver = true
+  #       # Enable ServiceMonitor discovery across all namespaces
+  #       serviceMonitorNamespaceSelector = {}
+  #       serviceMonitorSelector = {
+  #         matchLabels = {
+  #           release = "prometheus"
+  #         }
+  #       }
+  #       podMonitorNamespaceSelector = {}
+  #       podMonitorSelector = {}
+  #       additionalArgs = [
+  #         {
+  #           name  = "enable-feature"
+  #           value = "native-histograms"
+  #         }
+  #       ]
+  #       storageSpec = {
+  #         volumeClaimTemplate = {
+  #           spec = {
+  #             storageClassName = var.storage_class
+  #             accessModes      = ["ReadWriteOnce"]
+  #             resources = {
+  #               requests = {
+  #                 storage = var.telemetry_prometheus_storage_size
+  #               }
+  #             }
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  #   alertmanager = {
+  #     alertmanagerSpec = {
+  #       storage = {
+  #         volumeClaimTemplate = {
+  #           spec = {
+  #             storageClassName = var.storage_class
+  #             accessModes      = ["ReadWriteOnce"]
+  #             resources = {
+  #               requests = {
+  #                 storage = var.telemetry_alertmanager_storage_size
+  #               }
+  #             }
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  #   grafana = {
+  #     enabled = true
+  #     adminPassword = var.telemetry_grafana_admin_password
+  #     persistence = {
+  #       enabled = true
+  #       storageClassName = var.storage_class
+  #       size = var.telemetry_grafana_storage_size
+  #     }
+  #     "grafana.ini" = {
+  #       server = {
+  #         root_url = "https://${var.hub_host}/grafana"
+  #         serve_from_sub_path = true
+  #       }
+  #       "auth.anonymous" = {
+  #         enabled = true
+  #         org_name = "Main Org."
+  #         org_role = "Viewer"
+  #         hide_signin_menu = true
+  #       }
+  #     }
+  #   }
+  #   kubeStateMetrics = {
+  #     enabled = false
+  #   }
+  # }
 
   depends_on = [module.traefik, module.cert_manager]
 }
