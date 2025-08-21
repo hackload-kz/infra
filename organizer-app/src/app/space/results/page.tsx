@@ -326,7 +326,10 @@ export default async function ResultsPage() {
                   <div>• <strong>50,000 пользователей</strong> = 40 баллов при прохождении</div>
                   <div>• <strong>100,000 пользователей</strong> = 50 баллов при прохождении</div>
                   <div className="mt-2 pt-2 border-t border-slate-600/30">
-                    <strong>Максимум: 150 баллов</strong> (все тесты пройдены)
+                    <strong>Система оценки:</strong> Баллы начисляются за максимальную нагрузку
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    Если команда прошла тесты на 1К, 5К и 25К пользователей, она получает 30 баллов (только за 25К)
                   </div>
                 </div>
               </div>

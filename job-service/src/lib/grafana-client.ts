@@ -337,8 +337,12 @@ export class GrafanaClient {
     this.logger.info(`Starting team summary generation for: ${teamName} (${teamSlug})`);
     const testResults = await this.evaluateGetEventsTask(teamSlug, teamId);
     
-    const totalScore = testResults.reduce((sum, result) => sum + result.score, 0);
-    const passedTests = testResults.filter(result => result.testPassed).length;
+    // Calculate score based on maximum successful user load (not cumulative)
+    const passedTests = testResults.filter(result => result.testPassed);
+    const totalScore = passedTests.length > 0 
+      ? Math.max(...passedTests.map(result => result.score))
+      : 0;
+    
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
       : undefined;
@@ -349,7 +353,7 @@ export class GrafanaClient {
       teamName,
       totalScore,
       testResults,
-      passedTests,
+      passedTests: passedTests.length,
       totalTests: testResults.length,
       lastTestTime
     };
@@ -361,8 +365,12 @@ export class GrafanaClient {
   async generateArchiveTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
     const testResults = await this.evaluateArchiveTask(teamSlug, teamId);
     
-    const totalScore = testResults.reduce((sum, result) => sum + result.score, 0);
-    const passedTests = testResults.filter(result => result.testPassed).length;
+    // Calculate score based on maximum successful user load (not cumulative)
+    const passedTests = testResults.filter(result => result.testPassed);
+    const totalScore = passedTests.length > 0 
+      ? Math.max(...passedTests.map(result => result.score))
+      : 0;
+      
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
       : undefined;
@@ -373,7 +381,7 @@ export class GrafanaClient {
       teamName,
       totalScore,
       testResults,
-      passedTests,
+      passedTests: passedTests.length,
       totalTests: testResults.length,
       lastTestTime
     };
