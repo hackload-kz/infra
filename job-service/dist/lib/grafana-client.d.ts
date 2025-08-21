@@ -21,6 +21,7 @@ export interface GetEventsTestResult {
     successRate: number;
     errorCount: number;
     peakRps: number;
+    p95Latency: number;
     testPassed: boolean;
     score: number;
     grafanaDashboardUrl: string;

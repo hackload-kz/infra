@@ -27,7 +27,6 @@ export declare class K6LoadTestingService extends BaseJobService {
     collectMetrics(team: Team): Promise<MetricsData>;
     evaluateStatus(metrics: MetricsData): CriteriaStatus;
     calculateScore(status: CriteriaStatus, metrics: MetricsData): number;
-    private generateTeamSlug;
     generateDashboardUrl(testId: string): string;
     getConfiguration(): GetEventsTaskConfig;
     getCurrentMetrics(): K6LoadTestingMetrics;

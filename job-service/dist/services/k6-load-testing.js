@@ -43,7 +43,7 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
             return {};
         }
         try {
-            const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
+            const teamSlug = team.nickname;
             const summary = await this.grafana.generateTeamSummary(parseInt(team.id), teamSlug, team.name);
             this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} tests passed`);
             return {
@@ -59,6 +59,7 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
                     totalRequests: result.totalRequests,
                     errorCount: result.errorCount,
                     peakRps: result.peakRps,
+                    p95Latency: result.p95Latency,
                     grafanaDashboardUrl: result.grafanaDashboardUrl,
                     testId: result.testId
                 })),
@@ -92,15 +93,6 @@ class K6LoadTestingService extends base_service_1.BaseJobService {
             return totalScore;
         }
         return super.calculateScore(status, metrics);
-    }
-    generateTeamSlug(teamName, teamId) {
-        const slug = teamName
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
-        return slug || `team-${teamId}`;
     }
     generateDashboardUrl(testId) {
         return this.grafana.generateGrafanaDashboardUrl(testId);

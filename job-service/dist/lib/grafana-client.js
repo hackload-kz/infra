@@ -141,6 +141,9 @@ class GrafanaClient {
             const peakRpsQuery = `max(sum(irate(k6_http_reqs_total{testid=~"${testIdPattern}"}[1m])))`;
             const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
             const peakRps = this.extractMaxValue(peakRpsResponse) || 0;
+            const p95LatencyQuery = `histogram_quantile(0.95, sum by(le, name, method, status) (rate(k6_http_req_duration_seconds{testid=~"${testIdPattern}"}[5m])))`;
+            const p95Response = await this.prometheusRangeQuery(p95LatencyQuery);
+            const p95Latency = this.extractMaxValue(p95Response) || 0;
             const successfulRequests = totalRequests - failedRequests;
             const successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
             const errorCount = failedRequests;
@@ -168,6 +171,7 @@ class GrafanaClient {
                 successRate,
                 errorCount,
                 peakRps: Math.round(peakRps * 100) / 100,
+                p95Latency: Math.round(p95Latency * 1000 * 100) / 100,
                 testPassed,
                 score,
                 grafanaDashboardUrl: this.generateGrafanaDashboardUrl(testIdFromMetrics),
@@ -178,6 +182,7 @@ class GrafanaClient {
                 totalRequests,
                 successRate: successRate.toFixed(2),
                 peakRps: peakRps.toFixed(2),
+                p95Latency: p95Latency.toFixed(3),
                 testPassed,
                 score
             });

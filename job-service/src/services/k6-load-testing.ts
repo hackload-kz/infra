@@ -80,8 +80,9 @@ export class K6LoadTestingService extends BaseJobService {
     }
 
     try {
-      // Generate team slug and get test results
-      const teamSlug = this.generateTeamSlug(team.name, parseInt(team.id));
+      // Use team nickname directly as the slug (since test IDs use nickname, not generated slug from name)
+      const teamSlug = team.nickname;
+      
       const summary = await this.grafana.generateTeamSummary(parseInt(team.id), teamSlug, team.name);
       
       this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} tests passed`);
@@ -140,22 +141,6 @@ export class K6LoadTestingService extends BaseJobService {
     return super.calculateScore(status, metrics);
   }
 
-  /**
-   * Generate team slug from team name and ID
-   * Converts team name to URL-friendly slug format
-   */
-  private generateTeamSlug(teamName: string, teamId: number): string {
-    // Convert to lowercase and replace spaces/special chars with hyphens
-    const slug = teamName
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
-      .replace(/\s+/g, '-')         // Replace spaces with hyphens
-      .replace(/-+/g, '-')          // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, '');       // Remove leading/trailing hyphens
-    
-    // Fallback to team-{id} if slug is empty
-    return slug || `team-${teamId}`;
-  }
 
 
   /**
