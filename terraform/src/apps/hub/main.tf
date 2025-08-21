@@ -84,6 +84,7 @@ module "telemetry" {
   prometheus_host          = var.hub_host
   prometheus_path          = "/prometheus"
   prometheus_storage_size  = var.telemetry_prometheus_storage_size
+  prometheus_resources     = var.telemetry_prometheus_resources
 
   # Grafana configuration
   enable_grafana           = true

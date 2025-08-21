@@ -15,7 +15,42 @@ resource "helm_release" "prometheus" {
   namespace  = kubernetes_namespace.telemetry.metadata[0].name
 
   values = [
-    yamlencode(var.prometheus_helm_values)
+    yamlencode(merge(
+      var.prometheus_helm_values,
+      {
+        prometheus = {
+          prometheusSpec = {
+            resources = var.prometheus_resources
+            externalUrl = "https://${var.prometheus_host}${var.prometheus_path}"
+            routePrefix = var.prometheus_path
+            containers = [
+              {
+                name = "prometheus"
+                livenessProbe = {
+                  failureThreshold = 500
+                }
+                startupProbe = {
+                  failureThreshold = 500
+                }
+              }
+            ]
+            storageSpec = {
+              volumeClaimTemplate = {
+                spec = {
+                  storageClassName = var.storage_class
+                  accessModes      = ["ReadWriteOnce"]
+                  resources = {
+                    requests = {
+                      storage = var.prometheus_storage_size
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ))
   ]
 }
 

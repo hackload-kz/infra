@@ -66,6 +66,30 @@ variable "prometheus_storage_size" {
   default     = "10Gi"
 }
 
+variable "prometheus_resources" {
+  description = "Resource limits and requests for Prometheus"
+  type = object({
+    limits = object({
+      cpu    = string
+      memory = string
+    })
+    requests = object({
+      cpu    = string
+      memory = string
+    })
+  })
+  default = {
+    limits = {
+      cpu    = "2"
+      memory = "4Gi"
+    }
+    requests = {
+      cpu    = "1"
+      memory = "2Gi"
+    }
+  }
+}
+
 variable "enable_alertmanager" {
   description = "Enable Alertmanager"
   type        = bool

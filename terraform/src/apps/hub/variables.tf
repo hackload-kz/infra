@@ -185,6 +185,30 @@ variable "telemetry_prometheus_storage_size" {
   default     = "10Gi"
 }
 
+variable "telemetry_prometheus_resources" {
+  description = "Resource limits and requests for Prometheus"
+  type = object({
+    limits = object({
+      cpu    = string
+      memory = string
+    })
+    requests = object({
+      cpu    = string
+      memory = string
+    })
+  })
+  default = {
+    limits = {
+      cpu    = "4"
+      memory = "20Gi"
+    }
+    requests = {
+      cpu    = "1"
+      memory = "20Gi"
+    }
+  }
+}
+
 variable "telemetry_alertmanager_storage_size" {
   description = "Storage size for Alertmanager data"
   type        = string
