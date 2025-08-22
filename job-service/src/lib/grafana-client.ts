@@ -227,12 +227,23 @@ export class GrafanaClient {
       } catch (error) {
         this.logger.error(`Failed to evaluate authorization test for team ${teamSlug}:`, error);
       }
+    } else if (taskType === 'booking') {
+      // Booking tests don't have user sizes, just check for any booking tests
+      try {
+        // Pattern: <teamSlug>-booking-script-* for booking (e.g., orobotics-booking-script-162)
+        const testIdPattern = `${teamSlug}-booking-.*`;
+        const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, 0); // userSize 0 for booking tests
+        
+        if (testResult) {
+          results.push(testResult);
+        }
+      } catch (error) {
+        this.logger.error(`Failed to evaluate booking test for team ${teamSlug}:`, error);
+      }
     } else {
-      // Events, Archive, and Booking tests have user sizes
+      // Events and Archive tests have user sizes
       let userSizes: number[];
-      if (taskType === 'booking') {
-        userSizes = [1000, 5000, 10000, 25000, 50000]; // Booking user sizes
-      } else if (taskType === 'archive') {
+      if (taskType === 'archive') {
         userSizes = [1000, 5000, 10000, 50000, 100000]; // Archive user sizes
       } else {
         userSizes = [1000, 5000, 10000, 25000, 50000, 100000]; // Events user sizes
@@ -243,14 +254,11 @@ export class GrafanaClient {
           // Build test pattern based on task type
           // Pattern: <teamSlug>-events-<userSize>-events-<testNumber> for events
           // Pattern: <teamSlug>-archive-<userSize>-*-<testId> for archive
-          // Pattern: <teamSlug>-booking-<userSize>-*-<testId> for booking
           let testIdPattern: string;
           if (taskType === 'events') {
             testIdPattern = `${teamSlug}-events-${userSize}-events-.*`;
-          } else if (taskType === 'archive') {
+          } else { // archive
             testIdPattern = `${teamSlug}-archive-${userSize}-.*-.*`;
-          } else { // booking
-            testIdPattern = `${teamSlug}-booking-${userSize}-.*-.*`;
           }
             
           const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, userSize);
@@ -309,6 +317,41 @@ export class GrafanaClient {
       const failedResponse = await this.prometheusRangeQuery(failedRequestsQuery);
       const failedRequests = this.extractMaxValue(failedResponse) || 0;
 
+      // For booking tests, calculate special booking success rate
+      let bookingSuccessRate: number | null = null;
+      if (_taskType === 'booking') {
+        try {
+          // Query for successful bookings
+          const successfulBookingsQuery = `sum(k6_successful_bookings_total{testid=~"${testIdPattern}"})`;
+          const successfulBookingsResponse = await this.prometheusRangeQuery(successfulBookingsQuery);
+          const successfulBookings = this.extractMaxValue(successfulBookingsResponse) || 0;
+
+          // Query for failed bookings
+          const failedBookingsQuery = `sum(k6_failed_bookings_total{testid=~"${testIdPattern}"})`;
+          const failedBookingsResponse = await this.prometheusRangeQuery(failedBookingsQuery);
+          const failedBookings = this.extractMaxValue(failedBookingsResponse) || 0;
+
+          // Query for conflict bookings (seat already taken)
+          const conflictBookingsQuery = `sum(k6_conflict_bookings_total{testid=~"${testIdPattern}"})`;
+          const conflictBookingsResponse = await this.prometheusRangeQuery(conflictBookingsQuery);
+          const conflictBookings = this.extractMaxValue(conflictBookingsResponse) || 0;
+
+          // Calculate booking success rate: successful_bookings / total_booking_attempts
+          const totalBookingAttempts = successfulBookings + failedBookings + conflictBookings;
+          if (totalBookingAttempts > 0) {
+            bookingSuccessRate = (successfulBookings / totalBookingAttempts) * 100;
+            this.logger.info(`Booking success rate calculated: ${successfulBookings}/${totalBookingAttempts} = ${bookingSuccessRate.toFixed(2)}%`, {
+              successfulBookings,
+              failedBookings,
+              conflictBookings,
+              totalBookingAttempts
+            });
+          }
+        } catch (error) {
+          this.logger.warn(`Failed to calculate booking success rate for ${testIdPattern}:`, error);
+        }
+      }
+
       // Query for peak RPS (maximum instantaneous rate during the test) using range query
       const peakRpsQuery = `max(sum(irate(k6_http_reqs_total{testid=~"${testIdPattern}"}[1m])))`;
       const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
@@ -321,7 +364,13 @@ export class GrafanaClient {
 
       // Calculate success rate
       const successfulRequests = totalRequests - failedRequests;
-      const successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
+      let successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
+      
+      // For booking tests, use the booking-specific success rate if available
+      if (_taskType === 'booking' && bookingSuccessRate !== null) {
+        successRate = bookingSuccessRate;
+      }
+      
       const errorCount = failedRequests;
       const testPassed = successRate >= 95;
 
@@ -332,11 +381,13 @@ export class GrafanaClient {
           // Authorization tests get a fixed score if they pass (no user size scaling)
           score = 100;
         } else {
-          // Base scores for each user size level (events/archive)
+          // Base scores for each user size level (events/archive/booking)
           const baseScores: Record<number, number> = {
+            162: 5,      // 162 users get 5 points (booking specific)
             1000: 10,
             5000: 20,
-            25000: 30,
+            10000: 30,   // 10K users get 30 points
+            25000: 30,   // 25K users get 30 points (equal to 10K)
             50000: 40,
             100000: 50
           };
@@ -472,11 +523,9 @@ export class GrafanaClient {
   async generateBookingTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
     const testResults = await this.evaluateBookingTask(teamSlug, teamId);
     
-    // Calculate score based on maximum successful user load (not cumulative)
+    // Calculate score - for booking, it's pass/fail with fixed score like authorization
     const passedTests = testResults.filter(result => result.testPassed);
-    const totalScore = passedTests.length > 0 
-      ? Math.max(...passedTests.map(result => result.score))
-      : 0;
+    const totalScore = passedTests.length > 0 ? 100 : 0; // Fixed score for booking
       
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 

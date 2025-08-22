@@ -27,7 +27,7 @@ export interface K6BookingTestingMetrics {
 export interface BookingTaskConfig {
   userSizes: number[];
   successRateThreshold: number;
-  scoreWeights: Record<number, number>;
+  scoreWeights: Record<string, number>;
 }
 
 /**
@@ -54,16 +54,12 @@ export class K6BookingTestingService extends BaseJobService {
       topPerformers: []
     };
 
-    // Configuration for Ticket Booking load testing task
+    // Configuration for Ticket Booking testing task (no user sizes - pass/fail only)
     this.taskConfig = {
-      userSizes: [1000, 5000, 10000, 25000, 50000],
+      userSizes: [], // Booking tests don't have user size levels
       successRateThreshold: 95.0, // 95% success rate required
       scoreWeights: {
-        1000: 10,    // 10 points for 1K users
-        5000: 20,    // 20 points for 5K users
-        10000: 30,   // 30 points for 10K users
-        25000: 30,   // 30 points for 25K users (equal to 10K)
-        50000: 40    // 40 points for 50K users
+        booking: 100 // Fixed score for passing booking tests
       }
     };
 
@@ -101,10 +97,11 @@ export class K6BookingTestingService extends BaseJobService {
           totalRequests: result.totalRequests,
           errorCount: result.errorCount,
           peakRps: result.peakRps,
+          p95Latency: result.p95Latency,
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),
-        maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
+        maxPossibleScore: this.taskConfig.scoreWeights.booking,
         successRateThreshold: this.taskConfig.successRateThreshold,
         teamSlug,
         taskType: 'booking'

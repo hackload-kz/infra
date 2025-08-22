@@ -25,7 +25,8 @@ import {
   Settings,
   Save,
   X,
-  User
+  User,
+  Zap
 } from 'lucide-react'
 import TestRunForm from '@/components/test-run-form'
 
@@ -84,6 +85,7 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
   const [showEnvVars, setShowEnvVars] = useState(false)
   const [envVarsText, setEnvVarsText] = useState('')
   const [savingEnvVars, setSavingEnvVars] = useState(false)
+  const [runningAllScenarios, setRunningAllScenarios] = useState(false)
 
   // Resolve params promise
   useEffect(() => {
@@ -305,6 +307,69 @@ export default function TeamLoadTestingPage({ params }: { params: Promise<{ team
     }
   }
 
+  const handleRunAllScenarios = async () => {
+    if (!teamId) return
+    if (!confirm('Вы уверены, что хотите запустить все доступные сценарии тестирования? Это создаст отдельный тест для каждого активного сценария.')) return
+
+    try {
+      setRunningAllScenarios(true)
+      
+      // Fetch all active scenarios
+      const scenariosResponse = await fetch('/api/dashboard/test-scenarios')
+      if (!scenariosResponse.ok) {
+        throw new Error('Failed to fetch scenarios')
+      }
+      
+      const allScenarios = await scenariosResponse.json()
+      const activeScenarios = allScenarios.filter((scenario: { isActive: boolean }) => scenario.isActive)
+      
+      if (activeScenarios.length === 0) {
+        alert('Нет активных сценариев для запуска')
+        return
+      }
+
+      // Create a test run for each scenario
+      const createdRuns = []
+      for (const scenario of activeScenarios) {
+        try {
+          const response = await fetch(`/api/dashboard/load-testing/teams/${teamId}/test-runs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenarioId: scenario.id,
+              comment: `Автоматически созданный тест для сценария "${scenario.name}"`
+            })
+          })
+
+          if (response.ok) {
+            const newRun = await response.json()
+            createdRuns.push(newRun)
+          } else {
+            console.error(`Failed to create test run for scenario ${scenario.name}`)
+          }
+        } catch (error) {
+          console.error(`Error creating test run for scenario ${scenario.name}:`, error)
+        }
+      }
+
+      // Update the data with new test runs
+      if (data && createdRuns.length > 0) {
+        setData({
+          ...data,
+          testRuns: [...createdRuns, ...data.testRuns]
+        })
+      }
+
+      alert(`Успешно создано ${createdRuns.length} из ${activeScenarios.length} тестов`)
+      
+    } catch (error) {
+      console.error('Error running all scenarios:', error)
+      alert('Ошибка при создании тестов для всех сценариев')
+    } finally {
+      setRunningAllScenarios(false)
+    }
+  }
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'RUNNING':
@@ -509,6 +574,14 @@ export default function () {
             >
               <Plus size={16} />
               Новый тест
+            </Button>
+            <Button
+              onClick={handleRunAllScenarios}
+              disabled={runningAllScenarios}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium flex items-center gap-2"
+            >
+              <Zap size={16} />
+              {runningAllScenarios ? 'Создание тестов...' : 'Запустить все сценарии'}
             </Button>
             <Button
               onClick={handleShowEnvVars}

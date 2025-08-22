@@ -311,7 +311,29 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
-                              Забронировано: {criteria.metrics.bookedTickets || 0} билетов
+                              {criteria.metrics.bookedTickets !== undefined && (
+                                <div>Забронировано: {criteria.metrics.bookedTickets} билетов</div>
+                              )}
+                              {criteria.metrics.successRate !== undefined && (
+                                <div>Успешность бронирования: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%</div>
+                              )}
+                              {criteria.metrics.p95 !== undefined && (
+                                <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>
+                              )}
+                              {criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && criteria.metrics.testResults.length > 0 && (
+                                <div className="mt-1">
+                                  <div className="font-medium text-amber-300">Результаты тестов бронирования:</div>
+                                  {criteria.metrics.testResults
+                                    .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test)
+                                    .map((test, idx) => (
+                                      <div key={idx} className="text-xs">
+                                        {test.testPassed ? '✅' : '❌'} Успешность: {test.successRate.toFixed(1)}%
+                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
+                                        {test.score > 0 && <span className="text-amber-300"> | {test.score} pts</span>}
+                                      </div>
+                                    ))}
+                                </div>
+                              )}
                             </div>
                           )}
                           {criteriaType === 'BUDGET_TRACKING' && criteria?.metrics && (
@@ -351,7 +373,10 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         )}
                         {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            {criteria.metrics.bookedTickets || 0} билетов
+                            {criteria.metrics.successRate !== undefined ? 
+                              `${typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}% успех` : 
+                              `${criteria.metrics.bookedTickets || 0} билетов`
+                            }
                           </div>
                         )}
                         {criteriaType === 'TICKET_CANCELLATION' && criteria?.metrics && (

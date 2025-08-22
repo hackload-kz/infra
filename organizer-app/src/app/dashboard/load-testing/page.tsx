@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Search, 
   Users, 
@@ -71,6 +72,7 @@ export default function LoadTestingPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
   const [view, setView] = useState<'teams' | 'testRuns'>('teams')
+  const [statusFilter, setStatusFilter] = useState('APPROVED')
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -106,13 +108,17 @@ export default function LoadTestingPage() {
   }, [isAdmin])
 
   useEffect(() => {
-    const filtered = teams.filter(team =>
-      team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      team.nickname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (team.leader?.name.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
-    )
+    const filtered = teams.filter(team => {
+      const matchesSearch = team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        team.nickname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (team.leader?.name.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
+      
+      const matchesStatus = statusFilter === 'ALL' || team.status === statusFilter
+      
+      return matchesSearch && matchesStatus
+    })
     setFilteredTeams(filtered)
-  }, [teams, searchTerm])
+  }, [teams, searchTerm, statusFilter])
 
   const fetchTeams = async () => {
     try {
@@ -248,6 +254,25 @@ export default function LoadTestingPage() {
             className="pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500"
           />
         </div>
+        {view === 'teams' && (
+          <div className="min-w-[180px]">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                <SelectValue placeholder="Статус команды" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Все статусы</SelectItem>
+                <SelectItem value="APPROVED">Одобренные</SelectItem>
+                <SelectItem value="IN_REVIEW">На рассмотрении</SelectItem>
+                <SelectItem value="FINISHED">Завершенные</SelectItem>
+                <SelectItem value="NEW">Новые</SelectItem>
+                <SelectItem value="INCOMPLETED">Незавершенные</SelectItem>
+                <SelectItem value="CANCELED">Отмененные</SelectItem>
+                <SelectItem value="REJECTED">Отклоненные</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="flex rounded-lg border border-gray-300 bg-white">
           <Button
             onClick={() => setView('teams')}
