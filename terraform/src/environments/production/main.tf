@@ -165,82 +165,202 @@ module "biletter" {
   }
 }
 
-# alem
+# Event provider modules
 
-module "event_provider_alem" {
+module "event_provider_482931" {
   source = "../../apps/service-provider"
 
-  # Infrastructure Configuration
-  namespace         = "event-provider-alem"
+  namespace         = "event-provider-482931"
   storage_class     = "csi-sc-cinderplugin"
   cnpg_storage_size = "10Gi"
   enable_metrics    = true
 
-  # Service Provider Configuration
   service_provider_image = "ghcr.io/hackload-kz/service-provider"
-  service_provider_tag   = "pkg-25331a91c6f43a938a17a239f97fbc0a3ab89f88"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
   service_provider_host  = "hub.hackload.kz"
-  service_provider_path  = "/event/alem/event-provider"
+  service_provider_path  = "/event/482931/event-provider"
 
-  # Database Configuration
-  db_connection_pool_size = 32
+  db_connection_pool_size = 16
 
-  # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
   ghcr_username = var.ghcr_username
   ghcr_token    = var.ghcr_token
   ghcr_email    = var.ghcr_email
 
-  # Resource Configuration
   service_provider_resources = {
     requests = {
-      cpu    = "500m"
-      memory = "256Mi"
+      cpu    = "2"
+      memory = "2Gi"
     }
     limits = {
-      cpu    = "1"
-      memory = "512Mi"
+      cpu    = "2"
+      memory = "2Gi"
     }
   }
 }
 
-# metaload-akbori
-
-module "event_provider_metaload_akbori" {
+module "event_provider_736254" {
   source = "../../apps/service-provider"
 
-  # Infrastructure Configuration
-  namespace         = "event-provider-metaload-akbori"
+  namespace         = "event-provider-736254"
   storage_class     = "csi-sc-cinderplugin"
   cnpg_storage_size = "10Gi"
   enable_metrics    = true
 
-  # Service Provider Configuration
   service_provider_image = "ghcr.io/hackload-kz/service-provider"
-  service_provider_tag   = "pkg-25331a91c6f43a938a17a239f97fbc0a3ab89f88"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
   service_provider_host  = "hub.hackload.kz"
-  service_provider_path  = "/event/metaload-akbori/event-provider"
+  service_provider_path  = "/event/736254/event-provider"
 
-  # Database Configuration
-  db_connection_pool_size = 32
+  db_connection_pool_size = 16
 
-  # Certificate Management
   cert_issuer_name = "letsencrypt-prod"
 
   ghcr_username = var.ghcr_username
   ghcr_token    = var.ghcr_token
   ghcr_email    = var.ghcr_email
 
-  # Resource Configuration
   service_provider_resources = {
     requests = {
-      cpu    = "500m"
-      memory = "256Mi"
+      cpu    = "2"
+      memory = "2Gi"
     }
     limits = {
-      cpu    = "1"
-      memory = "512Mi"
+      cpu    = "2"
+      memory = "2Gi"
+    }
+  }
+}
+
+module "event_provider_195847" {
+  source = "../../apps/service-provider"
+
+  namespace         = "event-provider-195847"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/195847/event-provider"
+
+  db_connection_pool_size = 16
+
+  cert_issuer_name = "letsencrypt-prod"
+
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  service_provider_resources = {
+    requests = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+    limits = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+  }
+}
+
+module "event_provider_629318" {
+  source = "../../apps/service-provider"
+
+  namespace         = "event-provider-629318"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/629318/event-provider"
+
+  db_connection_pool_size = 16
+
+  cert_issuer_name = "letsencrypt-prod"
+
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  service_provider_resources = {
+    requests = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+    limits = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+  }
+}
+
+module "event_provider_873562" {
+  source = "../../apps/service-provider"
+
+  namespace         = "event-provider-873562"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/873562/event-provider"
+
+  db_connection_pool_size = 16
+
+  cert_issuer_name = "letsencrypt-prod"
+
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  service_provider_resources = {
+    requests = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+    limits = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+  }
+}
+
+module "event_provider_541729" {
+  source = "../../apps/service-provider"
+
+  namespace         = "event-provider-541729"
+  storage_class     = "csi-sc-cinderplugin"
+  cnpg_storage_size = "10Gi"
+  enable_metrics    = true
+
+  service_provider_image = "ghcr.io/hackload-kz/service-provider"
+  service_provider_tag   = "pkg-360af45ac3c9a11949a1ff7d44af52f09c85c9a1"
+  service_provider_host  = "hub.hackload.kz"
+  service_provider_path  = "/event/541729/event-provider"
+
+  db_connection_pool_size = 16
+
+  cert_issuer_name = "letsencrypt-prod"
+
+  ghcr_username = var.ghcr_username
+  ghcr_token    = var.ghcr_token
+  ghcr_email    = var.ghcr_email
+
+  service_provider_resources = {
+    requests = {
+      cpu    = "2"
+      memory = "2Gi"
+    }
+    limits = {
+      cpu    = "2"
+      memory = "2Gi"
     }
   }
 }
