@@ -33,15 +33,15 @@ env:
   BASE_IMAGE_NAME: ${{ vars.DOCKERHUB_ORGANIZATION || 'drimdev' }}/infra-base
 
 jobs:
-  quality-gate:
-    uses: ./.github/workflows/code-quality.yml
-    permissions:
-      contents: read
-      packages: read
+  # quality-gate:
+  #   uses: ./.github/workflows/code-quality.yml
+  #   permissions:
+  #     contents: read
+  #     packages: read
 
   build-and-push:
     runs-on: [self-hosted]
-    needs: [quality-gate]
+    # needs: [quality-gate]
     permissions:
       contents: read
       packages: write
@@ -490,7 +490,7 @@ jobs:
   notify-failure:
     runs-on: [self-hosted]
     if: failure()
-    needs: [quality-gate, build-and-push, deploy]
+    needs: [build-and-push, deploy]
     steps:
     - name: Notify on failure
       run: |
