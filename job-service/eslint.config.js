@@ -3,6 +3,15 @@ const typescriptParser = require('@typescript-eslint/parser');
 
 module.exports = [
   {
+    ignores: [
+      "**/.github/workflows/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.min.js"
+    ]
+  },
+  {
     files: ['**/*.ts'],
     languageOptions: {
       parser: typescriptParser,

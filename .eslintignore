@@ -1,0 +1,33 @@
+# ESLint ignore patterns for CI/CD and build artifacts
+
+# GitHub Actions workflows
+.github/workflows/
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+
+# Dependencies
+**/node_modules/
+
+# Minified files
+**/*.min.js
+**/*.min.css
+
+# Generated files
+**/coverage/
+**/.nyc_output/
+
+# Docker and infrastructure
+**/Dockerfile*
+**/docker-compose*.yml
+**/k8s/
+
+# Terraform
+**/terraform/
+**/*.tf
+**/*.tfvars
+
+# K6 test scripts (if needed)
+# **/k6-load-test/

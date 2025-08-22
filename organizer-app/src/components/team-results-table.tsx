@@ -272,14 +272,14 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {criteriaType === 'DEPLOYED_SOLUTION' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
-                              {criteria.metrics.workingEndpoints !== undefined && criteria.metrics.totalEndpoints && (
+                              {criteria.metrics.workingEndpoints !== undefined && criteria.metrics.totalEndpoints !== undefined && (
                                 <div>API эндпойнты: {criteria.metrics.workingEndpoints}/{criteria.metrics.totalEndpoints} работают</div>
                               )}
                               {criteria.metrics.successRate !== undefined && (
                                 <div>Покрытие API: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%</div>
                               )}
-                              {criteria.metrics.criticalSuccessRate !== undefined && (
-                                <div>Критические API: {typeof criteria.metrics.criticalSuccessRate === 'number' ? criteria.metrics.criticalSuccessRate.toFixed(1) : criteria.metrics.criticalSuccessRate}%</div>
+                              {criteria.metrics.criticalSuccessRate !== undefined && typeof criteria.metrics.criticalSuccessRate === 'number' && (
+                                <div>Критические API: {criteria.metrics.criticalSuccessRate.toFixed(1)}%</div>
                               )}
                               {criteria.metrics.responseTime && (
                                 <div>Среднее время ответа: {criteria.metrics.responseTime}ms</div>
@@ -291,7 +291,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                                 <div className="mt-1">
                                   <div className="font-medium text-amber-300">Детали API тестирования:</div>
                                   <div className="max-h-32 overflow-y-auto">
-                                    {criteria.metrics.endpointResults
+                                    {(criteria.metrics.endpointResults as any[])
                                       .filter((endpoint: any) => endpoint.critical)
                                       .map((endpoint: any, idx: number) => (
                                         <div key={idx} className="text-xs">
@@ -300,9 +300,9 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                                           {endpoint.error && <span className="text-red-400"> | {endpoint.error}</span>}
                                         </div>
                                       ))}
-                                    {criteria.metrics.endpointResults.filter((endpoint: any) => endpoint.critical).length < criteria.metrics.endpointResults.length && (
+                                    {(criteria.metrics.endpointResults as any[]).filter((endpoint: any) => endpoint.critical).length < (criteria.metrics.endpointResults as any[]).length && (
                                       <div className="text-xs text-slate-400 mt-1">
-                                        ... и еще {criteria.metrics.endpointResults.length - criteria.metrics.endpointResults.filter((endpoint: any) => endpoint.critical).length} некритических эндпойнтов
+                                        ... и еще {(criteria.metrics.endpointResults as any[]).length - (criteria.metrics.endpointResults as any[]).filter((endpoint: any) => endpoint.critical).length} некритических эндпойнтов
                                       </div>
                                     )}
                                   </div>
@@ -419,9 +419,9 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         )}
                         {criteriaType === 'DEPLOYED_SOLUTION' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            {criteria.metrics.successRate !== undefined ? 
-                              `${typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(0) : criteria.metrics.successRate}% API` : 
-                              (criteria.metrics.responseTime ? `${criteria.metrics.responseTime}ms` : 'Нет ответа')
+                            {typeof criteria.metrics.successRate === 'number' ? 
+                              `${criteria.metrics.successRate.toFixed(0)}% API` : 
+                              (typeof criteria.metrics.responseTime === 'number' ? `${criteria.metrics.responseTime}ms` : 'Нет ответа')
                             }
                           </div>
                         )}
