@@ -26,8 +26,8 @@ export const options = {
     // Main booking test - starts after reset
     biletter_booking_test: {
       executor: 'per-vu-iterations',
-      vus: 3,
-      iterations: 3000, // 3 users x 1000 iterations = 3000 booking attempts
+      vus: 10,
+      iterations: 1000, // 3 users x 1000 iterations = 3000 booking attempts
       maxDuration: '30m',
       startTime: '30s', // Start 30 seconds after reset
     },
@@ -40,7 +40,11 @@ const users = [
   { email: 'muslima_serikbaeva_999996@ticket.world', password: '_lnAio:Br7b' },
   { email: 'ayan_asqar_999997@fest.tix', password: 'U|t,P#R~' },
   { email: 'kozayym_asanova_999999@hackhload.kz', password: '_^@5=[oc!)+$' },
-  { email: 'alinur_aytzhanov_1000000@ticket.world', password: 'bjD[wU=u#@Wk1\ED' }  
+  { email: 'alinur_aytzhanov_1000000@ticket.world', password: 'bjD[wU=u#@Wk1\ED' },
+  { email: 'sofiya_karimova_999989@show.go', password: 't~bv:18I\V$@' },
+  { email: 'aysha_sarsenova_999990@ticket.world', password: 'zUKhVyYs%>\Ww' },
+  { email: 'medina_rakhmetova_999991@show.go', password: ')~c^V+Tx#G9' },
+  { email: 'erkenaz_smagulova_999992@quick.pass', password: 'I&R>IVB\=P)UmUM' }
 ];
 
 function createBasicAuthHeader(user) {

@@ -276,11 +276,11 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                               {criteria.metrics.statusCode && <div>HTTP: {criteria.metrics.statusCode}</div>}
                             </div>
                           )}
-                          {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH' || criteriaType === 'AUTH_PERFORMANCE') && criteria?.metrics && (
+                          {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH') && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
                               {criteria.metrics.p95 && <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>}
                               {criteria.metrics.successRate && <div>Успешность: {criteria.metrics.successRate}%</div>}
-                              {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH') && criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
+                              {criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
                                 <div className="mt-1">
                                   <div className="font-medium text-amber-300">
                                     {criteriaType === 'EVENT_SEARCH' ? 'Результаты тестов событий:' : 'Результаты архивных тестов:'}
@@ -305,6 +305,38 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                                       </div>
                                     ) : null
                                   })()}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              <div className="font-medium text-amber-300">K6 Пороговые значения:</div>
+                              {criteria.metrics.totalRequests !== undefined && criteria.metrics.expectedRequests && (
+                                <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests === criteria.metrics.expectedRequests ? '✅' : '❌'}</div>
+                              )}
+                              {criteria.metrics.successRate !== undefined && criteria.metrics.checksRequired && (
+                                <div>Проверки: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%/{criteria.metrics.checksRequired}% {criteria.metrics.successRate >= criteria.metrics.checksRequired ? '✅' : '❌'}</div>
+                              )}
+                              {criteria.metrics.thresholdsMet !== undefined && (
+                                <div>Статус: {criteria.metrics.thresholdsMet ? '✅ Все пороги пройдены' : '❌ Пороги не пройдены'}</div>
+                              )}
+                              {criteria.metrics.p95 !== undefined && (
+                                <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>
+                              )}
+                              {criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && criteria.metrics.testResults.length > 0 && (
+                                <div className="mt-1">
+                                  <div className="font-medium text-amber-300">Результаты тестов авторизации:</div>
+                                  {criteria.metrics.testResults
+                                    .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test)
+                                    .map((test, idx) => (
+                                      <div key={idx} className="text-xs">
+                                        {test.testPassed ? '✅' : '❌'} Пороги: {test.testPassed ? 'Пройдены' : 'Не пройдены'}
+                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
+                                        {test.totalRequests && <span className="text-slate-400"> | Запросов: {test.totalRequests}</span>}
+                                        {test.score > 0 && <span className="text-amber-300"> | {test.score} pts</span>}
+                                      </div>
+                                    ))}
                                 </div>
                               )}
                             </div>
@@ -368,7 +400,13 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         )}
                         {criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            {criteria.metrics.p95 ? `P95: ${typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}` : 'P95: N/A'}
+                            {criteria.metrics.thresholdsMet !== undefined ? 
+                              (criteria.metrics.thresholdsMet ? '✅ Пороги' : '❌ Пороги') : 
+                              (criteria.metrics.successRate !== undefined ? 
+                                `${typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}% провер.` : 
+                                (criteria.metrics.p95 ? `P95: ${typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}` : 'P95: N/A')
+                              )
+                            }
                           </div>
                         )}
                         {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (

@@ -372,7 +372,46 @@ export class GrafanaClient {
       }
       
       const errorCount = failedRequests;
-      const testPassed = successRate >= 95;
+      
+      // For authorization tests, check K6 thresholds instead of HTTP success rate
+      let testPassed = false;
+      
+      if (_taskType === 'authorization') {
+        try {
+          // Check if exactly 42 HTTP requests were made (from K6 threshold: 'http_reqs': ['count===42'])
+          const httpReqsMatch = totalRequests === 42;
+          
+          // Check if all checks passed (from K6 threshold: 'checks': ['rate>=1'])
+          const checksQuery = `k6_checks_total{testid=~"${testIdPattern}"} - k6_checks_failed_total{testid=~"${testIdPattern}"}`;
+          const checksResponse = await this.prometheusRangeQuery(checksQuery);
+          const passedChecks = this.extractMaxValue(checksResponse) || 0;
+          
+          const totalChecksQuery = `k6_checks_total{testid=~"${testIdPattern}"}`;
+          const totalChecksResponse = await this.prometheusRangeQuery(totalChecksQuery);
+          const totalChecks = this.extractMaxValue(totalChecksResponse) || 0;
+          
+          const checksRate = totalChecks > 0 ? (passedChecks / totalChecks) : 0;
+          const checksMatch = checksRate >= 1.0; // 100% checks must pass
+          
+          testPassed = httpReqsMatch && checksMatch;
+          
+          this.logger.info(`Authorization test thresholds for ${testIdPattern}:`, {
+            httpReqs: totalRequests,
+            httpReqsMatch,
+            checksRate: checksRate.toFixed(3),
+            checksMatch,
+            testPassed
+          });
+          
+        } catch (error) {
+          this.logger.warn(`Failed to check authorization thresholds for ${testIdPattern}:`, error);
+          testPassed = successRate >= 100; // Fallback to 100% success rate
+        }
+      } else {
+        // For other test types, use success rate thresholds
+        const successThreshold = _taskType === 'booking' ? 95 : 95; // 95% for most tests
+        testPassed = successRate >= successThreshold;
+      }
 
       // Calculate score based on task type and success
       let score = 0;
