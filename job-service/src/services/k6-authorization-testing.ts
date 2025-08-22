@@ -86,11 +86,11 @@ export class K6AuthorizationTestingService extends BaseJobService {
         totalTests: summary.totalTests,
         lastTestTime: summary.lastTestTime?.toISOString(),
         // Authorization-specific metrics based on K6 thresholds
-        totalRequests: summary.testResults.length > 0 ? summary.testResults[0].totalRequests : 0,
+        totalRequests: summary.testResults.length > 0 ? summary.testResults[0]?.totalRequests || 0 : 0,
         failedTests: summary.totalTests - summary.passedTests,
-        p95: summary.testResults.length > 0 ? summary.testResults[0].p95Latency : undefined,
-        successRate: summary.testResults.length > 0 ? summary.testResults[0].successRate : 0,
-        thresholdsMet: summary.testResults.length > 0 ? summary.testResults[0].testPassed : false,
+        p95: summary.testResults.length > 0 ? summary.testResults[0]?.p95Latency : undefined,
+        successRate: summary.testResults.length > 0 ? summary.testResults[0]?.successRate || 0 : 0,
+        thresholdsMet: summary.testResults.length > 0 ? summary.testResults[0]?.testPassed || false : false,
         expectedRequests: 42, // From K6 threshold: 'http_reqs': ['count===42']
         checksRequired: 100, // From K6 threshold: 'checks': ['rate>=1'] (100%)
         testResults: summary.testResults.map(result => ({
