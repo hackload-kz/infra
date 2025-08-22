@@ -280,15 +280,17 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                             <div className="text-slate-300 mt-1">
                               {criteria.metrics.p95 && <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>}
                               {criteria.metrics.successRate && <div>Успешность: {criteria.metrics.successRate}%</div>}
-                              {criteriaType === 'EVENT_SEARCH' && criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
+                              {(criteriaType === 'EVENT_SEARCH' || criteriaType === 'ARCHIVE_SEARCH') && criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && (
                                 <div className="mt-1">
-                                  <div className="font-medium text-amber-300">Результаты тестов:</div>
+                                  <div className="font-medium text-amber-300">
+                                    {criteriaType === 'EVENT_SEARCH' ? 'Результаты тестов событий:' : 'Результаты архивных тестов:'}
+                                  </div>
                                   {criteria.metrics.testResults
                                     .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test && 'userSize' in test)
                                     .map((test, idx) => (
                                       test.testPassed && (
                                         <div key={idx} className="text-xs">
-                                          ✅ {test.userSize} пользователей ({test.score} pts)
+                                          ✅ {test.userSize.toLocaleString()} пользователей ({test.score} pts)
                                           {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
                                         </div>
                                       )

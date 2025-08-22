@@ -229,9 +229,14 @@ export class GrafanaClient {
       }
     } else {
       // Events, Archive, and Booking tests have user sizes
-      const userSizes = taskType === 'booking' 
-        ? [1000, 5000, 10000, 25000, 50000] // Booking user sizes
-        : [1000, 5000, 25000, 50000, 100000]; // Events and Archive user sizes
+      let userSizes: number[];
+      if (taskType === 'booking') {
+        userSizes = [1000, 5000, 10000, 25000, 50000]; // Booking user sizes
+      } else if (taskType === 'archive') {
+        userSizes = [1000, 5000, 10000, 50000, 100000]; // Archive user sizes
+      } else {
+        userSizes = [1000, 5000, 10000, 25000, 50000, 100000]; // Events user sizes
+      }
       
       for (const userSize of userSizes) {
         try {

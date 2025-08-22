@@ -56,12 +56,12 @@ export class K6ArchiveTestingService extends BaseJobService {
 
     // Configuration for Archive Search load testing task
     this.taskConfig = {
-      userSizes: [1000, 5000, 25000, 50000, 100000],
+      userSizes: [1000, 5000, 10000, 50000, 100000],
       successRateThreshold: 95.0, // 95% success rate required
       scoreWeights: {
         1000: 10,    // 10 points for 1K users
         5000: 20,    // 20 points for 5K users
-        25000: 30,   // 30 points for 25K users
+        10000: 30,   // 30 points for 10K users
         50000: 40,   // 40 points for 50K users
         100000: 50   // 50 points for 100K users
       }
