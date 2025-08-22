@@ -200,9 +200,16 @@ export class GrafanaClient {
   }
 
   /**
+   * Evaluate booking testing task performance for a specific team
+   */
+  async evaluateBookingTask(teamSlug: string, teamId: number): Promise<GetEventsTestResult[]> {
+    return this.evaluateLoadTestingTask(teamSlug, teamId, 'booking');
+  }
+
+  /**
    * Generic load testing evaluation for different API endpoints
    */
-  async evaluateLoadTestingTask(teamSlug: string, teamId: number, taskType: 'events' | 'archive' | 'authorization'): Promise<GetEventsTestResult[]> {
+  async evaluateLoadTestingTask(teamSlug: string, teamId: number, taskType: 'events' | 'archive' | 'authorization' | 'booking'): Promise<GetEventsTestResult[]> {
     const results: GetEventsTestResult[] = [];
 
     this.logger.info(`Evaluating ${taskType} load testing task for team: ${teamSlug}`);
@@ -221,17 +228,25 @@ export class GrafanaClient {
         this.logger.error(`Failed to evaluate authorization test for team ${teamSlug}:`, error);
       }
     } else {
-      // Events and Archive tests have user sizes
-      const userSizes = [1000, 5000, 25000, 50000, 100000];
+      // Events, Archive, and Booking tests have user sizes
+      const userSizes = taskType === 'booking' 
+        ? [1000, 5000, 10000, 25000, 50000] // Booking user sizes
+        : [1000, 5000, 25000, 50000, 100000]; // Events and Archive user sizes
       
       for (const userSize of userSizes) {
         try {
           // Build test pattern based on task type
           // Pattern: <teamSlug>-events-<userSize>-events-<testNumber> for events
           // Pattern: <teamSlug>-archive-<userSize>-*-<testId> for archive
-          const testIdPattern = taskType === 'events' 
-            ? `${teamSlug}-events-${userSize}-events-.*`
-            : `${teamSlug}-archive-${userSize}-.*-.*`;
+          // Pattern: <teamSlug>-booking-<userSize>-*-<testId> for booking
+          let testIdPattern: string;
+          if (taskType === 'events') {
+            testIdPattern = `${teamSlug}-events-${userSize}-events-.*`;
+          } else if (taskType === 'archive') {
+            testIdPattern = `${teamSlug}-archive-${userSize}-.*-.*`;
+          } else { // booking
+            testIdPattern = `${teamSlug}-booking-${userSize}-.*-.*`;
+          }
             
           const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, userSize);
           
@@ -250,7 +265,7 @@ export class GrafanaClient {
   /**
    * Get the latest test result for a specific test pattern
    */
-  async getLatestTestResult(testIdPattern: string, _teamId: number, _taskType: 'events' | 'archive' | 'authorization' = 'events', userSize: number): Promise<GetEventsTestResult | null> {
+  async getLatestTestResult(testIdPattern: string, _teamId: number, _taskType: 'events' | 'archive' | 'authorization' | 'booking' = 'events', userSize: number): Promise<GetEventsTestResult | null> {
     this.logger.info(`Getting test result for pattern: ${testIdPattern}, userSize: ${userSize}`);
     try {
       // Extract components from pattern
@@ -429,6 +444,34 @@ export class GrafanaClient {
     // Calculate score - for authorization, it's pass/fail with fixed score
     const passedTests = testResults.filter(result => result.testPassed);
     const totalScore = passedTests.length > 0 ? 100 : 0; // Fixed score for authorization
+      
+    const lastTestTime = testResults.length > 0 
+      ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
+      : undefined;
+
+    return {
+      teamId,
+      teamSlug,
+      teamName,
+      totalScore,
+      testResults,
+      passedTests: passedTests.length,
+      totalTests: testResults.length,
+      lastTestTime
+    };
+  }
+
+  /**
+   * Generate comprehensive team summary for Booking task
+   */
+  async generateBookingTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
+    const testResults = await this.evaluateBookingTask(teamSlug, teamId);
+    
+    // Calculate score based on maximum successful user load (not cumulative)
+    const passedTests = testResults.filter(result => result.testPassed);
+    const totalScore = passedTests.length > 0 
+      ? Math.max(...passedTests.map(result => result.score))
+      : 0;
       
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 

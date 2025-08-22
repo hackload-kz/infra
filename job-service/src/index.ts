@@ -14,6 +14,7 @@ import { DeploymentMonitorService } from './services/deployment-monitor';
 import { K6LoadTestingService } from './services/k6-load-testing';
 import { K6ArchiveTestingService } from './services/k6-archive-testing';
 import { K6AuthorizationTestingService } from './services/k6-authorization-testing';
+import { K6BookingTestingService } from './services/k6-booking-testing';
 import { HealthServer } from './health/server';
 import { createLogger, setLogger } from './lib/logger';
 
@@ -95,6 +96,12 @@ async function main(): Promise<void> {
       k6AuthorizationTestingService.setApiClient(apiClient);
       scheduler.registerService(k6AuthorizationTestingService, config.k6Services);
       logger.info(`K6 Authorization Testing Service (AUTH_PERFORMANCE) registered with interval: ${config.k6Services.interval}`);
+      
+      // Register K6 Booking Testing Service (TICKET_BOOKING)
+      const k6BookingTestingService = new K6BookingTestingService();
+      k6BookingTestingService.setApiClient(apiClient);
+      scheduler.registerService(k6BookingTestingService, config.k6Services);
+      logger.info(`K6 Booking Testing Service (TICKET_BOOKING) registered with interval: ${config.k6Services.interval}`);
     } else {
       logger.info('K6 Services disabled');
     }

@@ -101,6 +101,7 @@ export class K6ArchiveTestingService extends BaseJobService {
           totalRequests: result.totalRequests,
           errorCount: result.errorCount,
           peakRps: result.peakRps,
+          p95Latency: result.p95Latency,
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),
@@ -160,5 +161,69 @@ export class K6ArchiveTestingService extends BaseJobService {
    */
   getCurrentMetrics(): K6ArchiveTestingMetrics {
     return { ...this.metrics };
+  }
+
+  /**
+   * Generate detailed report for archive test results showing passed tests with user loads and P95 latency
+   */
+  async generateArchiveTestReport(team: Team): Promise<string> {
+    this.log('info', `Generating archive test report for team ${team.nickname}`);
+
+    if (!this.grafana.isConfigured()) {
+      return 'Grafana not configured - cannot generate archive test report';
+    }
+
+    try {
+      const teamSlug = team.nickname;
+      const summary = await this.grafana.generateArchiveTeamSummary(parseInt(team.id), teamSlug, team.name);
+      
+      const passedTests = summary.testResults.filter(result => result.testPassed);
+      
+      if (passedTests.length === 0) {
+        return `Archive Test Report for ${team.name} (${teamSlug}):
+❌ No passed archive tests found
+Total tests attempted: ${summary.totalTests}
+Score: ${summary.totalScore} / ${Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0)} points`;
+      }
+
+      let report = `Archive Test Report for ${team.name} (${teamSlug}):
+✅ Passed Tests: ${passedTests.length}/${summary.totalTests}
+🏆 Total Score: ${summary.totalScore} / ${Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0)} points
+
+Passed Test Details:`;
+
+      // Sort passed tests by user size for better readability
+      const sortedPassedTests = passedTests.sort((a, b) => a.userSize - b.userSize);
+
+      for (const test of sortedPassedTests) {
+        const p95LatencyMs = (test.p95Latency * 1000).toFixed(1); // Convert seconds to milliseconds
+        report += `
+  📊 ${test.userSize.toLocaleString()} users: 
+     • Score: ${test.score} points
+     • Success Rate: ${test.successRate.toFixed(1)}%
+     • P95 Latency: ${p95LatencyMs}ms
+     • Peak RPS: ${test.peakRps.toFixed(0)}
+     • Test ID: ${test.testId}`;
+      }
+
+      // Add highest load achieved
+      const maxUserSize = Math.max(...passedTests.map(t => t.userSize));
+      report += `
+
+🎯 Highest Load Achieved: ${maxUserSize.toLocaleString()} users
+📈 Best P95 Latency: ${Math.min(...passedTests.map(t => t.p95Latency * 1000)).toFixed(1)}ms`;
+
+      if (summary.lastTestTime) {
+        report += `
+🕒 Last Test: ${summary.lastTestTime.toLocaleString()}`;
+      }
+
+      this.log('info', `Archive test report generated for team ${teamSlug}: ${passedTests.length} passed tests`);
+      return report;
+
+    } catch (error) {
+      this.log('error', `Failed to generate archive test report for team ${team.id}:`, error);
+      return `Error generating archive test report for ${team.name}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
   }
 }

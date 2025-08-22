@@ -1,16 +1,17 @@
 /**
- * K6 Load Testing Service for "Get Events" Task
+ * K6 Booking Testing Service for "Ticket Booking" Task
  * 
- * Evaluates team performance on the Get Events load testing challenge.
- * Tests are performed at different load levels (1K, 5K, 25K, 50K, 100K users)
+ * Evaluates team performance on the Ticket Booking load testing challenge.
+ * Tests are performed at different load levels (1K, 5K, 10K, 25K, 50K users)
  * with scoring based on achieving 95% success rate threshold.
+ * Uses booking test pattern: <teamSlug>-booking-<userSize>-<testNumber>
  */
 
 import { BaseJobService } from './base-service';
 import { GrafanaClient } from '../lib/grafana-client';
 import { CriteriaType, CriteriaStatus, Team, MetricsData } from '../types/criteria';
 
-export interface K6LoadTestingMetrics {
+export interface K6BookingTestingMetrics {
   teamsEvaluated: number;
   totalTestsFound: number;
   testsPassedOverall: number;
@@ -23,22 +24,22 @@ export interface K6LoadTestingMetrics {
   }>;
 }
 
-export interface GetEventsTaskConfig {
+export interface BookingTaskConfig {
   userSizes: number[];
   successRateThreshold: number;
   scoreWeights: Record<number, number>;
 }
 
 /**
- * K6 Load Testing Service for Get Events Task
+ * K6 Booking Testing Service for Ticket Booking Task
  */
-export class K6LoadTestingService extends BaseJobService {
-  readonly criteriaType: CriteriaType = CriteriaType.EVENT_SEARCH;
-  readonly serviceName: string = 'K6LoadTestingService';
+export class K6BookingTestingService extends BaseJobService {
+  readonly criteriaType: CriteriaType = CriteriaType.TICKET_BOOKING;
+  readonly serviceName: string = 'K6BookingTestingService';
   
   private grafana: GrafanaClient;
-  private metrics: K6LoadTestingMetrics;
-  private readonly taskConfig: GetEventsTaskConfig;
+  private metrics: K6BookingTestingMetrics;
+  private readonly taskConfig: BookingTaskConfig;
 
   constructor() {
     super();
@@ -53,40 +54,38 @@ export class K6LoadTestingService extends BaseJobService {
       topPerformers: []
     };
 
-    // Configuration for Get Events load testing task
+    // Configuration for Ticket Booking load testing task
     this.taskConfig = {
-      userSizes: [1000, 5000, 10000, 25000, 50000, 100000],
+      userSizes: [1000, 5000, 10000, 25000, 50000],
       successRateThreshold: 95.0, // 95% success rate required
       scoreWeights: {
         1000: 10,    // 10 points for 1K users
         5000: 20,    // 20 points for 5K users
         10000: 30,   // 30 points for 10K users
         25000: 30,   // 30 points for 25K users (equal to 10K)
-        50000: 40,   // 40 points for 50K users
-        100000: 50   // 50 points for 100K users
+        50000: 40    // 40 points for 50K users
       }
     };
 
-    this.log('info', 'K6 Load Testing Service initialized', {
+    this.log('info', 'K6 Booking Testing Service initialized', {
       taskConfig: this.taskConfig
     });
   }
 
   async collectMetrics(team: Team): Promise<MetricsData> {
-    this.log('info', `[K6LoadTestingService] Starting metrics collection for team: ${team.name} (${team.nickname})`);
+    this.log('info', `Collecting K6 booking testing metrics for team ${team.nickname}`);
 
     if (!this.grafana.isConfigured()) {
-      this.log('error', 'Grafana not configured, skipping K6 load testing evaluation - check dashboardBaseUrl in config');
+      this.log('warn', 'Grafana not configured, skipping K6 booking testing evaluation');
       return {};
     }
 
     try {
-      // Use team nickname directly as the slug (since test IDs use nickname, not generated slug from name)
+      // Use team nickname directly as approved teams have specific nicknames for test IDs
       const teamSlug = team.nickname;
+      const summary = await this.grafana.generateBookingTeamSummary(parseInt(team.id), teamSlug, team.name);
       
-      const summary = await this.grafana.generateTeamSummary(parseInt(team.id), teamSlug, team.name);
-      
-      this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} tests passed`);
+      this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} booking tests passed`);
 
       // Return metrics data for BaseJobService
       return {
@@ -102,16 +101,16 @@ export class K6LoadTestingService extends BaseJobService {
           totalRequests: result.totalRequests,
           errorCount: result.errorCount,
           peakRps: result.peakRps,
-          p95Latency: result.p95Latency,
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),
         maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
         successRateThreshold: this.taskConfig.successRateThreshold,
-        teamSlug
+        teamSlug,
+        taskType: 'booking'
       };
     } catch (error) {
-      this.log('error', `Failed to collect K6 load testing metrics for team ${team.id}:`, error);
+      this.log('error', `Failed to collect K6 booking testing metrics for team ${team.id}:`, error);
       throw error;
     }
   }
@@ -142,10 +141,8 @@ export class K6LoadTestingService extends BaseJobService {
     return super.calculateScore(status, metrics);
   }
 
-
-
   /**
-   * Generate Grafana dashboard URL for a specific test
+   * Generate Grafana dashboard URL for a specific booking test
    */
   generateDashboardUrl(testId: string): string {
     return this.grafana.generateGrafanaDashboardUrl(testId);
@@ -154,14 +151,14 @@ export class K6LoadTestingService extends BaseJobService {
   /**
    * Get service configuration for debugging
    */
-  getConfiguration(): GetEventsTaskConfig {
+  getConfiguration(): BookingTaskConfig {
     return { ...this.taskConfig };
   }
 
   /**
    * Get current metrics for monitoring
    */
-  getCurrentMetrics(): K6LoadTestingMetrics {
+  getCurrentMetrics(): K6BookingTestingMetrics {
     return { ...this.metrics };
   }
 }
