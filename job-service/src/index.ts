@@ -12,7 +12,8 @@ import { HubApiClient } from './lib/api-client';
 import { GitMonitorService } from './services/git-monitor';
 import { DeploymentMonitorService } from './services/deployment-monitor';
 import { K6LoadTestingService } from './services/k6-load-testing';
-// import { K6ArchiveTestingService } from './services/k6-archive-testing';
+import { K6ArchiveTestingService } from './services/k6-archive-testing';
+import { K6AuthorizationTestingService } from './services/k6-authorization-testing';
 import { HealthServer } from './health/server';
 import { createLogger, setLogger } from './lib/logger';
 
@@ -83,11 +84,17 @@ async function main(): Promise<void> {
       scheduler.registerService(k6LoadTestingService, config.k6Services);
       logger.info(`K6 Load Testing Service (EVENT_SEARCH) registered with interval: ${config.k6Services.interval}`);
       
-      // Register K6 Archive Testing Service (ARCHIVE_SEARCH) - DISABLED
-      // const k6ArchiveTestingService = new K6ArchiveTestingService();
-      // k6ArchiveTestingService.setApiClient(apiClient);
-      // scheduler.registerService(k6ArchiveTestingService, config.k6Services);
-      // logger.info(`K6 Archive Testing Service (ARCHIVE_SEARCH) registered with interval: ${config.k6Services.interval}`);
+      // Register K6 Archive Testing Service (ARCHIVE_SEARCH)
+      const k6ArchiveTestingService = new K6ArchiveTestingService();
+      k6ArchiveTestingService.setApiClient(apiClient);
+      scheduler.registerService(k6ArchiveTestingService, config.k6Services);
+      logger.info(`K6 Archive Testing Service (ARCHIVE_SEARCH) registered with interval: ${config.k6Services.interval}`);
+      
+      // Register K6 Authorization Testing Service (AUTH_PERFORMANCE)
+      const k6AuthorizationTestingService = new K6AuthorizationTestingService();
+      k6AuthorizationTestingService.setApiClient(apiClient);
+      scheduler.registerService(k6AuthorizationTestingService, config.k6Services);
+      logger.info(`K6 Authorization Testing Service (AUTH_PERFORMANCE) registered with interval: ${config.k6Services.interval}`);
     } else {
       logger.info('K6 Services disabled');
     }

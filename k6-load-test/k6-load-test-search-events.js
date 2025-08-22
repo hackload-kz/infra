@@ -8,12 +8,14 @@ export const options = {
       executor: 'ramping-arrival-rate',
       startRate: 0,
       timeUnit: '1s',
-      preAllocatedVUs: 1500,
-      maxVUs: 2000,
+      preAllocatedVUs: 8000,
+      maxVUs: 10000,
       stages: [
-        { duration: '2m', target: 1000 },
-        { duration: '5m', target: 1000 },
-        { duration: '1m', target: 0 },  
+        { duration: '1m', target: 1000 },   // Ramp up to 1000 RPS
+        { duration: '2m', target: 5000 },   // Ramp up to 5000 RPS  
+        { duration: '3m', target: 10000 },  // Ramp up to 10000 RPS
+        { duration: '6m', target: 10000 },  // Hold at 10000 RPS
+        { duration: '3m', target: 0 },      // Ramp down
       ],
     },
   },
@@ -34,26 +36,13 @@ const users = [
   { email: 'sultan_sultanov_2@show.go', password: '*IVSf?kh)xa' }
 ];
 
-const months = [
-  '2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06',
-  '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'
-];
+// Note: Archive test IDs are set via k6 configuration/environment variables, not generated in script
 
 function getRandomElement(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomDate(month) {
-  const year = month.split('-')[0];
-  const monthNum = month.split('-')[1];
-  const daysInMonth = new Date(year, monthNum, 0).getDate();
-  const day = getRandomInt(1, daysInMonth);
-  return `${year}-${monthNum}-${String(day).padStart(2, '0')}`;
-}
+// Removed unused getRandomInt and getRandomDate functions as they're no longer used with fixed parameters
 
 function createBasicAuthHeader(user) {
   const credentials = `${user.email}:${user.password}`;
@@ -62,7 +51,7 @@ function createBasicAuthHeader(user) {
 }
 
 export default function () {
-  const baseUrl = __ENV.API_URL || 'https://hub.hackload.kz/event-provider/common';
+  const baseUrl = __ENV.API_URL;
   const user = getRandomElement(users);
   
   const params = {
@@ -73,48 +62,24 @@ export default function () {
     timeout: '30s'
   };
 
+  // Extremely limited scenarios to minimize cardinality
   const testScenarios = [
-    // 1. Search with query phrase
+    // 1. Simple query search (fixed page=1, pageSize=20)
     () => {
       const query = getRandomElement(searchPhrases);
-      const page = getRandomInt(1, 50);
-      const pageSize = getRandomInt(10, 20); // API max is 20
-      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`;
+      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&page=1&pageSize=20`;
     },
     
-    // 2. Search with query and specific date
+    // 2. Query with fixed date (fixed page=1, pageSize=20)
     () => {
       const query = getRandomElement(searchPhrases);
-      const page = getRandomInt(1, 50);
-      const pageSize = getRandomInt(10, 20);
-      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&date=2024-12-25&page=${page}&pageSize=${pageSize}`;
+      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&date=2024-12-25&page=1&pageSize=20`;
     },
     
-    // 3. Search with query and date range from 2024-12-25 to 2024-12-31
+    // 3. Archive testing - just query (fixed page=1, pageSize=20)
     () => {
       const query = getRandomElement(searchPhrases);
-      const page = getRandomInt(1, 50);
-      const pageSize = getRandomInt(10, 20);
-      const endDate = getRandomInt(25, 31);
-      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&date=2024-12-${endDate}&page=${page}&pageSize=${pageSize}`;
-    },
-    
-    // 4. Search with query and random month date
-    () => {
-      const query = getRandomElement(searchPhrases);
-      const randomMonth = getRandomElement(months);
-      const randomDate = getRandomDate(randomMonth);
-      const page = getRandomInt(1, 50);
-      const pageSize = getRandomInt(10, 20);
-      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&date=${randomDate}&page=${page}&pageSize=${pageSize}`;
-    },
-    
-    // 5. Search without date (only query)
-    () => {
-      const query = getRandomElement(searchPhrases);
-      const page = getRandomInt(1, 50);
-      const pageSize = getRandomInt(10, 20);
-      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`;
+      return `${baseUrl}/api/events?query=${encodeURIComponent(query)}&page=1&pageSize=20`;
     }
   ];
 
@@ -125,10 +90,28 @@ export default function () {
 
   check(response, {
     'status is 200': (r) => r.status === 200,
-    'response has events': (r) => {
+    'response has valid structure with success=true': (r) => {
       try {
         const data = JSON.parse(r.body);
-        return Array.isArray(data);
+        // Actual API response: {"count":0,"events":[],"success":true}
+        if (typeof data !== 'object' || data === null) return false;
+        
+        // Check required properties
+        if (typeof data.success !== 'boolean' || !data.success) return false;
+        if (typeof data.count !== 'number') return false;
+        if (!Array.isArray(data.events)) return false;
+        
+        // Validate events array structure if not empty
+        if (data.events.length > 0) {
+          const event = data.events[0];
+          // Each event should have id and title at minimum
+          if (typeof event !== 'object' || event === null) return false;
+          if (typeof event.id !== 'number') return false;
+          if (typeof event.title !== 'string') return false;
+        }
+        
+        // Count should match events array length
+        return data.count === data.events.length;
       } catch {
         return false;
       }
@@ -163,5 +146,3 @@ export function teardown(data) {
   console.log(`   Target: ${data.environment}`);
   console.log(`   Scenarios tested: query search, date filtering, pagination`);
 }
-
-// docker run --rm -i -e API_URL=http://rorobotics.hub.hackload.kz grafana/k6:latest run - < k6-load-test-search-events.js

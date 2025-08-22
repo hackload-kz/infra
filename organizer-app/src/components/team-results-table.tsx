@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { 
   ChevronUp, 
   ChevronDown, 
-  Clock, 
   AlertCircle,
   ExternalLink
 } from 'lucide-react'
@@ -116,7 +115,7 @@ const StatusDot: React.FC<{ status: 'PASSED' | 'FAILED' | 'NO_DATA' }> = ({ stat
 }
 
 export function TeamResultsTable({ teams }: TeamResultsTableProps) {
-  const [sortField, setSortField] = useState<SortField>('lastUpdate')
+  const [sortField, setSortField] = useState<SortField>('totalScore')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   const handleSort = (field: SortField) => {
@@ -204,15 +203,6 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                 </th>
               ))}
               
-              <th className="px-6 py-4 text-center">
-                <button
-                  onClick={() => handleSort('passedCriteria')}
-                  className="flex items-center space-x-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                >
-                  <span>Пройдено</span>
-                  <SortIcon field="passedCriteria" />
-                </button>
-              </th>
               
               <th className="px-6 py-4 text-center">
                 <button
@@ -224,15 +214,6 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                 </button>
               </th>
               
-              <th className="px-6 py-4 text-center">
-                <button
-                  onClick={() => handleSort('lastUpdate')}
-                  className="flex items-center space-x-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                >
-                  <span>Обновлено</span>
-                  <SortIcon field="lastUpdate" />
-                </button>
-              </th>
             </tr>
           </thead>
           
@@ -411,11 +392,6 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                   )
                 })}
                 
-                <td className="px-6 py-4 text-center">
-                  <div className="text-white font-medium">
-                    {team.passedCriteria}/{Object.keys(criteriaLabels).length}
-                  </div>
-                </td>
                 
                 <td className="px-6 py-4 text-center">
                   <div className="text-white font-medium">
@@ -423,17 +399,6 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                   </div>
                 </td>
                 
-                <td className="px-6 py-4 text-center">
-                  <div className="flex items-center justify-center space-x-2">
-                    <Clock className="w-4 h-4 text-slate-400" />
-                    <span className="text-sm text-slate-300">
-                      {team.lastCriteriaUpdate 
-                        ? formatDistanceToNow(team.lastCriteriaUpdate, { locale: ru, addSuffix: true })
-                        : 'Нет данных'
-                      }
-                    </span>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>

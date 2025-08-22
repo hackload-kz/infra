@@ -193,30 +193,54 @@ export class GrafanaClient {
   }
 
   /**
+   * Evaluate authorization testing task performance for a specific team
+   */
+  async evaluateAuthorizationTask(teamSlug: string, teamId: number): Promise<GetEventsTestResult[]> {
+    return this.evaluateLoadTestingTask(teamSlug, teamId, 'authorization');
+  }
+
+  /**
    * Generic load testing evaluation for different API endpoints
    */
-  async evaluateLoadTestingTask(teamSlug: string, teamId: number, taskType: 'events' | 'archive'): Promise<GetEventsTestResult[]> {
-    const userSizes = [1000, 5000, 25000, 50000, 100000];
+  async evaluateLoadTestingTask(teamSlug: string, teamId: number, taskType: 'events' | 'archive' | 'authorization'): Promise<GetEventsTestResult[]> {
     const results: GetEventsTestResult[] = [];
 
     this.logger.info(`Evaluating ${taskType} load testing task for team: ${teamSlug}`);
 
-    for (const userSize of userSizes) {
+    if (taskType === 'authorization') {
+      // Authorization tests don't have user sizes, just check for any authorization tests
       try {
-        // Build test pattern based on task type
-        // Pattern: <teamSlug>-<taskType>-<userSize>-<taskType>-<testNumber> for events
-        // Pattern: <teamSlug>-<taskType>-<userSize>-<testNumber> for archive
-        const testIdPattern = taskType === 'events' 
-          ? `${teamSlug}-events-${userSize}-events-.*`
-          : `${teamSlug}-archive-${userSize}-.*`;
-          
-        const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, userSize);
+        // Pattern: <teamSlug>-check-authorizations-*-<testId> for authorization
+        const testIdPattern = `${teamSlug}-check-authorizations-.*-.*`;
+        const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, 0); // userSize 0 for auth tests
         
         if (testResult) {
           results.push(testResult);
         }
       } catch (error) {
-        this.logger.error(`Failed to evaluate ${userSize} user ${taskType} test for team ${teamSlug}:`, error);
+        this.logger.error(`Failed to evaluate authorization test for team ${teamSlug}:`, error);
+      }
+    } else {
+      // Events and Archive tests have user sizes
+      const userSizes = [1000, 5000, 25000, 50000, 100000];
+      
+      for (const userSize of userSizes) {
+        try {
+          // Build test pattern based on task type
+          // Pattern: <teamSlug>-events-<userSize>-events-<testNumber> for events
+          // Pattern: <teamSlug>-archive-<userSize>-*-<testId> for archive
+          const testIdPattern = taskType === 'events' 
+            ? `${teamSlug}-events-${userSize}-events-.*`
+            : `${teamSlug}-archive-${userSize}-.*-.*`;
+            
+          const testResult = await this.getLatestTestResult(testIdPattern, teamId, taskType, userSize);
+          
+          if (testResult) {
+            results.push(testResult);
+          }
+        } catch (error) {
+          this.logger.error(`Failed to evaluate ${userSize} user ${taskType} test for team ${teamSlug}:`, error);
+        }
       }
     }
 
@@ -226,14 +250,18 @@ export class GrafanaClient {
   /**
    * Get the latest test result for a specific test pattern
    */
-  async getLatestTestResult(testIdPattern: string, _teamId: number, _taskType: 'events' | 'archive' = 'events', userSize: number): Promise<GetEventsTestResult | null> {
+  async getLatestTestResult(testIdPattern: string, _teamId: number, _taskType: 'events' | 'archive' | 'authorization' = 'events', userSize: number): Promise<GetEventsTestResult | null> {
     this.logger.info(`Getting test result for pattern: ${testIdPattern}, userSize: ${userSize}`);
     try {
       // Extract components from pattern
       // Pattern for events: <teamSlug>-events-<userSize>-events-.*
-      // Pattern for archive: <teamSlug>-archive-<userSize>-.*
-      const match = testIdPattern.match(/(\w+)-(events)-(\d+)-events-.*/) || 
-                    testIdPattern.match(/(\w+)-(archive)-(\d+)-.*/);
+      // Pattern for archive: <teamSlug>-archive-<userSize>-*-.*
+      // Pattern for authorization: <teamSlug>-check-authorizations-*-.*
+      const eventsMatch = testIdPattern.match(/(\w+)-(events)-(\d+)-events-.*/);
+      const archiveMatch = testIdPattern.match(/(\w+)-(archive)-(\d+)-.*-.*/);
+      const authMatch = testIdPattern.match(/(\w+)-(check-authorizations)-.*-.*/);
+      
+      const match = eventsMatch || archiveMatch || authMatch;
       if (!match) {
         throw new Error(`Invalid test ID pattern: ${testIdPattern}`);
       }
@@ -277,18 +305,23 @@ export class GrafanaClient {
       const errorCount = failedRequests;
       const testPassed = successRate >= 95;
 
-      // Calculate score based on user size and success
+      // Calculate score based on task type and success
       let score = 0;
       if (testPassed) {
-        // Base scores for each user size level
-        const baseScores: Record<number, number> = {
-          1000: 10,
-          5000: 20,
-          25000: 30,
-          50000: 40,
-          100000: 50
-        };
-        score = baseScores[userSize] || 0;
+        if (_taskType === 'authorization') {
+          // Authorization tests get a fixed score if they pass (no user size scaling)
+          score = 100;
+        } else {
+          // Base scores for each user size level (events/archive)
+          const baseScores: Record<number, number> = {
+            1000: 10,
+            5000: 20,
+            25000: 30,
+            50000: 40,
+            100000: 50
+          };
+          score = baseScores[userSize] || 0;
+        }
       }
 
       // Find the specific test ID from the metrics using range query
@@ -370,6 +403,32 @@ export class GrafanaClient {
     const totalScore = passedTests.length > 0 
       ? Math.max(...passedTests.map(result => result.score))
       : 0;
+      
+    const lastTestTime = testResults.length > 0 
+      ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
+      : undefined;
+
+    return {
+      teamId,
+      teamSlug,
+      teamName,
+      totalScore,
+      testResults,
+      passedTests: passedTests.length,
+      totalTests: testResults.length,
+      lastTestTime
+    };
+  }
+
+  /**
+   * Generate comprehensive team summary for Authorization task
+   */
+  async generateAuthorizationTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
+    const testResults = await this.evaluateAuthorizationTask(teamSlug, teamId);
+    
+    // Calculate score - for authorization, it's pass/fail with fixed score
+    const passedTests = testResults.filter(result => result.testPassed);
+    const totalScore = passedTests.length > 0 ? 100 : 0; // Fixed score for authorization
       
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 

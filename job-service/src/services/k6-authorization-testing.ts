@@ -1,45 +1,44 @@
 /**
- * K6 Archive Testing Service for "Archive Search" Task
+ * K6 Authorization Testing Service for "Authorization Check" Task
  * 
- * Evaluates team performance on the Archive Search load testing challenge.
- * Tests are performed at different load levels (1K, 5K, 25K, 50K, 100K users)
- * with scoring based on achieving 95% success rate threshold.
- * Uses archive test pattern: <teamSlug>-archive-<userSize>-<testNumber>
+ * Evaluates team performance on the Authorization Check testing challenge.
+ * Tests are performed without specific user loads, focusing on authorization
+ * functionality with 95% success rate threshold for passing.
+ * Uses auth test pattern: <teamSlug>-check-authorizations-*-<testId>
  */
 
 import { BaseJobService } from './base-service';
 import { GrafanaClient } from '../lib/grafana-client';
 import { CriteriaType, CriteriaStatus, Team, MetricsData } from '../types/criteria';
 
-export interface K6ArchiveTestingMetrics {
+export interface K6AuthorizationTestingMetrics {
   teamsEvaluated: number;
   totalTestsFound: number;
   testsPassedOverall: number;
-  averageScore: number;
+  averageSuccessRate: number;
   lastEvaluationDuration: number;
   topPerformers: Array<{
     teamSlug: string;
-    score: number;
-    passedTests: number;
+    successRate: number;
+    testsPassed: number;
   }>;
 }
 
-export interface ArchiveTaskConfig {
-  userSizes: number[];
+export interface AuthorizationTaskConfig {
   successRateThreshold: number;
-  scoreWeights: Record<number, number>;
+  baseScore: number;
 }
 
 /**
- * K6 Archive Testing Service for Archive Search Task
+ * K6 Authorization Testing Service for Authorization Check Task
  */
-export class K6ArchiveTestingService extends BaseJobService {
-  readonly criteriaType: CriteriaType = CriteriaType.ARCHIVE_SEARCH;
-  readonly serviceName: string = 'K6ArchiveTestingService';
+export class K6AuthorizationTestingService extends BaseJobService {
+  readonly criteriaType: CriteriaType = CriteriaType.AUTH_PERFORMANCE;
+  readonly serviceName: string = 'K6AuthorizationTestingService';
   
   private grafana: GrafanaClient;
-  private metrics: K6ArchiveTestingMetrics;
-  private readonly taskConfig: ArchiveTaskConfig;
+  private metrics: K6AuthorizationTestingMetrics;
+  private readonly taskConfig: AuthorizationTaskConfig;
 
   constructor() {
     super();
@@ -49,43 +48,36 @@ export class K6ArchiveTestingService extends BaseJobService {
       teamsEvaluated: 0,
       totalTestsFound: 0,
       testsPassedOverall: 0,
-      averageScore: 0,
+      averageSuccessRate: 0,
       lastEvaluationDuration: 0,
       topPerformers: []
     };
 
-    // Configuration for Archive Search load testing task
+    // Configuration for Authorization Check testing task
     this.taskConfig = {
-      userSizes: [1000, 5000, 25000, 50000, 100000],
       successRateThreshold: 95.0, // 95% success rate required
-      scoreWeights: {
-        1000: 10,    // 10 points for 1K users
-        5000: 20,    // 20 points for 5K users
-        25000: 30,   // 30 points for 25K users
-        50000: 40,   // 40 points for 50K users
-        100000: 50   // 50 points for 100K users
-      }
+      baseScore: 100 // Base score for passing authorization tests
     };
 
-    this.log('info', 'K6 Archive Testing Service initialized', {
+    this.log('info', 'K6 Authorization Testing Service initialized', {
       taskConfig: this.taskConfig
     });
   }
 
   async collectMetrics(team: Team): Promise<MetricsData> {
-    this.log('info', `Collecting K6 archive testing metrics for team ${team.nickname}`);
+    this.log('info', `Collecting K6 authorization testing metrics for team ${team.nickname}`);
 
     if (!this.grafana.isConfigured()) {
-      this.log('warn', 'Grafana not configured, skipping K6 archive testing evaluation');
+      this.log('warn', 'Grafana not configured, skipping K6 authorization testing evaluation');
       return {};
     }
 
     try {
       // Use team nickname directly as approved teams have specific nicknames for test IDs
       const teamSlug = team.nickname;
-      const summary = await this.grafana.generateArchiveTeamSummary(parseInt(team.id), teamSlug, team.name);
+      const summary = await this.grafana.generateAuthorizationTeamSummary(parseInt(team.id), teamSlug, team.name);
       
-      this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} archive tests passed`);
+      this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} authorization tests passed`);
 
       // Return metrics data for BaseJobService
       return {
@@ -94,7 +86,6 @@ export class K6ArchiveTestingService extends BaseJobService {
         totalTests: summary.totalTests,
         lastTestTime: summary.lastTestTime?.toISOString(),
         testResults: summary.testResults.map(result => ({
-          userSize: result.userSize,
           testPassed: result.testPassed,
           score: result.score,
           successRate: result.successRate,
@@ -104,13 +95,13 @@ export class K6ArchiveTestingService extends BaseJobService {
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),
-        maxPossibleScore: Object.values(this.taskConfig.scoreWeights).reduce((sum, score) => sum + score, 0),
+        maxPossibleScore: this.taskConfig.baseScore,
         successRateThreshold: this.taskConfig.successRateThreshold,
         teamSlug,
-        taskType: 'archive'
+        taskType: 'authorization'
       };
     } catch (error) {
-      this.log('error', `Failed to collect K6 archive testing metrics for team ${team.id}:`, error);
+      this.log('error', `Failed to collect K6 authorization testing metrics for team ${team.id}:`, error);
       throw error;
     }
   }
@@ -118,11 +109,10 @@ export class K6ArchiveTestingService extends BaseJobService {
   override evaluateStatus(metrics: MetricsData): CriteriaStatus {
     const totalTests = (metrics['totalTests'] as number) || 0;
     const passedTests = (metrics['passedTests'] as number) || 0;
-    const totalScore = (metrics['totalScore'] as number) || 0;
     
     if (totalTests === 0) {
       return CriteriaStatus.NO_DATA;
-    } else if (passedTests > 0 && totalScore > 0) {
+    } else if (passedTests > 0) {
       return CriteriaStatus.PASSED;
     } else {
       return CriteriaStatus.FAILED;
@@ -142,7 +132,7 @@ export class K6ArchiveTestingService extends BaseJobService {
   }
 
   /**
-   * Generate Grafana dashboard URL for a specific archive test
+   * Generate Grafana dashboard URL for a specific authorization test
    */
   generateDashboardUrl(testId: string): string {
     return this.grafana.generateGrafanaDashboardUrl(testId);
@@ -151,14 +141,14 @@ export class K6ArchiveTestingService extends BaseJobService {
   /**
    * Get service configuration for debugging
    */
-  getConfiguration(): ArchiveTaskConfig {
+  getConfiguration(): AuthorizationTaskConfig {
     return { ...this.taskConfig };
   }
 
   /**
    * Get current metrics for monitoring
    */
-  getCurrentMetrics(): K6ArchiveTestingMetrics {
+  getCurrentMetrics(): K6AuthorizationTestingMetrics {
     return { ...this.metrics };
   }
 }
