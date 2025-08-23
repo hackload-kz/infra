@@ -345,30 +345,38 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
-                              <div className="font-medium text-amber-300">K6 Пороговые значения:</div>
+                              <div className="font-medium text-amber-300">Двухчастное скоринг (макс. 30 баллов):</div>
+                              <div className="text-xs text-slate-400 mb-1">15 баллов за корректные запросы + 15 баллов за % успеха</div>
                               {criteria.metrics.totalRequests !== undefined && criteria.metrics.expectedRequests && (
-                                <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests === criteria.metrics.expectedRequests ? '✅' : '❌'}</div>
+                                <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests === criteria.metrics.expectedRequests ? '✅ +15 баллов' : '❌ +0 баллов'}</div>
                               )}
-                              {criteria.metrics.successRate !== undefined && criteria.metrics.checksRequired && (
-                                <div>Проверки: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%/{criteria.metrics.checksRequired}% {criteria.metrics.successRate >= criteria.metrics.checksRequired ? '✅' : '❌'}</div>
+                              {criteria.metrics.successRate !== undefined && (
+                                <div>
+                                  Успешность: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}% 
+                                  <span className="text-amber-300"> | +{typeof criteria.metrics.successRate === 'number' ? Math.round((criteria.metrics.successRate / 100) * 15) : 0} баллов</span>
+                                </div>
+                              )}
+                              {criteria.metrics.checksRequired && (
+                                <div>K6 Проверки: {criteria.metrics.checksRequired}% требуется</div>
                               )}
                               {criteria.metrics.thresholdsMet !== undefined && (
-                                <div>Статус: {criteria.metrics.thresholdsMet ? '✅ Все пороги пройдены' : '❌ Пороги не пройдены'}</div>
+                                <div>K6 Пороги: {criteria.metrics.thresholdsMet ? '✅ Все пороги пройдены' : '❌ Пороги не пройдены'}</div>
                               )}
                               {criteria.metrics.p95 !== undefined && (
                                 <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>
                               )}
                               {criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && criteria.metrics.testResults.length > 0 && (
                                 <div className="mt-1">
-                                  <div className="font-medium text-amber-300">Результаты тестов авторизации:</div>
+                                  <div className="font-medium text-amber-300">Последнее выполнение теста:</div>
                                   {criteria.metrics.testResults
                                     .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test)
                                     .map((test, idx) => (
                                       <div key={idx} className="text-xs">
-                                        {test.testPassed ? '✅' : '❌'} Пороги: {test.testPassed ? 'Пройдены' : 'Не пройдены'}
-                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
-                                        {test.totalRequests && <span className="text-slate-400"> | Запросов: {test.totalRequests}</span>}
-                                        {test.score > 0 && <span className="text-amber-300"> | {test.score} pts</span>}
+                                        <div>{test.testPassed ? '✅' : '❌'} K6 Пороги: {test.testPassed ? 'Пройдены' : 'Не пройдены'}</div>
+                                        <div className="text-amber-300">Итого баллов: {test.score}/30</div>
+                                        {test.p95Latency && <div className="text-slate-400">P95: {test.p95Latency}ms</div>}
+                                        {test.totalRequests && <div className="text-slate-400">HTTP запросов: {test.totalRequests}</div>}
+                                        {test.successRate !== undefined && <div className="text-slate-400">Успешность: {test.successRate.toFixed(1)}%</div>}
                                       </div>
                                     ))}
                                 </div>

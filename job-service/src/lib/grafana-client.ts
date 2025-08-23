@@ -194,9 +194,37 @@ export class GrafanaClient {
 
   /**
    * Evaluate authorization testing task performance for a specific team
+   * Only considers the last test execution by testId
    */
   async evaluateAuthorizationTask(teamSlug: string, teamId: number): Promise<GetEventsTestResult[]> {
-    return this.evaluateLoadTestingTask(teamSlug, teamId, 'authorization');
+    const results: GetEventsTestResult[] = [];
+
+    this.logger.info(`Evaluating authorization load testing task for team: ${teamSlug}`);
+
+    try {
+      // Find all authorization test IDs for this team first
+      const testIdPattern = `${teamSlug}-check-authorizations-.*-.*`;
+      const testIds = await this.getAuthorizationTestIds(testIdPattern);
+      
+      if (testIds.length === 0) {
+        this.logger.debug(`No authorization test IDs found for pattern: ${testIdPattern}`);
+        return results;
+      }
+
+      // Get only the latest test ID (most recent execution)
+      const latestTestId = testIds[testIds.length - 1]; // testIds should be chronologically ordered
+      this.logger.info(`Processing latest authorization test: ${latestTestId}`);
+
+      const testResult = await this.getAuthorizationTestResult(latestTestId, teamId);
+      
+      if (testResult) {
+        results.push(testResult);
+      }
+    } catch (error) {
+      this.logger.error(`Failed to evaluate authorization test for team ${teamSlug}:`, error);
+    }
+
+    return results;
   }
 
   /**
@@ -536,9 +564,11 @@ export class GrafanaClient {
   async generateAuthorizationTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
     const testResults = await this.evaluateAuthorizationTask(teamSlug, teamId);
     
-    // Calculate score - for authorization, it's pass/fail with fixed score
+    // Calculate score - use the actual calculated score from the test result (0-30 points)
+    const totalScore = testResults.length > 0 ? (testResults[0]?.score || 0) : 0;
+    
+    // Count tests as passed if they have K6 thresholds met (not based on score)
     const passedTests = testResults.filter(result => result.testPassed);
-    const totalScore = passedTests.length > 0 ? 100 : 0; // Fixed score for authorization
       
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
@@ -580,6 +610,161 @@ export class GrafanaClient {
       totalTests: testResults.length,
       lastTestTime
     };
+  }
+
+  /**
+   * Get all authorization test IDs for a given pattern, sorted chronologically
+   */
+  private async getAuthorizationTestIds(testIdPattern: string): Promise<string[]> {
+    try {
+      const query = `group by (testid) (k6_http_reqs_total{testid=~"${testIdPattern}"})`;
+      const response = await this.prometheusRangeQuery(query);
+      
+      const testIds: string[] = [];
+      
+      if (response.data.result.length > 0) {
+        for (const result of response.data.result) {
+          if (result?.metric && 'testid' in result.metric) {
+            const testid = result.metric['testid'];
+            if (testid) {
+              testIds.push(testid);
+            }
+          }
+        }
+      }
+      
+      // Sort testIds chronologically (assuming testId contains timestamp or incremental number)
+      testIds.sort();
+      
+      this.logger.info(`Found ${testIds.length} authorization test IDs:`, testIds);
+      return testIds;
+    } catch (error) {
+      this.logger.error('Failed to get authorization test IDs:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get test result for a specific authorization test ID
+   */
+  private async getAuthorizationTestResult(testId: string, _teamId: number): Promise<GetEventsTestResult | null> {
+    this.logger.info(`Getting authorization test result for testId: ${testId}`);
+    
+    try {
+      const teamSlugMatch = testId.match(/^(\w+)-check-authorizations/);
+      const teamSlug = teamSlugMatch?.[1] || 'unknown';
+
+      // Query for total requests for this specific test ID
+      const totalRequestsQuery = `sum(k6_http_reqs_total{testid="${testId}"})`;
+      const totalResponse = await this.prometheusRangeQuery(totalRequestsQuery);
+      const totalRequests = this.extractMaxValue(totalResponse) || 0;
+      
+      if (totalRequests === 0) {
+        this.logger.debug(`No test data found for testId: ${testId}`);
+        return null;
+      }
+
+      // Query for failed requests for this specific test ID
+      const failedRequestsQuery = `sum(k6_http_reqs_total{testid="${testId}", expected_response="false"})`;
+      const failedResponse = await this.prometheusRangeQuery(failedRequestsQuery);
+      const failedRequests = this.extractMaxValue(failedResponse) || 0;
+
+      // Query for peak RPS for this specific test ID
+      const peakRpsQuery = `max(sum(irate(k6_http_reqs_total{testid="${testId}"}[1m])))`;
+      const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
+      const peakRps = this.extractMaxValue(peakRpsResponse) || 0;
+
+      // Query for P95 latency for this specific test ID
+      const p95LatencyQuery = `histogram_quantile(0.95, sum by(le, name, method, status) (rate(k6_http_req_duration_seconds{testid="${testId}"}[5m])))`;
+      const p95Response = await this.prometheusRangeQuery(p95LatencyQuery);
+      const p95Latency = this.extractMaxValue(p95Response) || 0;
+
+      // Calculate success rate
+      const successfulRequests = totalRequests - failedRequests;
+      const successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
+
+      // Check K6 thresholds for authorization tests
+      let testPassed = false;
+      
+      try {
+        // Check if exactly 42 HTTP requests were made (from K6 threshold: 'http_reqs': ['count===42'])
+        const httpReqsMatch = totalRequests === 42;
+        
+        // Check if all checks passed (from K6 threshold: 'checks': ['rate>=1'])
+        const checksQuery = `k6_checks_total{testid="${testId}"} - k6_checks_failed_total{testid="${testId}"}`;
+        const checksResponse = await this.prometheusRangeQuery(checksQuery);
+        const passedChecks = this.extractMaxValue(checksResponse) || 0;
+        
+        const totalChecksQuery = `k6_checks_total{testid="${testId}"}`;
+        const totalChecksResponse = await this.prometheusRangeQuery(totalChecksQuery);
+        const totalChecks = this.extractMaxValue(totalChecksResponse) || 0;
+        
+        const checksRate = totalChecks > 0 ? (passedChecks / totalChecks) : 0;
+        const checksMatch = checksRate >= 1.0; // 100% checks must pass
+        
+        testPassed = httpReqsMatch && checksMatch;
+        
+        this.logger.info(`Authorization test thresholds for ${testId}:`, {
+          httpReqs: totalRequests,
+          httpReqsMatch,
+          checksRate: checksRate.toFixed(3),
+          checksMatch,
+          testPassed
+        });
+        
+      } catch (error) {
+        this.logger.warn(`Failed to check authorization thresholds for ${testId}:`, error);
+        testPassed = successRate >= 100; // Fallback to 100% success rate
+      }
+
+      // Calculate score - authorization tests use two-part scoring
+      // 15 points for meeting HTTP request requirements + 15 points based on success percentage
+      let score = 0;
+      
+      // Part 1: 15 points if exactly 42 HTTP requests were made (valid request count)
+      const httpReqsMatch = totalRequests === 42;
+      if (httpReqsMatch) {
+        score += 15;
+        this.logger.info(`Authorization test ${testId}: +15 points for valid request count (${totalRequests}/42)`);
+      }
+      
+      // Part 2: 15 points based on success rate percentage (0-100% maps to 0-15 points)
+      const successRatePoints = Math.round((successRate / 100) * 15);
+      score += successRatePoints;
+      this.logger.info(`Authorization test ${testId}: +${successRatePoints} points for ${successRate.toFixed(1)}% success rate`);
+      
+      this.logger.info(`Authorization test ${testId}: Total score = ${score}/30 points`);
+
+      const result: GetEventsTestResult = {
+        teamSlug,
+        userSize: 0, // Authorization tests don't have user sizes
+        testNumber: this.extractTestNumber(testId),
+        totalRequests,
+        successRate,
+        errorCount: failedRequests,
+        peakRps: Math.round(peakRps * 100) / 100,
+        p95Latency: Math.round(p95Latency * 1000 * 100) / 100, // Convert to milliseconds
+        testPassed,
+        score,
+        grafanaDashboardUrl: this.generateGrafanaDashboardUrl(testId),
+        testId,
+        timestamp: new Date()
+      };
+
+      this.logger.info(`Authorization test result for ${testId}:`, {
+        totalRequests,
+        successRate: successRate.toFixed(2),
+        peakRps: peakRps.toFixed(2),
+        p95Latency: p95Latency.toFixed(3),
+        testPassed,
+        score
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to get authorization test result for ${testId}:`, error);
+      return null;
+    }
   }
 
   /**

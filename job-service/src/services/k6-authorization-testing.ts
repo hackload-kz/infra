@@ -55,8 +55,8 @@ export class K6AuthorizationTestingService extends BaseJobService {
 
     // Configuration for Authorization Check testing task
     this.taskConfig = {
-      successRateThreshold: 100.0, // 100% success rate required for authorization
-      baseScore: 100 // Base score for passing authorization tests
+      successRateThreshold: 100.0, // 100% success rate required for full points
+      baseScore: 30 // Maximum score: 15 points for valid requests + 15 points for success rate
     };
 
     this.log('info', 'K6 Authorization Testing Service initialized', {
