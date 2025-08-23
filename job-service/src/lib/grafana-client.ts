@@ -213,8 +213,13 @@ export class GrafanaClient {
 
       // Get only the latest test ID (most recent execution)
       const latestTestId = testIds[testIds.length - 1]; // testIds should be chronologically ordered
+      
+      if (!latestTestId) {
+        this.logger.warn(`No valid test ID found from authorization test IDs: ${testIds}`);
+        return results;
+      }
+      
       this.logger.info(`Processing latest authorization test: ${latestTestId}`);
-
       const testResult = await this.getAuthorizationTestResult(latestTestId, teamId);
       
       if (testResult) {
@@ -229,9 +234,44 @@ export class GrafanaClient {
 
   /**
    * Evaluate booking testing task performance for a specific team
+   * Uses scalar queries for booking metrics
    */
   async evaluateBookingTask(teamSlug: string, teamId: number): Promise<GetEventsTestResult[]> {
-    return this.evaluateLoadTestingTask(teamSlug, teamId, 'booking');
+    const results: GetEventsTestResult[] = [];
+
+    this.logger.info(`Evaluating booking load testing task for team: ${teamSlug}`);
+
+    try {
+      // Pattern: <teamSlug>-booking-script-* for booking (e.g., alem-booking-script-212)
+      const testIdPattern = `${teamSlug}-booking-.*`;
+      
+      // Get all booking test IDs for this team first
+      const testIds = await this.getBookingTestIds(testIdPattern);
+      
+      if (testIds.length === 0) {
+        this.logger.debug(`No booking test IDs found for pattern: ${testIdPattern}`);
+        return results;
+      }
+
+      // Get only the latest test ID (most recent execution)
+      const latestTestId = testIds[testIds.length - 1];
+      
+      if (!latestTestId) {
+        this.logger.warn(`No valid test ID found from booking test IDs: ${testIds}`);
+        return results;
+      }
+      
+      this.logger.info(`Processing latest booking test: ${latestTestId}`);
+      const testResult = await this.getBookingTestResult(latestTestId, teamId);
+      
+      if (testResult) {
+        results.push(testResult);
+      }
+    } catch (error) {
+      this.logger.error(`Failed to evaluate booking test for team ${teamSlug}:`, error);
+    }
+
+    return results;
   }
 
   /**
@@ -592,9 +632,11 @@ export class GrafanaClient {
   async generateBookingTeamSummary(teamId: number, teamSlug: string, teamName: string): Promise<TeamTestSummary> {
     const testResults = await this.evaluateBookingTask(teamSlug, teamId);
     
-    // Calculate score - for booking, it's pass/fail with fixed score like authorization
+    // Calculate score - use the actual calculated score from the test result (0-30 points)
+    const totalScore = testResults.length > 0 ? (testResults[0]?.score || 0) : 0;
+    
+    // Count tests as passed if they meet the success rate threshold
     const passedTests = testResults.filter(result => result.testPassed);
-    const totalScore = passedTests.length > 0 ? 100 : 0; // Fixed score for booking
       
     const lastTestTime = testResults.length > 0 
       ? new Date(Math.max(...testResults.map(r => r.timestamp.getTime()))) 
@@ -610,6 +652,125 @@ export class GrafanaClient {
       totalTests: testResults.length,
       lastTestTime
     };
+  }
+
+  /**
+   * Get all booking test IDs for a given pattern, sorted chronologically
+   */
+  private async getBookingTestIds(testIdPattern: string): Promise<string[]> {
+    try {
+      const query = `group by (testid) (k6_successful_bookings_total{testid=~"${testIdPattern}"})`;
+      const response = await this.prometheusRangeQuery(query);
+      
+      const testIds: string[] = [];
+      
+      if (response.data.result.length > 0) {
+        for (const result of response.data.result) {
+          if (result?.metric && 'testid' in result.metric) {
+            const testid = result.metric['testid'];
+            if (testid) {
+              testIds.push(testid);
+            }
+          }
+        }
+      }
+      
+      // Sort testIds chronologically (assuming testId contains timestamp or incremental number)
+      testIds.sort();
+      
+      this.logger.info(`Found ${testIds.length} booking test IDs:`, testIds);
+      return testIds;
+    } catch (error) {
+      this.logger.error('Failed to get booking test IDs:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get test result for a specific booking test ID using scalar queries
+   */
+  private async getBookingTestResult(testId: string, _teamId: number): Promise<GetEventsTestResult | null> {
+    this.logger.info(`Getting booking test result for testId: ${testId}`);
+    
+    try {
+      const teamSlugMatch = testId.match(/^(\w+)-booking/);
+      const teamSlug = teamSlugMatch?.[1] || 'unknown';
+
+      // Query for successful bookings (scalar value)
+      const successfulBookingsQuery = `k6_successful_bookings_total{testid="${testId}"}`;
+      const successfulBookingsResponse = await this.prometheusQuery(successfulBookingsQuery);
+      const successfulBookings = this.extractScalarValue(successfulBookingsResponse) || 0;
+
+      // Query for failed bookings (scalar value)
+      const failedBookingsQuery = `k6_failed_bookings_total{testid="${testId}"}`;
+      const failedBookingsResponse = await this.prometheusQuery(failedBookingsQuery);
+      const failedBookings = this.extractScalarValue(failedBookingsResponse) || 0;
+
+      // Query for conflict bookings (scalar value)
+      const conflictBookingsQuery = `k6_conflict_bookings_total{testid="${testId}"}`;
+      const conflictBookingsResponse = await this.prometheusQuery(conflictBookingsQuery);
+      const conflictBookings = this.extractScalarValue(conflictBookingsResponse) || 0;
+
+      // Query for failed seat requests (scalar value)
+      const failedSeatRequestsQuery = `k6_failed_seat_requests_total{testid="${testId}"}`;
+      const failedSeatRequestsResponse = await this.prometheusQuery(failedSeatRequestsQuery);
+      const failedSeatRequests = this.extractScalarValue(failedSeatRequestsResponse) || 0;
+
+      // Calculate total booking attempts and success rate
+      const totalBookingAttempts = successfulBookings + failedBookings + conflictBookings;
+      const bookingSuccessRate = totalBookingAttempts > 0 ? (successfulBookings / totalBookingAttempts) * 100 : 0;
+
+      // Query for total HTTP requests (scalar value)
+      const totalRequestsQuery = `k6_http_reqs_total{testid="${testId}"}`;
+      const totalRequestsResponse = await this.prometheusQuery(totalRequestsQuery);
+      const totalRequests = this.extractScalarValue(totalRequestsResponse) || 0;
+
+      // Query for P95 latency
+      const p95LatencyQuery = `histogram_quantile(0.95, k6_http_req_duration_seconds{testid="${testId}"})`;
+      const p95Response = await this.prometheusQuery(p95LatencyQuery);
+      const p95Latency = this.extractScalarValue(p95Response) || 0;
+
+      // Query for peak RPS
+      const peakRpsQuery = `max(irate(k6_http_reqs_total{testid="${testId}"}[1m]))`;
+      const peakRpsResponse = await this.prometheusQuery(peakRpsQuery);
+      const peakRps = this.extractScalarValue(peakRpsResponse) || 0;
+
+      // Test passes if booking success rate >= 95%
+      const testPassed = bookingSuccessRate >= 95.0;
+      const score = testPassed ? 30 : 0; // Maximum 30 points for booking tests
+
+      const result: GetEventsTestResult = {
+        teamSlug,
+        userSize: 0, // Booking tests don't have user sizes  
+        testNumber: this.extractTestNumber(testId),
+        totalRequests,
+        successRate: bookingSuccessRate,
+        errorCount: failedBookings + conflictBookings + failedSeatRequests,
+        peakRps: Math.round(peakRps * 100) / 100,
+        p95Latency: Math.round(p95Latency * 1000 * 100) / 100, // Convert to milliseconds
+        testPassed,
+        score,
+        grafanaDashboardUrl: this.generateGrafanaDashboardUrl(testId),
+        testId,
+        timestamp: new Date()
+      };
+
+      this.logger.info(`Booking test result for ${testId}:`, {
+        successfulBookings,
+        failedBookings,
+        conflictBookings,
+        failedSeatRequests,
+        totalBookingAttempts,
+        bookingSuccessRate: bookingSuccessRate.toFixed(2),
+        testPassed,
+        score
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to get booking test result for ${testId}:`, error);
+      return null;
+    }
   }
 
   /**
@@ -687,8 +848,9 @@ export class GrafanaClient {
       let testPassed = false;
       
       try {
-        // Check if exactly 42 HTTP requests were made (from K6 threshold: 'http_reqs': ['count===42'])
-        const httpReqsMatch = totalRequests === 42;
+        // Check if at least 42 HTTP requests were made (from K6 threshold: 'http_reqs': ['count===42'])
+        // Allow teams to pass with >= 42 requests (meeting or exceeding the minimum)
+        const httpReqsMatch = totalRequests >= 42;
         
         // Check if all checks passed (from K6 threshold: 'checks': ['rate>=1'])
         const checksQuery = `k6_checks_total{testid="${testId}"} - k6_checks_failed_total{testid="${testId}"}`;
@@ -706,7 +868,7 @@ export class GrafanaClient {
         
         this.logger.info(`Authorization test thresholds for ${testId}:`, {
           httpReqs: totalRequests,
-          httpReqsMatch,
+          httpReqsMatch: `${totalRequests}>=42: ${httpReqsMatch}`,
           checksRate: checksRate.toFixed(3),
           checksMatch,
           testPassed
@@ -721,11 +883,11 @@ export class GrafanaClient {
       // 15 points for meeting HTTP request requirements + 15 points based on success percentage
       let score = 0;
       
-      // Part 1: 15 points if exactly 42 HTTP requests were made (valid request count)
-      const httpReqsMatch = totalRequests === 42;
+      // Part 1: 15 points if at least 42 HTTP requests were made (meeting minimum requirement)
+      const httpReqsMatch = totalRequests >= 42;
       if (httpReqsMatch) {
         score += 15;
-        this.logger.info(`Authorization test ${testId}: +15 points for valid request count (${totalRequests}/42)`);
+        this.logger.info(`Authorization test ${testId}: +15 points for meeting minimum request count (${totalRequests}>=42)`);
       }
       
       // Part 2: 15 points based on success rate percentage (0-100% maps to 0-15 points)
@@ -826,6 +988,23 @@ export class GrafanaClient {
     }
 
     return maxValue;
+  }
+
+  /**
+   * Extract scalar value from instant query response (single value)
+   */
+  private extractScalarValue(response: GrafanaResponse | undefined): number | null {
+    if (!response || response.data.result.length === 0) {
+      return null;
+    }
+
+    const firstResult = response.data.result[0];
+    if (!firstResult?.value || firstResult.value.length < 2) {
+      return null;
+    }
+
+    const value = parseFloat(firstResult.value[1] || '0');
+    return isNaN(value) ? null : value;
   }
 
 

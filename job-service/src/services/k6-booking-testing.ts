@@ -59,7 +59,7 @@ export class K6BookingTestingService extends BaseJobService {
       userSizes: [], // Booking tests don't have user size levels
       successRateThreshold: 95.0, // 95% success rate required
       scoreWeights: {
-        booking: 100 // Fixed score for passing booking tests
+        booking: 30 // Maximum score for passing booking tests (30 points)
       }
     };
 

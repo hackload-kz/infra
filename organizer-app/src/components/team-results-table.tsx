@@ -179,9 +179,9 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
   }
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 overflow-hidden">
+    <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg border border-slate-700/30 overflow-hidden mb-4">
       {/* Table Header */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-visible">
         <table className="w-full">
           <thead className="bg-slate-700/50">
             <tr>
@@ -237,7 +237,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                   const status = criteria?.status || 'NO_DATA'
                   
                   return (
-                    <td key={criteriaType} className="px-3 py-4 text-center">
+                    <td key={criteriaType} className="px-3 py-4 text-center relative">
                       <div 
                         className="flex flex-col items-center space-y-1 relative group cursor-help"
                         title={`${criteriaLabels[criteriaType]}: ${status === 'PASSED' ? 'Пройдено' : status === 'FAILED' ? 'Не пройдено' : 'Нет данных'}${criteria?.score !== undefined ? ` (${criteria.score} pts)` : ''}`}
@@ -250,7 +250,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         )}
                         
                         {/* Hover tooltip */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-slate-900 border border-slate-700 text-white text-xs rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 min-w-max max-w-sm whitespace-normal">
                           <div className="font-semibold">{criteriaLabels[criteriaType]}</div>
                           <div className="text-slate-300">
                             Статус: {status === 'PASSED' ? '✅ Пройдено' : status === 'FAILED' ? '❌ Не пройдено' : '⚪ Нет данных'}
@@ -346,9 +346,9 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           {criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
                               <div className="font-medium text-amber-300">Двухчастное скоринг (макс. 30 баллов):</div>
-                              <div className="text-xs text-slate-400 mb-1">15 баллов за корректные запросы + 15 баллов за % успеха</div>
+                              <div className="text-xs text-slate-400 mb-1">15 баллов за ≥42 запросов + 15 баллов за % успеха</div>
                               {criteria.metrics.totalRequests !== undefined && criteria.metrics.expectedRequests && (
-                                <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests === criteria.metrics.expectedRequests ? '✅ +15 баллов' : '❌ +0 баллов'}</div>
+                                <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests >= criteria.metrics.expectedRequests ? '✅ +15 баллов' : '❌ +0 баллов'}</div>
                               )}
                               {criteria.metrics.successRate !== undefined && (
                                 <div>
@@ -416,8 +416,8 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                               {criteria.metrics.currency && criteria.metrics.currency !== 'USD' && ` ${criteria.metrics.currency}`}
                             </div>
                           )}
-                          {/* Arrow pointing down */}
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
+                          {/* Arrow pointing up */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-slate-900"></div>
                         </div>
                         {/* Show specific metrics based on criteria type */}
                         {criteriaType === 'CODE_REPO' && criteria?.metrics && (
