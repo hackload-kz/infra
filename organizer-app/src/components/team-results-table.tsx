@@ -22,6 +22,11 @@ interface TestResult {
   p95Latency?: number
   grafanaDashboardUrl: string
   testId: string
+  // Booking-specific metrics (optional)
+  successfulBookings?: number
+  failedBookings?: number
+  conflictBookings?: number
+  failedSeatRequests?: number
 }
 
 interface TeamCriteriaData {
@@ -385,25 +390,45 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {criteriaType === 'TICKET_BOOKING' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
+                              <div className="font-medium text-amber-300">Бронирование билетов (макс. 30 баллов):</div>
+                              <div className="text-xs text-slate-400 mb-1">Требуется ≥95% успешности для прохождения</div>
                               {criteria.metrics.bookedTickets !== undefined && (
-                                <div>Забронировано: {criteria.metrics.bookedTickets} билетов</div>
+                                <div>Успешно забронировано: {criteria.metrics.bookedTickets} билетов</div>
                               )}
                               {criteria.metrics.successRate !== undefined && (
-                                <div>Успешность бронирования: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%</div>
+                                <div>
+                                  Успешность бронирования: {typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate.toFixed(1) : criteria.metrics.successRate}%
+                                  <span className={`ml-2 ${typeof criteria.metrics.successRate === 'number' && criteria.metrics.successRate >= 95 ? 'text-green-400' : 'text-red-400'}`}>
+                                    {typeof criteria.metrics.successRate === 'number' && criteria.metrics.successRate >= 95 ? '✅ Пройдено' : '❌ Не пройдено'}
+                                  </span>
+                                </div>
                               )}
                               {criteria.metrics.p95 !== undefined && (
                                 <div>P95 латентность: {typeof criteria.metrics.p95 === 'number' ? `${criteria.metrics.p95.toFixed(1)}ms` : `${criteria.metrics.p95}s`}</div>
                               )}
                               {criteria.metrics.testResults && Array.isArray(criteria.metrics.testResults) && criteria.metrics.testResults.length > 0 && (
                                 <div className="mt-1">
-                                  <div className="font-medium text-amber-300">Результаты тестов бронирования:</div>
+                                  <div className="font-medium text-amber-300">Последнее выполнение теста:</div>
                                   {criteria.metrics.testResults
                                     .filter((test): test is TestResult => typeof test === 'object' && test !== null && 'testPassed' in test)
                                     .map((test, idx) => (
                                       <div key={idx} className="text-xs">
-                                        {test.testPassed ? '✅' : '❌'} Успешность: {test.successRate.toFixed(1)}%
-                                        {test.p95Latency && <span className="text-slate-400"> | P95: {test.p95Latency}ms</span>}
-                                        {test.score > 0 && <span className="text-amber-300"> | {test.score} pts</span>}
+                                        <div>{test.testPassed ? '✅' : '❌'} Тест: {test.testPassed ? 'Пройден' : 'Не пройден'}</div>
+                                        <div className="text-amber-300">Итого баллов: {test.score}/30</div>
+                                        <div className="text-slate-400">Успешность: {test.successRate.toFixed(1)}%</div>
+                                        {test.successfulBookings !== undefined && (
+                                          <div className="text-slate-400">Успешных бронирований: {test.successfulBookings}</div>
+                                        )}
+                                        {test.failedBookings !== undefined && (
+                                          <div className="text-slate-400">Неудачных бронирований: {test.failedBookings}</div>
+                                        )}
+                                        {test.conflictBookings !== undefined && (
+                                          <div className="text-slate-400">Конфликтов мест: {test.conflictBookings}</div>
+                                        )}
+                                        {test.failedSeatRequests !== undefined && (
+                                          <div className="text-slate-400">Ошибки получения мест: {test.failedSeatRequests}</div>
+                                        )}
+                                        {test.p95Latency && <div className="text-slate-400">P95: {test.p95Latency}ms</div>}
                                       </div>
                                     ))}
                                 </div>

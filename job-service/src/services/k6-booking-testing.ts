@@ -83,12 +83,22 @@ export class K6BookingTestingService extends BaseJobService {
       
       this.log('info', `Team ${team.name} (${teamSlug}): ${summary.totalScore} points, ${summary.passedTests}/${summary.totalTests} booking tests passed`);
 
+      // Calculate total successfully booked tickets from test results  
+      const totalSuccessfulBookings = summary.testResults.reduce((sum, result) => {
+        // Use actual successful bookings count if available from K6 metrics
+        return sum + (result.successfulBookings || 0);
+      }, 0);
+
       // Return metrics data for BaseJobService
       return {
         totalScore: summary.totalScore,
         passedTests: summary.passedTests,
         totalTests: summary.totalTests,
         lastTestTime: summary.lastTestTime?.toISOString(),
+        // Booking-specific metrics
+        bookedTickets: totalSuccessfulBookings,
+        successRate: summary.testResults.length > 0 ? summary.testResults[0]?.successRate || 0 : 0,
+        p95: summary.testResults.length > 0 ? summary.testResults[0]?.p95Latency : undefined,
         testResults: summary.testResults.map(result => ({
           userSize: result.userSize,
           testPassed: result.testPassed,
@@ -101,7 +111,7 @@ export class K6BookingTestingService extends BaseJobService {
           grafanaDashboardUrl: result.grafanaDashboardUrl,
           testId: result.testId
         })),
-        maxPossibleScore: this.taskConfig.scoreWeights.booking,
+        maxPossibleScore: this.taskConfig.scoreWeights['booking'],
         successRateThreshold: this.taskConfig.successRateThreshold,
         teamSlug,
         taskType: 'booking'

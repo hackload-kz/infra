@@ -41,6 +41,11 @@ export interface GetEventsTestResult {
   grafanaDashboardUrl: string;
   testId: string;
   timestamp: Date;
+  // Booking-specific metrics (optional)
+  successfulBookings?: number;
+  failedBookings?: number;
+  conflictBookings?: number;
+  failedSeatRequests?: number;
 }
 
 export interface TeamTestSummary {
@@ -752,7 +757,12 @@ export class GrafanaClient {
         score,
         grafanaDashboardUrl: this.generateGrafanaDashboardUrl(testId),
         testId,
-        timestamp: new Date()
+        timestamp: new Date(),
+        // Include booking-specific metrics
+        successfulBookings,
+        failedBookings,
+        conflictBookings,
+        failedSeatRequests
       };
 
       this.logger.info(`Booking test result for ${testId}:`, {
