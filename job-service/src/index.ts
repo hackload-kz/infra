@@ -15,6 +15,8 @@ import { K6LoadTestingService } from './services/k6-load-testing';
 import { K6ArchiveTestingService } from './services/k6-archive-testing';
 import { K6AuthorizationTestingService } from './services/k6-authorization-testing';
 import { K6BookingTestingService } from './services/k6-booking-testing';
+import { BudgetTrackingService } from './services/budget-tracking';
+import { JudgeScoreService } from './services/judge-score';
 import { HealthServer } from './health/server';
 import { createLogger, setLogger } from './lib/logger';
 
@@ -105,9 +107,28 @@ async function main(): Promise<void> {
     } else {
       logger.info('K6 Services disabled');
     }
-    if (config.costTracking.enabled) {
-      logger.warn('Cost Tracking Service implemented but requires architectural refactoring to match BaseJobService pattern');
-    }
+    
+    // Register Budget Tracking Service (BUDGET_TRACKING)
+    const budgetTrackingService = new BudgetTrackingService();
+    budgetTrackingService.setApiClient(apiClient);
+    scheduler.registerService(budgetTrackingService, {
+      enabled: true,
+      interval: '*/15 * * * *', // Every 15 minutes
+      timeout: 120000,
+      retries: 3
+    });
+    logger.info('Budget Tracking Service (BUDGET_TRACKING) registered with interval: */15 * * * *');
+    
+    // Register Judge Score Service (JUDGE_SCORE)
+    const judgeScoreService = new JudgeScoreService();
+    judgeScoreService.setApiClient(apiClient);
+    scheduler.registerService(judgeScoreService, {
+      enabled: true,
+      interval: '*/10 * * * *', // Every 10 minutes
+      timeout: 60000,
+      retries: 3
+    });
+    logger.info('Judge Score Service (JUDGE_SCORE) registered with interval: */10 * * * *');
     
     // Create and start health server
     logger.info('Starting health and metrics servers...');

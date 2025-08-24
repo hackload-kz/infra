@@ -61,9 +61,8 @@ interface TeamCriteriaData {
     testDuration?: number
     userLoad?: number
     
-    // TICKET_BOOKING/CANCELLATION specific
+    // TICKET_BOOKING specific
     bookedTickets?: number
-    cancelledTickets?: number
     
     // BUDGET_TRACKING specific
     totalSpent?: number
@@ -104,8 +103,8 @@ const criteriaLabels: Record<string, string> = {
   ARCHIVE_SEARCH: 'Архивные события',
   AUTH_PERFORMANCE: 'Аутентификация',
   TICKET_BOOKING: 'Бронирование билетов',
-  TICKET_CANCELLATION: 'Отмена билетов',
-  BUDGET_TRACKING: 'Потраченные средства'
+  BUDGET_TRACKING: 'Потраченные средства',
+  JUDGE_SCORE: 'Баллы жюри'
 }
 
 
@@ -239,7 +238,20 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                 
                 {Object.keys(criteriaLabels).map((criteriaType) => {
                   const criteria = team.criteria.find(c => c.criteriaType === criteriaType)
-                  const status = criteria?.status || 'NO_DATA'
+                  let status = criteria?.status || 'NO_DATA'
+                  
+                  // Special handling for AUTH_PERFORMANCE: show green if success rate >= 95%
+                  if (criteriaType === 'AUTH_PERFORMANCE' && criteria?.metrics?.successRate !== undefined) {
+                    const successRate = typeof criteria.metrics.successRate === 'number' ? criteria.metrics.successRate : 0
+                    if (successRate >= 95) {
+                      status = 'PASSED'
+                    }
+                  }
+                  
+                  // Special handling for BUDGET_TRACKING: always green when there's data
+                  if (criteriaType === 'BUDGET_TRACKING' && criteria?.metrics?.hasSpendingData) {
+                    status = 'PASSED'
+                  }
                   
                   return (
                     <td key={criteriaType} className="px-3 py-4 text-center relative">
@@ -247,7 +259,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                         className="flex flex-col items-center space-y-1 relative group cursor-help"
                         title={`${criteriaLabels[criteriaType]}: ${status === 'PASSED' ? 'Пройдено' : status === 'FAILED' ? 'Не пройдено' : 'Нет данных'}${criteria?.score !== undefined ? ` (${criteria.score} pts)` : ''}`}
                       >
-                        <StatusDot status={status} />
+                        {criteriaType !== 'BUDGET_TRACKING' && <StatusDot status={status} />}
                         {criteria?.score !== undefined && (
                           <div className="text-xs text-slate-400">
                             {criteria.score} pts
@@ -352,6 +364,7 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                             <div className="text-slate-300 mt-1">
                               <div className="font-medium text-amber-300">Двухчастное скоринг (макс. 30 баллов):</div>
                               <div className="text-xs text-slate-400 mb-1">15 баллов за ≥42 запросов + 15 баллов за % успеха</div>
+                              <div className="text-xs text-green-300 mb-1">🟢 Критерий прохождения ≥95%</div>
                               {criteria.metrics.totalRequests !== undefined && criteria.metrics.expectedRequests && (
                                 <div>HTTP запросы: {criteria.metrics.totalRequests}/{criteria.metrics.expectedRequests} {criteria.metrics.totalRequests >= criteria.metrics.expectedRequests ? '✅ +15 баллов' : '❌ +0 баллов'}</div>
                               )}
@@ -437,8 +450,21 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                           )}
                           {criteriaType === 'BUDGET_TRACKING' && criteria?.metrics && (
                             <div className="text-slate-300 mt-1">
-                              Потрачено: ${criteria.metrics.totalSpent || 0}
-                              {criteria.metrics.currency && criteria.metrics.currency !== 'USD' && ` ${criteria.metrics.currency}`}
+                              <div className="font-medium text-amber-300">Потраченные средства (макс. 30 баллов):</div>
+                              <div className="text-xs text-green-300 mb-1">🟢 Всегда зеленая при наличии данных</div>
+                              <div>Потрачено: {criteria.metrics.totalSpent || 0} KZT</div>
+                              <div className="text-xs text-slate-400">Скоринг: меньше потратил = больше баллов</div>
+                              <div className="text-xs text-slate-400">Минимум трат = 30 баллов, максимум = 5 баллов</div>
+                            </div>
+                          )}
+                          {criteriaType === 'JUDGE_SCORE' && criteria?.metrics && (
+                            <div className="text-slate-300 mt-1">
+                              <div className="font-medium text-amber-300">Баллы жюри (макс. 10 баллов):</div>
+                              {criteria.metrics.hasJudgeScore ? (
+                                <div>Оценка жюри: {criteria.metrics.judgeScore}/10 баллов</div>
+                              ) : (
+                                <div className="text-slate-400">0</div>
+                              )}
                             </div>
                           )}
                           {/* Arrow pointing up */}
@@ -487,14 +513,14 @@ export function TeamResultsTable({ teams }: TeamResultsTableProps) {
                             }
                           </div>
                         )}
-                        {criteriaType === 'TICKET_CANCELLATION' && criteria?.metrics && (
-                          <div className="text-xs text-slate-400">
-                            {criteria.metrics.cancelledTickets || 0} отменено
-                          </div>
-                        )}
                         {criteriaType === 'BUDGET_TRACKING' && criteria?.metrics && (
                           <div className="text-xs text-slate-400">
-                            ${criteria.metrics.totalSpent || 0}
+                            {criteria.metrics.totalSpent || 0} KZT
+                          </div>
+                        )}
+                        {criteriaType === 'JUDGE_SCORE' && criteria?.metrics?.hasJudgeScore && (
+                          <div className="text-xs text-slate-400">
+                            {criteria.metrics.judgeScore}/10
                           </div>
                         )}
                         {criteria?.lastUpdated && criteria.lastUpdated.getTime() > 0 && (

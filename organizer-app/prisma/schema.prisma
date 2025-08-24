@@ -513,6 +513,7 @@ enum CriteriaType {
   TICKET_BOOKING
   TICKET_CANCELLATION
   BUDGET_TRACKING
+  JUDGE_SCORE
 }
 
 enum CriteriaStatus {

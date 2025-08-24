@@ -3,14 +3,20 @@ import { sleep, check } from 'k6';
 import encoding from 'k6/encoding';
 import { Counter, Rate } from 'k6/metrics';
 
-// Custom metrics for tracking bookings
-const successfulBookings = new Counter('successful_bookings');
-const failedBookings = new Counter('failed_bookings');
-const conflictBookings = new Counter('conflict_bookings');
-const failedSeatRequests = new Counter('failed_seat_requests');
+// Custom metrics for tracking bookings (with k6_ prefix for Prometheus)
+const successfulBookings = new Counter('k6_successful_bookings_total');
+const failedBookings = new Counter('k6_failed_bookings_total');
+const conflictBookings = new Counter('k6_conflict_bookings_total');
+const failedSeatRequests = new Counter('k6_failed_seat_requests_total');
 
 // Rate metric for Prometheus - tracks booking success rate
 const bookingSuccessRate = new Rate('booking_success_rate');
+
+// Runtime counters for logging (k6 Counter.count is not accessible during execution)
+let successfulBookingsCount = 0;
+let failedBookingsCount = 0;
+let conflictBookingsCount = 0;
+let failedSeatRequestsCount = 0;
 
 export const options = {
   scenarios: {
@@ -165,6 +171,7 @@ export default function () {
 
   if (seatsResponse.status !== 200) {
     failedSeatRequests.add(1);
+    failedSeatRequestsCount++;
     console.error(`❌ Get seats failed: ${seatsResponse.status} - ${seatsResponse.body}`);
     return;
   }
@@ -237,8 +244,9 @@ export default function () {
 
   if (selectSeatResponse.status === 200) {
     successfulBookings.add(1);
+    successfulBookingsCount++;
     bookingSuccessRate.add(true);
-    console.log(`✅ User ${user.email} successfully booked seat ${firstFreeSeat.id} (row ${firstFreeSeat.row}, number ${firstFreeSeat.number}) [Total: ${successfulBookings.count}]`);
+    console.log(`✅ User ${user.email} successfully booked seat ${firstFreeSeat.id} (row ${firstFreeSeat.row}, number ${firstFreeSeat.number}) [Total: ${successfulBookingsCount}]`);
     
     // Verify booking confirmation using GET /api/bookings
     sleep(0.5); // Brief delay to ensure booking is processed
@@ -287,12 +295,14 @@ export default function () {
     
   } else if (selectSeatResponse.status === 419) {
     conflictBookings.add(1);
+    conflictBookingsCount++;
     bookingSuccessRate.add(false);
-    console.log(`⚠️ User ${user.email} failed to book seat ${firstFreeSeat.id} - seat already taken [Conflicts: ${conflictBookings.count}]`);
+    console.log(`⚠️ User ${user.email} failed to book seat ${firstFreeSeat.id} - seat already taken [Conflicts: ${conflictBookingsCount}]`);
   } else {
     failedBookings.add(1);
+    failedBookingsCount++;
     bookingSuccessRate.add(false);
-    console.error(`❌ User ${user.email} select seat failed: ${selectSeatResponse.status} - ${selectSeatResponse.body} [Failures: ${failedBookings.count}]`);
+    console.error(`❌ User ${user.email} select seat failed: ${selectSeatResponse.status} - ${selectSeatResponse.body} [Failures: ${failedBookingsCount}]`);
   }
 
   sleep(Math.random() * 2 + 0.5);
@@ -328,6 +338,7 @@ export function conflictTest() {
 
   if (seatsResponse.status !== 200) {
     failedSeatRequests.add(1);
+    failedSeatRequestsCount++;
     console.error(`❌ Conflict test get seats failed: ${seatsResponse.status}`);
     return;
   }
@@ -397,8 +408,9 @@ export function conflictTest() {
 
   if (selectSeatResponse.status === 200) {
     successfulBookings.add(1);
+    successfulBookingsCount++;
     bookingSuccessRate.add(true);
-    console.log(`✅ User ${user.email} successfully booked seat ${targetSeat.id} - WINNER! [Total: ${successfulBookings.count}]`);
+    console.log(`✅ User ${user.email} successfully booked seat ${targetSeat.id} - WINNER! [Total: ${successfulBookingsCount}]`);
     check(selectSeatResponse, {
       'conflict test winner gets seat': (r) => r.status === 200,
     });
@@ -439,8 +451,9 @@ export function conflictTest() {
 
   } else if (selectSeatResponse.status === 419) {
     conflictBookings.add(1);
+    conflictBookingsCount++;
     bookingSuccessRate.add(false);
-    console.log(`⚠️ User ${user.email} failed to book seat ${targetSeat.id} - seat already taken (EXPECTED BEHAVIOR) [Conflicts: ${conflictBookings.count}]`);
+    console.log(`⚠️ User ${user.email} failed to book seat ${targetSeat.id} - seat already taken (EXPECTED BEHAVIOR) [Conflicts: ${conflictBookingsCount}]`);
     check(selectSeatResponse, {
       'conflict test loser gets 419 status': (r) => r.status === 419,
     });
@@ -471,8 +484,9 @@ export function conflictTest() {
 
   } else {
     failedBookings.add(1);
+    failedBookingsCount++;
     bookingSuccessRate.add(false);
-    console.error(`❌ User ${user.email} conflict test unexpected response: ${selectSeatResponse.status} - ${selectSeatResponse.body} [Failures: ${failedBookings.count}]`);
+    console.error(`❌ User ${user.email} conflict test unexpected response: ${selectSeatResponse.status} - ${selectSeatResponse.body} [Failures: ${failedBookingsCount}]`);
   }
 
   sleep(0.5);
@@ -513,11 +527,11 @@ export function teardown(data) {
   const duration = (Date.now() - data.startTime) / 1000;
   console.log(`✅ Biletter Booking Test completed in ${duration}s`);
   console.log(`📊 BOOKING STATISTICS:`);
-  console.log(`   ✅ Successful bookings: ${successfulBookings.count || 0}`);
-  console.log(`   ❌ Failed bookings: ${failedBookings.count || 0}`);
-  console.log(`   ⚠️ Conflict bookings: ${conflictBookings.count || 0}`);
-  console.log(`   🔍 Failed seat requests: ${failedSeatRequests.count || 0}`);
-  console.log(`   📊 Total attempts: ${(successfulBookings.count || 0) + (conflictBookings.count || 0) + (failedBookings.count || 0)}`);
+  console.log(`   ✅ Successful bookings: ${successfulBookingsCount}`);
+  console.log(`   ❌ Failed bookings: ${failedBookingsCount}`);
+  console.log(`   ⚠️ Conflict bookings: ${conflictBookingsCount}`);
+  console.log(`   🔍 Failed seat requests: ${failedSeatRequestsCount}`);
+  console.log(`   📊 Total attempts: ${successfulBookingsCount + conflictBookingsCount + failedBookingsCount}`);
   console.log(`📈 Check metrics for booking performance analysis`);
   console.log(`   Target: ${data.environment}`);
   console.log(`   Scenarios tested: system reset, seat lookup, booking creation, seat selection`);

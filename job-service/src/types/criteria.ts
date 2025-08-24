@@ -6,6 +6,7 @@ export enum CriteriaType {
   AUTH_PERFORMANCE = 'AUTH_PERFORMANCE',
   TICKET_BOOKING = 'TICKET_BOOKING',
   BUDGET_TRACKING = 'BUDGET_TRACKING',
+  JUDGE_SCORE = 'JUDGE_SCORE',
 }
 
 export enum CriteriaStatus {

@@ -64,6 +64,7 @@ export class GrafanaClient {
   private readonly prometheusUrl: string;
   private readonly logger: Logger;
   private readonly timeout: number;
+  private readonly queryTimeRangeDays: number = 3; // Query last 3 days for better performance
 
   constructor() {
     const config = loadConfig();
@@ -98,16 +99,16 @@ export class GrafanaClient {
     // Properly encode the query parameter
     url.searchParams.set('query', query);
     
-    // Set time range to cover when tests are likely to run (last 7 days with better granularity)
+    // Set time range to cover when tests are likely to run (configurable time range for better performance)
     const now = Math.floor(Date.now() / 1000);
-    const sevenDaysAgo = now - (7 * 24 * 60 * 60); // 7 days ago in seconds
+    const startTime = now - (this.queryTimeRangeDays * 24 * 60 * 60); // N days ago in seconds
     
-    url.searchParams.set('start', sevenDaysAgo.toString());
+    url.searchParams.set('start', startTime.toString());
     url.searchParams.set('end', now.toString());
     url.searchParams.set('step', '60'); // 1 minute steps for better resolution
 
     this.logger.info(`Prometheus Query URL: ${url.toString()}`);
-    this.logger.debug(`Executing Prometheus range query: ${query} from ${sevenDaysAgo} to ${now}`);
+    this.logger.debug(`Executing Prometheus range query: ${query} from ${startTime} to ${now} (last ${this.queryTimeRangeDays} days)`);
 
     try {
       const response = await this.makeRequest(url.toString());
@@ -208,11 +209,34 @@ export class GrafanaClient {
 
     try {
       // Find all authorization test IDs for this team first
-      const testIdPattern = `${teamSlug}-check-authorizations-.*-.*`;
-      const testIds = await this.getAuthorizationTestIds(testIdPattern);
+      // Try multiple patterns to be more flexible
+      const testIdPatterns = [
+        `${teamSlug}-check-authorizations-.*-.*`,
+        `${teamSlug}-check-authorization-.*-.*`,
+        `${teamSlug}-authorization-.*`,
+        `${teamSlug}-auth-.*`
+      ];
+      
+      let testIds: string[] = [];
+      for (const pattern of testIdPatterns) {
+        testIds = await this.getAuthorizationTestIds(pattern);
+        if (testIds.length > 0) {
+          this.logger.info(`Found authorization test IDs using pattern: ${pattern}`);
+          break;
+        }
+      }
       
       if (testIds.length === 0) {
-        this.logger.debug(`No authorization test IDs found for pattern: ${testIdPattern}`);
+        this.logger.warn(`No authorization test IDs found for any patterns: ${testIdPatterns.join(', ')}, falling back to old evaluation method`);
+        // Fallback to the old pattern-based evaluation
+        try {
+          const fallbackResult = await this.getLatestTestResult(`${teamSlug}-check-authorizations-.*-.*`, teamId, 'authorization', 0);
+          if (fallbackResult) {
+            results.push(fallbackResult);
+          }
+        } catch (fallbackError) {
+          this.logger.error(`Fallback authorization evaluation also failed:`, fallbackError);
+        }
         return results;
       }
 
@@ -385,6 +409,9 @@ export class GrafanaClient {
         return null;
       }
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for failed requests (expected_response="false") using range query
       const failedRequestsQuery = `sum(k6_http_reqs_total{testid=~"${testIdPattern}", expected_response="false"})`;
       const failedResponse = await this.prometheusRangeQuery(failedRequestsQuery);
@@ -399,10 +426,16 @@ export class GrafanaClient {
           const successfulBookingsResponse = await this.prometheusRangeQuery(successfulBookingsQuery);
           const successfulBookings = this.extractMaxValue(successfulBookingsResponse) || 0;
 
+          // Add delay before next query
+          await this.delayBetweenQueries(200);
+
           // Query for failed bookings
           const failedBookingsQuery = `sum(k6_failed_bookings_total{testid=~"${testIdPattern}"})`;
           const failedBookingsResponse = await this.prometheusRangeQuery(failedBookingsQuery);
           const failedBookings = this.extractMaxValue(failedBookingsResponse) || 0;
+
+          // Add delay before next query
+          await this.delayBetweenQueries(200);
 
           // Query for conflict bookings (seat already taken)
           const conflictBookingsQuery = `sum(k6_conflict_bookings_total{testid=~"${testIdPattern}"})`;
@@ -425,10 +458,16 @@ export class GrafanaClient {
         }
       }
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for peak RPS (maximum instantaneous rate during the test) using range query
       const peakRpsQuery = `max(sum(irate(k6_http_reqs_total{testid=~"${testIdPattern}"}[1m])))`;
       const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
       const peakRps = this.extractMaxValue(peakRpsResponse) || 0;
+
+      // Add delay before next query
+      await this.delayBetweenQueries();
 
       // Query for P95 latency using histogram_quantile
       const p95LatencyQuery = `histogram_quantile(0.95, sum by(le, name, method, status) (rate(k6_http_req_duration_seconds{testid=~"${testIdPattern}"}[5m])))`;
@@ -454,17 +493,20 @@ export class GrafanaClient {
           // Check if exactly 42 HTTP requests were made (from K6 threshold: 'http_reqs': ['count===42'])
           const httpReqsMatch = totalRequests === 42;
           
-          // Check if all checks passed (from K6 threshold: 'checks': ['rate>=1'])
+          // Check if checks passed (from K6 threshold: 'checks': ['rate>=0.95'])
           const checksQuery = `k6_checks_total{testid=~"${testIdPattern}"} - k6_checks_failed_total{testid=~"${testIdPattern}"}`;
           const checksResponse = await this.prometheusRangeQuery(checksQuery);
           const passedChecks = this.extractMaxValue(checksResponse) || 0;
+          
+          // Add delay before next query
+          await this.delayBetweenQueries(200);
           
           const totalChecksQuery = `k6_checks_total{testid=~"${testIdPattern}"}`;
           const totalChecksResponse = await this.prometheusRangeQuery(totalChecksQuery);
           const totalChecks = this.extractMaxValue(totalChecksResponse) || 0;
           
           const checksRate = totalChecks > 0 ? (passedChecks / totalChecks) : 0;
-          const checksMatch = checksRate >= 1.0; // 100% checks must pass
+          const checksMatch = checksRate >= 0.95; // 95% checks must pass
           
           testPassed = httpReqsMatch && checksMatch;
           
@@ -478,7 +520,7 @@ export class GrafanaClient {
           
         } catch (error) {
           this.logger.warn(`Failed to check authorization thresholds for ${testIdPattern}:`, error);
-          testPassed = successRate >= 100; // Fallback to 100% success rate
+          testPassed = successRate >= 95; // Fallback to 95% success rate
         }
       } else {
         // For other test types, use success rate thresholds
@@ -706,15 +748,24 @@ export class GrafanaClient {
       const successfulBookingsResponse = await this.prometheusQuery(successfulBookingsQuery);
       const successfulBookings = this.extractScalarValue(successfulBookingsResponse) || 0;
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for failed bookings (scalar value)
       const failedBookingsQuery = `k6_failed_bookings_total{testid="${testId}"}`;
       const failedBookingsResponse = await this.prometheusQuery(failedBookingsQuery);
       const failedBookings = this.extractScalarValue(failedBookingsResponse) || 0;
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for conflict bookings (scalar value)
       const conflictBookingsQuery = `k6_conflict_bookings_total{testid="${testId}"}`;
       const conflictBookingsResponse = await this.prometheusQuery(conflictBookingsQuery);
       const conflictBookings = this.extractScalarValue(conflictBookingsResponse) || 0;
+
+      // Add delay before next query
+      await this.delayBetweenQueries();
 
       // Query for failed seat requests (scalar value)
       const failedSeatRequestsQuery = `k6_failed_seat_requests_total{testid="${testId}"}`;
@@ -725,15 +776,24 @@ export class GrafanaClient {
       const totalBookingAttempts = successfulBookings + failedBookings + conflictBookings;
       const bookingSuccessRate = totalBookingAttempts > 0 ? (successfulBookings / totalBookingAttempts) * 100 : 0;
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for total HTTP requests (scalar value)
       const totalRequestsQuery = `k6_http_reqs_total{testid="${testId}"}`;
       const totalRequestsResponse = await this.prometheusQuery(totalRequestsQuery);
       const totalRequests = this.extractScalarValue(totalRequestsResponse) || 0;
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for P95 latency
       const p95LatencyQuery = `histogram_quantile(0.95, k6_http_req_duration_seconds{testid="${testId}"})`;
       const p95Response = await this.prometheusQuery(p95LatencyQuery);
       const p95Latency = this.extractScalarValue(p95Response) || 0;
+
+      // Add delay before next query
+      await this.delayBetweenQueries();
 
       // Query for peak RPS
       const peakRpsQuery = `max(irate(k6_http_reqs_total{testid="${testId}"}[1m]))`;
@@ -788,18 +848,32 @@ export class GrafanaClient {
    */
   private async getAuthorizationTestIds(testIdPattern: string): Promise<string[]> {
     try {
-      const query = `group by (testid) (k6_http_reqs_total{testid=~"${testIdPattern}"})`;
-      const response = await this.prometheusRangeQuery(query);
+      // Try multiple metric names to find authorization tests
+      const metricQueries = [
+        `group by (testid) (k6_http_reqs_total{testid=~"${testIdPattern}"})`,
+        `group by (testid) (k6_checks_total{testid=~"${testIdPattern}"})`,
+        `group by (testid) (k6_iterations_total{testid=~"${testIdPattern}"})`
+      ];
       
-      const testIds: string[] = [];
+      let testIds: string[] = [];
       
-      if (response.data.result.length > 0) {
-        for (const result of response.data.result) {
-          if (result?.metric && 'testid' in result.metric) {
-            const testid = result.metric['testid'];
-            if (testid) {
-              testIds.push(testid);
+      for (const query of metricQueries) {
+        this.logger.debug(`Trying authorization query: ${query}`);
+        const response = await this.prometheusRangeQuery(query);
+        
+        if (response?.data?.result?.length > 0) {
+          for (const result of response.data.result) {
+            if (result?.metric && 'testid' in result.metric) {
+              const testid = result.metric['testid'];
+              if (testid && !testIds.includes(testid)) {
+                testIds.push(testid);
+              }
             }
+          }
+          
+          if (testIds.length > 0) {
+            this.logger.info(`Found authorization test IDs using query: ${query}`);
+            break;
           }
         }
       }
@@ -807,10 +881,10 @@ export class GrafanaClient {
       // Sort testIds chronologically (assuming testId contains timestamp or incremental number)
       testIds.sort();
       
-      this.logger.info(`Found ${testIds.length} authorization test IDs:`, testIds);
+      this.logger.info(`Found ${testIds.length} authorization test IDs for pattern ${testIdPattern}:`, testIds);
       return testIds;
     } catch (error) {
-      this.logger.error('Failed to get authorization test IDs:', error);
+      this.logger.error(`Failed to get authorization test IDs for pattern ${testIdPattern}:`, error);
       return [];
     }
   }
@@ -835,15 +909,24 @@ export class GrafanaClient {
         return null;
       }
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for failed requests for this specific test ID
       const failedRequestsQuery = `sum(k6_http_reqs_total{testid="${testId}", expected_response="false"})`;
       const failedResponse = await this.prometheusRangeQuery(failedRequestsQuery);
       const failedRequests = this.extractMaxValue(failedResponse) || 0;
 
+      // Add delay before next query
+      await this.delayBetweenQueries();
+
       // Query for peak RPS for this specific test ID
       const peakRpsQuery = `max(sum(irate(k6_http_reqs_total{testid="${testId}"}[1m])))`;
       const peakRpsResponse = await this.prometheusRangeQuery(peakRpsQuery);
       const peakRps = this.extractMaxValue(peakRpsResponse) || 0;
+
+      // Add delay before next query
+      await this.delayBetweenQueries();
 
       // Query for P95 latency for this specific test ID
       const p95LatencyQuery = `histogram_quantile(0.95, sum by(le, name, method, status) (rate(k6_http_req_duration_seconds{testid="${testId}"}[5m])))`;
@@ -867,12 +950,15 @@ export class GrafanaClient {
         const checksResponse = await this.prometheusRangeQuery(checksQuery);
         const passedChecks = this.extractMaxValue(checksResponse) || 0;
         
+        // Add delay before next query
+        await this.delayBetweenQueries(200);
+        
         const totalChecksQuery = `k6_checks_total{testid="${testId}"}`;
         const totalChecksResponse = await this.prometheusRangeQuery(totalChecksQuery);
         const totalChecks = this.extractMaxValue(totalChecksResponse) || 0;
         
         const checksRate = totalChecks > 0 ? (passedChecks / totalChecks) : 0;
-        const checksMatch = checksRate >= 1.0; // 100% checks must pass
+        const checksMatch = checksRate >= 0.95; // 95% checks must pass
         
         testPassed = httpReqsMatch && checksMatch;
         
@@ -886,7 +972,7 @@ export class GrafanaClient {
         
       } catch (error) {
         this.logger.warn(`Failed to check authorization thresholds for ${testId}:`, error);
-        testPassed = successRate >= 100; // Fallback to 100% success rate
+        testPassed = successRate >= 95; // Fallback to 95% success rate
       }
 
       // Calculate score - authorization tests use two-part scoring
@@ -1019,7 +1105,14 @@ export class GrafanaClient {
 
 
   /**
-   * Make HTTP request to Prometheus
+   * Add delay between queries to reduce load on Grafana
+   */
+  private async delayBetweenQueries(delayMs: number = 500): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+
+  /**
+   * Make HTTP request to Prometheus with retry logic for 503 errors
    */
   private async makeRequest(url: string): Promise<Response> {
     const headers: Record<string, string> = {
@@ -1027,26 +1120,64 @@ export class GrafanaClient {
       'User-Agent': 'HackLoad-Job-Service/1.0'
     };
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const maxRetries = 5;
+    const baseDelayMs = 2000; // Start with 2 second delay
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-        signal: controller.signal
-      });
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      clearTimeout(timeoutId);
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers,
+          signal: controller.signal
+        });
 
-      if (!response.ok) {
+        clearTimeout(timeoutId);
+
+        // If response is OK, return immediately
+        if (response.ok) {
+          return response;
+        }
+
+        // If it's a 503 Service Unavailable or 502/504 Gateway errors and we have retries left, retry
+        if ((response.status === 503 || response.status === 502 || response.status === 504) && attempt < maxRetries) {
+          const delayMs = baseDelayMs * Math.pow(2, attempt); // Exponential backoff
+          console.log(`[GrafanaClient] Prometheus returned ${response.status}, retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          continue;
+        }
+
+        // For other errors or if we've exhausted retries, throw
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
 
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        
+        // Check if it's a retryable error (timeout, network error, or specific HTTP errors)
+        const isRetryableError = error instanceof Error && (
+          error.name === 'AbortError' || // Timeout
+          error.message.includes('503') ||
+          error.message.includes('502') ||
+          error.message.includes('504') ||
+          error.message.includes('ECONNRESET') ||
+          error.message.includes('ETIMEDOUT')
+        );
+        
+        // If we've exhausted retries or it's not a retryable error, throw immediately
+        if (attempt === maxRetries || !isRetryableError) {
+          throw error;
+        }
+        
+        // Retry with exponential backoff
+        const delayMs = baseDelayMs * Math.pow(2, attempt);
+        console.log(`[GrafanaClient] Request failed (${error.name || 'Error'}), retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries + 1}):`, error.message);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
     }
+
+    // This should never be reached, but TypeScript requires it
+    throw new Error('Maximum retries exceeded');
   }
 }

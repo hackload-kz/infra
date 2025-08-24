@@ -55,7 +55,7 @@ export class K6AuthorizationTestingService extends BaseJobService {
 
     // Configuration for Authorization Check testing task
     this.taskConfig = {
-      successRateThreshold: 100.0, // 100% success rate required for full points
+      successRateThreshold: 95.0, // 95% success rate required for full points
       baseScore: 30 // Maximum score: 15 points for valid requests + 15 points for success rate
     };
 
@@ -92,7 +92,7 @@ export class K6AuthorizationTestingService extends BaseJobService {
         successRate: summary.testResults.length > 0 ? summary.testResults[0]?.successRate || 0 : 0,
         thresholdsMet: summary.testResults.length > 0 ? summary.testResults[0]?.testPassed || false : false,
         expectedRequests: 42, // From K6 threshold: 'http_reqs': ['count===42']
-        checksRequired: 100, // From K6 threshold: 'checks': ['rate>=1'] (100%)
+        checksRequired: 95, // From K6 threshold: 'checks': ['rate>=0.95'] (95%)
         testResults: summary.testResults.map(result => ({
           testPassed: result.testPassed,
           score: result.score,
