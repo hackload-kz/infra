@@ -6,7 +6,7 @@ export const criteriaUpdateSchema = z.object({
   hackathonId: z.string().min(1),
   criteriaType: z.nativeEnum(CriteriaType),
   status: z.nativeEnum(CriteriaStatus),
-  score: z.number().int().min(0).optional(),
+  score: z.number().min(0).optional(),
   metrics: z.record(z.any()).optional(),
   updatedBy: z.string().min(1)
 })
@@ -17,7 +17,7 @@ export const bulkCriteriaUpdateSchema = z.object({
 
 export const singleCriteriaUpdateSchema = z.object({
   status: z.nativeEnum(CriteriaStatus),
-  score: z.number().int().min(0).optional(),
+  score: z.number().min(0).optional(),
   metrics: z.record(z.any()).optional(),
   updatedBy: z.string().min(1)
 })

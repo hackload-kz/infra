@@ -49,8 +49,8 @@ export class JudgeScoreService extends BaseJobService {
         };
       }
 
-      // Clamp score to maximum of 10 points
-      const clampedScore = Math.min(Math.max(0, judgeScore), 10);
+      // Clamp score to maximum of 10 points and round to nearest integer
+      const clampedScore = Math.round(Math.min(Math.max(0, judgeScore), 10));
 
       this.log('info', `Team ${team.nickname} judge score: ${clampedScore}/10`);
 
