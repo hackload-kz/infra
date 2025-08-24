@@ -49,23 +49,19 @@ export function loadConfig(): AppConfig {
       dashboardBaseUrl: getOptionalEnvVar('GRAFANA_DASHBOARD_BASE_URL', 'https://hub.hackload.kz/grafana') as string,
     },
     
-    costTracking: {
-      enabled: getBooleanEnvVar('COST_TRACKING_ENABLED', true),
-      interval: getOptionalEnvVar('COST_TRACKING_INTERVAL', '0 */6 * * *') as string,
-      timeout: getNumberEnvVar('COST_TRACKING_TIMEOUT', 600000),
-      retries: getNumberEnvVar('COST_TRACKING_RETRIES', 2),
-      aws: {
-        accessKeyId: getOptionalEnvVar('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: getOptionalEnvVar('AWS_SECRET_ACCESS_KEY'),
-      },
-      azure: {
-        clientId: getOptionalEnvVar('AZURE_CLIENT_ID'),
-        clientSecret: getOptionalEnvVar('AZURE_CLIENT_SECRET'),
-        tenantId: getOptionalEnvVar('AZURE_TENANT_ID'),
-      },
-      gcp: {
-        serviceAccountKey: getOptionalEnvVar('GCP_SERVICE_ACCOUNT_KEY'),
-      },
+    
+    budgetTracking: {
+      enabled: getBooleanEnvVar('BUDGET_TRACKING_ENABLED', true),
+      interval: getOptionalEnvVar('BUDGET_TRACKING_INTERVAL', '*/15 * * * *') as string,
+      timeout: getNumberEnvVar('BUDGET_TRACKING_TIMEOUT', 120000),
+      retries: getNumberEnvVar('BUDGET_TRACKING_RETRIES', 3),
+    },
+    
+    judgeScore: {
+      enabled: getBooleanEnvVar('JUDGE_SCORE_ENABLED', true),
+      interval: getOptionalEnvVar('JUDGE_SCORE_INTERVAL', '*/10 * * * *') as string,
+      timeout: getNumberEnvVar('JUDGE_SCORE_TIMEOUT', 60000),
+      retries: getNumberEnvVar('JUDGE_SCORE_RETRIES', 3),
     },
     
     database: {

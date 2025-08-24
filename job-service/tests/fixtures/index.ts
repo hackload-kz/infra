@@ -188,12 +188,6 @@ export const testServiceConfigs = {
     timeout: 1200000,
     retries: 1
   },
-  costTracking: {
-    enabled: false,
-    interval: '0 */6 * * *',
-    timeout: 600000,
-    retries: 2
-  }
 };
 
 // Test environment configurations
@@ -206,7 +200,6 @@ export const testEnvironments = {
     GIT_MONITOR_ENABLED: 'false',
     DEPLOYMENT_MONITOR_ENABLED: 'false',
     K6_SERVICES_ENABLED: 'false',
-    COST_TRACKING_ENABLED: 'false'
   },
   withServices: {
     NODE_ENV: 'test',
@@ -216,7 +209,6 @@ export const testEnvironments = {
     GIT_MONITOR_ENABLED: 'true',
     DEPLOYMENT_MONITOR_ENABLED: 'true',
     K6_SERVICES_ENABLED: 'false',
-    COST_TRACKING_ENABLED: 'false',
     GITHUB_TOKEN: 'test-github-token',
     HTTP_TIMEOUT: '15000'
   },
@@ -228,12 +220,9 @@ export const testEnvironments = {
     GIT_MONITOR_ENABLED: 'true',
     DEPLOYMENT_MONITOR_ENABLED: 'true',
     K6_SERVICES_ENABLED: 'true',
-    COST_TRACKING_ENABLED: 'true',
     GITHUB_TOKEN: 'github-token',
     GRAFANA_API_URL: 'https://grafana.hackload.kz/api',
     GRAFANA_TOKEN: 'grafana-token',
-    AWS_ACCESS_KEY_ID: 'aws-key',
-    AWS_SECRET_ACCESS_KEY: 'aws-secret',
     HTTP_TIMEOUT: '10000',
     HEALTH_CHECK_PORT: '8080',
     METRICS_PORT: '9090'

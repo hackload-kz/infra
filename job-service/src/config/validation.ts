@@ -37,7 +37,6 @@ export function validateConfig(config: AppConfig): void {
   validateCronInterval(config.gitMonitor.interval, 'GIT_MONITOR_INTERVAL');
   validateCronInterval(config.deploymentMonitor.interval, 'DEPLOYMENT_MONITOR_INTERVAL');
   validateCronInterval(config.k6Services.interval, 'K6_SERVICES_INTERVAL');
-  validateCronInterval(config.costTracking.interval, 'COST_TRACKING_INTERVAL');
 
   // Git monitor specific validation
   if (config.gitMonitor.enabled) {

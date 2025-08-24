@@ -23,19 +23,17 @@ export interface K6ServicesConfig extends ServiceConfig {
   dashboardBaseUrl: string;
 }
 
-export interface CostTrackingConfig extends ServiceConfig {
-  aws?: {
-    accessKeyId?: string;
-    secretAccessKey?: string;
-  };
-  azure?: {
-    clientId?: string;
-    clientSecret?: string;
-    tenantId?: string;
-  };
-  gcp?: {
-    serviceAccountKey?: string;
-  };
+
+export interface BudgetTrackingConfig extends ServiceConfig {
+  // Configuration for budget tracking service
+  // Reads MONEY_SPEND from team environment variables
+  // Uses dynamic scoring: min spend = 30 pts, max spend = 5 pts
+}
+
+export interface JudgeScoreConfig extends ServiceConfig {
+  // Configuration for judge score service
+  // Reads JUDJE_SCORE from team environment variables
+  // Maximum 10 points, blank when 0 or null
 }
 
 export interface DatabaseConfig {
@@ -76,7 +74,8 @@ export interface AppConfig {
   gitMonitor: GitMonitorConfig;
   deploymentMonitor: DeploymentMonitorConfig;
   k6Services: K6ServicesConfig;
-  costTracking: CostTrackingConfig;
+  budgetTracking: BudgetTrackingConfig;
+  judgeScore: JudgeScoreConfig;
   
   // Database Configuration (optional direct access)
   database: DatabaseConfig;

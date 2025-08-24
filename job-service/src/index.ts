@@ -109,26 +109,24 @@ async function main(): Promise<void> {
     }
     
     // Register Budget Tracking Service (BUDGET_TRACKING)
-    const budgetTrackingService = new BudgetTrackingService();
-    budgetTrackingService.setApiClient(apiClient);
-    scheduler.registerService(budgetTrackingService, {
-      enabled: true,
-      interval: '*/15 * * * *', // Every 15 minutes
-      timeout: 120000,
-      retries: 3
-    });
-    logger.info('Budget Tracking Service (BUDGET_TRACKING) registered with interval: */15 * * * *');
+    if (config.budgetTracking.enabled) {
+      const budgetTrackingService = new BudgetTrackingService();
+      budgetTrackingService.setApiClient(apiClient);
+      scheduler.registerService(budgetTrackingService, config.budgetTracking);
+      logger.info(`Budget Tracking Service (BUDGET_TRACKING) registered with interval: ${config.budgetTracking.interval}`);
+    } else {
+      logger.info('Budget Tracking Service (BUDGET_TRACKING) disabled');
+    }
     
     // Register Judge Score Service (JUDGE_SCORE)
-    const judgeScoreService = new JudgeScoreService();
-    judgeScoreService.setApiClient(apiClient);
-    scheduler.registerService(judgeScoreService, {
-      enabled: true,
-      interval: '*/10 * * * *', // Every 10 minutes
-      timeout: 60000,
-      retries: 3
-    });
-    logger.info('Judge Score Service (JUDGE_SCORE) registered with interval: */10 * * * *');
+    if (config.judgeScore.enabled) {
+      const judgeScoreService = new JudgeScoreService();
+      judgeScoreService.setApiClient(apiClient);
+      scheduler.registerService(judgeScoreService, config.judgeScore);
+      logger.info(`Judge Score Service (JUDGE_SCORE) registered with interval: ${config.judgeScore.interval}`);
+    } else {
+      logger.info('Judge Score Service (JUDGE_SCORE) disabled');
+    }
     
     // Create and start health server
     logger.info('Starting health and metrics servers...');
